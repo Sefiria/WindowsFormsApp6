@@ -46,12 +46,6 @@ namespace WindowsFormsApp6.World
             UIButton b;
             int x = 20, y = 50;
 
-            b = new UIButton(Resources.returnback.Transparent(), x, y);
-            b.ID = "Bouton Retour";
-            UI.Add(b);
-            x = b.X + b.W + 20;
-            b.OnClick += (s, a) => Data.Instance.State = PreviousState;
-
             b = new UIButton("Acheter", x, y);
             b.ID = "Bouton Acheter";
             UI.Add(b);

@@ -52,12 +52,18 @@ namespace WindowsFormsApp6
                 TypeNameHandling = TypeNameHandling.Objects
             };
 
+
+            UI.Add(new UIButton(Resources.returnback.Transparent(), 10, 10));
+            UI.Last().OnClick += (_s, _e) => { if (Data.Instance.State.PreviousState != null) Data.Instance.State = Data.Instance.State.PreviousState; };
+
+
             UI.Add(new UIButton("Inventaire", 0, 10));
             x = Core.W - UI.Last().W - 10;
             UI.Last().X = x;
             UI.Last().OnClick += (_s, _e) =>
             {
                 Data.Instance.Inventory.Refresh();
+                Data.Instance.Inventory.PreviousState = Data.Instance.World;
                 Data.Instance.State = Data.Instance.Inventory;
             };
 
@@ -103,10 +109,10 @@ namespace WindowsFormsApp6
 
             Data.Instance.State.Draw();
 
-            Core.g.DrawImage(CoinIco, 10, 16);
-            Core.g.DrawString(Data.Instance.StatInfo.Money.ToString(), DefaultFont, Brushes.White, 28, 18);
+            Core.g.DrawImage(CoinIco, 60, 16);
+            Core.g.DrawString(Data.Instance.StatInfo.Money.ToString(), DefaultFont, Brushes.White, 78, 18);
             int w = (int)Core.g.MeasureString(Data.Instance.StatInfo.Money.ToString(), DefaultFont).Width;
-            DrawOres(38 + w);
+            DrawOres(88 + w);
             DrawUI();
 
             Render.Image = Image;

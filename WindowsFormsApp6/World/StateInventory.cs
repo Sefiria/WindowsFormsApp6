@@ -16,6 +16,7 @@ namespace WindowsFormsApp6.World
         [JsonIgnore] public Bitmap StaticImage { get; set; }
         public List<Particule> Particules { get; set; } = new List<Particule>();
         public List<IUI> UI { get; set; } = new List<IUI>();
+        public IState PreviousState { get; set; } = null;
 
         public StateInventory()
         {

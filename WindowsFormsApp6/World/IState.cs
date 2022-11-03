@@ -15,6 +15,7 @@ namespace WindowsFormsApp6.World
         int TileSz { get; }
         [JsonIgnore] Bitmap StaticImage { get; set; }
         List<Particule> Particules { get; set; }
+        IState PreviousState { get; set; }
         void Update();
         void Draw();
         void DrawStatic();

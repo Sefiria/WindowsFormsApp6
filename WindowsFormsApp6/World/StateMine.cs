@@ -15,6 +15,7 @@ namespace WindowsFormsApp6.World
         public int TileSz => 64;
         IBloc[,] Blocs { get; set; } = new IBloc[BlocCount, BlocCount];
         [JsonIgnore] public Bitmap StaticImage { get; set; }
+        public IState PreviousState { get; set; } = null;
         public List<Particule> Particules { get; set; } = new List<Particule>();
 
         public StateMine()
