@@ -1,17 +1,17 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using WindowsFormsApp6.World.Blocs.Tool;
 using WindowsFormsApp6.World.Ores;
+using WindowsFormsApp6.World.WorldResources;
 
 namespace WindowsFormsApp6
 {
     [Serializable]
     public class Inventory
     {
-        private List<Item<ToolPickaxe>> m_Pickaxes = new List<Item<ToolPickaxe>>();
-        [JsonIgnore] public List<Item<ToolPickaxe>> Pickaxes { get => m_Pickaxes; set => m_Pickaxes = value; }
+        public List<Item<ToolPickaxe>> Pickaxes { get; set; } = new List<Item<ToolPickaxe>>();
+        public List<Item<BasicResource>> BasicResources { get; set; } = new List<Item<BasicResource>>();
         public int UsedPickaxeID { get; set; } = -1;
         public ToolPickaxe GetUsedPickaxe() => Pickaxes[UsedPickaxeID].ItemRef;
 
@@ -30,6 +30,13 @@ namespace WindowsFormsApp6
                     Pickaxes.Add(new Item<ToolPickaxe>(pickaxe));
                     break;
             }
+        }
+        public void AddResource<T>(T item, int count = 1) where T : BasicResource
+        {
+            if (BasicResources.Any(x => x.ItemRef is T))
+                BasicResources.First(x => x.ItemRef is T).Count++;
+            else
+                BasicResources.Add(new Item<BasicResource>(item, count));
         }
         public void UsePickaxe(ToolPickaxe pickaxe)
         {

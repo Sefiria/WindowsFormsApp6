@@ -21,10 +21,10 @@ namespace WindowsFormsApp6.World
 
             if ((int)explosionSize > 0)
             {
-                new Particule(x.ToWorld(rndWithinTile()), y.ToWorld(rndWithinTile()), -3F, -3F, Image);
-                new Particule(x.ToWorld(rndWithinTile()), y.ToWorld(rndWithinTile()), -3F, 3F, Image);
-                new Particule(x.ToWorld(rndWithinTile()), y.ToWorld(rndWithinTile()), 3F, -3F, Image);
-                new Particule(x.ToWorld(rndWithinTile()), y.ToWorld(rndWithinTile()), 3F, 3F, Image);
+                new Particule(x.ToCurWorld(rndWithinTile()), y.ToCurWorld(rndWithinTile()), -3F, -3F, Image);
+                new Particule(x.ToCurWorld(rndWithinTile()), y.ToCurWorld(rndWithinTile()), -3F, 3F, Image);
+                new Particule(x.ToCurWorld(rndWithinTile()), y.ToCurWorld(rndWithinTile()), 3F, -3F, Image);
+                new Particule(x.ToCurWorld(rndWithinTile()), y.ToCurWorld(rndWithinTile()), 3F, 3F, Image);
             }
 
             int min, max;
@@ -38,7 +38,7 @@ namespace WindowsFormsApp6.World
 
             var rnd = Tools.RND.Next(min, max);
             for(int i=0; i< rnd; i++)
-                new Particule(x.ToWorld(rndWithinTile()), y.ToWorld(rndWithinTile()), Tools.RND.Next(70) / 10F - 3F, Tools.RND.Next(70) / 10F - 3F, Image);
+                new Particule(x.ToCurWorld(rndWithinTile()), y.ToCurWorld(rndWithinTile()), Tools.RND.Next(70) / 10F - 3F, Tools.RND.Next(70) / 10F - 3F, Image);
         }
 
         public static IBloc Generate(int x, int y, int layer, bool withOre = false)

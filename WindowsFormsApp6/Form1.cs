@@ -6,10 +6,8 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using System.Windows.Input;
 using WindowsFormsApp6.Properties;
 using WindowsFormsApp6.UI;
-using WindowsFormsApp6.World.Blocs;
 using WindowsFormsApp6.World.Ores;
 using MouseEventArgs = System.Windows.Forms.MouseEventArgs;
 
@@ -95,12 +93,8 @@ namespace WindowsFormsApp6
 
         private new void Update()
         {
+            Data.Instance.World.IdleUpdate();
             Data.Instance.State.Update();
-
-            if (Keyboard.IsKeyDown(Key.A))
-                Data.Instance.State = Data.Instance.World;
-            else if (Keyboard.IsKeyDown(Key.Z))
-                Data.Instance.State = Data.Instance.Mine;
         }
 
         private void Draw()
@@ -113,6 +107,7 @@ namespace WindowsFormsApp6
             Core.g.DrawString(Data.Instance.StatInfo.Money.ToString(), DefaultFont, Brushes.White, 78, 18);
             int w = (int)Core.g.MeasureString(Data.Instance.StatInfo.Money.ToString(), DefaultFont).Width;
             DrawOres(88 + w);
+            DrawBasicResources(50 + w);
             DrawUI();
 
             Render.Image = Image;
@@ -126,6 +121,15 @@ namespace WindowsFormsApp6
                 x += (int)Core.g.MeasureString(ore.Value.ToString(), DefaultFont).Width + 28;
             }
         }
+        private void DrawBasicResources(int x)
+        {
+            foreach (var basic in Data.Instance.StatInfo.Inventory.BasicResources)
+            {
+                Core.g.DrawImage(basic.ItemRef.Image, x, 38);
+                Core.g.DrawString(basic.Count.ToString(), DefaultFont, Brushes.White, x + 26, 42);
+                x += (int)Core.g.MeasureString(basic.Count.ToString(), DefaultFont).Width + 36;
+            }
+        }
         private void DrawUI()
         {
             foreach (var ui in UI)
@@ -134,6 +138,9 @@ namespace WindowsFormsApp6
 
         private void Render_MouseMove(object sender, MouseEventArgs e)
         {
+            if (e.X < 0 || e.Y < 0 || e.X >= Core.W || e.Y >= Core.H)
+                return;
+
             Core.MousePosition = e.Location;
         }
 

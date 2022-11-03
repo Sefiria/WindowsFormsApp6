@@ -163,13 +163,22 @@
   <data name="stone" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\stone.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="structure_factory" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\structure_factory.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="structure_mine" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\structure_mine.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="structure_shop" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\structure_shop.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="tronc" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\tronc.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="unit" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\unit.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="unit_selected" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\unit_selected.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

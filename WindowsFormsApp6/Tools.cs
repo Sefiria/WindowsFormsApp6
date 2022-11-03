@@ -13,7 +13,8 @@ namespace WindowsFormsApp6
         public static Random RND = new Random((int)DateTime.Now.Ticks);
         public static int Snap(this int v) => v / Data.Instance.State.TileSz * Data.Instance.State.TileSz;
         public static int ToUnit(this int v) => v / Data.Instance.State.TileSz;
-        public static int ToWorld(this int v, int offset = 0) => v * Data.Instance.State.TileSz + offset;
+        public static int ToCurWorld(this int v, int offset = 0) => v * Data.Instance.State.TileSz + offset;
+        public static int ToWorld(this int v, int offset = 0) => v * Data.Instance.World.TileSz + offset;
         public static Bitmap Resized(this Bitmap img, int w, int h) => new Bitmap(img, w, h);
         public static Bitmap Resized(this Bitmap img, int sz) => img.Resized(sz, sz);
         public static Bitmap Transparent(this Bitmap img) { var b = new Bitmap(img); b.MakeTransparent(); return b; }

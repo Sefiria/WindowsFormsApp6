@@ -34,6 +34,7 @@ namespace WindowsFormsApp6
         public StateWorld World { get; set; }
         public StateMine Mine { get; set; }
         public StateShop Shop { get; set; }
+        public StateFactory Factory { get; set; }
         public StateInventory Inventory { get; set; }
         public StatInfo StatInfo { get; set; } = new StatInfo();
 
@@ -47,6 +48,8 @@ namespace WindowsFormsApp6
             World.InitializeWorld();
 
             Shop = new StateShop();
+
+            Factory = new StateFactory();
 
             Inventory = new StateInventory();
 

@@ -16,6 +16,15 @@ namespace WindowsFormsApp6.Particules
         [JsonIgnore] private Bitmap Image;
         private int LifeTime = 30;
 
+        public Particule(int x, int y, Bitmap image)
+        {
+            X = x;
+            Y = y;
+            VecX = Tools.RND.Next(-100, 100) / 1000F;
+            VecY = Tools.RND.Next(-100, 100) / 1000F;
+            Image = SmallImg(image);
+            Data.Instance.State.Particules.Add(this);
+        }
         public Particule(int x, int y, float vecX, float vecY, Bitmap image)
         {
             X = x;
@@ -34,11 +43,11 @@ namespace WindowsFormsApp6.Particules
             return smallimg;
         }
 
-        public void Update()
+        public void Update(float gravity = 0.2F)
         {
             X += VecX;
             Y += VecY;
-            VecY += 0.2F;
+            VecY += gravity;
 
             LifeTime--;
             if(LifeTime <= 0)
@@ -53,6 +62,19 @@ namespace WindowsFormsApp6.Particules
         public void Draw()
         {
             Core.g.DrawImage(Image, X, Y);
+        }
+
+        public static List<Particule> RangeRND(int x, int y, int count, Bitmap img, int lifeTime = 30)
+        {
+            var result = new List<Particule>();
+            Particule p;
+            for (int i = 0; i < count; i++)
+            {
+                p = new Particule(x, y, img);
+                p.LifeTime = lifeTime;
+                result.Add(p);
+            }
+            return result;
         }
     }
 }

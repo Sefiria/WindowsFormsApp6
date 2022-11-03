@@ -24,6 +24,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -33,6 +34,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -92,6 +94,7 @@
     <Compile Include="FullMoney.cs" />
     <Compile Include="Inventory.cs" />
     <Compile Include="Item.cs" />
+    <Compile Include="Maths.cs" />
     <Compile Include="Particules\Particule.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -102,6 +105,7 @@
     <Compile Include="World\Blocs\BlocBase.cs" />
     <Compile Include="World\Blocs\Consommables\ConsoTree.cs" />
     <Compile Include="World\Blocs\Consommables\ConsoBase.cs" />
+    <Compile Include="World\Blocs\Consommables\IReGrowable.cs" />
     <Compile Include="World\Blocs\Tool\ToolPickaxe.cs" />
     <Compile Include="World\Blocs\Tool\ToolBase.cs" />
     <Compile Include="World\Blocs\Tool\ITool.cs" />
@@ -115,7 +119,11 @@
     <Compile Include="World\Blocs\BlocDirt.cs" />
     <Compile Include="World\BlocGenerator.cs" />
     <Compile Include="World\Blocs\IBloc.cs" />
-    <Compile Include="World\Ores\Ore.cs" />
+    <Compile Include="World\StateFactory.cs" />
+    <Compile Include="World\Structures\StructureFactory.cs" />
+    <Compile Include="World\WorldResources\BasicResource.cs" />
+    <Compile Include="World\WorldResources\BoisBrut.cs" />
+    <Compile Include="World\WorldResources\Ores\Ore.cs" />
     <Compile Include="World\StateMine.cs" />
     <Compile Include="World\StateInventory.cs" />
     <Compile Include="World\StateTemplate.cs" />
@@ -195,8 +203,11 @@
     <None Include="Resources\returnback.bmp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\unit_selected.bmp" />
     <None Include="Resources\unit.bmp" />
     <Content Include="Resources\conso_tree.png" />
+    <None Include="Resources\structure_factory.bmp" />
+    <Content Include="Resources\tronc.png" />
     <Content Include="Resources\conso_tronc.png" />
   </ItemGroup>
   <ItemGroup />

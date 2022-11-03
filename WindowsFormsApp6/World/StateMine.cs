@@ -96,6 +96,7 @@ namespace WindowsFormsApp6.World
                     }
                 }
 
+                int TimeOut = 0;
                 do
                 {
                     DoHit(x, y, 0);
@@ -110,8 +111,9 @@ namespace WindowsFormsApp6.World
                         DoHit(x - i, y + i, i);
                         DoHit(x + i, y - i, i);
                     }
+                    TimeOut++;
                 }
-                while (restingDamage > 0);
+                while (restingDamage > 0 && TimeOut < 1000);
             }
         }
     }
