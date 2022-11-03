@@ -16,6 +16,7 @@ namespace WindowsFormsApp6.World
         public int TileSz => Core.TileSzBase;
         public IBloc[,] Blocs { get; set; } = new IBloc[BlocCount, BlocCount];
         [JsonIgnore] public Bitmap StaticImage { get; set; }
+        public IState PreviousState { get; set; } = null;
         public List<Particule> Particules { get; set; } = new List<Particule>();
 
         public StateWorld()
@@ -34,6 +35,7 @@ namespace WindowsFormsApp6.World
         public void InitializeWorld()
         {
             ReplaceBloc(4, 4, new BlocGrass(4, 4), new StructureShop(4, 4));
+            ReplaceBloc(12, 6, new BlocGrass(12, 6), new StructureMine(12, 6));
         }
 
         public void Update()

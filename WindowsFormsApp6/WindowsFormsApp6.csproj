@@ -117,6 +117,7 @@
     <Compile Include="World\StateTemplate.cs" />
     <Compile Include="World\StateShop.cs" />
     <Compile Include="World\StateWorld.cs" />
+    <Compile Include="World\Structures\StructureMine.cs" />
     <Compile Include="World\Structures\StructureShop.cs" />
     <Compile Include="World\Structures\StructureBase.cs" />
     <Compile Include="World\Structures\IStructure.cs" />
@@ -188,6 +189,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\returnback.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\structure_mine.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\structure_template.bmp" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Text.Json.6.0.6\build\System.Text.Json.targets" Condition="Exists('..\packages\System.Text.Json.6.0.6\build\System.Text.Json.targets')" />

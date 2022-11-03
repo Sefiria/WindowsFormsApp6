@@ -176,20 +176,34 @@ namespace WindowsFormsApp6
         }
         public void Multiply(int count)
         {
+            var _K = K;
+            var _M = M;
+            var _B = B;
+            var _T = T;
+            var _kT = kT;
+            var _mT = mT;
+            var _bT = bT;
+            var _tT = tT;
+            var _U = U;
+            var _KU = KU;
+            var _MU = MU;
+            var _BU = BU;
+            var _TU = TU;
+
             Units *= count;
-            K *= count;
-            M *= count;
-            B *= count;
-            T *= count;
-            kT *= count;
-            mT *= count;
-            bT *= count;
-            tT *= count;
-            U *= count;
-            KU *= count;
-            MU *= count;
-            BU *= count;
-            TU *= count;
+            K += _K *count;
+            M += _M * count;
+            B += _B * count;
+            T += _T * count;
+            kT += _kT * count;
+            mT += _mT * count;
+            bT += _bT * count;
+            tT += _tT * count;
+            U += _U * count;
+            KU += _KU * count;
+            MU += _MU * count;
+            BU += _BU * count;
+            TU += _TU * count;
         }
         public bool GreaterThan(FullMoney money)
         {
