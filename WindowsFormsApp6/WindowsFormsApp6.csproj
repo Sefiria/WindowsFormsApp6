@@ -100,9 +100,13 @@
     <Compile Include="UI\UIBase.cs" />
     <Compile Include="UI\IUI.cs" />
     <Compile Include="World\Blocs\BlocBase.cs" />
+    <Compile Include="World\Blocs\Consommables\ConsoTree.cs" />
+    <Compile Include="World\Blocs\Consommables\ConsoBase.cs" />
     <Compile Include="World\Blocs\Tool\ToolPickaxe.cs" />
     <Compile Include="World\Blocs\Tool\ToolBase.cs" />
     <Compile Include="World\Blocs\Tool\ITool.cs" />
+    <Compile Include="World\Entities\Entity.cs" />
+    <Compile Include="World\Entities\Unit.cs" />
     <Compile Include="World\IState.cs" />
     <Compile Include="Tools.cs" />
     <Compile Include="World\Blocs\BlocStone.cs" />
@@ -189,6 +193,12 @@
   <ItemGroup>
     <None Include="Resources\returnback.bmp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\unit.bmp" />
+    <Content Include="Resources\conso_tree.png" />
+    <Content Include="Resources\conso_tronc.png" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Text.Json.6.0.6\build\System.Text.Json.targets" Condition="Exists('..\packages\System.Text.Json.6.0.6\build\System.Text.Json.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

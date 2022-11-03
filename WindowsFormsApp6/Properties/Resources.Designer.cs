@@ -73,6 +73,26 @@ namespace WindowsFormsApp6.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap conso_tree {
+            get {
+                object obj = ResourceManager.GetObject("conso_tree", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap conso_tronc {
+            get {
+                object obj = ResourceManager.GetObject("conso_tronc", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap deepdirt {
             get {
                 object obj = ResourceManager.GetObject("deepdirt", resourceCulture);
@@ -196,6 +216,16 @@ namespace WindowsFormsApp6.Properties {
         internal static System.Drawing.Bitmap structure_shop {
             get {
                 object obj = ResourceManager.GetObject("structure_shop", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap unit {
+            get {
+                object obj = ResourceManager.GetObject("unit", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
