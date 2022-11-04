@@ -91,7 +91,6 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="FullMoney.cs" />
     <Compile Include="Inventory.cs" />
     <Compile Include="Item.cs" />
     <Compile Include="Maths.cs" />
@@ -110,6 +109,7 @@
     <Compile Include="World\Blocs\Tool\ToolBase.cs" />
     <Compile Include="World\Blocs\Tool\ITool.cs" />
     <Compile Include="World\Entities\Entity.cs" />
+    <Compile Include="World\Entities\TowerEntities\TowerUnit.cs" />
     <Compile Include="World\Entities\Unit.cs" />
     <Compile Include="World\IState.cs" />
     <Compile Include="Tools.cs" />
@@ -120,6 +120,8 @@
     <Compile Include="World\BlocGenerator.cs" />
     <Compile Include="World\Blocs\IBloc.cs" />
     <Compile Include="World\StateFactory.cs" />
+    <Compile Include="World\StateTower.cs" />
+    <Compile Include="World\Structures\StructureTower.cs" />
     <Compile Include="World\Structures\StructureFactory.cs" />
     <Compile Include="World\WorldResources\BasicResource.cs" />
     <Compile Include="World\WorldResources\BoisBrut.cs" />
@@ -207,6 +209,7 @@
     <None Include="Resources\unit.bmp" />
     <Content Include="Resources\conso_tree.png" />
     <None Include="Resources\structure_factory.bmp" />
+    <None Include="Resources\structure_tower.bmp" />
     <Content Include="Resources\tronc.png" />
     <Content Include="Resources\conso_tronc.png" />
   </ItemGroup>

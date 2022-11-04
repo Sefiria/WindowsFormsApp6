@@ -52,6 +52,7 @@ namespace WindowsFormsApp6.World
             ReplaceBloc(4, 4, new BlocGrass(4, 4), new StructureShop(4, 4));
             ReplaceBloc(12, 6, new BlocGrass(12, 6), new StructureMine(12, 6));
             ReplaceBloc(8, 16, new BlocGrass(8, 16), new StructureFactory(8, 16));
+            ReplaceBloc(20, 20, new BlocGrass(20, 20), new StructureTower(20, 20));
 
             int x, y;
             IStructure structure;

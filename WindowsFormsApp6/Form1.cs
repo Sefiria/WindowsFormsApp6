@@ -107,7 +107,7 @@ namespace WindowsFormsApp6
             Core.g.DrawString(Data.Instance.StatInfo.Money.ToString(), DefaultFont, Brushes.White, 78, 18);
             int w = (int)Core.g.MeasureString(Data.Instance.StatInfo.Money.ToString(), DefaultFont).Width;
             DrawOres(88 + w);
-            DrawBasicResources(50 + w);
+            DrawBasicResources(88 + w);
             DrawUI();
 
             Render.Image = Image;

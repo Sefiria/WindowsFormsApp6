@@ -19,7 +19,6 @@ namespace WindowsFormsApp6.UI
         [JsonIgnore] Bitmap Image { get; }
         event EventHandler OnClick;
 
-
         void Update();
         void Draw(Graphics g = null, Color? bounds_color = null);
         void Clicked();

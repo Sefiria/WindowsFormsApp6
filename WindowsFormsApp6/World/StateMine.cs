@@ -67,10 +67,10 @@ namespace WindowsFormsApp6.World
             int y = Core.MousePosition.Y.ToUnit();
             if (e.Button == MouseButtons.Left)
             {
-                int restingDamage = Data.Instance.StatInfo.Inventory.GetUsedPickaxe().GetQualitySTR();
+                int radius = Data.Instance.StatInfo.Inventory.GetUsedPickaxe().Radius;
+                int restingDamage = Data.Instance.StatInfo.Inventory.GetUsedPickaxe().GetQualitySTR() * radius;
                 if (restingDamage <= 0)
                     return;
-                int radius = Data.Instance.StatInfo.Inventory.GetUsedPickaxe().Radius;
 
                 void DoHit(int _x, int _y, int farpoint)
                 {
@@ -80,7 +80,7 @@ namespace WindowsFormsApp6.World
                     var hit = Blocs[_x, _y].Life;
                     Blocs[_x, _y].Life -= restingDamage - farpoint >= 0 ? restingDamage - farpoint : 0;
                     if(farpoint == 0)
-                        restingDamage -= hit;
+                        restingDamage -= hit - Blocs[_x, _y].Life < 0 ? hit : hit - Blocs[_x, _y].Life;
                     if (Blocs[_x, _y].Life <= 0)
                     {
                         int la_yer = Blocs[_x, _y].Layer;
@@ -99,18 +99,29 @@ namespace WindowsFormsApp6.World
                 int TimeOut = 0;
                 do
                 {
-                    DoHit(x, y, 0);
-                    for (int i = 1; i <= radius; i++)
+                    for (int _x = -radius; _x <= radius; _x++)
                     {
-                        DoHit(x - i, y, i);
-                        DoHit(x + i, y, i);
-                        DoHit(x, y - i, i);
-                        DoHit(x, y + i, i);
-                        DoHit(x - i, y - i, i);
-                        DoHit(x + i, y + i, i);
-                        DoHit(x - i, y + i, i);
-                        DoHit(x + i, y - i, i);
+                        for (int _y = -radius; _y <= radius; _y++)
+                        {
+                            DoHit(x + _x, y + _y, Math.Abs(_x) + Math.Abs(_y));
+                            if (restingDamage <= 0)
+                                break;
+                        }
+                        if (restingDamage <= 0)
+                            break;
                     }
+                    //DoHit(x, y, 0);
+                    //for (int i = 1; i <= radius; i++)
+                    //{
+                    //    DoHit(x - i, y, i);
+                    //    DoHit(x + i, y, i);
+                    //    DoHit(x, y - i, i);
+                    //    DoHit(x, y + i, i);
+                    //    DoHit(x - i, y - i, i);
+                    //    DoHit(x + i, y + i, i);
+                    //    DoHit(x - i, y + i, i);
+                    //    DoHit(x + i, y - i, i);
+                    //}
                     TimeOut++;
                 }
                 while (restingDamage > 0 && TimeOut < 1000);

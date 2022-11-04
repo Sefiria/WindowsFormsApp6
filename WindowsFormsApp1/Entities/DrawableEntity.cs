@@ -4,7 +4,7 @@ namespace WindowsFormsApp1.Entities
 {
     public abstract class DrawableEntity : Entity, IDraw
     {
-        [JsonIgnore] public Bitmap Image { get; set; }
+        public Bitmap Image { get; set; }
         public int W => Image.Width;
         public int H => Image.Height;
 

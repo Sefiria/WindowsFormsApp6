@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using WindowsFormsApp6.World;
 using WindowsFormsApp6.World.Ores;
 
@@ -16,7 +17,7 @@ namespace WindowsFormsApp6
             [OreType.Titanium] = 0,
             [OreType.Diamond] = 0,
         };
-        public FullMoney Money = new FullMoney(0);
+        public BigInteger Money = 1000000000000;
         public Inventory Inventory = new Inventory();
         public StatInfo(){}
     }
@@ -36,6 +37,7 @@ namespace WindowsFormsApp6
         public StateShop Shop { get; set; }
         public StateFactory Factory { get; set; }
         public StateInventory Inventory { get; set; }
+        public StateTower Tower { get; set; }
         public StatInfo StatInfo { get; set; } = new StatInfo();
 
         public Data()
@@ -55,6 +57,9 @@ namespace WindowsFormsApp6
 
             Mine = new StateMine();
             Mine.DrawStatic();
+
+            Tower = new StateTower();
+            Tower.DrawStatic();
         }
     }
 }

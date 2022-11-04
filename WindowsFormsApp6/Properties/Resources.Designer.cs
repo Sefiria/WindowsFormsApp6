@@ -243,6 +243,16 @@ namespace WindowsFormsApp6.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap structure_tower {
+            get {
+                object obj = ResourceManager.GetObject("structure_tower", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap tronc {
             get {
                 object obj = ResourceManager.GetObject("tronc", resourceCulture);

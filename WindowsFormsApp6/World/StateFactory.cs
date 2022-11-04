@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Numerics;
 using System.Windows.Forms;
 using WindowsFormsApp6.Particules;
 using WindowsFormsApp6.Properties;
@@ -19,7 +20,7 @@ namespace WindowsFormsApp6.World
         public List<Particule> Particules { get; set; } = new List<Particule>();
         public IState PreviousState { get; set; } = null;
         [JsonIgnore] public List<IUI> UI { get; set; } = new List<IUI>();
-        public static List<(string Name, Bitmap Image, FullMoney Price, Action Action)> ToBuy;
+        public static List<(string Name, Bitmap Image, BigInteger Price, Action Action)> ToBuy;
         private static void Cross10Price(int index)
         {
             ToBuy[index] = (ToBuy[index].Name, ToBuy[index].Image, ToBuy[index].Price * 10, ToBuy[index].Action);
@@ -27,10 +28,11 @@ namespace WindowsFormsApp6.World
          
         public StateFactory()
         {
-            ToBuy = new List<(string Name, Bitmap Image, FullMoney Price, Action Action)>()
+            ToBuy = new List<(string Name, Bitmap Image, BigInteger Price, Action Action)>()
             {
-                ("Unit", Resources.unit.Transparent(), new FullMoney(500, FullMoney.MoneyTier.Units), new Action(() => { Data.Instance.World.Entities.Add(new Unit(9.ToWorld() + Data.Instance.World.GetUnits().Count * 8, 18.ToWorld())); Cross10Price(0); })),
+                ("Unit", Resources.unit.Transparent(), new BigInteger(500), new Action(() => { Data.Instance.World.Entities.Add(new Unit(9.ToWorld() + Data.Instance.World.GetUnits().Count * 8, 18.ToWorld())); Cross10Price(0); })),
             };
+            UI.Clear();
         }
         public void AddCategoryUI()
         {
@@ -38,7 +40,7 @@ namespace WindowsFormsApp6.World
             int x = 20, y = 50;
 
             b = new UIButton("Unités", x, y);
-            b.ID = "Unités";
+            b.ID = "Channel";
             UI.Add(b);
             x = b.X + b.W + 20;
             b.OnClick += (s, a) => RefreshUnits();
@@ -46,7 +48,7 @@ namespace WindowsFormsApp6.World
         private void RefreshUnits() { RemoveUI(); AddUnitsUI(); }
         public void RemoveUI()
         {
-            var list = UI.Where(x => x.ID == "Unités").ToList();
+            var list = UI.Where(x => x.ID != "Channel").ToList();
             foreach (var ui in list)
                 UI.Remove(ui);
         }

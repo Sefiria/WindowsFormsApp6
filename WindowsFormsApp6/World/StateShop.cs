@@ -11,6 +11,7 @@ using WindowsFormsApp6.World.Blocs.Tool;
 using WindowsFormsApp6.World.Ores;
 using WindowsFormsApp6.World.Structures;
 using WindowsFormsApp6.Properties;
+using System.Numerics;
 
 namespace WindowsFormsApp6.World
 {
@@ -22,23 +23,23 @@ namespace WindowsFormsApp6.World
         public List<Particule> Particules { get; set; } = new List<Particule>();
         public IState PreviousState { get; set; } = null;
         public List<IUI> UI { get; set; } = new List<IUI>();
-        public Dictionary<string, FullMoney> ItemPrice { get; set; } = new Dictionary<string, FullMoney>()
+        public Dictionary<string, BigInteger> ItemPrice { get; set; } = new Dictionary<string, BigInteger>()
         {
-            [Enum.GetName(typeof(OreType), OreType.Bronze)] = new FullMoney(1),
-            [Enum.GetName(typeof(OreType), OreType.Silver)] = new FullMoney(2),
-            [Enum.GetName(typeof(OreType), OreType.Gold)] = new FullMoney(4),
-            [Enum.GetName(typeof(OreType), OreType.Titanium)] = new FullMoney(8),
-            [Enum.GetName(typeof(OreType), OreType.Diamond)] = new FullMoney(20),
-            ["Bronze Pickaxe"] = new FullMoney(50),
-            ["Silver Pickaxe"] = new FullMoney(200),
-            ["Gold Pickaxe"] = new FullMoney(600),
-            ["Titanium Pickaxe"] = new FullMoney(1, FullMoney.MoneyTier.K),
-            ["Diamond Pickaxe"] = new FullMoney(5, FullMoney.MoneyTier.K),
-            ["Bronze Large Pickaxe"] = new FullMoney(10, FullMoney.MoneyTier.K),
-            ["Silver Large Pickaxe"] = new FullMoney(20, FullMoney.MoneyTier.K),
-            ["Gold Large Pickaxe"] = new FullMoney(50, FullMoney.MoneyTier.K),
-            ["Titanium Large Pickaxe"] = new FullMoney(100, FullMoney.MoneyTier.K),
-            ["Diamond Large Pickaxe"] = new FullMoney(500, FullMoney.MoneyTier.K),
+            [Enum.GetName(typeof(OreType), OreType.Bronze)] = 1,
+            [Enum.GetName(typeof(OreType), OreType.Silver)] = 2,
+            [Enum.GetName(typeof(OreType), OreType.Gold)] = 4,
+            [Enum.GetName(typeof(OreType), OreType.Titanium)] = 8,
+            [Enum.GetName(typeof(OreType), OreType.Diamond)] = 20,
+            ["Bronze Pickaxe"] = 50,
+            ["Silver Pickaxe"] = 200,
+            ["Gold Pickaxe"] = 600,
+            ["Titanium Pickaxe"] = 1000,
+            ["Diamond Pickaxe"] = 5000,
+            ["Bronze Large Pickaxe"] = 10000,
+            ["Silver Large Pickaxe"] = 20000,
+            ["Gold Large Pickaxe"] = 50000,
+            ["Titanium Large Pickaxe"] = 100000,
+            ["Diamond Large Pickaxe"] = 500000,
         };
 
         public StateShop()
@@ -71,7 +72,7 @@ namespace WindowsFormsApp6.World
             UIButton b;
             UILabel l;
             int x = 20, y = 100;
-            var ToolsToBuy = new List<(string Name, FullMoney Price, ITool Tool)>()
+            var ToolsToBuy = new List<(string Name, BigInteger Price, ITool Tool)>()
             {
                 ("Bronze Pickaxe", GetPrice("Bronze Pickaxe"), new ToolPickaxe(OreType.Bronze)),
                 ("Silver Pickaxe", GetPrice("Silver Pickaxe"), new ToolPickaxe(OreType.Silver)),
@@ -141,9 +142,9 @@ namespace WindowsFormsApp6.World
             }
         }
 
-        private FullMoney GetPrice(string item)
+        private BigInteger GetPrice(string item)
         {
-            return ItemPrice.ContainsKey(item) ? ItemPrice[item] : new FullMoney(0);
+            return ItemPrice.ContainsKey(item) ? ItemPrice[item] : 0;
         }
 
         public void Update()
