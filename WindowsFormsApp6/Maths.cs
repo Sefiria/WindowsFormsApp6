@@ -35,5 +35,10 @@ namespace WindowsFormsApp6
             float dy = look.Y;
             return (float)Math.Atan2(dy, dx);
         }
+
+        public static float Lerp(float v0, float v1, float t)
+        {
+            return (1F - t) * v0 + t * v1;
+        }
     }
 }

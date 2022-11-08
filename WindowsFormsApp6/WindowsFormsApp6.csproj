@@ -123,6 +123,9 @@
     <Compile Include="World\StateTower.cs" />
     <Compile Include="World\Structures\StructureTower.cs" />
     <Compile Include="World\Structures\StructureFactory.cs" />
+    <Compile Include="World\Tower\Bullet.cs" />
+    <Compile Include="World\Tower\CardArrow.cs" />
+    <Compile Include="World\Tower\CardBase.cs" />
     <Compile Include="World\WorldResources\BasicResource.cs" />
     <Compile Include="World\WorldResources\BoisBrut.cs" />
     <Compile Include="World\WorldResources\Ores\Ore.cs" />
@@ -207,9 +210,11 @@
   <ItemGroup>
     <None Include="Resources\unit_selected.bmp" />
     <None Include="Resources\unit.bmp" />
+    <None Include="Resources\bullet_0.bmp" />
     <Content Include="Resources\conso_tree.png" />
     <None Include="Resources\structure_factory.bmp" />
     <None Include="Resources\structure_tower.bmp" />
+    <None Include="Resources\card_arrow.bmp" />
     <Content Include="Resources\tronc.png" />
     <Content Include="Resources\conso_tronc.png" />
   </ItemGroup>
