@@ -13,6 +13,7 @@ namespace WindowsFormsApp7
         [JsonIgnore]
         public List<Color> Gradient = new List<Color>() { Color.Black };
         public List<int> GradientArgb => Gradient.Select(x => x.ToArgb()).ToList();
+        public bool IsLerp = true;
         
         public void Update(int x, int y)
         {

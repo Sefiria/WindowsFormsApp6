@@ -20,9 +20,9 @@ namespace WindowsFormsApp7
 
             numWidth.Minimum = numHeight.Minimum = 4;
             numTileSize.Minimum = 1;
-            numWidth.Maximum = 256;
-            numHeight.Maximum = 256;
-            numTileSize.Maximum = 256;
+            numWidth.Maximum = 1024;
+            numHeight.Maximum = 1024;
+            numTileSize.Maximum = 64;
 
             numWidth.Value = Core.RW < numWidth.Minimum ? numWidth.Minimum : (Core.RW > numWidth.Maximum ? numWidth.Maximum : Core.RW);
             numHeight.Value = Core.RH < numHeight.Minimum ? numHeight.Minimum : (Core.RH > numHeight.Maximum ? numHeight.Maximum : Core.RH);

@@ -9,7 +9,7 @@ namespace WindowsFormsApp7
 {
     public class Core
     {
-        public static int TileSz = 4;
+        public static int TileSz;
         public static Point MousePosition = new Point(-1, -1);
         public static Bitmap Image;
 

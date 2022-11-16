@@ -21,10 +21,12 @@ namespace WindowsFormsApp7
         {
             InitializeComponent();
 
+            Core.TileSz = 24;
+            Core.RW = Core.TileSz * 16;
+            Core.RH = Core.TileSz * 16;
+
             Core.Image = new Bitmap(Render.Width, Render.Height);
             Core.g = Graphics.FromImage(Core.Image);
-            Core.RW = Core.Image.Width;
-            Core.RH = Core.Image.Height;
 
             ImagePal = new Bitmap(RenderPal.Width, RenderPal.Height);
             Core.gp = Graphics.FromImage(ImagePal);

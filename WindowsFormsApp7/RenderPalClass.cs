@@ -18,54 +18,6 @@ namespace WindowsFormsApp7
         {
             new Pixel(),
             new Pixel(){Gradient = new List<Color>() { Color.White } },
-            new Pixel() { Gradient = new List<Color>() {
-            Color.FromArgb(255,   0,     0),
-            Color.FromArgb(200,   0,   55),
-            Color.FromArgb(150,   0, 105),
-            Color.FromArgb(100,   0, 155),
-            Color.FromArgb(  50,   0, 205),
-            Color.FromArgb(    0,   0, 255),
-            } },
-            new Pixel() { Gradient = new List<Color>() {
-            Color.FromArgb(200,   0,   55),
-            Color.FromArgb(150,   0, 105),
-            Color.FromArgb(100,   0, 155),
-            Color.FromArgb(  50,   0, 205),
-            Color.FromArgb(    0,   0, 255),
-            Color.FromArgb(255,   0,     0),
-            } },
-            new Pixel() { Gradient = new List<Color>() {
-            Color.FromArgb(150,   0, 105),
-            Color.FromArgb(100,   0, 155),
-            Color.FromArgb(  50,   0, 205),
-            Color.FromArgb(    0,   0, 255),
-            Color.FromArgb(255,   0,     0),
-            Color.FromArgb(200,   0,   55),
-            } },
-            new Pixel() { Gradient = new List<Color>() {
-            Color.FromArgb(100,   0, 155),
-            Color.FromArgb(  50,   0, 205),
-            Color.FromArgb(    0,   0, 255),
-            Color.FromArgb(255,   0,     0),
-            Color.FromArgb(200,   0,   55),
-            Color.FromArgb(150,   0, 105),
-            } },
-            new Pixel() { Gradient = new List<Color>() {
-            Color.FromArgb(  50,   0, 205),
-            Color.FromArgb(    0,   0, 255),
-            Color.FromArgb(255,   0,     0),
-            Color.FromArgb(200,   0,   55),
-            Color.FromArgb(150,   0, 105),
-            Color.FromArgb(100,   0, 155),
-            } },
-            new Pixel() { Gradient = new List<Color>() {
-            Color.FromArgb(    0,   0, 255),
-            Color.FromArgb(255,   0,     0),
-            Color.FromArgb(200,   0,   55),
-            Color.FromArgb(150,   0, 105),
-            Color.FromArgb(100,   0, 155),
-            Color.FromArgb(  50,   0, 205),
-            } },
         };
         public static int LastPalY = 0;
         private static byte m_SelectedPixelId = 0;
@@ -78,6 +30,7 @@ namespace WindowsFormsApp7
                 SecureId();
             }
         }
+        public static int EditingPixelId = -1;
         public static void SecureId()
         {
             while (m_SelectedPixelId >= Pixels.Count) m_SelectedPixelId -= (byte) Pixels.Count;
@@ -148,13 +101,20 @@ namespace WindowsFormsApp7
             UI.Add(b);
             x += b.Image.Width + 6;
 
+            DIsplayPixelsUI();
+        }
+        private static void DIsplayPixelsUI()
+        {
+            UI.Where(ui => ui.Tag.StartsWith("PixelRef") || ui.Tag.StartsWith("PixelMisc")).ToList().ForEach(ui => UI.Remove(ui));
+
+            UIButton b;
             Bitmap img = new Bitmap(PalTileSZ, PalTileSZ);
             Graphics g = Graphics.FromImage(img);
-            x = 0;
-            y = 100;
-            for (byte i=0; i < Pixels.Count; i++)
+            int x = 1;
+            int y = 100;
+            for (byte i = 0; i < Pixels.Count; i++)
             {
-                if(2 + (x + 1) * (PalTileSZ + 2) >= Core.RPW)
+                if (2 + (x + 1) * (PalTileSZ + 2) >= Core.RPW)
                 {
                     x = 0;
                     y += PalTileSZ + 2;
@@ -166,15 +126,38 @@ namespace WindowsFormsApp7
                 b = new UIButton(img, 2 + x * (PalTileSZ + 2), y);
                 b.Tag = $"PixelRef {i}";
                 b.LinkedPixelId = i;
-                b.OnClick += (s, e) => SelectedPixelId = (byte) (s as UIButton).LinkedPixelId;
+                b.OnClick += (s, e) => SelectedPixelId = (byte)(s as UIButton).LinkedPixelId;
                 UI.Add(b);
 
                 x++;
             }
             g.Dispose();
 
+            b = new UIButton("-", 2, y, w: PalTileSZ, h: PalTileSZ, margin: 0);
+            b.Tag = $"PixelMisc Remove PixelRef";
+            b.OnClick += (s, e) => { if (Pixels.Count > 1) { Pixels.RemoveAt(Pixels.Count - 1); FIxRenderPixels(Pixels.Count); DIsplayPixelsUI(); } };
+            UI.Add(b);
+            b = new UIButton("+", 2 + x * (PalTileSZ + 2), y, w: PalTileSZ, h: PalTileSZ, margin: 0);
+            b.Tag = $"PixelMisc Add PixelRef";
+            b.OnClick += (s, e) => { Pixels.Add(new Pixel()); DIsplayPixelsUI(); };
+            UI.Add(b);
+
             LastPalY = y;
         }
+
+        private static void FIxRenderPixels(int removedId)
+        {
+            for (int x = 0; x < Core.RWT; x++)
+                for (int y = 0; y < Core.RHT; y++)
+                    if (RenderClass.Pixels[x, y] == removedId)
+                    {
+                        RenderClass.Pixels[x, y] = 0;
+                        RenderClass.ModifiedPixels.Add(new Point(x, y));
+                    }
+            if (SelectedPixelId == removedId) SelectedPixelId--;
+            DestroyUIEditing();
+        }
+
         private static void LoadImg()
         {
             var dial = new OpenFileDialog();
@@ -191,14 +174,17 @@ namespace WindowsFormsApp7
             Core.RH = rh;
             Core.TileSz = tsz;
             RenderClass.Pixels = new byte[rw / tsz, rh / tsz];
+            byte px;
             for (int x = 0; x < rw / tsz; x++)
             {
                 for (int y = 0; y < rh / tsz; y++)
                 {
-                    RenderClass.Pixels[x, y] = (byte)int.Parse(""+lines[3][x * (rh / tsz) + y]);
+                    px = (byte)int.Parse("" + lines[3][x * (rh / tsz) + y]);
+                    RenderClass.Pixels[x, y] = px < Pixels.Count ? px : (byte) 0;
                     RenderClass.ModifiedPixels.Add(new Point(x, y));
                 }
             }
+            Core.g.Clear(Color.Black);
         }
         private static void SaveImg()
         {
@@ -225,19 +211,24 @@ namespace WindowsFormsApp7
             if (dial.ShowDialog() != DialogResult.OK) return;
             string content = File.ReadAllText(dial.FileName).UnZip();
             string[] lines = content.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
-            if (lines.Length != Pixels.Count) return;
             Pixel p;
             List<Color> colors;
-            for (int i = 0; i < lines.Length; i++)
+            Pixels.Clear();
+            string line;
+            foreach (string l in lines)
             {
+                line = l;
                 p = new Pixel();
                 p.Gradient.Clear();
-                colors = lines[i].Split(',').Select(x => Color.FromArgb(int.Parse(x))).ToList();
+                p.IsLerp = int.Parse("" + line[0]) == 1;
+                line = line.Remove(0, 1);
+                colors = line.Split(',').Select(x => Color.FromArgb(int.Parse(x))).ToList();
                 foreach (var c in colors)
                     p.Gradient.Add(c);
-                Pixels[i] = p;
+                Pixels.Add(p);
             }
             RenderClass.ModifiedPixels = RenderClass.GetAllPixelsPoints();
+            DIsplayPixelsUI();
         }
         private static void SavePal()
         {
@@ -247,6 +238,7 @@ namespace WindowsFormsApp7
             string content = "";
             foreach(var px in Pixels)
             {
+                content += px.IsLerp ? "1" : "0";
                 foreach (var c in px.GradientArgb)
                     content += c + (px.GradientArgb.IndexOf(c) < px.GradientArgb.Count - 1 ? "," : "");
                 if(Pixels.IndexOf(px) < Pixels.Count - 1)
@@ -266,7 +258,12 @@ namespace WindowsFormsApp7
                 if (e.Button == MouseButtons.Left)
                     clickedUI.ForEach(x => x.Clicked());
                 else if (e.Button == MouseButtons.Right && clickedUI.First() is UIButton && clickedUI.First().Tag.StartsWith("PixelRef"))
-                    LoadEditPixelUI((clickedUI.First() as UIButton).LinkedPixelId);
+                {
+                    if (EditingPixelId != (clickedUI.First() as UIButton).LinkedPixelId)
+                        LoadEditPixelUI((clickedUI.First() as UIButton).LinkedPixelId);
+                    else
+                        DestroyUIEditing();
+                }
             }
         }
         public static void MouseMove(MouseEventArgs e)
@@ -312,7 +309,7 @@ namespace WindowsFormsApp7
             }
 
 
-            list = UI.Where(ui => ui.Tag == null || ui.Tag.StartsWith("MISC") || ui.Tag.StartsWith("PxRef")).ToList();
+            list = UI.Where(ui => ui.Tag == null || new[] { "MISC", "PxRef", "PixelMisc" }.ToList().Any(tag => ui.Tag.StartsWith(tag))).ToList();
             foreach (var ui in list)
                 ui.Draw(Core.gp);
 
@@ -338,6 +335,15 @@ namespace WindowsFormsApp7
                 }
                 ui.Draw(Core.gp, c);
             }
+
+            list = UI.Where(ui => ui.Tag?.StartsWith("PixelRef") ?? false).ToList();
+            var b = list.First(ui => list.IndexOf(ui) == SelectedPixelId);
+            Core.gp.FillRectangle(Brushes.White, b.X + PalTileSZ / 2 - 1, b.Y - 8, 3, 4);
+            if (EditingPixelId > -1)
+            {
+                b = list.First(ui => list.IndexOf(ui) == EditingPixelId);
+                Core.gp.FillRectangle(Brushes.White, b.X + PalTileSZ / 2 - 1, b.Y + PalTileSZ + 5, 3, 4);
+            }
         }
 
         public static void KeyDown(KeyEventArgs e)
@@ -361,7 +367,8 @@ namespace WindowsFormsApp7
 
         public static void LoadEditPixelUI(int pxid)
         {
-            UI.Where(ui => ui is UIButton && ui.Tag != null && (ui.Tag.StartsWith("PxRef") || ui.Tag.StartsWith("MISC"))).ToList().ForEach(ui => UI.Remove(ui));
+            DestroyUIEditing();
+            EditingPixelId = pxid;
 
             UIButton b;
             Bitmap img = new Bitmap(PalTileSZ, PalTileSZ);
@@ -389,12 +396,27 @@ namespace WindowsFormsApp7
             g.Dispose();
 
             b = new UIButton("-", 2, y, w: PalTileSZ, h: PalTileSZ, margin: 0);
-            b.Tag = $"MISC Add Gradient";
+            b.Tag = $"MISC Remove Gradient";
             b.OnClick += (s, e) => { if (Pixels[pxid].Gradient.Count > 1) { Pixels[pxid].Gradient.RemoveAt(Pixels[pxid].Gradient.Count - 1); LoadEditPixelUI(pxid); } };
             UI.Add(b);
             b = new UIButton("+", 2 + x * (PalTileSZ + 2), y, w: PalTileSZ, h: PalTileSZ, margin: 0);
-            b.Tag = $"MISC Remove Gradient";
+            b.Tag = $"MISC Add Gradient";
             b.OnClick += (s, e) => { Pixels[pxid].Gradient.Add(Pixels[pxid].Gradient.Last()); LoadEditPixelUI(pxid); };
+            UI.Add(b);
+            Bitmap GenIsLerpImg()
+            {
+                Bitmap imgL = new Bitmap(16, 16);
+                using (Graphics gL = Graphics.FromImage(imgL))
+                {
+                    gL.Clear(Pixels[pxid].IsLerp ? Color.Lime : Color.Red);
+                    gL.DrawRectangle(new Pen(Color.White, 2F), 0, 0, 16, 16);
+                    gL.DrawRectangle(new Pen(Color.Black, 2F), 2, 2, 12, 12);
+                }
+                return imgL;
+            }
+            b = new UIButton(GenIsLerpImg(), 2 + (x + 1) * (PalTileSZ + 2), y);
+            b.Tag = $"MISC isLerp";
+            b.OnClick += (s, e) => { Pixels[pxid].IsLerp = !Pixels[pxid].IsLerp; b.Image = GenIsLerpImg(); };
             UI.Add(b);
         }
         public static void LoadEditPixelGradientUI(int pxid, int gid)
@@ -406,6 +428,12 @@ namespace WindowsFormsApp7
                 LoadEditPixelUI(pxid);
                 RenderClass.ModifiedPixels.AddRange(RenderClass.GetAllPixelsPoints());
             }
+        }
+
+        public static void DestroyUIEditing()
+        {
+            UI.Where(ui => ui is UIButton && ui.Tag != null && (ui.Tag.StartsWith("PxRef") || ui.Tag.StartsWith("MISC"))).ToList().ForEach(ui => UI.Remove(ui));
+            EditingPixelId = -1;
         }
     }
 }

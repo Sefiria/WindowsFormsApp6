@@ -92,9 +92,11 @@ namespace WindowsFormsApp7
         }
         public static void MouseDown(MouseEventArgs e)
         {
-            if (MouseRightDown)
+            if (!IsMouseInRender(e)) return;
+
+            if (MouseRightDown && e.X / Core.TileSz < Pixels.GetLength(0) && e.Y / Core.TileSz < Pixels.GetLength(1))
             {
-                RenderPalClass.SelectedPixelId = Pixels[e.X / Core.TileSz, e.Y / Core.TileSz];
+                RenderPalClass.SelectedPixelId = Pixels[(e.X - OfstX) / Core.TileSz, (e.Y - OfstY) / Core.TileSz];
                 RenderPalClass.LoadEditPixelUI(RenderPalClass.SelectedPixelId);
                 return;
             }
@@ -105,7 +107,7 @@ namespace WindowsFormsApp7
 
                 if (Tool == 0)
                     MouseMove(e);
-                else if (Tool == 1 && IsMouseInRender(e))
+                else if (Tool == 1)
                 {
                     if(!IsMouseInRender(e)) return;
                     Tools.FloodFill(new Point((e.X - OfstX) / Core.TileSz, (e.Y - OfstY) / Core.TileSz), RenderPalClass.SelectedPixelId);
@@ -168,11 +170,18 @@ namespace WindowsFormsApp7
             while (id >= count) id -= count;
             while (id < 0) id += count;
 
-            Color s, e, r;
-            s = RenderPalClass.Pixels[px].Gradient[id];
-            e = id == RenderPalClass.Pixels[px].Gradient.Count - 1 ? RenderPalClass.Pixels[px].Gradient[0] : RenderPalClass.Pixels[px].Gradient[id + 1];
-            r = Color.FromArgb((byte)Maths.Lerp(s.R, e.R, t), (byte)Maths.Lerp(s.G, e.G, t), (byte)Maths.Lerp(s.B, e.B, t));
-            return r;
+            if (RenderPalClass.Pixels[px].IsLerp)
+            {
+                Color s, e, r;
+                s = RenderPalClass.Pixels[px].Gradient[id];
+                e = id == RenderPalClass.Pixels[px].Gradient.Count - 1 ? RenderPalClass.Pixels[px].Gradient[0] : RenderPalClass.Pixels[px].Gradient[id + 1];
+                r = Color.FromArgb((byte)Maths.Lerp(s.R, e.R, t), (byte)Maths.Lerp(s.G, e.G, t), (byte)Maths.Lerp(s.B, e.B, t));
+                return r;
+            }
+            else
+            {
+                return RenderPalClass.Pixels[px].Gradient[id];
+            }
         }
         private static void SetImage()
         {
@@ -212,6 +221,16 @@ namespace WindowsFormsApp7
 
         public static void Draw()
         {
+            Core.g.DrawRectangle(Pens.Gray, OfstX - 1, OfstY - 1, Core.RW + 1, Core.RH + 1);
+
+            Pen p = new Pen(Color.FromArgb(20, 20, 20));
+            for (int x = 0; x < Core.RWT; x++)
+                for (int y = 0; y < Core.RHT; y++)
+                {
+                    if (x == 0 && y == 0) continue;
+                    if (y > 0) Core.g.DrawLine(p, OfstX + x * Core.TileSz, OfstY + y * Core.TileSz, OfstX + (x + 1) * Core.TileSz - 1, OfstY + y * Core.TileSz);
+                    if (x > 0) Core.g.DrawLine(p, OfstX + x * Core.TileSz, OfstY + y * Core.TileSz, OfstX + x * Core.TileSz, OfstY + (y + 1) * Core.TileSz - 1);
+                }
         }
 
         public static void KeyDown(KeyEventArgs e)
@@ -241,7 +260,9 @@ namespace WindowsFormsApp7
             Core.TileSz = tsz;
             Core.RW = w * tsz;
             Core.RH = h * tsz;
+            Core.g.Clear(Color.Black);
             Pixels = new byte[w, h];
+            ModifiedPixels = GetAllPixelsPoints();
         }
     }
 }
