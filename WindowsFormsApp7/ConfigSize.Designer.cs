@@ -36,17 +36,19 @@
             this.btCancel = new System.Windows.Forms.Button();
             this.numTileSize = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
-            this.lbResultsize = new System.Windows.Forms.Label();
-            this.lbResultsizeValue = new System.Windows.Forms.Label();
+            this.numIteN = new System.Windows.Forms.NumericUpDown();
+            this.lbIterationsCount = new System.Windows.Forms.Label();
+            this.panel1 = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.numWidth)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numHeight)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numTileSize)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numIteN)).BeginInit();
             this.SuspendLayout();
             // 
             // lbWidth
             // 
             this.lbWidth.AutoSize = true;
-            this.lbWidth.Location = new System.Drawing.Point(45, 111);
+            this.lbWidth.Location = new System.Drawing.Point(45, 34);
             this.lbWidth.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.lbWidth.Name = "lbWidth";
             this.lbWidth.Size = new System.Drawing.Size(63, 25);
@@ -55,7 +57,7 @@
             // 
             // numWidth
             // 
-            this.numWidth.Location = new System.Drawing.Point(130, 109);
+            this.numWidth.Location = new System.Drawing.Point(120, 32);
             this.numWidth.Margin = new System.Windows.Forms.Padding(6);
             this.numWidth.Maximum = new decimal(new int[] {
             256,
@@ -79,7 +81,7 @@
             // 
             // numHeight
             // 
-            this.numHeight.Location = new System.Drawing.Point(130, 170);
+            this.numHeight.Location = new System.Drawing.Point(120, 93);
             this.numHeight.Margin = new System.Windows.Forms.Padding(6);
             this.numHeight.Maximum = new decimal(new int[] {
             256,
@@ -104,7 +106,7 @@
             // lbHeight
             // 
             this.lbHeight.AutoSize = true;
-            this.lbHeight.Location = new System.Drawing.Point(45, 172);
+            this.lbHeight.Location = new System.Drawing.Point(46, 95);
             this.lbHeight.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.lbHeight.Name = "lbHeight";
             this.lbHeight.Size = new System.Drawing.Size(68, 25);
@@ -113,7 +115,7 @@
             // 
             // btOK
             // 
-            this.btOK.Location = new System.Drawing.Point(12, 294);
+            this.btOK.Location = new System.Drawing.Point(12, 323);
             this.btOK.Name = "btOK";
             this.btOK.Size = new System.Drawing.Size(176, 35);
             this.btOK.TabIndex = 4;
@@ -124,7 +126,7 @@
             // btCancel
             // 
             this.btCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btCancel.Location = new System.Drawing.Point(194, 294);
+            this.btCancel.Location = new System.Drawing.Point(194, 323);
             this.btCancel.Name = "btCancel";
             this.btCancel.Size = new System.Drawing.Size(181, 35);
             this.btCancel.TabIndex = 4;
@@ -133,7 +135,7 @@
             // 
             // numTileSize
             // 
-            this.numTileSize.Location = new System.Drawing.Point(130, 232);
+            this.numTileSize.Location = new System.Drawing.Point(120, 155);
             this.numTileSize.Margin = new System.Windows.Forms.Padding(6);
             this.numTileSize.Maximum = new decimal(new int[] {
             256,
@@ -158,32 +160,53 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(45, 234);
+            this.label1.Location = new System.Drawing.Point(35, 157);
             this.label1.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(79, 25);
             this.label1.TabIndex = 5;
             this.label1.Text = "Tile size";
             // 
-            // lbResultsize
+            // numIteN
             // 
-            this.lbResultsize.AutoSize = true;
-            this.lbResultsize.Location = new System.Drawing.Point(15, 28);
-            this.lbResultsize.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            this.lbResultsize.Name = "lbResultsize";
-            this.lbResultsize.Size = new System.Drawing.Size(99, 25);
-            this.lbResultsize.TabIndex = 7;
-            this.lbResultsize.Text = "Result size";
+            this.numIteN.Location = new System.Drawing.Point(120, 238);
+            this.numIteN.Margin = new System.Windows.Forms.Padding(6);
+            this.numIteN.Maximum = new decimal(new int[] {
+            256,
+            0,
+            0,
+            0});
+            this.numIteN.Minimum = new decimal(new int[] {
+            4,
+            0,
+            0,
+            0});
+            this.numIteN.Name = "numIteN";
+            this.numIteN.Size = new System.Drawing.Size(220, 32);
+            this.numIteN.TabIndex = 8;
+            this.numIteN.Value = new decimal(new int[] {
+            4,
+            0,
+            0,
+            0});
             // 
-            // lbResultsizeValue
+            // lbIterationsCount
             // 
-            this.lbResultsizeValue.AutoSize = true;
-            this.lbResultsizeValue.Location = new System.Drawing.Point(126, 28);
-            this.lbResultsizeValue.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            this.lbResultsizeValue.Name = "lbResultsizeValue";
-            this.lbResultsizeValue.Size = new System.Drawing.Size(51, 25);
-            this.lbResultsizeValue.TabIndex = 8;
-            this.lbResultsizeValue.Text = "0 x 0";
+            this.lbIterationsCount.AutoSize = true;
+            this.lbIterationsCount.Location = new System.Drawing.Point(56, 240);
+            this.lbIterationsCount.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.lbIterationsCount.Name = "lbIterationsCount";
+            this.lbIterationsCount.Size = new System.Drawing.Size(52, 25);
+            this.lbIterationsCount.TabIndex = 7;
+            this.lbIterationsCount.Text = "Ite N";
+            // 
+            // panel1
+            // 
+            this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.panel1.Location = new System.Drawing.Point(26, 210);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(337, 5);
+            this.panel1.TabIndex = 9;
             // 
             // FormConfigSize
             // 
@@ -191,9 +214,10 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btCancel;
-            this.ClientSize = new System.Drawing.Size(387, 341);
-            this.Controls.Add(this.lbResultsizeValue);
-            this.Controls.Add(this.lbResultsize);
+            this.ClientSize = new System.Drawing.Size(387, 370);
+            this.Controls.Add(this.panel1);
+            this.Controls.Add(this.numIteN);
+            this.Controls.Add(this.lbIterationsCount);
             this.Controls.Add(this.numTileSize);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btCancel);
@@ -210,6 +234,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.numWidth)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numHeight)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numTileSize)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numIteN)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -225,7 +250,8 @@
         public System.Windows.Forms.Button btCancel;
         public System.Windows.Forms.NumericUpDown numTileSize;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label lbResultsize;
-        private System.Windows.Forms.Label lbResultsizeValue;
+        public System.Windows.Forms.NumericUpDown numIteN;
+        private System.Windows.Forms.Label lbIterationsCount;
+        private System.Windows.Forms.Panel panel1;
     }
 }

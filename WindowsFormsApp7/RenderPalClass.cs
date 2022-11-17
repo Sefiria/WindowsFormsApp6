@@ -166,21 +166,23 @@ namespace WindowsFormsApp7
             if (dial.ShowDialog() != DialogResult.OK) return;
             string content = File.ReadAllText(dial.FileName).UnZip();
             string[] lines = content.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
-            if (lines.Length != 4) return;
+            if (lines.Length != 5) return;
             if (!int.TryParse(lines[0], out int rw)) return;
             if (!int.TryParse(lines[1], out int rh)) return;
             if (!int.TryParse(lines[2], out int tsz)) return;
-            if (lines[3].Length != (rw / tsz) * (rh / tsz)) return;
+            if (!int.TryParse(lines[3], out int iten)) return;
+            if (lines[4].Length != (rw / tsz) * (rh / tsz)) return;
             Core.RW = rw;
             Core.RH = rh;
             Core.TileSz = tsz;
+            Core.IterationsCount = iten;
             RenderClass.Pixels = new byte[rw / tsz, rh / tsz];
             byte px;
             for (int x = 0; x < rw / tsz; x++)
             {
                 for (int y = 0; y < rh / tsz; y++)
                 {
-                    px = (byte)int.Parse("" + lines[3][x * (rh / tsz) + y]);
+                    px = (byte)int.Parse("" + lines[4][x * (rh / tsz) + y]);
                     RenderClass.Pixels[x, y] = px < Pixels.Count ? px : (byte) 0;
                     RenderClass.ModifiedPixels.Add(new Point(x, y));
                 }
@@ -196,6 +198,7 @@ namespace WindowsFormsApp7
             content += Core.RW + Environment.NewLine;
             content += Core.RH + Environment.NewLine;
             content += Core.TileSz + Environment.NewLine;
+            content += Core.IterationsCount + Environment.NewLine;
             for (int x = 0; x < Core.RWT; x++)
             {
                 for (int y = 0; y < Core.RHT; y++)

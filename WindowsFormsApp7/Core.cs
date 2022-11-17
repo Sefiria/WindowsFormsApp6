@@ -13,6 +13,7 @@ namespace WindowsFormsApp7
         public static int TileSz;
         public static Point MousePosition = new Point(-1, -1);
         public static Bitmap Image;
+        public static int IterationsCount = 4;
 
         public static Graphics g;
         public static int ExactRenderW, ExactRenderH;

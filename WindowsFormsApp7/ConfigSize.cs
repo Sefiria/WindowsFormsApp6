@@ -19,27 +19,28 @@ namespace WindowsFormsApp7
             InitializeComponent();
 
             numWidth.Minimum = numHeight.Minimum = 4;
-            numTileSize.Minimum = 1;
+            numTileSize.Minimum = numIteN.Minimum = 1;
             numWidth.Maximum = 1024;
             numHeight.Maximum = 1024;
-            numTileSize.Maximum = 64;
+            numTileSize.Maximum = numIteN.Maximum = 64;
 
-            numWidth.Value = Core.RW < numWidth.Minimum ? numWidth.Minimum : (Core.RW > numWidth.Maximum ? numWidth.Maximum : Core.RW);
-            numHeight.Value = Core.RH < numHeight.Minimum ? numHeight.Minimum : (Core.RH > numHeight.Maximum ? numHeight.Maximum : Core.RH);
+            numWidth.Value = Core.RWT < numWidth.Minimum ? numWidth.Minimum : (Core.RWT > numWidth.Maximum ? numWidth.Maximum : Core.RWT);
+            numHeight.Value = Core.RHT < numHeight.Minimum ? numHeight.Minimum : (Core.RHT > numHeight.Maximum ? numHeight.Maximum : Core.RHT);
             numTileSize.Value = Core.TileSz < numTileSize.Minimum ? numTileSize.Minimum : (Core.TileSz > numTileSize.Maximum ? numTileSize.Maximum : Core.TileSz);
+            numIteN.Value = Core.IterationsCount < numIteN.Minimum ? numIteN.Minimum : (Core.IterationsCount > numIteN.Maximum ? numIteN.Maximum : Core.IterationsCount);
         }
 
         private void btOK_Click(object sender, EventArgs e)
         {
+            Core.IterationsCount = (int)numIteN.Value;
             DialogResult = DialogResult.OK;
             Close();
         }
 
         private void ResetResultSize(object sender, EventArgs e)
         {
-            ResultW = (int)(numWidth.Value / numTileSize.Value);
-            ResultH = (int)(numHeight.Value / numTileSize.Value);
-            lbResultsizeValue.Text = $"{ResultW} x {ResultH}";
+            ResultW = (int)numWidth.Value;
+            ResultH = (int)numHeight.Value;
         }
     }
 }

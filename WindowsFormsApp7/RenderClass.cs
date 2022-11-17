@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Security.Policy;
 using System.Windows.Forms;
 
@@ -15,7 +16,6 @@ namespace WindowsFormsApp7
         public static List<Point> ModifiedPixels = new List<Point>();
         public static Bitmap Image = new Bitmap(Core.RW, Core.RH);
         public static byte Tool = 0;
-        private static int GradientCount = 6;
         private static int m_GradientId = 0;
         public static int GradientId
         {
@@ -27,7 +27,7 @@ namespace WindowsFormsApp7
             }
         }
         public static bool MouseRightDown = false;
-        public static float t = 0F;
+        public static double t = 0D;
         private static int OfstX => Core.ExactRenderW / 2 - Core.RW / 2;
         private static int OfstY => Core.ExactRenderH / 2 - Core.RH / 2;
 
@@ -58,16 +58,16 @@ namespace WindowsFormsApp7
 
         public static void SecureId()
         {
-            while (m_GradientId >= GradientCount) m_GradientId -= GradientCount;
-            while (m_GradientId < 0) m_GradientId += GradientCount;
+            while (m_GradientId >= Core.IterationsCount) m_GradientId -= Core.IterationsCount;
+            while (m_GradientId < 0) m_GradientId += Core.IterationsCount;
         }
         public static void Increase()
         {
-            t += 0.1F;
-            if (t > 1F)
+            t += 0.1;
+            if (t >1D)
             {
                 GradientId++;
-                t = 0F;
+                t = 0D;
             }
         }
         public static void Decrease() { GradientId--; t = 0F; }
@@ -256,10 +256,16 @@ namespace WindowsFormsApp7
 
         public static void Resize(int w, int h, int tsz)
         {
-            Core.g.Clear(GetGradient(0));
+            if (Core.TileSz == tsz
+          && Core.RW == w * tsz
+          && Core.RH == h * tsz)
+                return;
+
             Core.TileSz = tsz;
             Core.RW = w * tsz;
             Core.RH = h * tsz;
+
+            Core.g.Clear(GetGradient(0));
             Core.g.Clear(Color.Black);
             Pixels = new byte[w, h];
             ModifiedPixels = GetAllPixelsPoints();
