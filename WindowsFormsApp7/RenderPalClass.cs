@@ -69,7 +69,7 @@ namespace WindowsFormsApp7
 
             b = new UIButton("Size", x, y, Color.White, Color.Gray);
             b.Tag = $"Config Size";
-            b.OnClick += (s, e) => { var dial = new FormConfigSize(); if (dial.ShowDialog() == DialogResult.OK) RenderClass.Resize((int)dial.ResultW, (int)dial.ResultH, (int)dial.numTileSize.Value); };
+            b.OnClick += (s, e) => { var dial = new FormConfigSize(); if (dial.ShowDialog(Core.MainForm) == DialogResult.OK) RenderClass.Resize((int)dial.ResultW, (int)dial.ResultH, (int)dial.numTileSize.Value); };
             b.BoundWidth = 2F;
             UI.Add(b);
             x += b.Image.Width + 6;

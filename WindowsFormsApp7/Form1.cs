@@ -21,6 +21,7 @@ namespace WindowsFormsApp7
         {
             InitializeComponent();
 
+            Core.MainForm = this;
             Core.TileSz = 24;
             Core.RW = Core.TileSz * 16;
             Core.RH = Core.TileSz * 16;

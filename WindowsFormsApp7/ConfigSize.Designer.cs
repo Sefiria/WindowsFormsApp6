@@ -205,6 +205,7 @@
             this.Font = new System.Drawing.Font("Segoe UI", 14F);
             this.Margin = new System.Windows.Forms.Padding(6);
             this.Name = "FormConfigSize";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Config Size";
             ((System.ComponentModel.ISupportInitialize)(this.numWidth)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numHeight)).EndInit();
