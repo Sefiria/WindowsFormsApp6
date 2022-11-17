@@ -24,7 +24,9 @@ namespace WindowsFormsApp7
         }
         public Pixel(Pixel copy)
         {
-            Gradient = copy.Gradient;
+            Gradient.Clear();
+            Gradient.AddRange(copy.Gradient);
+            IsLerp = copy.IsLerp;
         }
     }
 }

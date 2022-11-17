@@ -38,6 +38,7 @@ namespace WindowsFormsApp7
         }
         public static void Increase() => SelectedPixelId++;
         public static void Decrease() => SelectedPixelId--;
+        public static ColorDialog ColorDialog = new ColorDialog();
 
 
         public static void Initialize()
@@ -101,9 +102,9 @@ namespace WindowsFormsApp7
             UI.Add(b);
             x += b.Image.Width + 6;
 
-            DIsplayPixelsUI();
+            DisplayPixelsUI();
         }
-        private static void DIsplayPixelsUI()
+        private static void DisplayPixelsUI()
         {
             UI.Where(ui => ui.Tag.StartsWith("PixelRef") || ui.Tag.StartsWith("PixelMisc")).ToList().ForEach(ui => UI.Remove(ui));
 
@@ -135,11 +136,11 @@ namespace WindowsFormsApp7
 
             b = new UIButton("-", 2, y, w: PalTileSZ, h: PalTileSZ, margin: 0);
             b.Tag = $"PixelMisc Remove PixelRef";
-            b.OnClick += (s, e) => { if (Pixels.Count > 1) { Pixels.RemoveAt(Pixels.Count - 1); FIxRenderPixels(Pixels.Count); DIsplayPixelsUI(); } };
+            b.OnClick += (s, e) => { if (Pixels.Count > 1) { Pixels.RemoveAt(Pixels.Count - 1); FIxRenderPixels(Pixels.Count); DisplayPixelsUI(); } };
             UI.Add(b);
             b = new UIButton("+", 2 + x * (PalTileSZ + 2), y, w: PalTileSZ, h: PalTileSZ, margin: 0);
             b.Tag = $"PixelMisc Add PixelRef";
-            b.OnClick += (s, e) => { Pixels.Add(new Pixel()); DIsplayPixelsUI(); };
+            b.OnClick += (s, e) => { Pixels.Add(new Pixel(Pixels.Last())); DisplayPixelsUI(); };
             UI.Add(b);
 
             LastPalY = y;
@@ -228,7 +229,7 @@ namespace WindowsFormsApp7
                 Pixels.Add(p);
             }
             RenderClass.ModifiedPixels = RenderClass.GetAllPixelsPoints();
-            DIsplayPixelsUI();
+            DisplayPixelsUI();
         }
         private static void SavePal()
         {
@@ -421,10 +422,10 @@ namespace WindowsFormsApp7
         }
         public static void LoadEditPixelGradientUI(int pxid, int gid)
         {
-            var dial = new ColorDialog() { Color = Pixels[pxid].Gradient[gid] };
-            if (dial.ShowDialog() == DialogResult.OK)
+            ColorDialog.Color = Pixels[pxid].Gradient[gid];
+            if (ColorDialog.ShowDialog() == DialogResult.OK)
             {
-                Pixels[pxid].Gradient[gid] = dial.Color;
+                Pixels[pxid].Gradient[gid] = ColorDialog.Color;
                 LoadEditPixelUI(pxid);
                 RenderClass.ModifiedPixels.AddRange(RenderClass.GetAllPixelsPoints());
             }
