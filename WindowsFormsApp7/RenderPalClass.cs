@@ -171,7 +171,7 @@ namespace WindowsFormsApp7
             if (!int.TryParse(lines[1], out int rh)) return;
             if (!int.TryParse(lines[2], out int tsz)) return;
             if (!int.TryParse(lines[3], out int iten)) return;
-            if (lines[3].Length != (rw / tsz) * (rh / tsz)) return;
+            if (lines[4].Length != (rw / tsz) * (rh / tsz)) return;
             Core.RW = rw;
             Core.RH = rh;
             Core.IterationsCount = iten;
