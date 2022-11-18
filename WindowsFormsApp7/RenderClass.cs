@@ -28,8 +28,8 @@ namespace WindowsFormsApp7
         }
         public static bool MouseRightDown = false;
         public static double t = 0D;
-        private static int OfstX => Core.ExactRenderW / 2 - Core.RW / 2;
-        private static int OfstY => Core.ExactRenderH / 2 - Core.RH / 2;
+        private static int OfstX => Core.ExactRenderW / 2 - Core.RWxZ / 2;
+        private static int OfstY => Core.ExactRenderH / 2 - Core.RHxZ / 2;
 
         public static byte[,] CopiedPixels()
         {
@@ -94,9 +94,9 @@ namespace WindowsFormsApp7
         {
             if (!IsMouseInRender(e)) return;
 
-            if (MouseRightDown && e.X / Core.TileSz < Pixels.GetLength(0) && e.Y / Core.TileSz < Pixels.GetLength(1))
+            if (MouseRightDown && e.X / Core.TileSzZoom < Pixels.GetLength(0) && e.Y / Core.TileSzZoom < Pixels.GetLength(1))
             {
-                RenderPalClass.SelectedPixelId = Pixels[(e.X - OfstX) / Core.TileSz, (e.Y - OfstY) / Core.TileSz];
+                RenderPalClass.SelectedPixelId = Pixels[(e.X - OfstX) / Core.TileSzZoom, (e.Y - OfstY) / Core.TileSzZoom];
                 RenderPalClass.LoadEditPixelUI(RenderPalClass.SelectedPixelId);
                 return;
             }
@@ -110,15 +110,15 @@ namespace WindowsFormsApp7
                 else if (Tool == 1)
                 {
                     if(!IsMouseInRender(e)) return;
-                    Tools.FloodFill(new Point((e.X - OfstX) / Core.TileSz, (e.Y - OfstY) / Core.TileSz), RenderPalClass.SelectedPixelId);
+                    Tools.FloodFill(new Point((e.X - OfstX) / Core.TileSzZoom, (e.Y - OfstY) / Core.TileSzZoom), RenderPalClass.SelectedPixelId);
                     SetImage();
                 }
             }
         }
         public static bool IsMouseInRender(MouseEventArgs e)
         {
-            var a = !(Core.MousePosition.X < OfstX || Core.MousePosition.X >= OfstX + Core.RW || Core.MousePosition.Y < OfstY || Core.MousePosition.Y >= OfstY + Core.RH);
-            var b = !(e.X < OfstX || e.X >= OfstX + Core.RW || e.Y < OfstY || e.Y >= OfstY + Core.RH);
+            var a = !(Core.MousePosition.X < OfstX || Core.MousePosition.X >= OfstX + Core.RWxZ || Core.MousePosition.Y < OfstY || Core.MousePosition.Y >= OfstY + Core.RHxZ);
+            var b = !(e.X < OfstX || e.X >= OfstX + Core.RWxZ || e.Y < OfstY || e.Y >= OfstY + Core.RHxZ);
             return a && b;
         }
         public static void MouseMove(MouseEventArgs e)
@@ -130,7 +130,7 @@ namespace WindowsFormsApp7
 
             if (MouseRightDown)
             {
-                RenderPalClass.SelectedPixelId = Pixels[eX / Core.TileSz, eY / Core.TileSz];
+                RenderPalClass.SelectedPixelId = Pixels[eX / Core.RWxZ, eY / Core.RHxZ];
                 RenderPalClass.LoadEditPixelUI(RenderPalClass.SelectedPixelId);
                 return;
             }
@@ -138,10 +138,10 @@ namespace WindowsFormsApp7
             if (Tool != 0)
                 return;
 
-            int x1 = (Core.MousePosition.X - OfstX) / Core.TileSz;
-            int y1 = (Core.MousePosition.Y - OfstY) / Core.TileSz;
-            int x2 = eX / Core.TileSz;
-            int y2 = eY / Core.TileSz;
+            int x1 = (Core.MousePosition.X - OfstX) / Core.Zoom;
+            int y1 = (Core.MousePosition.Y - OfstY) / Core.Zoom;
+            int x2 = eX / Core.Zoom;
+            int y2 = eY / Core.Zoom;
 
             float d = Maths.Distance(x1, y1, x2, y2);
             if (d == 0F)
@@ -190,11 +190,9 @@ namespace WindowsFormsApp7
             var list = new List<Point>(ModifiedPixels);
             foreach (var pt in list)
             {
-                Core.g.FillRectangle(new SolidBrush(GetGradient(Pixels[pt.X, pt.Y])), OfstX + pt.X * Core.TileSz, OfstY + pt.Y * Core.TileSz, Core.TileSz, Core.TileSz);
+                Core.g.FillRectangle(new SolidBrush(GetGradient(Pixels[pt.X, pt.Y])), OfstX + pt.X * Core.TileSzZoom, OfstY + pt.Y * Core.TileSzZoom, Core.TileSzZoom, Core.TileSzZoom);
                 ModifiedPixels.Remove(pt);
             }
-
-            g.DrawRectangle(Pens.Gray, OfstX - 1, OfstY - 1, Core.RW + 2, Core.RH + 2);
 
             g.Dispose();
         }
@@ -221,16 +219,24 @@ namespace WindowsFormsApp7
 
         public static void Draw()
         {
-            Core.g.DrawRectangle(Pens.Gray, OfstX - 1, OfstY - 1, Core.RW + 1, Core.RH + 1);
+            Core.ImageUI = new Bitmap(Core.ImageUI.Width, Core.ImageUI.Height);
+            Core.gui.Dispose();
+            Core.gui = Graphics.FromImage(Core.ImageUI);
+            Core.gui.Clear(Color.Black);
+            Core.gui.DrawRectangle(Pens.Gray, OfstX - 1, OfstY - 1, Core.RWxZ + 1, Core.RHxZ + 1);
 
-            Pen p = new Pen(Color.FromArgb(20, 20, 20));
-            for (int x = 0; x < Core.RWT; x++)
-                for (int y = 0; y < Core.RHT; y++)
-                {
-                    if (x == 0 && y == 0) continue;
-                    if (y > 0) Core.g.DrawLine(p, OfstX + x * Core.TileSz, OfstY + y * Core.TileSz, OfstX + (x + 1) * Core.TileSz - 1, OfstY + y * Core.TileSz);
-                    if (x > 0) Core.g.DrawLine(p, OfstX + x * Core.TileSz, OfstY + y * Core.TileSz, OfstX + x * Core.TileSz, OfstY + (y + 1) * Core.TileSz - 1);
-                }
+            if (Core.Zoom >= 8)
+            {
+                Pen p = new Pen(Color.FromArgb(20, 20, 20));
+                for (int x = 0; x < Core.RW; x++)
+                    for (int y = 0; y < Core.RW; y++)
+                    {
+                        if (x == 0 && y == 0) continue;
+                        if (y > 0) Core.gui.DrawLine(p, OfstX + x * Core.Zoom, OfstY + y * Core.Zoom, OfstX + (x + 1) * Core.Zoom - 1, OfstY + y * Core.Zoom);
+                        if (x > 0) Core.gui.DrawLine(p, OfstX + x * Core.Zoom, OfstY + y * Core.Zoom, OfstX + x * Core.Zoom, OfstY + (y + 1) * Core.Zoom - 1);
+                    }
+            }
+            Core.ImageUI.MakeTransparent();
         }
 
         public static void KeyDown(KeyEventArgs e)
@@ -254,20 +260,14 @@ namespace WindowsFormsApp7
                 PixelsHistory.RemoveAt(0);
         }
 
-        public static void Resize(int w, int h, int tsz)
+        public static void Resize(int w, int h)
         {
-            if (Core.TileSz == tsz
-          && Core.RW == w * tsz
-          && Core.RH == h * tsz)
-                return;
-
-            Core.TileSz = tsz;
-            Core.RW = w * tsz;
-            Core.RH = h * tsz;
+            Core.RW = w * Core.TileSz;
+            Core.RH = h * Core.TileSz;
 
             Core.g.Clear(GetGradient(0));
             Core.g.Clear(Color.Black);
-            Pixels = new byte[w, h];
+            Pixels = new byte[Core.RW, Core.RH];
             ModifiedPixels = GetAllPixelsPoints();
         }
     }

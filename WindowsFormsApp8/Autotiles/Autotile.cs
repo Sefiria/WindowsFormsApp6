@@ -50,7 +50,7 @@ namespace WindowsFormsApp8.Autotiles
         private void AutoSplit0()
         {
             Bitmap res = Resource;
-            ResSplit["single"] = new List<Bitmap() { res };// et les gradients coco ????
+            ResSplit["single"] = new List<Bitmap>() { res };// et les gradients coco ????
         }
         private void AutoSplit1()
         {

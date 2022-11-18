@@ -34,14 +34,14 @@
             this.lbHeight = new System.Windows.Forms.Label();
             this.btOK = new System.Windows.Forms.Button();
             this.btCancel = new System.Windows.Forms.Button();
-            this.numTileSize = new System.Windows.Forms.NumericUpDown();
+            this.numZoom = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
             this.numIteN = new System.Windows.Forms.NumericUpDown();
             this.lbIterationsCount = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.numWidth)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numHeight)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numTileSize)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numZoom)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numIteN)).BeginInit();
             this.SuspendLayout();
             // 
@@ -133,29 +133,28 @@
             this.btCancel.Text = "Cancel";
             this.btCancel.UseVisualStyleBackColor = true;
             // 
-            // numTileSize
+            // numZoom
             // 
-            this.numTileSize.Location = new System.Drawing.Point(120, 155);
-            this.numTileSize.Margin = new System.Windows.Forms.Padding(6);
-            this.numTileSize.Maximum = new decimal(new int[] {
+            this.numZoom.Location = new System.Drawing.Point(120, 155);
+            this.numZoom.Margin = new System.Windows.Forms.Padding(6);
+            this.numZoom.Maximum = new decimal(new int[] {
             256,
             0,
             0,
             0});
-            this.numTileSize.Minimum = new decimal(new int[] {
+            this.numZoom.Minimum = new decimal(new int[] {
             4,
             0,
             0,
             0});
-            this.numTileSize.Name = "numTileSize";
-            this.numTileSize.Size = new System.Drawing.Size(220, 32);
-            this.numTileSize.TabIndex = 6;
-            this.numTileSize.Value = new decimal(new int[] {
+            this.numZoom.Name = "numZoom";
+            this.numZoom.Size = new System.Drawing.Size(220, 32);
+            this.numZoom.TabIndex = 6;
+            this.numZoom.Value = new decimal(new int[] {
             4,
             0,
             0,
             0});
-            this.numTileSize.ValueChanged += new System.EventHandler(this.ResetResultSize);
             // 
             // label1
             // 
@@ -163,9 +162,9 @@
             this.label1.Location = new System.Drawing.Point(35, 157);
             this.label1.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(79, 25);
+            this.label1.Size = new System.Drawing.Size(61, 25);
             this.label1.TabIndex = 5;
-            this.label1.Text = "Tile size";
+            this.label1.Text = "Zoom";
             // 
             // numIteN
             // 
@@ -218,7 +217,7 @@
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.numIteN);
             this.Controls.Add(this.lbIterationsCount);
-            this.Controls.Add(this.numTileSize);
+            this.Controls.Add(this.numZoom);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btCancel);
             this.Controls.Add(this.btOK);
@@ -233,7 +232,7 @@
             this.Text = "Config Size";
             ((System.ComponentModel.ISupportInitialize)(this.numWidth)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numHeight)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numTileSize)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numZoom)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numIteN)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -248,7 +247,7 @@
         private System.Windows.Forms.Label lbHeight;
         public System.Windows.Forms.Button btOK;
         public System.Windows.Forms.Button btCancel;
-        public System.Windows.Forms.NumericUpDown numTileSize;
+        public System.Windows.Forms.NumericUpDown numZoom;
         private System.Windows.Forms.Label label1;
         public System.Windows.Forms.NumericUpDown numIteN;
         private System.Windows.Forms.Label lbIterationsCount;

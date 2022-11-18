@@ -69,7 +69,7 @@ namespace WindowsFormsApp7
 
             b = new UIButton("Size", x, y, Color.White, Color.Gray);
             b.Tag = $"Config Size";
-            b.OnClick += (s, e) => { var dial = new FormConfigSize(); if (dial.ShowDialog(Core.MainForm) == DialogResult.OK) RenderClass.Resize((int)dial.ResultW, (int)dial.ResultH, (int)dial.numTileSize.Value); };
+            b.OnClick += (s, e) => { var dial = new FormConfigSize(); if (dial.ShowDialog(Core.MainForm) == DialogResult.OK && dial.TilesHasChanged) RenderClass.Resize((int)dial.ResultW, (int)dial.ResultH); };
             b.BoundWidth = 2F;
             UI.Add(b);
             x += b.Image.Width + 6;
@@ -171,10 +171,9 @@ namespace WindowsFormsApp7
             if (!int.TryParse(lines[1], out int rh)) return;
             if (!int.TryParse(lines[2], out int tsz)) return;
             if (!int.TryParse(lines[3], out int iten)) return;
-            if (lines[4].Length != (rw / tsz) * (rh / tsz)) return;
+            if (lines[3].Length != (rw / tsz) * (rh / tsz)) return;
             Core.RW = rw;
             Core.RH = rh;
-            Core.TileSz = tsz;
             Core.IterationsCount = iten;
             RenderClass.Pixels = new byte[rw / tsz, rh / tsz];
             byte px;

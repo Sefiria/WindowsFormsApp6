@@ -22,12 +22,16 @@ namespace WindowsFormsApp7
             InitializeComponent();
 
             Core.MainForm = this;
-            Core.TileSz = 24;
-            Core.RW = Core.TileSz * 16;
-            Core.RH = Core.TileSz * 16;
+            Core.TileSz = 1;
+            Core.Zoom = 24;
+            Core.RW = 16;
+            Core.RH = 16;
 
             Core.Image = new Bitmap(Render.Width, Render.Height);
             Core.g = Graphics.FromImage(Core.Image);
+
+            Core.ImageUI = new Bitmap(Render.Width, Render.Height).Transparent();
+            Core.gui = Graphics.FromImage(Core.ImageUI);
 
             ImagePal = new Bitmap(RenderPal.Width, RenderPal.Height);
             Core.gp = Graphics.FromImage(ImagePal);
@@ -146,7 +150,14 @@ namespace WindowsFormsApp7
             RenderClass.Draw();
             RenderPalClass.Draw();
 
-            Render.Image = Core.Image;
+            Bitmap img = new Bitmap(Core.ImageUI.Width, Core.ImageUI.Height);
+            using (Graphics g = Graphics.FromImage(img))
+            {
+                g.DrawImage(Core.Image, 0, 0);
+                g.DrawImage(Core.ImageUI, 0, 0);
+            }
+
+            Render.Image = img;
             RenderPal.Image = ImagePal;
         }
     }
