@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Printing;
+using System.Text.RegularExpressions;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace WindowsFormsApp7.UI
 {
     public class UIButton : UIBase
     {
+        public static Regex RxAlphaNum = new Regex(@"^[a-zA-Z0-9\s,]*$");
+
         public string Text;
         public Bitmap Icon;
         public int Margin { get; private set; } = 5;
@@ -59,7 +63,7 @@ namespace WindowsFormsApp7.UI
                 if(Icon != null)
                     g.DrawImage(Icon, 0, 0);
                 else
-                    g.DrawString(Text, Font, new SolidBrush(TextColor), Margin, Margin);
+                    g.DrawString(Text, Font, new SolidBrush(TextColor), Margin, Text.Length == 1 && !RxAlphaNum.IsMatch(Text) ? -5 : Margin);
             }
             return result;
         }

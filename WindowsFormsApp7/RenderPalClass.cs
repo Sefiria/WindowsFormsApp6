@@ -406,6 +406,10 @@ namespace WindowsFormsApp7
             b.Tag = $"MISC Add Gradient";
             b.OnClick += (s, e) => { Pixels[pxid].Gradient.Add(Pixels[pxid].Gradient.Last()); LoadEditPixelUI(pxid); };
             UI.Add(b);
+            b = new UIButton(">", 2 + (x + 1) * (PalTileSZ + 2), y, w: PalTileSZ, h: PalTileSZ, margin: 0);
+            b.Tag = $"MISC Shift Left Gradient";
+            b.OnClick += (s, e) => { ShiftLeft(pxid); LoadEditPixelUI(pxid); };
+            UI.Add(b);
             Bitmap GenIsLerpImg()
             {
                 Bitmap imgL = new Bitmap(16, 16);
@@ -417,11 +421,22 @@ namespace WindowsFormsApp7
                 }
                 return imgL;
             }
-            b = new UIButton(GenIsLerpImg(), 2 + (x + 1) * (PalTileSZ + 2), y);
+            b = new UIButton(GenIsLerpImg(), b.X + b.W + 2, y);
             b.Tag = $"MISC isLerp";
             b.OnClick += (s, e) => { Pixels[pxid].IsLerp = !Pixels[pxid].IsLerp; b.Image = GenIsLerpImg(); };
             UI.Add(b);
         }
+
+        private static void ShiftLeft(int pxid)
+        {
+            var px = Pixels[pxid];
+            var g = new List<Color>();
+            g.Add(px.Gradient[px.Gradient.Count - 1]);
+            for (int i = 0; i < px.Gradient.Count - 1; i++)
+                g.Add(px.Gradient[i]);
+            Pixels[pxid].Gradient = g;
+        }
+
         public static void LoadEditPixelGradientUI(int pxid, int gid)
         {
             ColorDialog.Color = Pixels[pxid].Gradient[gid];
