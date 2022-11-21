@@ -64,6 +64,8 @@ namespace WindowsFormsApp8
         private static void DrawAnimatedSelection()
         {
             Point ms = Core.MouseSnap;
+            if (ms.X < 0 || ms.Y < 0 || ms.X >= Core.WT * Core.TileSz || ms.Y >= Core.HT * Core.TileSz)
+                return;
             if (AnimSelTmr == 2)
             {
                 AnimSelId++;

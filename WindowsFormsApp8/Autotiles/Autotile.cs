@@ -65,7 +65,7 @@ namespace WindowsFormsApp8.Autotiles
             if (ResSplit.Count == 1)
                 return ResSplit["single"][0];
 
-
+            return null;
         }
     }
 }

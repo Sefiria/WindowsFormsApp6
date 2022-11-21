@@ -61,6 +61,7 @@ namespace WindowsFormsApp8
         {
             RenderClass.Update();
         }
+
         private void Draw(object sender, EventArgs e)
         {
             Bitmap renderImage = new Bitmap(Core.W, Core.H);
@@ -79,6 +80,29 @@ namespace WindowsFormsApp8
             }
 
             Render.Image = renderImage;
+        }
+
+
+
+        private void listTiles_MouseDown(object sender, MouseEventArgs e)
+        {
+            if(e.Button == MouseButtons.Right)
+            {
+                ToolStripDropDown menu = new ToolStripDropDown();
+                menu.BackColor = Color.FromArgb(22, 22, 22);
+                menu.ForeColor = Color.FromArgb(200, 200, 200);
+                menu.Font = new Font("Segoe UI", 12F);
+
+                var item = listTiles.GetChildAtPoint(e.Location) as ToolStripItem;
+                if (item != null)
+                    ;
+
+                menu.Items.Add("toto");
+                menu.Items.Add(new ToolStripSeparator());
+                menu.Items.Add("tata");
+
+                menu.Show(listTiles, e.Location);
+            }
         }
     }
 }
