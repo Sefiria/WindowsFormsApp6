@@ -135,7 +135,7 @@ namespace WindowsFormsApp7
 
         private void LoadImported(string fileName)
         {
-            var img = ((Bitmap) System.Drawing.Image.FromFile(fileName));
+            var img = ((Bitmap) Image.FromFile(fileName));
             ImageIndexing.Process(img);
             RenderPalClass.Initialize();
         }

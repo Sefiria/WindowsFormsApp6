@@ -19,6 +19,7 @@ namespace WindowsFormsApp7
             new Pixel(),
             new Pixel(){Gradient = new List<Color>() { Color.White } },
         };
+        private static UIButton PalTickValueButton;
         public static int LastPalY = 0;
         private static byte m_SelectedPixelId = 0;
         public static byte SelectedPixelId
@@ -44,6 +45,9 @@ namespace WindowsFormsApp7
         public static void Initialize()
         {
             UI.Clear();
+
+            EditingPixelId = -1;
+            SelectedPixelId = 0;
 
             UIButton b;
             int x = 2, y = 10;
@@ -100,9 +104,36 @@ namespace WindowsFormsApp7
             b.OnClick += (s, e) => SaveImg();
             b.BoundWidth = 2F;
             UI.Add(b);
+
+            x = 2;
+            y = 100;
+
+            b = new UIButton($"TickVal:{100}", x, y, Color.White, Color.Gray);
+            b.Text = $"TickVal:{Core.PalTickValue}";
+            b.Image = b.GenerateButtonImage();
+            b.Tag = $"Config TickValue";
+            b.OnClick += (s, e) => ChangePalTickValue();
+            b.BoundWidth = 2F;
+            PalTickValueButton = b;
+            UI.Add(b);
             x += b.Image.Width + 6;
 
             DisplayPixelsUI();
+        }
+        private static void ResetPalTickValueButtonDisplay()
+        {
+            PalTickValueButton.Text = $"TickVal:{Core.PalTickValue}";
+            PalTickValueButton.Image = PalTickValueButton.GenerateButtonImage();
+        }
+        private static void ChangePalTickValue()
+        {
+            if (Core.PalTickValue == 100) Core.PalTickValue = 1;
+            if (Core.PalTickValue == 50) Core.PalTickValue = 100;
+            if (Core.PalTickValue == 25) Core.PalTickValue = 50;
+            if (Core.PalTickValue == 10) Core.PalTickValue = 25;
+            if (Core.PalTickValue == 5) Core.PalTickValue = 10;
+            if (Core.PalTickValue == 1) Core.PalTickValue = 5;
+            ResetPalTickValueButtonDisplay();
         }
         private static void DisplayPixelsUI()
         {
@@ -111,8 +142,8 @@ namespace WindowsFormsApp7
             UIButton b;
             Bitmap img = new Bitmap(PalTileSZ, PalTileSZ);
             Graphics g = Graphics.FromImage(img);
-            int x = 1;
-            int y = 100;
+            int x = 2;
+            int y = 150;
             for (byte i = 0; i < Pixels.Count; i++)
             {
                 if (2 + (x + 1) * (PalTileSZ + 2) >= Core.RPW)
@@ -214,6 +245,9 @@ namespace WindowsFormsApp7
             if (dial.ShowDialog() != DialogResult.OK) return;
             string content = File.ReadAllText(dial.FileName).UnZip();
             string[] lines = content.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+            Core.PalTickValue = int.Parse(lines[0]);
+            ResetPalTickValueButtonDisplay();
+            lines = lines.Skip(1).ToArray();
             Pixel p;
             List<Color> colors;
             Pixels.Clear();
@@ -238,7 +272,7 @@ namespace WindowsFormsApp7
             var dial = new SaveFileDialog();
             dial.Filter = "PAL files | *.pal";
             if (dial.ShowDialog() != DialogResult.OK) return;
-            string content = "";
+            string content = Core.PalTickValue.ToString() + Environment.NewLine;
             foreach(var px in Pixels)
             {
                 content += px.IsLerp ? "1" : "0";

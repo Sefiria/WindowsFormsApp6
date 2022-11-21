@@ -63,8 +63,8 @@ namespace WindowsFormsApp7
         }
         public static void Increase()
         {
-            t += 0.1;
-            if (t >1D)
+            t += 1D / (Core.PalTickValue / 10D);
+            if (t > 1D)
             {
                 GradientId++;
                 t = 0D;
@@ -94,9 +94,9 @@ namespace WindowsFormsApp7
         {
             if (!IsMouseInRender(e)) return;
 
-            if (MouseRightDown && e.X / Core.TileSzZoom < Pixels.GetLength(0) && e.Y / Core.TileSzZoom < Pixels.GetLength(1))
+            if (MouseRightDown && (e.X - OfstX) / Core.Zoom < Pixels.GetLength(0) && (e.Y - OfstX) / Core.Zoom < Pixels.GetLength(1))
             {
-                RenderPalClass.SelectedPixelId = Pixels[(e.X - OfstX) / Core.TileSzZoom, (e.Y - OfstY) / Core.TileSzZoom];
+                RenderPalClass.SelectedPixelId = Pixels[(e.X - OfstX) / Core.Zoom, (e.Y - OfstY) / Core.Zoom];
                 RenderPalClass.LoadEditPixelUI(RenderPalClass.SelectedPixelId);
                 return;
             }
@@ -110,7 +110,7 @@ namespace WindowsFormsApp7
                 else if (Tool == 1)
                 {
                     if(!IsMouseInRender(e)) return;
-                    Tools.FloodFill(new Point((e.X - OfstX) / Core.TileSzZoom, (e.Y - OfstY) / Core.TileSzZoom), RenderPalClass.SelectedPixelId);
+                    Tools.FloodFill(new Point((e.X - OfstX) / Core.Zoom, (e.Y - OfstY) / Core.Zoom), RenderPalClass.SelectedPixelId);
                     SetImage();
                 }
             }
@@ -130,7 +130,7 @@ namespace WindowsFormsApp7
 
             if (MouseRightDown)
             {
-                RenderPalClass.SelectedPixelId = Pixels[eX / Core.RWxZ, eY / Core.RHxZ];
+                RenderPalClass.SelectedPixelId = Pixels[eX / Core.Zoom, eY / Core.Zoom];
                 RenderPalClass.LoadEditPixelUI(RenderPalClass.SelectedPixelId);
                 return;
             }
@@ -229,7 +229,7 @@ namespace WindowsFormsApp7
             {
                 Pen p = new Pen(Color.FromArgb(20, 20, 20));
                 for (int x = 0; x < Core.RW; x++)
-                    for (int y = 0; y < Core.RW; y++)
+                    for (int y = 0; y < Core.RH; y++)
                     {
                         if (x == 0 && y == 0) continue;
                         if (y > 0) Core.gui.DrawLine(p, OfstX + x * Core.Zoom, OfstY + y * Core.Zoom, OfstX + (x + 1) * Core.Zoom - 1, OfstY + y * Core.Zoom);

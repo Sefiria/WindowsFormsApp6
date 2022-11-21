@@ -14,6 +14,7 @@ namespace WindowsFormsApp7
         public static Point MousePosition = new Point(-1, -1);
         public static Bitmap Image, ImageUI;
         public static int IterationsCount = 4;
+        public static int PalTickValue = 10;
         public static int TileSzZoom =>TileSz * Zoom;
 
         public static Graphics gui;
