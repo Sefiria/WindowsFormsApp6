@@ -273,12 +273,37 @@ namespace WindowsFormsApp8
             foreach (Tile tile in Core.ListTiles.Items) tile.ModifiedPixels = tile.GetAllPixelsPoints();
         }
 
-        internal static void ClearTileList()
+        public static void ClearTileList()
         {
             Core.ListTiles.Items.Clear();
+            ClearRenderImage();
+        }
+        public static void ClearRenderImage()
+        {
             Core.Image = new Bitmap(Core.Image.Width, Core.Image.Height);
             Core.g.Dispose();
             Core.g = Graphics.FromImage(Core.Image);
+        }
+
+        public static void ChangeTilesArraySize()
+        {
+            byte[,] tiles = new byte[Tiles.GetLength(0), Tiles.GetLength(1)];
+            for (int x = 0; x < Tiles.GetLength(0); x++)
+            {
+                for (int y = 0; y < Tiles.GetLength(1); y++)
+                {
+                    tiles[x, y] = Tiles[x, y];
+                }
+            }
+            Tiles = new byte[Core.WT, Core.HT];
+            for (int x = 0; x < tiles.GetLength(0) && x < Tiles.GetLength(0); x++)
+            {
+                for (int y = 0; y < tiles.GetLength(1) && y < Tiles.GetLength(1); y++)
+                {
+                    Tiles[x, y] = tiles[x, y];
+                }
+            }
+            ClearRenderImage();
         }
     }
 }

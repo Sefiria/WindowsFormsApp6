@@ -154,6 +154,9 @@ namespace WindowsFormsApp8
                     }
                 }
             }
+
+            if (e.KeyCode == Keys.C)
+                Configs();
         }
 
         int GetListTilesItemClicked(MouseEventArgs e)
@@ -165,6 +168,11 @@ namespace WindowsFormsApp8
                     return i;
             }
             return -1;
+        }
+
+        private void Configs()
+        {
+            new Configs().ShowDialog(this);
         }
     }
 }

@@ -49,6 +49,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Autotiles\Autotile.cs" />
+    <Compile Include="Configs.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Configs.Designer.cs">
+      <DependentUpon>Configs.cs</DependentUpon>
+    </Compile>
     <Compile Include="Core.cs" />
     <Compile Include="FileCompressor.cs" />
     <Compile Include="Form1.cs">
@@ -65,6 +71,9 @@
     <Compile Include="RenderClass.cs" />
     <Compile Include="Tile.cs" />
     <Compile Include="Tools.cs" />
+    <EmbeddedResource Include="Configs.resx">
+      <DependentUpon>Configs.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
