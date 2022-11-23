@@ -124,4 +124,10 @@
   <data name="grass" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\grass.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="tool_bucket" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\tool_bucket.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="tool_pen" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\tool_pen.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WindowsFormsApp8.Properties;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace WindowsFormsApp8
@@ -24,6 +25,7 @@ namespace WindowsFormsApp8
 
             Core.RW = Render.Width;
             Core.RH = Render.Height;
+            Core.Cam = new Point(-Core.RW / 2 + (Core.WT * Core.TileSz) / 2, -Core.RH / 2 + (Core.HT * Core.TileSz) / 2);
             Core.Image = new Bitmap(Core.RW, Core.RH);
             Core.g = Graphics.FromImage(Core.Image);
             ImageUI = new Bitmap(Core.RW, Core.RH);
@@ -36,12 +38,19 @@ namespace WindowsFormsApp8
             TimerDraw.Tick += Draw;
 
             listTiles.ForeColor = Color.White;
+
+            btPen_Click(null, null);
         }
 
         private void Render_MouseDown(object sender, MouseEventArgs e)
         {
             Core.IsMouseDown = true;
             Core.IsRightMouseDown = e.Button == MouseButtons.Right;
+            if(e.Button == MouseButtons.Middle)
+            {
+                Core.IsMiddleMouseDown = true;
+                RenderClass.MousePositionAtMiddleFirstClick = e.Location;
+            }
             RenderClass.MouseDown();
         }
         private void Render_MouseLeave(object sender, EventArgs e)
@@ -53,9 +62,12 @@ namespace WindowsFormsApp8
         {
             Core.IsMouseDown = false;
             Core.IsRightMouseDown = false;
+            Core.IsMiddleMouseDown = false;
         }
         private void Render_MouseMove(object sender, MouseEventArgs e)
         {
+            if (e.Button == MouseButtons.Middle)
+                RenderClass.MousePositionAtMiddleFirstClick = e.Location;
             RenderClass.MouseMove();
             Core.MousePosition = e.Location;
         }
@@ -131,7 +143,7 @@ namespace WindowsFormsApp8
             {
                 if (listTiles.SelectedIndex < listTiles.Items.Count - 1)
                 {
-                    if (e.KeyCode == Keys.Tab)
+                    if (e.KeyCode == Keys.D1)
                         listTiles.SelectedIndex++;
                     if (e.KeyCode == Keys.Down)
                     {
@@ -143,7 +155,7 @@ namespace WindowsFormsApp8
                 }
                 if (listTiles.SelectedIndex > 0)
                 {
-                    if (e.Shift && e.KeyCode == Keys.Tab)
+                    if (e.Shift && e.KeyCode == Keys.D1)
                         listTiles.SelectedIndex--;
                     if (e.KeyCode == Keys.Up)
                     {
@@ -157,6 +169,14 @@ namespace WindowsFormsApp8
 
             if (e.KeyCode == Keys.C)
                 Configs();
+
+            if (e.KeyCode == Keys.OemQuotes)
+            {
+                if (RenderClass.Tool == RenderClass.Tools.Pen)
+                    btBucket_Click(null, null);
+                else
+                    btPen_Click(null, null);
+            }
         }
 
         int GetListTilesItemClicked(MouseEventArgs e)
@@ -173,6 +193,17 @@ namespace WindowsFormsApp8
         private void Configs()
         {
             new Configs().ShowDialog(this);
+        }
+
+        private void btPen_Click(object sender, EventArgs e)
+        {
+            RenderClass.Tool = RenderClass.Tools.Pen;
+            imgUsedTool.Image = Resources.tool_pen;
+        }
+        private void btBucket_Click(object sender, EventArgs e)
+        {
+            RenderClass.Tool = RenderClass.Tools.Bucket;
+            imgUsedTool.Image = Resources.tool_bucket;
         }
     }
 }

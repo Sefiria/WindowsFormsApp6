@@ -102,6 +102,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\auto_pavement.png" />
+    <Content Include="Resources\tool_bucket.png" />
+    <Content Include="Resources\tool_pen.png" />
     <Content Include="Resources\grass.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

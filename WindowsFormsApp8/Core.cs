@@ -17,12 +17,15 @@ namespace WindowsFormsApp8
         public static Graphics g, gui;
         public static bool IsMouseDown = false;
         public static bool IsRightMouseDown = false;
+        public static bool IsMiddleMouseDown = false;
         public static Palette Palette;
         public static ListBox ListTiles;
+        public static PointF Cam;
 
         public static int WT = 16;
         public static int HT = 16;
         public static Point MouseTile => new Point(MousePosition.X / TileSz, MousePosition.Y / TileSz);
         public static Point MouseSnap => new Point(MouseTile.X * TileSz, MouseTile.Y * TileSz);
+        public static Rectangle CamTile => new Rectangle((int)Cam.X / TileSz, (int)Cam.Y / TileSz, RW / TileSz, RH / TileSz);
     }
 }

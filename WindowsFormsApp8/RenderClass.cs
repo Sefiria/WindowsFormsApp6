@@ -12,9 +12,17 @@ namespace WindowsFormsApp8
 {
     public class RenderClass
     {
+        public enum Tools
+        {
+            Pen,
+            Bucket,
+        }
+
         public static byte[,] Tiles = new byte[Core.WT, Core.HT];
         public static List<Point> ModifiedTiles = new List<Point>();
         public static int AnimSelTmr = 0, AnimSelId = 0;
+        public static Point MousePositionAtMiddleFirstClick;
+        public static Tools Tool = Tools.Pen;
 
         public static List<Point> GetAllTilesPoints()
         {
@@ -41,11 +49,28 @@ namespace WindowsFormsApp8
 
         public static void MouseDown()
         {
-            MouseMove();
+            if (Tool == Tools.Bucket && !Core.IsRightMouseDown && !Core.IsMiddleMouseDown)
+            {
+                Point ms = new Point(Core.MouseTile.X + Core.CamTile.X, Core.MouseTile.Y + Core.CamTile.Y);
+                FloodFillTiles(ms, (byte)Core.ListTiles.SelectedIndex);
+            }
+            else
+            {
+                MouseMove();
+            }
         }
         public static void MouseMove()
         {
-            if (Core.MouseTile.X < 0 || Core.MouseTile.Y < 0 || Core.MouseTile.X >= Core.WT || Core.MouseTile.Y >= Core.HT)
+            if (Core.IsMiddleMouseDown)
+            {
+                Core.Cam.X += Core.MousePosition.X - MousePositionAtMiddleFirstClick.X;
+                Core.Cam.Y += Core.MousePosition.Y - MousePositionAtMiddleFirstClick.Y;
+                ClearRenderImage();
+                return;
+            }
+
+            Point ms = new Point(Core.MouseTile.X + Core.CamTile.X, Core.MouseTile.Y + Core.CamTile.Y);
+            if (ms.X < 0 || ms.Y < 0 || ms.X >= Core.WT || ms.Y >= Core.HT)
                 return;
 
             if (!Core.IsMouseDown)
@@ -60,8 +85,11 @@ namespace WindowsFormsApp8
             if (Core.ListTiles.SelectedIndex == -1)
                 return;
 
-            Tiles[Core.MouseTile.X, Core.MouseTile.Y] = (byte)Core.ListTiles.SelectedIndex;
-            ModifiedTiles.Add(Core.MouseTile);
+            if (Tool == Tools.Pen)
+            {
+                Tiles[Core.MouseTile.X + Core.CamTile.X, Core.MouseTile.Y + Core.CamTile.Y] = (byte)Core.ListTiles.SelectedIndex;
+                ModifiedTiles.Add(Core.MouseTile);
+            }
         }
 
         public static void Update()
@@ -84,8 +112,10 @@ namespace WindowsFormsApp8
             {
                 for (int y = 0; y < Core.HT; y++)
                 {
+                    if (x < Core.CamTile.X - 1 || y < Core.CamTile.Y - 1 || x >= Core.CamTile.X + Core.CamTile.Width + 1 || y >= Core.CamTile.Y + Core.CamTile.Height + 1)
+                        continue;
                     if (Tiles[x, y] < Core.ListTiles.Items.Count)
-                        Core.g.DrawImage((Core.ListTiles.Items[Tiles[x, y]] as Tile).Image, x * Core.TileSz, y * Core.TileSz);
+                        Core.g.DrawImage((Core.ListTiles.Items[Tiles[x, y]] as Tile).Image, x * Core.TileSz - Core.Cam.X, y * Core.TileSz - Core.Cam.Y);
                 }
             }
 
@@ -93,8 +123,8 @@ namespace WindowsFormsApp8
         }
         private static void DrawAnimatedSelection()
         {
-            Point ms = Core.MouseSnap;
-            if (ms.X < 0 || ms.Y < 0 || ms.X >= Core.WT * Core.TileSz || ms.Y >= Core.HT * Core.TileSz)
+            Point ms = new Point(Core.MouseSnap.X - (int)Core.Cam.X % Core.TileSz, Core.MouseSnap.Y - (int)Core.Cam.Y % Core.TileSz);
+            if (ms.X + Core.Cam.X < 0 || ms.Y + Core.Cam.Y < 0 || ms.X + Core.Cam.X >= Core.WT * Core.TileSz || ms.Y + Core.Cam.Y >= Core.HT * Core.TileSz)
                 return;
             if (AnimSelTmr == 2)
             {
@@ -304,6 +334,43 @@ namespace WindowsFormsApp8
                 }
             }
             ClearRenderImage();
+        }
+
+
+        public static void FloodFillTiles(Point pt, byte replacementPx)
+        {
+            byte targetPx = Tiles[pt.X, pt.Y];
+            if (targetPx == replacementPx)
+                return;
+            Queue<Point> q = new Queue<Point>();
+            q.Enqueue(pt);
+            while (q.Count > 0)
+            {
+                Point n = q.Dequeue();
+                if (Tiles[n.X, n.Y] != targetPx)
+                    continue;
+                Point w = n, e = new Point(n.X + 1, n.Y);
+                while ((w.X >= 0) && Tiles[w.X, w.Y] == targetPx)
+                {
+                    Tiles[w.X, w.Y] = replacementPx;
+                    ModifiedTiles.Add(w);
+                    if ((w.Y > 0) && Tiles[w.X, w.Y - 1] == targetPx)
+                        q.Enqueue(new Point(w.X, w.Y - 1));
+                    if ((w.Y < Core.HT - 1) && Tiles[w.X, w.Y + 1] == targetPx)
+                        q.Enqueue(new Point(w.X, w.Y + 1));
+                    w.X--;
+                }
+                while ((e.X <= Core.WT - 1) && Tiles[e.X, e.Y] == targetPx)
+                {
+                    Tiles[e.X, e.Y] = replacementPx;
+                    ModifiedTiles.Add(e);
+                    if ((e.Y > 0) && Tiles[e.X, e.Y - 1] == targetPx)
+                        q.Enqueue(new Point(e.X, e.Y - 1));
+                    if ((e.Y < Core.HT - 1) && Tiles[e.X, e.Y + 1] == targetPx)
+                        q.Enqueue(new Point(e.X, e.Y + 1));
+                    e.X++;
+                }
+            }
         }
     }
 }
