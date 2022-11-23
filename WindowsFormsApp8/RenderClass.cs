@@ -19,9 +19,9 @@ namespace WindowsFormsApp8
         public static List<Point> GetAllTilesPoints()
         {
             List<Point> result = new List<Point>();
-            for(int x=0; x<Core.WT; x++)
+            for (int x = 0; x < Core.WT; x++)
             {
-                for(int y=0; y<Core.HT; y++)
+                for (int y = 0; y < Core.HT; y++)
                 {
                     result.Add(new Point(x, y));
                 }
@@ -51,7 +51,7 @@ namespace WindowsFormsApp8
             if (!Core.IsMouseDown)
                 return;
 
-            if(Core.IsRightMouseDown)
+            if (Core.IsRightMouseDown && Tiles[Core.MouseTile.X, Core.MouseTile.Y] < Core.ListTiles.Items.Count)
             {
                 Core.ListTiles.SelectedIndex = Tiles[Core.MouseTile.X, Core.MouseTile.Y];
                 return;
@@ -81,10 +81,11 @@ namespace WindowsFormsApp8
         {
             if (Core.Palette == null || Core.ListTiles.Items.Count == 0) return;
             for (int x = 0; x < Core.WT; x++)
-                {
+            {
                 for (int y = 0; y < Core.HT; y++)
                 {
-                    Core.g.DrawImage((Core.ListTiles.Items[Tiles[x, y]] as Tile).Image, x * Core.TileSz, y * Core.TileSz);
+                    if (Tiles[x, y] < Core.ListTiles.Items.Count)
+                        Core.g.DrawImage((Core.ListTiles.Items[Tiles[x, y]] as Tile).Image, x * Core.TileSz, y * Core.TileSz);
                 }
             }
 
@@ -135,7 +136,8 @@ namespace WindowsFormsApp8
             Core.HT = ht;
             Core.TileSz = tsz;
             ImportPalette(fnpal);
-            foreach(string fntile in fntiles)
+            ClearTileList();
+            foreach (string fntile in fntiles)
                 ImportTile(fntile);
             Core.TileSz = tsz;
             Tiles = new byte[wt, ht];
@@ -153,7 +155,7 @@ namespace WindowsFormsApp8
         }
         public static void SaveMap()
         {
-            if(Core.Palette == null)
+            if (Core.Palette == null)
             {
                 MessageBox.Show("No palette set in the map !");
                 return;
@@ -167,9 +169,9 @@ namespace WindowsFormsApp8
             content += Core.TileSz + Environment.NewLine;
             content += Core.Palette.FileName + Environment.NewLine;
             string fntiles = "";
-            foreach(Tile tile in Core.ListTiles.Items)
+            foreach (Tile tile in Core.ListTiles.Items)
                 fntiles += tile.FileName + ",";
-            content += fntiles.Remove(fntiles.Length-1) + Environment.NewLine;
+            content += fntiles.Remove(fntiles.Length - 1) + Environment.NewLine;
             for (int x = 0; x < Core.WT; x++)
             {
                 for (int y = 0; y < Core.HT; y++)
@@ -180,23 +182,31 @@ namespace WindowsFormsApp8
             File.WriteAllText(dial.FileName, content.Zip());
         }
 
-        public static void ImportTile()
+        public static Tile GetImportedTile()
         {
+            Tile tile = null;
             var dial = new OpenFileDialog();
             dial.Filter = "TIL files | *.til";
             if (dial.ShowDialog() == DialogResult.OK)
-                ImportTile(dial.FileName);
+                tile = GetImportedTile(dial.FileName);
+            return tile;
         }
-        public static void ImportTile(string fnTile)
+        public static Tile GetImportedTile(string fnTile)
         {
+            if (!File.Exists(fnTile))
+            {
+                MessageBox.Show($"[Tile] File Not Found :{Environment.NewLine}{fnTile}");
+                ImportTile();
+                return null;
+            }
             string content = File.ReadAllText(fnTile).UnZip();
             string[] lines = content.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
-            if (lines.Length != 5) return;
-            if (!int.TryParse(lines[0], out int rw)) return;
-            if (!int.TryParse(lines[1], out int rh)) return;
-            if (!int.TryParse(lines[2], out int tsz)) return;
-            if (!int.TryParse(lines[3], out int iten)) return;
-            if (lines[4].Length != (rw / tsz) * (rh / tsz)) return;
+            if (lines.Length != 5) return null;
+            if (!int.TryParse(lines[0], out int rw)) return null;
+            if (!int.TryParse(lines[1], out int rh)) return null;
+            if (!int.TryParse(lines[2], out int tsz)) return null;
+            if (!int.TryParse(lines[3], out int iten)) return null;
+            if (lines[4].Length != (rw / tsz) * (rh / tsz)) return null;
             Tile tile = new Tile(fnTile, Path.GetFileNameWithoutExtension(fnTile), rw, rh, iten);
             tile.Pixels = new byte[rw / tsz, rh / tsz];
             byte px;
@@ -209,7 +219,20 @@ namespace WindowsFormsApp8
                     tile.ModifiedPixels.Add(new Point(x, y));
                 }
             }
-            Core.ListTiles.Items.Add(tile);
+            return tile;
+        }
+        public static void ImportTile()
+        {
+            var dial = new OpenFileDialog();
+            dial.Filter = "TIL files | *.til";
+            if (dial.ShowDialog() == DialogResult.OK)
+                ImportTile(dial.FileName);
+        }
+        public static void ImportTile(string fnTile)
+        {
+            var tile = GetImportedTile(fnTile);
+            if (tile != null)
+                Core.ListTiles.Items.Add(tile);
         }
         public static void ImportPalette()
         {
@@ -220,6 +243,12 @@ namespace WindowsFormsApp8
         }
         public static void ImportPalette(string fnPal)
         {
+            if (!File.Exists(fnPal))
+            {
+                MessageBox.Show($"[Palette] File Not Found :{Environment.NewLine}{fnPal}");
+                ImportPalette();
+                return;
+            }
             string content = File.ReadAllText(fnPal).UnZip();
             string[] lines = content.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
             Core.Palette = new Palette(fnPal);
@@ -242,6 +271,14 @@ namespace WindowsFormsApp8
                 Core.Palette.Pixels.Add(p);
             }
             foreach (Tile tile in Core.ListTiles.Items) tile.ModifiedPixels = tile.GetAllPixelsPoints();
+        }
+
+        internal static void ClearTileList()
+        {
+            Core.ListTiles.Items.Clear();
+            Core.Image = new Bitmap(Core.Image.Width, Core.Image.Height);
+            Core.g.Dispose();
+            Core.g = Graphics.FromImage(Core.Image);
         }
     }
 }

@@ -12,6 +12,7 @@ namespace WindowsFormsApp8
     {
         public static int RW, RH;
         public static int TileSz = 32;
+        public static Bitmap Image;
         public static Point MousePosition;
         public static Graphics g, gui;
         public static bool IsMouseDown = false;

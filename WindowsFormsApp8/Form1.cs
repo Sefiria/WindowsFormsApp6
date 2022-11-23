@@ -16,7 +16,7 @@ namespace WindowsFormsApp8
     {
         Timer TimerUpdate = new Timer() { Enabled = true, Interval = 10 };
         Timer TimerDraw = new Timer() { Enabled = true, Interval = 10 };
-        Bitmap Image, ImageUI;
+        Bitmap ImageUI;
 
         public Form1()
         {
@@ -24,8 +24,8 @@ namespace WindowsFormsApp8
 
             Core.RW = Render.Width;
             Core.RH = Render.Height;
-            Image = new Bitmap(Core.RW, Core.RH);
-            Core.g = Graphics.FromImage(Image);
+            Core.Image = new Bitmap(Core.RW, Core.RH);
+            Core.g = Graphics.FromImage(Core.Image);
             ImageUI = new Bitmap(Core.RW, Core.RH);
             ImageUI.MakeTransparent(Color.White);
             Core.ListTiles = listTiles;
@@ -74,7 +74,7 @@ namespace WindowsFormsApp8
                 {
                     RenderClass.Draw();
 
-                    g.DrawImage(Image, 0, 0);
+                    g.DrawImage(Core.Image, 0, 0);
                     g.DrawImage(ImageUI, 0, 0);
 
                     Core.gui.Clear(Color.White);
@@ -100,6 +100,9 @@ namespace WindowsFormsApp8
                 if (itemId != -1)
                 {
                     // Click on a specific item
+                    menu.Items.Add("Replace Tile").Click += (_s, _e) => { var tile = RenderClass.GetImportedTile(); if (tile != null) listTiles.Items[itemId] = tile; };
+                    menu.Items.Add(new ToolStripSeparator());
+                    menu.Items.Add("Remove Tile").Click += (_s, _e) => listTiles.Items.RemoveAt(itemId);
 
                 }
                 else
@@ -108,7 +111,7 @@ namespace WindowsFormsApp8
                     menu.Items.Add("Import Tile").Click += (_s, _e) => RenderClass.ImportTile();
                     menu.Items.Add("Import Palette").Click += (_s, _e) => RenderClass.ImportPalette();
                     menu.Items.Add(new ToolStripSeparator());
-                    menu.Items.Add("Clear").Click += (_s, _e) => { if (MessageBox.Show(this, "Are you sure you want to clear the item list ?", "Clear", MessageBoxButtons.YesNo) == DialogResult.Yes) listTiles.Items.Clear(); };
+                    menu.Items.Add("Clear").Click += (_s, _e) => { if (MessageBox.Show(this, "Are you sure you want to clear the item list ?", "Clear", MessageBoxButtons.YesNo) == DialogResult.Yes) RenderClass.ClearTileList(); };
 
                 }
 
@@ -123,6 +126,34 @@ namespace WindowsFormsApp8
 
             if (e.KeyCode == Keys.S)
                 RenderClass.SaveMap();
+
+            if (listTiles.SelectedIndex > -1)
+            {
+                if (listTiles.SelectedIndex < listTiles.Items.Count - 1)
+                {
+                    if (e.KeyCode == Keys.Tab)
+                        listTiles.SelectedIndex++;
+                    if (e.KeyCode == Keys.Down)
+                    {
+                        Tile tile = listTiles.SelectedItem as Tile;
+                        listTiles.Items[listTiles.SelectedIndex] = listTiles.Items[listTiles.SelectedIndex + 1];
+                        listTiles.Items[listTiles.SelectedIndex + 1] = tile;
+                        listTiles.SelectedIndex++;
+                    }
+                }
+                if (listTiles.SelectedIndex > 0)
+                {
+                    if (e.Shift && e.KeyCode == Keys.Tab)
+                        listTiles.SelectedIndex--;
+                    if (e.KeyCode == Keys.Up)
+                    {
+                        Tile tile = listTiles.SelectedItem as Tile;
+                        listTiles.Items[listTiles.SelectedIndex] = listTiles.Items[listTiles.SelectedIndex - 1];
+                        listTiles.Items[listTiles.SelectedIndex - 1] = tile;
+                        listTiles.SelectedIndex--;
+                    }
+                }
+            }
         }
 
         int GetListTilesItemClicked(MouseEventArgs e)
