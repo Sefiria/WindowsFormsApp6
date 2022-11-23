@@ -63,7 +63,7 @@ namespace WindowsFormsApp7
         }
         public static void Increase()
         {
-            t += 1D / (Core.PalTickValue / 10D);
+            t += Core.PalTickValue / 100D;
             if (t > 1D)
             {
                 GradientId++;

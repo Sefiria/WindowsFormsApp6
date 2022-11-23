@@ -127,12 +127,13 @@ namespace WindowsFormsApp7
         }
         private static void ChangePalTickValue()
         {
-            if (Core.PalTickValue == 100) Core.PalTickValue = 1;
+            if (Core.PalTickValue == 100) Core.PalTickValue = -1;
             if (Core.PalTickValue == 50) Core.PalTickValue = 100;
             if (Core.PalTickValue == 25) Core.PalTickValue = 50;
             if (Core.PalTickValue == 10) Core.PalTickValue = 25;
             if (Core.PalTickValue == 5) Core.PalTickValue = 10;
             if (Core.PalTickValue == 1) Core.PalTickValue = 5;
+            if (Core.PalTickValue == -1) Core.PalTickValue = 1;
             ResetPalTickValueButtonDisplay();
         }
         private static void DisplayPixelsUI()
@@ -142,7 +143,7 @@ namespace WindowsFormsApp7
             UIButton b;
             Bitmap img = new Bitmap(PalTileSZ, PalTileSZ);
             Graphics g = Graphics.FromImage(img);
-            int x = 2;
+            int x = 1;
             int y = 150;
             for (byte i = 0; i < Pixels.Count; i++)
             {

@@ -36,9 +36,9 @@ namespace WindowsFormsApp8
             return (float)Math.Atan2(dy, dx);
         }
 
-        public static float Lerp(float v0, float v1, float t)
+        public static float Lerp(float v0, float v1, double t)
         {
-            return (1F - t) * v0 + t * v1;
+            return (float)((1D - t) * (double)v0 + t * (double)v1);
         }
     }
 }

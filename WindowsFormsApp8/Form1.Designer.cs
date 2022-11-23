@@ -44,6 +44,7 @@
             this.Render.MouseLeave += new System.EventHandler(this.Render_MouseLeave);
             this.Render.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Render_MouseMove);
             this.Render.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Render_MouseUp);
+            this.Render.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.Form_KeyDown);
             // 
             // listTiles
             // 
@@ -56,6 +57,7 @@
             this.listTiles.Size = new System.Drawing.Size(274, 407);
             this.listTiles.TabIndex = 1;
             this.listTiles.MouseDown += new System.Windows.Forms.MouseEventHandler(this.listTiles_MouseDown);
+            this.listTiles.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.Form_KeyDown);
             // 
             // Form1
             // 
@@ -68,7 +70,6 @@
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Form1";
-            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             ((System.ComponentModel.ISupportInitialize)(this.Render)).EndInit();
             this.ResumeLayout(false);
 

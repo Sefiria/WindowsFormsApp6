@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,40 +22,42 @@ namespace WindowsFormsApp8
         {
             InitializeComponent();
 
-            Core.W = Render.Width;
-            Core.H = Render.Height;
-            Image = new Bitmap(Core.W, Core.H);
+            Core.RW = Render.Width;
+            Core.RH = Render.Height;
+            Image = new Bitmap(Core.RW, Core.RH);
             Core.g = Graphics.FromImage(Image);
-            ImageUI = new Bitmap(Core.W, Core.H);
+            ImageUI = new Bitmap(Core.RW, Core.RH);
             ImageUI.MakeTransparent(Color.White);
+            Core.ListTiles = listTiles;
 
             RenderClass.Initialize();
 
             TimerUpdate.Tick += Update;
             TimerDraw.Tick += Draw;
+
+            listTiles.ForeColor = Color.White;
         }
 
         private void Render_MouseDown(object sender, MouseEventArgs e)
         {
             Core.IsMouseDown = true;
+            Core.IsRightMouseDown = e.Button == MouseButtons.Right;
             RenderClass.MouseDown();
         }
         private void Render_MouseLeave(object sender, EventArgs e)
         {
             Core.IsMouseDown = false;
+            Core.IsRightMouseDown = false;
         }
         private void Render_MouseUp(object sender, MouseEventArgs e)
         {
             Core.IsMouseDown = false;
+            Core.IsRightMouseDown = false;
         }
         private void Render_MouseMove(object sender, MouseEventArgs e)
         {
             RenderClass.MouseMove();
             Core.MousePosition = e.Location;
-        }
-
-        private void Form1_KeyDown(object sender, KeyEventArgs e)
-        {
         }
 
         private void Update(object sender, EventArgs e)
@@ -64,7 +67,7 @@ namespace WindowsFormsApp8
 
         private void Draw(object sender, EventArgs e)
         {
-            Bitmap renderImage = new Bitmap(Core.W, Core.H);
+            Bitmap renderImage = new Bitmap(Core.RW, Core.RH);
             using (Graphics g = Graphics.FromImage(renderImage))
             {
                 using (Core.gui = Graphics.FromImage(ImageUI))
@@ -93,16 +96,44 @@ namespace WindowsFormsApp8
                 menu.ForeColor = Color.FromArgb(200, 200, 200);
                 menu.Font = new Font("Segoe UI", 12F);
 
-                var item = listTiles.GetChildAtPoint(e.Location) as ToolStripItem;
-                if (item != null)
-                    ;
+                int itemId = GetListTilesItemClicked(e);
+                if (itemId != -1)
+                {
+                    // Click on a specific item
 
-                menu.Items.Add("toto");
-                menu.Items.Add(new ToolStripSeparator());
-                menu.Items.Add("tata");
+                }
+                else
+                {
+                    // Click away from items
+                    menu.Items.Add("Import Tile").Click += (_s, _e) => RenderClass.ImportTile();
+                    menu.Items.Add("Import Palette").Click += (_s, _e) => RenderClass.ImportPalette();
+                    menu.Items.Add(new ToolStripSeparator());
+                    menu.Items.Add("Clear").Click += (_s, _e) => { if (MessageBox.Show(this, "Are you sure you want to clear the item list ?", "Clear", MessageBoxButtons.YesNo) == DialogResult.Yes) listTiles.Items.Clear(); };
+
+                }
 
                 menu.Show(listTiles, e.Location);
             }
+        }
+
+        private void Form_KeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            if (e.KeyCode == Keys.L)
+                RenderClass.LoadMap();
+
+            if (e.KeyCode == Keys.S)
+                RenderClass.SaveMap();
+        }
+
+        int GetListTilesItemClicked(MouseEventArgs e)
+        {
+            for (int i = 0; i < listTiles.Items.Count; i++)
+            {
+                var rect = listTiles.GetItemRectangle(i);
+                if (rect.Contains(e.Location))
+                    return i;
+            }
+            return -1;
         }
     }
 }
