@@ -213,7 +213,7 @@ namespace WindowsFormsApp7
             {
                 for (int y = 0; y < rh / tsz; y++)
                 {
-                    px = (byte)int.Parse("" + lines[4][x * (rh / tsz) + y]);
+                    px = (byte)(lines[4][x * (rh / tsz) + y] - '0');
                     RenderClass.Pixels[x, y] = px < Pixels.Count ? px : (byte) 0;
                     RenderClass.ModifiedPixels.Add(new Point(x, y));
                 }
@@ -234,7 +234,7 @@ namespace WindowsFormsApp7
             {
                 for (int y = 0; y < Core.RHT; y++)
                 {
-                    content += RenderClass.Pixels[x, y];
+                    content += (char)('0'+RenderClass.Pixels[x, y]);
                 }
             }
             File.WriteAllText(dial.FileName, content.Zip());

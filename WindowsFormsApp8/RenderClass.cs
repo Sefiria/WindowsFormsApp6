@@ -76,9 +76,9 @@ namespace WindowsFormsApp8
             if (!Core.IsMouseDown)
                 return;
 
-            if (Core.IsRightMouseDown && Tiles[Core.MouseTile.X, Core.MouseTile.Y] < Core.ListTiles.Items.Count)
+            if (Core.IsRightMouseDown && Tiles[ms.X, ms.Y] < Core.ListTiles.Items.Count)
             {
-                Core.ListTiles.SelectedIndex = Tiles[Core.MouseTile.X, Core.MouseTile.Y];
+                Core.ListTiles.SelectedIndex = Tiles[ms.X, ms.Y];
                 return;
             }
 
@@ -108,6 +108,7 @@ namespace WindowsFormsApp8
         public static void Draw()
         {
             if (Core.Palette == null || Core.ListTiles.Items.Count == 0) return;
+            Bitmap img;
             for (int x = 0; x < Core.WT; x++)
             {
                 for (int y = 0; y < Core.HT; y++)
@@ -115,7 +116,11 @@ namespace WindowsFormsApp8
                     if (x < Core.CamTile.X - 1 || y < Core.CamTile.Y - 1 || x >= Core.CamTile.X + Core.CamTile.Width + 1 || y >= Core.CamTile.Y + Core.CamTile.Height + 1)
                         continue;
                     if (Tiles[x, y] < Core.ListTiles.Items.Count)
-                        Core.g.DrawImage((Core.ListTiles.Items[Tiles[x, y]] as Tile).Image, x * Core.TileSz - Core.Cam.X, y * Core.TileSz - Core.Cam.Y);
+                    {
+                        img = (Core.ListTiles.Items[Tiles[x, y]] as Tile).Image;
+                        if(img != null)
+                            Core.g.DrawImage(img, x * Core.TileSz - Core.Cam.X, y * Core.TileSz - Core.Cam.Y);
+                    }
                 }
             }
 
@@ -244,7 +249,7 @@ namespace WindowsFormsApp8
             {
                 for (int y = 0; y < rh / tsz; y++)
                 {
-                    px = (byte)int.Parse("" + lines[4][x * (rh / tsz) + y]);
+                    px = (byte)(lines[4][x * (rh / tsz) + y] - '0');
                     tile.Pixels[x, y] = px;
                     tile.ModifiedPixels.Add(new Point(x, y));
                 }
