@@ -128,6 +128,7 @@ namespace WindowsFormsApp8
         }
         private static void DrawAnimatedSelection()
         {
+            Point tms = new Point(((Core.MousePosition.X - (int)Core.Cam.X % Core.TileSz) / Core.TileSz) * Core.TileSz, ((Core.MousePosition.Y - (int)Core.Cam.Y % Core.TileSz) / Core.TileSz) * Core.TileSz);
             Point ms = new Point(Core.MouseSnap.X - (int)Core.Cam.X % Core.TileSz, Core.MouseSnap.Y - (int)Core.Cam.Y % Core.TileSz);
             if (ms.X + Core.Cam.X < 0 || ms.Y + Core.Cam.Y < 0 || ms.X + Core.Cam.X >= Core.WT * Core.TileSz || ms.Y + Core.Cam.Y >= Core.HT * Core.TileSz)
                 return;
@@ -151,6 +152,8 @@ namespace WindowsFormsApp8
             Core.gui.DrawLine(AnimSelId == 5 ? pa : (new[] { 4, 6 }.Contains(AnimSelId) ? pb : pc), ms.X + Core.TileSz / 2, ms.Y + Core.TileSz, ms.X - 1, ms.Y + Core.TileSz);
             Core.gui.DrawLine(AnimSelId == 6 ? pa : (new[] { 5, 7 }.Contains(AnimSelId) ? pb : pc), ms.X - 1, ms.Y + Core.TileSz, ms.X - 1, ms.Y + Core.TileSz / 2);
             Core.gui.DrawLine(AnimSelId == 7 ? pa : (new[] { 6, 0 }.Contains(AnimSelId) ? pb : pc), ms.X - 1, ms.Y + Core.TileSz / 2, ms.X - 1, ms.Y - 1);
+
+            Core.gui.DrawRectangle(Pens.Red, tms.X - 1, tms.Y - 1, Core.TileSz, Core.TileSz);
         }
 
         public static void LoadMap()

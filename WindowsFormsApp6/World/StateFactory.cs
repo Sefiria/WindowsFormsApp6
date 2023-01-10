@@ -30,7 +30,7 @@ namespace WindowsFormsApp6.World
         {
             ToBuy = new List<(string Name, Bitmap Image, BigInteger Price, Action Action)>()
             {
-                ("Unit", Resources.unit.Transparent(), new BigInteger(500), new Action(() => { Data.Instance.World.Entities.Add(new Unit(9.ToWorld() + Data.Instance.World.GetUnits().Count * 8, 18.ToWorld())); Cross10Price(0); })),
+                ("Unit", Resources.unit.Transparent(), new BigInteger(500), new Action(() => { Data.Instance.World.Entities.Add(new Unit(9.ToWorld() + Data.Instance.World.GetUnits().Count * 8, 19.ToWorld())); Cross10Price(0); })),
             };
             UI.Clear();
         }
