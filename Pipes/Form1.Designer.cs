@@ -1,4 +1,4 @@
-﻿namespace WindowsFormsApp12
+﻿namespace Pipes
 {
     partial class Form1
     {
@@ -34,35 +34,27 @@
             // 
             // Render
             // 
-            this.Render.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.Render.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Render.Location = new System.Drawing.Point(0, 0);
             this.Render.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Render.Name = "Render";
-            this.Render.Size = new System.Drawing.Size(800, 800);
+            this.Render.Size = new System.Drawing.Size(531, 484);
             this.Render.TabIndex = 0;
             this.Render.TabStop = false;
-            this.Render.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Render_MouseDown);
-            this.Render.MouseEnter += new System.EventHandler(this.Render_MouseEnter);
-            this.Render.MouseLeave += new System.EventHandler(this.Render_MouseLeave);
-            this.Render.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Render_MouseMove);
-            this.Render.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Render_MouseUp);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 21F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.Black;
-            this.ClientSize = new System.Drawing.Size(800, 800);
+            this.ClientSize = new System.Drawing.Size(531, 484);
             this.Controls.Add(this.Render);
             this.Font = new System.Drawing.Font("Segoe UI", 12F);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Form1";
-            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
-            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyUp);
+            this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Render_MouseDown);
+            this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Render_MouseMove);
             ((System.ComponentModel.ISupportInitialize)(this.Render)).EndInit();
             this.ResumeLayout(false);
 
