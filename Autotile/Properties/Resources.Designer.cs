@@ -63,9 +63,19 @@ namespace Autotile.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap auto_ground {
+        internal static System.Drawing.Bitmap auto_ground_pavet {
             get {
-                object obj = ResourceManager.GetObject("auto_ground", resourceCulture);
+                object obj = ResourceManager.GetObject("auto_ground_pavet", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap auto_ground_stone {
+            get {
+                object obj = ResourceManager.GetObject("auto_ground_stone", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

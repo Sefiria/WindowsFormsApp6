@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Autotile
+namespace RetfarC
 {
-    public class Data
+    public enum TileTypes
     {
-        public static int TileSize = 24;
+        Grass = 0,
+        Stone,
+        Sand
     }
 }

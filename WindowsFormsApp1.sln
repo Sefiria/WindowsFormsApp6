@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pipes", "Pipes\Pipes.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Maze", "Maze\Maze.csproj", "{C395AB57-BFFB-4DE9-8C7A-0C1F3E65785D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetfarC", "RetfarC\RetfarC.csproj", "{5E4D72CC-196A-4069-BA8E-E7299F2DF238}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -99,6 +101,10 @@ Global
 		{C395AB57-BFFB-4DE9-8C7A-0C1F3E65785D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C395AB57-BFFB-4DE9-8C7A-0C1F3E65785D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C395AB57-BFFB-4DE9-8C7A-0C1F3E65785D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E4D72CC-196A-4069-BA8E-E7299F2DF238}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E4D72CC-196A-4069-BA8E-E7299F2DF238}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E4D72CC-196A-4069-BA8E-E7299F2DF238}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E4D72CC-196A-4069-BA8E-E7299F2DF238}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

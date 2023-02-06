@@ -23,9 +23,11 @@ namespace Autotile
                 while (m_curId < 0) m_curId += 11;
             }
         }
+        public int AutoType = 0;
 
-        public Autotile(Bitmap img)
+        public Autotile(Bitmap img, int autoType)
         {
+            AutoType = autoType;
             Source = new Bitmap(img, Data.TileSize * 3, Data.TileSize * 3);
             Source.MakeTransparent();
             Split();
@@ -128,14 +130,16 @@ namespace Autotile
         /// <returns></returns>
         public void Calculate(Palette pal, byte[,] iaround)
         {
-            bool a = pal.Tiles[iaround[0, 0]] == this;
-            bool z = pal.Tiles[iaround[1, 0]] == this;
-            bool e = pal.Tiles[iaround[2, 0]] == this;
-            bool q = pal.Tiles[iaround[0, 1]] == this;
-            bool d = pal.Tiles[iaround[2, 1]] == this;
-            bool w = pal.Tiles[iaround[0, 2]] == this;
-            bool x = pal.Tiles[iaround[1, 2]] == this;
-            bool c = pal.Tiles[iaround[2, 2]] == this;
+            bool v(int i, int j) => (pal.Tiles[iaround[i, j]] as Autotile)?.AutoType == AutoType;
+
+            bool a = v(0, 0);
+            bool z = v(1, 0);
+            bool e = v(2, 0);
+            bool q = v(0, 1);
+            bool d = v(2, 1);
+            bool w = v(0, 2);
+            bool x = v(1, 2);
+            bool c = v(2, 2);
 
             // Corners
             if (a && z && q && !d&& !x && !c)
@@ -219,5 +223,13 @@ namespace Autotile
 
             //if (!a && !z && !e && !q && !d && !w && !x && !c)
         }
+
+        public List<Bitmap> AllTiles() => new List<Bitmap>()
+        {
+            A, Z, E,
+            Q, S, D,
+            W, X, C,
+            Alone, Horizontal, Vertical
+        };
     }
 }

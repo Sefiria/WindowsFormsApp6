@@ -106,5 +106,11 @@
     <Content Include="Resources\tool_pen.png" />
     <Content Include="Resources\grass.png" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Autotile\Autotile.csproj">
+      <Project>{e2a55859-47ee-4083-a9ef-c2ff4aa439a3}</Project>
+      <Name>Autotile</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

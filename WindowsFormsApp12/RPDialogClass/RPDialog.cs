@@ -82,7 +82,6 @@ namespace WindowsFormsApp12
         private Rectangle TextBounds;
         private Rectangle ButtonBounds_OK, ButtonBounds_YES, ButtonBounds_NO;
         private RPDIalogConv Conversation = null;
-        private bool R_Enter = true;
 
         public RPDialog(Rectangle renderBounds)
         {

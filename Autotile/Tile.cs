@@ -14,7 +14,7 @@ namespace Autotile
         public Tile() { }
         public Tile(Bitmap img)
         {
-            Current = img;
+            Current = new Bitmap(img, Data.TileSize, Data.TileSize);
         }
     }
 }
