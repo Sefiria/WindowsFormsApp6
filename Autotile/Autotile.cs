@@ -15,10 +15,10 @@ namespace Autotile
         Bitmap Source;
         Bitmap A, Z, E, Q, S, D, W, X, C, Alone, Horizontal, Vertical;
         int m_curId;
-        int curId
+        public int curId
         {
             get => m_curId;
-            set
+            private set
             {
                 m_curId = value;
                 while (m_curId > 11) m_curId -= 11;
@@ -97,9 +97,10 @@ namespace Autotile
         /// <returns></returns>
         public Bitmap Get() => Current;
         public Bitmap GetNext() { curId++; Current = GetCurrentFromCurId(); return Current; }
-        private Bitmap GetCurrentFromCurId()
+        public Bitmap GetCurrentFromCurId() => GetFromId(curId);
+        public Bitmap GetFromId(int ID)
         {
-            switch(curId)
+            switch (ID)
             {
                 case 0: return A;
                 case 1: return Z;
@@ -110,7 +111,7 @@ namespace Autotile
                 case 6: return W;
                 case 7: return X;
                 case 8: return C;
-   default: case 9: return Alone;
+                default: case 9: return Alone;
                 case 10: return Horizontal;
                 case 11: return Vertical;
             }

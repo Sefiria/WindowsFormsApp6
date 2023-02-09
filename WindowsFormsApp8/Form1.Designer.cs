@@ -75,6 +75,9 @@
             // 
             // Render
             // 
+            this.Render.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.Render.Location = new System.Drawing.Point(0, 41);
             this.Render.Name = "Render";
             this.Render.Size = new System.Drawing.Size(837, 631);
@@ -87,6 +90,7 @@
             // 
             // imgUsedTool
             // 
+            this.imgUsedTool.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.imgUsedTool.Location = new System.Drawing.Point(803, 5);
             this.imgUsedTool.Name = "imgUsedTool";
             this.imgUsedTool.Size = new System.Drawing.Size(32, 32);
@@ -109,6 +113,7 @@
             this.Text = "Form1";
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyUp);
+            this.Resize += new System.EventHandler(this.Form1_Resize);
             ((System.ComponentModel.ISupportInitialize)(this.Render)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.imgUsedTool)).EndInit();
             this.ResumeLayout(false);

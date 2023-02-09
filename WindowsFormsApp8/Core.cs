@@ -25,6 +25,8 @@ namespace WindowsFormsApp8
         public static bool DisplayAllTiles = false;
         public static Point TileToManuallySet = Point.Empty;
 
+        public static int CWT => RW / TileSz;
+        public static int CHT => RH / TileSz;
         public static int WT = 16;
         public static int HT = 16;
         public static Point Mouse => new Point(MousePosition.X + (int)Cam.X, MousePosition.Y + (int)Cam.Y);
@@ -34,8 +36,8 @@ namespace WindowsFormsApp8
         public static Point CamSnap => new Point(CamTile.X * TileSz, CamTile.Y * TileSz);
 
 
-        public static Tile ListTilesTile(int tileX, int tileY) => ListTilesTile(RenderClass.Tiles[tileX, tileY]);
-        public static Autotile.Autotile ListTilesAutotile(int tileX, int tileY) => ListTilesAutotile(RenderClass.Tiles[tileX, tileY]);
+        public static Tile ListTilesTile(int tileX, int tileY) => ListTilesTile(RenderClass.Tiles[tileX, tileY].Index);
+        public static Autotile.Autotile ListTilesAutotile(int tileX, int tileY) => ListTilesAutotile(RenderClass.Tiles[tileX, tileY].Index);
         public static Tile ListTilesTile(int i)
         {
             if (i < 0 || i >= ListTiles.Items.Count) return ListTiles.Items[0] as Tile;

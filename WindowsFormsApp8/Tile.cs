@@ -94,13 +94,21 @@ namespace WindowsFormsApp8
             Image = new Bitmap(W, H);
             Graphics g = Graphics.FromImage(Image);
 
-            var list = new List<Point>(ModifiedPixels);
-            foreach (var pt in list)
+            for(int x=0; x<Pixels.GetLength(0); x++)
             {
-                g.FillRectangle(new SolidBrush(GetGradient(Pixels[pt.X, pt.Y])), pt.X, pt.Y, 1, 1);
-                //g.DrawLine(new Pen(GetGradient(Pixels[pt.X, pt.Y])), pt.X, pt.Y, pt.X+1, pt.Y);
-                ModifiedPixels.Remove(pt);
+                for (int y = 0; y < Pixels.GetLength(1); y++)
+                {
+                    g.FillRectangle(new SolidBrush(GetGradient(Pixels[x, y])), x, y, 1, 1);
+                }
             }
+
+            //var list = new List<Point>(ModifiedPixels);
+            //foreach (var pt in list)
+            //{
+            //    g.FillRectangle(new SolidBrush(GetGradient(Pixels[pt.X, pt.Y])), pt.X, pt.Y, 1, 1);
+            //    //g.DrawLine(new Pen(GetGradient(Pixels[pt.X, pt.Y])), pt.X, pt.Y, pt.X+1, pt.Y);
+            //    ModifiedPixels.Remove(pt);
+            //}
 
             g.Dispose();
 

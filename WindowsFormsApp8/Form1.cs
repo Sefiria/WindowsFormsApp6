@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -81,7 +82,11 @@ namespace WindowsFormsApp8
 
         private void Draw(object sender, EventArgs e)
         {
-            Bitmap renderImage = new Bitmap(Core.RW, Core.RH);
+            //Stopwatch toto = new Stopwatch();
+            //toto.Start();
+
+            if (Render.Width == 0 || Render.Height == 0) return;
+            Bitmap renderImage = new Bitmap(Render.Width, Render.Height);
             using (Graphics g = Graphics.FromImage(renderImage))
             {
                 using (Core.gui = Graphics.FromImage(ImageUI))
@@ -92,12 +97,17 @@ namespace WindowsFormsApp8
                     g.DrawImage(ImageUI, 0, 0);
                     g.DrawImage(RenderClass.Layer2, 0, 0);
 
+                    g.DrawRectangle(Pens.Red, 0, 0, Render.Width - 1, Render.Height - 1);
+
                     Core.gui.Clear(Color.White);
                 }
                 ImageUI.MakeTransparent(Color.White);
             }
 
             Render.Image = renderImage;
+
+            //toto.Stop();
+            //Console.WriteLine(toto.ElapsedMilliseconds);
         }
 
 
@@ -213,6 +223,16 @@ namespace WindowsFormsApp8
         private void Form1_KeyUp(object sender, KeyEventArgs e)
         {
             Core.ControlKeyHelp = e.Control;
+        }
+
+        private void Form1_Resize(object sender, EventArgs e)
+        {
+            Core.RW = Render.Width;
+            Core.RH = Render.Height;
+            Core.Image = new Bitmap(Core.RW, Core.RH);
+            Core.g = Graphics.FromImage(Core.Image);
+            ImageUI = new Bitmap(Core.RW, Core.RH);
+            ImageUI.MakeTransparent(Color.White);
         }
     }
 }

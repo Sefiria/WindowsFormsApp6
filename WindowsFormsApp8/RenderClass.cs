@@ -19,7 +19,7 @@ namespace WindowsFormsApp8
             Bucket,
         }
 
-        public static byte[,] Tiles = new byte[Core.WT, Core.HT];
+        public static (byte Index, byte SubID)[,] Tiles = new (byte Index, byte SubID)[Core.WT, Core.HT];
         public static List<Point> ModifiedTiles = new List<Point>();
         public static int AnimSelTmr = 0, AnimSelId = 0;
         public static Point MousePositionAtMiddleFirstClick;
@@ -28,10 +28,10 @@ namespace WindowsFormsApp8
         public static Bitmap Layer2;
         public static Graphics g2;
 
-        private static byte GetTile(int _x, int _y) => (_x < 0 || _y < 0 || _x >= Core.WT || _y >= Core.HT) ? (byte)0 : Tiles[_x, _y];
+        private static (byte Index, byte SubID) GetTile(int _x, int _y) => (_x < 0 || _y < 0 || _x >= Core.WT || _y >= Core.HT) ? ((byte)0, (byte)0) : Tiles[_x, _y];
         private static byte[,] GetAround(int x, int y)
         {
-            byte Get(int _x, int _y) => GetTile(_x, _y);
+            byte Get(int _x, int _y) => GetTile(_x, _y).Index;
 
             var result = new byte[,]
             {
@@ -96,9 +96,8 @@ namespace WindowsFormsApp8
                         int y = (Core.MousePosition.Y - TileToShowAllTiles.Y) / Core.TileSz;
                         if (!(y < 0 || y > 3 || x < 0 || x > 2))
                         {
-                            Tiles[Core.TileToManuallySet.X, Core.TileToManuallySet.Y] = (byte) Core.ListTiles.SelectedIndex;
+                            Tiles[Core.TileToManuallySet.X, Core.TileToManuallySet.Y] = ((byte) Core.ListTiles.SelectedIndex, (byte)(y * 3 + x));
                             ModifiedTiles.Add(Core.TileToManuallySet);
-                            at.SetCurID(y * 3 + x);
                             //g2.DrawImage(at.AllTiles()[y * 3 + x], Core.TileToManuallySet.X * Core.TileSz - Core.Cam.X, Core.TileToManuallySet.Y * Core.TileSz - Core.Cam.Y);
                         }
                     }
@@ -113,7 +112,7 @@ namespace WindowsFormsApp8
             if (Tool == Tools.Bucket && !Core.IsRightMouseDown && !Core.IsMiddleMouseDown)
             {
                 Point ms = new Point(Core.MouseTile.X + Core.CamTile.X, Core.MouseTile.Y + Core.CamTile.Y);
-                FloodFillTiles(ms, (byte)Core.ListTiles.SelectedIndex);
+                FloodFillTiles(ms, ((byte)Core.ListTiles.SelectedIndex, 0));
             }
             else
             {
@@ -142,9 +141,9 @@ namespace WindowsFormsApp8
             if (!Core.IsMouseDown || Core.ControlKeyHelp)
                 return;
 
-            if (Core.IsRightMouseDown && Tiles[ms.X, ms.Y] < Core.ListTiles.Items.Count)
+            if (Core.IsRightMouseDown && Tiles[ms.X, ms.Y].Index < Core.ListTiles.Items.Count)
             {
-                Core.ListTiles.SelectedIndex = Tiles[ms.X, ms.Y];
+                Core.ListTiles.SelectedIndex = Tiles[ms.X, ms.Y].Index;
                 return;
             }
 
@@ -153,11 +152,37 @@ namespace WindowsFormsApp8
 
             if (Tool == Tools.Pen)
             {
-                Tiles[ms.X, ms.Y] = (byte)Core.ListTiles.SelectedIndex;
-                var at = Core.ListTilesAutotile(ms.X, ms.Y);
+                byte sub = 0;
+                var at = Core.ListTiles.SelectedItem as Autotile.Autotile;
                 if (at != null)
+                {
                     at.Calculate(Core.ListTiles.Items.Cast<Autotile.Tile>().ToList(), GetAround(ms.X, ms.Y));
+                    sub = (byte)at.curId;
+                    CalculateAutotilesAround(ms.X, ms.Y);
+                }
+                Tiles[ms.X, ms.Y] = ((byte)Core.ListTiles.SelectedIndex, sub);
                 ModifiedTiles.Add(ms);
+            }
+        }
+        private static void CalculateAutotilesAround(int x, int y)
+        {
+            Autotile.Autotile at;
+            byte id, sub;
+            for (int i = -1; i < 2; i++)
+            {
+                for (int j = -1; j < 2; j++)
+                {
+                    if (i == 0 && j == 0) continue;
+                    if (x + i < 0 || x + i >= Core.WT || y + j < 0 || y + j >= Core.HT) continue;
+                    id = Tiles[x + i, y + j].Index;
+                    at = Core.ListTilesAutotile(id);
+                    if (at != null)
+                    {
+                        at.Calculate(Core.ListTiles.Items.Cast<Autotile.Tile>().ToList(), GetAround(x + i, y + j));
+                        sub = (byte)at.curId;
+                        Tiles[x + i, y + j] = (id, sub);
+                    }
+                }
             }
         }
 
@@ -187,7 +212,7 @@ namespace WindowsFormsApp8
                 {
                     if (x < Core.CamTile.X - 1 || y < Core.CamTile.Y - 1 || x >= Core.CamTile.X + Core.CamTile.Width + 1 || y >= Core.CamTile.Y + Core.CamTile.Height + 1)
                         continue;
-                    if (Tiles[x, y] < Core.ListTiles.Items.Count)
+                    if (Tiles[x, y].Index < Core.ListTiles.Items.Count)
                     {
                         img = Core.ListTilesTile(x, y)?.Image;
                         if (img != null)
@@ -197,8 +222,8 @@ namespace WindowsFormsApp8
                         else
                         {
                             var at = Core.ListTilesAutotile(x, y);
-                            if(at != null)
-                                Core.g.DrawImage(at.Current, x * Core.TileSz - Core.Cam.X, y * Core.TileSz - Core.Cam.Y);
+                            if (at != null)
+                                Core.g.DrawImage(at.GetFromId(Tiles[x, y].SubID), x * Core.TileSz - Core.Cam.X, y * Core.TileSz - Core.Cam.Y);
                         }
                     }
                 }
@@ -291,18 +316,14 @@ namespace WindowsFormsApp8
                     ImportTile(fntile);
             }
             Core.TileSz = tsz;
-            Tiles = new byte[wt, ht];
+            Tiles = new (byte Index, byte SubID)[wt, ht];
             byte px;
-            Autotile.Autotile at;
             for (int x = 0; x < wt; x++)
             {
                 for (int y = 0; y < ht; y++)
                 {
                     px = (byte)int.Parse("" + lines[5][x * 2 * ht + y * 2]);
-                    Tiles[x, y] = px;
-                    at = Core.ListTiles.Items[px] as Autotile.Autotile;
-                    if (at != null)
-                        at.SetCurID(int.Parse("" + lines[5][x * 2 * ht + y * 2 + 1]));
+                    Tiles[x, y] = (px, (byte)(Core.ListTiles.Items[px] as Autotile.Autotile != null ? int.Parse("" + lines[5][x * 2 * ht + y * 2 + 1]) : 0));
                     ModifiedTiles.Add(new Point(x, y));
                 }
             }
@@ -481,7 +502,7 @@ namespace WindowsFormsApp8
 
         public static void ChangeTilesArraySize()
         {
-            byte[,] tiles = new byte[Tiles.GetLength(0), Tiles.GetLength(1)];
+            (byte Index, byte SubID)[,] tiles = new (byte Index, byte SubID)[Tiles.GetLength(0), Tiles.GetLength(1)];
             for (int x = 0; x < Tiles.GetLength(0); x++)
             {
                 for (int y = 0; y < Tiles.GetLength(1); y++)
@@ -489,7 +510,7 @@ namespace WindowsFormsApp8
                     tiles[x, y] = Tiles[x, y];
                 }
             }
-            Tiles = new byte[Core.WT, Core.HT];
+            Tiles = new (byte Index, byte SubID)[Core.WT, Core.HT];
             for (int x = 0; x < tiles.GetLength(0) && x < Tiles.GetLength(0); x++)
             {
                 for (int y = 0; y < tiles.GetLength(1) && y < Tiles.GetLength(1); y++)
@@ -501,9 +522,9 @@ namespace WindowsFormsApp8
         }
 
 
-        public static void FloodFillTiles(Point pt, byte replacementPx)
+        public static void FloodFillTiles(Point pt, (byte Index, byte SubID) replacementPx)
         {
-            byte targetPx = Tiles[pt.X, pt.Y];
+            (byte Index, byte SubID) targetPx = Tiles[pt.X, pt.Y];
             if (targetPx == replacementPx)
                 return;
             Queue<Point> q = new Queue<Point>();
