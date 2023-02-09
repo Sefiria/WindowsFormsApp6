@@ -27,8 +27,8 @@ namespace WindowsFormsApp8
 
         public static int CWT => RW / TileSz;
         public static int CHT => RH / TileSz;
-        public static int WT = 16;
-        public static int HT = 16;
+        public static int WT = 32;
+        public static int HT = 32;
         public static Point Mouse => new Point(MousePosition.X + (int)Cam.X, MousePosition.Y + (int)Cam.Y);
         public static Point MouseTile => new Point(Mouse.X / TileSz, Mouse.Y / TileSz);
         public static Point MouseSnap => new Point(MouseTile.X * TileSz - (int)Cam.X, MouseTile.Y * TileSz - (int)Cam.Y);
