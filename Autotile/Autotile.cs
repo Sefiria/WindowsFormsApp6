@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ namespace Autotile
 {
     public class Autotile : Tile
     {
+        public string FileName = "autotile";
         Bitmap Source;
         Bitmap A, Z, E, Q, S, D, W, X, C, Alone, Horizontal, Vertical;
         int m_curId;
@@ -23,6 +25,7 @@ namespace Autotile
                 while (m_curId < 0) m_curId += 11;
             }
         }
+        public void SetCurID(int curId) => this.curId = curId;
         public int AutoType = 0;
 
         public Autotile(Bitmap img, int autoType)
@@ -117,6 +120,7 @@ namespace Autotile
         /// </summary>
         /// <param name="around"></param>
         /// <returns></returns>
+        public Bitmap CalculateAndGet(List<Tile> pal, byte[,] around) => CalculateAndGet(new Palette() { Tiles = pal }, around);
         public Bitmap CalculateAndGet(Palette pal, byte[,] around)
         {
             Calculate(pal, around);
@@ -128,9 +132,10 @@ namespace Autotile
         /// </summary>
         /// <param name="around"></param>
         /// <returns></returns>
+        public void Calculate(List<Tile> pal, byte[,] iaround) => Calculate(new Palette() { Tiles = pal }, iaround);
         public void Calculate(Palette pal, byte[,] iaround)
         {
-            bool v(int i, int j) => (pal.Tiles[iaround[i, j]] as Autotile)?.AutoType == AutoType;
+            bool v(int i, int j) => (((iaround[i, j] < 0 || iaround[i, j] >= pal.Tiles.Count) ? pal.Tiles[0] : pal.Tiles[iaround[i, j]]) as Autotile)?.AutoType == AutoType;
 
             bool a = v(0, 0);
             bool z = v(1, 0);
@@ -231,5 +236,10 @@ namespace Autotile
             W, X, C,
             Alone, Horizontal, Vertical
         };
+
+        public override string ToString()
+        {
+            return Path.GetFileNameWithoutExtension(FileName);
+        }
     }
 }

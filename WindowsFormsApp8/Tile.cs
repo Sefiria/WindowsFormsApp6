@@ -8,7 +8,7 @@ using System.Xml.Linq;
 
 namespace WindowsFormsApp8
 {
-    public class Tile
+    public class Tile : Autotile.Tile
     {
         public string FileName;
         public string Name;
@@ -43,14 +43,15 @@ namespace WindowsFormsApp8
             }
         }
         public void Decrease() { GradientId--; t = 0F; }
-        public List<Point> GetAllPixelsPoints()
+        public List<Point> GetAllPixelsPoints(bool notOnlyTileType = false)
         {
             var all = new List<Point>();
             for (int x = 0; x < W; x++)
             {
                 for (int y = 0; y < H; y++)
                 {
-                    all.Add(new Point(x, y));
+                    if (notOnlyTileType || Core.ListTilesTile(x, y) != null)
+                        all.Add(new Point(x, y));
                 }
             }
             return all;
@@ -97,6 +98,7 @@ namespace WindowsFormsApp8
             foreach (var pt in list)
             {
                 g.FillRectangle(new SolidBrush(GetGradient(Pixels[pt.X, pt.Y])), pt.X, pt.Y, 1, 1);
+                //g.DrawLine(new Pen(GetGradient(Pixels[pt.X, pt.Y])), pt.X, pt.Y, pt.X+1, pt.Y);
                 ModifiedPixels.Remove(pt);
             }
 

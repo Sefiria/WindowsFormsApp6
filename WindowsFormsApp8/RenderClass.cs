@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WindowsFormsApp8.Properties;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace WindowsFormsApp8
 {
@@ -23,6 +24,23 @@ namespace WindowsFormsApp8
         public static int AnimSelTmr = 0, AnimSelId = 0;
         public static Point MousePositionAtMiddleFirstClick;
         public static Tools Tool = Tools.Pen;
+        public static Point TileToShowAllTiles;
+        public static Bitmap Layer2;
+        public static Graphics g2;
+
+        private static byte GetTile(int _x, int _y) => (_x < 0 || _y < 0 || _x >= Core.WT || _y >= Core.HT) ? (byte)0 : Tiles[_x, _y];
+        private static byte[,] GetAround(int x, int y)
+        {
+            byte Get(int _x, int _y) => GetTile(_x, _y);
+
+            var result = new byte[,]
+            {
+                { Get(x-1, y-1), Get(x-1, y), Get(x-1, y+1) },
+                { Get(x, y-1), 0, Get(x, y+1) },
+                { Get(x+1, y-1), Get(x+1, y), Get(x+1, y+1)}
+            };
+            return result;
+        }
 
         public static List<Point> GetAllTilesPoints()
         {
@@ -44,11 +62,54 @@ namespace WindowsFormsApp8
 
         public static void Initialize()
         {
+            Layer2 = new Bitmap(Core.RW, Core.RH);
+            g2 = Graphics.FromImage(Layer2);
             RefreshTiles();
         }
 
-        public static void MouseDown()
+        public static void MouseDown(MouseEventArgs e)
         {
+            if (Core.ControlKeyHelp)
+            {
+                if (e.Button == MouseButtons.Left)
+                {
+                    if (!Core.DisplayAllTiles)
+                    {
+                        var at = Core.ListTiles.SelectedItem as Autotile.Autotile;
+                        if (at != null)
+                        {
+                            Core.TileToManuallySet = Core.MouseTile;
+                            TileToShowAllTiles = Core.MousePosition;
+                            Core.DisplayAllTiles = true;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (Core.DisplayAllTiles)
+                {
+                    var at = Core.ListTiles.SelectedItem as Autotile.Autotile;
+                    if (at != null)
+                    {
+                        int x = (Core.MousePosition.X - TileToShowAllTiles.X) / Core.TileSz;
+                        int y = (Core.MousePosition.Y - TileToShowAllTiles.Y) / Core.TileSz;
+                        if (!(y < 0 || y > 3 || x < 0 || x > 2))
+                        {
+                            Tiles[Core.TileToManuallySet.X, Core.TileToManuallySet.Y] = (byte) Core.ListTiles.SelectedIndex;
+                            ModifiedTiles.Add(Core.TileToManuallySet);
+                            at.SetCurID(y * 3 + x);
+                            //g2.DrawImage(at.AllTiles()[y * 3 + x], Core.TileToManuallySet.X * Core.TileSz - Core.Cam.X, Core.TileToManuallySet.Y * Core.TileSz - Core.Cam.Y);
+                        }
+                    }
+                    Core.TileToManuallySet = Point.Empty;
+                    Core.DisplayAllTiles = false;
+                    //Core.g.DrawImage(Layer2, 0, 0);
+                    ResetLayer2();
+                    return;
+                }
+            }
+
             if (Tool == Tools.Bucket && !Core.IsRightMouseDown && !Core.IsMiddleMouseDown)
             {
                 Point ms = new Point(Core.MouseTile.X + Core.CamTile.X, Core.MouseTile.Y + Core.CamTile.Y);
@@ -58,6 +119,11 @@ namespace WindowsFormsApp8
             {
                 MouseMove();
             }
+        }
+        private static void ResetLayer2()
+        {
+            Layer2 = new Bitmap(Layer2.Width, Layer2.Height);
+            g2 = Graphics.FromImage(Layer2);
         }
         public static void MouseMove()
         {
@@ -69,11 +135,11 @@ namespace WindowsFormsApp8
                 return;
             }
 
-            Point ms = new Point(Core.MouseTile.X + Core.CamTile.X, Core.MouseTile.Y + Core.CamTile.Y);
+            var ms = Core.MouseTile;
             if (ms.X < 0 || ms.Y < 0 || ms.X >= Core.WT || ms.Y >= Core.HT)
                 return;
 
-            if (!Core.IsMouseDown)
+            if (!Core.IsMouseDown || Core.ControlKeyHelp)
                 return;
 
             if (Core.IsRightMouseDown && Tiles[ms.X, ms.Y] < Core.ListTiles.Items.Count)
@@ -87,8 +153,11 @@ namespace WindowsFormsApp8
 
             if (Tool == Tools.Pen)
             {
-                Tiles[Core.MouseTile.X + Core.CamTile.X, Core.MouseTile.Y + Core.CamTile.Y] = (byte)Core.ListTiles.SelectedIndex;
-                ModifiedTiles.Add(Core.MouseTile);
+                Tiles[ms.X, ms.Y] = (byte)Core.ListTiles.SelectedIndex;
+                var at = Core.ListTilesAutotile(ms.X, ms.Y);
+                if (at != null)
+                    at.Calculate(Core.ListTiles.Items.Cast<Autotile.Tile>().ToList(), GetAround(ms.X, ms.Y));
+                ModifiedTiles.Add(ms);
             }
         }
 
@@ -97,8 +166,11 @@ namespace WindowsFormsApp8
             if (Core.Palette == null)
                 return;
 
-            foreach (Tile tile in Core.ListTiles.Items)
+            foreach (var obj in Core.ListTiles.Items)
             {
+                Tile tile = obj as Tile;
+                if (tile == null)
+                    continue;
                 tile.Increase();
                 tile.ModifiedPixels = tile.GetAllPixelsPoints();
                 tile.SetImage();
@@ -117,19 +189,29 @@ namespace WindowsFormsApp8
                         continue;
                     if (Tiles[x, y] < Core.ListTiles.Items.Count)
                     {
-                        img = (Core.ListTiles.Items[Tiles[x, y]] as Tile).Image;
-                        if(img != null)
+                        img = Core.ListTilesTile(x, y)?.Image;
+                        if (img != null)
+                        {
                             Core.g.DrawImage(img, x * Core.TileSz - Core.Cam.X, y * Core.TileSz - Core.Cam.Y);
+                        }
+                        else
+                        {
+                            var at = Core.ListTilesAutotile(x, y);
+                            if(at != null)
+                                Core.g.DrawImage(at.Current, x * Core.TileSz - Core.Cam.X, y * Core.TileSz - Core.Cam.Y);
+                        }
                     }
                 }
             }
 
             DrawAnimatedSelection();
+
+            DisplayAutotileAllTiles();
         }
         private static void DrawAnimatedSelection()
         {
-            Point tms = new Point(((Core.MousePosition.X - (int)Core.Cam.X % Core.TileSz) / Core.TileSz) * Core.TileSz, ((Core.MousePosition.Y - (int)Core.Cam.Y % Core.TileSz) / Core.TileSz) * Core.TileSz);
-            Point ms = new Point(Core.MouseSnap.X - (int)Core.Cam.X % Core.TileSz, Core.MouseSnap.Y - (int)Core.Cam.Y % Core.TileSz);
+            var ms = Core.MouseSnap;
+
             if (ms.X + Core.Cam.X < 0 || ms.Y + Core.Cam.Y < 0 || ms.X + Core.Cam.X >= Core.WT * Core.TileSz || ms.Y + Core.Cam.Y >= Core.HT * Core.TileSz)
                 return;
             if (AnimSelTmr == 2)
@@ -153,7 +235,32 @@ namespace WindowsFormsApp8
             Core.gui.DrawLine(AnimSelId == 6 ? pa : (new[] { 5, 7 }.Contains(AnimSelId) ? pb : pc), ms.X - 1, ms.Y + Core.TileSz, ms.X - 1, ms.Y + Core.TileSz / 2);
             Core.gui.DrawLine(AnimSelId == 7 ? pa : (new[] { 6, 0 }.Contains(AnimSelId) ? pb : pc), ms.X - 1, ms.Y + Core.TileSz / 2, ms.X - 1, ms.Y - 1);
 
-            Core.gui.DrawRectangle(Pens.Red, tms.X - 1, tms.Y - 1, Core.TileSz, Core.TileSz);
+            //Core.gui.DrawRectangle(Pens.Red, tms.X - 1, tms.Y - 1, Core.TileSz, Core.TileSz);
+        }
+        private static void DisplayAutotileAllTiles()
+        {
+            if (Core.DisplayAllTiles)
+            {
+                var at = Core.ListTiles.SelectedItem as Autotile.Autotile;
+                if (at != null)
+                {
+                    int x = TileToShowAllTiles.X, y = TileToShowAllTiles.Y;
+                    ResetLayer2();
+                    var tiles = at.AllTiles();
+                    g2.FillRectangle(Brushes.Black, x, y, 3 * Core.TileSz - 1, 3 * Core.TileSz - 1);
+                    g2.DrawRectangle(Pens.White, x, y, 3 * Core.TileSz + 1, 3 * Core.TileSz + 1);
+                    foreach (Bitmap tile in tiles)
+                    {
+                        g2.DrawImage(tile, x, y);
+                        x += Core.TileSz;
+                        if (x > TileToShowAllTiles.X + 2 * Core.TileSz)
+                        {
+                            x = TileToShowAllTiles.X;
+                            y += Core.TileSz;
+                        }
+                    }
+                }
+            }
         }
 
         public static void LoadMap()
@@ -169,23 +276,33 @@ namespace WindowsFormsApp8
             if (!int.TryParse(lines[2], out int tsz)) return;
             string fnpal = lines[3];
             List<string> fntiles = lines[4].Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries).ToList();
-            if (lines[5].Length != wt * ht) return;
+            if (lines[5].Length != wt * ht * 2) return;
             Core.WT = wt;
             Core.HT = ht;
             Core.TileSz = tsz;
             ImportPalette(fnpal);
             ClearTileList();
+            fntiles = new List<string> { "grass.til", "dirtygrass.til", "dirtygrass.til", "dirtabitofgrass.til", "dirt.til", "auto_ground_pavet.png" };
             foreach (string fntile in fntiles)
-                ImportTile(fntile);
+            {
+                if (fntile.StartsWith("auto"))
+                    ImportAutotile(fntile);
+                else
+                    ImportTile(fntile);
+            }
             Core.TileSz = tsz;
             Tiles = new byte[wt, ht];
             byte px;
+            Autotile.Autotile at;
             for (int x = 0; x < wt; x++)
             {
                 for (int y = 0; y < ht; y++)
                 {
-                    px = (byte)int.Parse("" + lines[5][x * ht + y]);
+                    px = (byte)int.Parse("" + lines[5][x * 2 * ht + y * 2]);
                     Tiles[x, y] = px;
+                    at = Core.ListTiles.Items[px] as Autotile.Autotile;
+                    if (at != null)
+                        at.SetCurID(int.Parse("" + lines[5][x * 2 * ht + y * 2 + 1]));
                     ModifiedTiles.Add(new Point(x, y));
                 }
             }
@@ -207,19 +324,53 @@ namespace WindowsFormsApp8
             content += Core.TileSz + Environment.NewLine;
             content += Core.Palette.FileName + Environment.NewLine;
             string fntiles = "";
-            foreach (Tile tile in Core.ListTiles.Items)
+            foreach (dynamic tile in Core.ListTiles.Items)
+            {
                 fntiles += tile.FileName + ",";
+            }
             content += fntiles.Remove(fntiles.Length - 1) + Environment.NewLine;
             for (int x = 0; x < Core.WT; x++)
             {
                 for (int y = 0; y < Core.HT; y++)
                 {
                     content += Tiles[x, y];
+                    content += 0;
                 }
             }
             File.WriteAllText(dial.FileName, content.Zip());
         }
-
+        
+        public static void ImportAutotile()
+        {
+            var dial = new OpenFileDialog();
+            dial.Filter = "PNG Files | auto*.png|Bitmap Files | *.bmp|JPEG Files | *.jpg";
+            if (dial.ShowDialog() == DialogResult.OK)
+                ImportAutotile(dial.FileName);
+        }
+        public static void ImportAutotile(string fnAutotile)
+        {
+            var autotile = GetImportedAutotile(fnAutotile);
+            if (autotile != null)
+                Core.ListTiles.Items.Add(autotile);
+        }
+        public static Autotile.Autotile GetImportedAutotile()
+        {
+            Autotile.Autotile autotile = null;
+            var dial = new OpenFileDialog();
+            dial.Filter = "PNG Files | auto*.png|Bitmap Files | *.bmp|JPEG Files | *.jpg";
+            if (dial.ShowDialog() == DialogResult.OK)
+            {
+                autotile = GetImportedAutotile(dial.FileName);
+                autotile.FileName = Path.GetFileName(dial.FileName);
+            }
+            return autotile;
+        }
+        public static Autotile.Autotile GetImportedAutotile(string fnAutotile)
+        {
+            var at =  new Autotile.Autotile((Bitmap)Bitmap.FromFile(fnAutotile), 0);
+            at.FileName = Path.GetFileName(fnAutotile);
+            return at;
+        }
         public static Tile GetImportedTile()
         {
             Tile tile = null;
@@ -308,7 +459,12 @@ namespace WindowsFormsApp8
                     p.Gradient.Add(c);
                 Core.Palette.Pixels.Add(p);
             }
-            foreach (Tile tile in Core.ListTiles.Items) tile.ModifiedPixels = tile.GetAllPixelsPoints();
+            foreach (var obj in Core.ListTiles.Items)
+            {
+                var tile = obj as Tile;
+                if (tile != null)
+                    tile.ModifiedPixels = tile.GetAllPixelsPoints(true);
+            }
         }
 
         public static void ClearTileList()

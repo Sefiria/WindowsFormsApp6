@@ -23,6 +23,8 @@ namespace WindowsFormsApp8
         {
             InitializeComponent();
 
+            Autotile.Data.TileSize = Core.TileSz;
+
             Core.RW = Render.Width;
             Core.RH = Render.Height;
             Core.Cam = new Point(-Core.RW / 2 + (Core.WT * Core.TileSz) / 2, -Core.RH / 2 + (Core.HT * Core.TileSz) / 2);
@@ -51,7 +53,7 @@ namespace WindowsFormsApp8
                 Core.IsMiddleMouseDown = true;
                 RenderClass.MousePositionAtMiddleFirstClick = e.Location;
             }
-            RenderClass.MouseDown();
+            RenderClass.MouseDown(e);
         }
         private void Render_MouseLeave(object sender, EventArgs e)
         {
@@ -88,6 +90,7 @@ namespace WindowsFormsApp8
 
                     g.DrawImage(Core.Image, 0, 0);
                     g.DrawImage(ImageUI, 0, 0);
+                    g.DrawImage(RenderClass.Layer2, 0, 0);
 
                     Core.gui.Clear(Color.White);
                 }
@@ -112,6 +115,7 @@ namespace WindowsFormsApp8
                 if (itemId != -1)
                 {
                     // Click on a specific item
+                    menu.Items.Add("Replace Autotile").Click += (_s, _e) => { var tile = RenderClass.GetImportedAutotile(); if (tile != null) listTiles.Items[itemId] = tile; };
                     menu.Items.Add("Replace Tile").Click += (_s, _e) => { var tile = RenderClass.GetImportedTile(); if (tile != null) listTiles.Items[itemId] = tile; };
                     menu.Items.Add(new ToolStripSeparator());
                     menu.Items.Add("Remove Tile").Click += (_s, _e) => listTiles.Items.RemoveAt(itemId);
@@ -120,6 +124,7 @@ namespace WindowsFormsApp8
                 else
                 {
                     // Click away from items
+                    menu.Items.Add("Import Autotile").Click += (_s, _e) => RenderClass.ImportAutotile();
                     menu.Items.Add("Import Tile").Click += (_s, _e) => RenderClass.ImportTile();
                     menu.Items.Add("Import Palette").Click += (_s, _e) => RenderClass.ImportPalette();
                     menu.Items.Add(new ToolStripSeparator());
@@ -128,54 +133,6 @@ namespace WindowsFormsApp8
                 }
 
                 menu.Show(listTiles, e.Location);
-            }
-        }
-
-        private void Form_KeyDown(object sender, PreviewKeyDownEventArgs e)
-        {
-            if (e.KeyCode == Keys.L)
-                RenderClass.LoadMap();
-
-            if (e.KeyCode == Keys.S)
-                RenderClass.SaveMap();
-
-            if (listTiles.SelectedIndex > -1)
-            {
-                if (listTiles.SelectedIndex < listTiles.Items.Count - 1)
-                {
-                    if (e.KeyCode == Keys.D1)
-                        listTiles.SelectedIndex++;
-                    if (e.KeyCode == Keys.Down)
-                    {
-                        Tile tile = listTiles.SelectedItem as Tile;
-                        listTiles.Items[listTiles.SelectedIndex] = listTiles.Items[listTiles.SelectedIndex + 1];
-                        listTiles.Items[listTiles.SelectedIndex + 1] = tile;
-                        listTiles.SelectedIndex++;
-                    }
-                }
-                if (listTiles.SelectedIndex > 0)
-                {
-                    if (e.Shift && e.KeyCode == Keys.D1)
-                        listTiles.SelectedIndex--;
-                    if (e.KeyCode == Keys.Up)
-                    {
-                        Tile tile = listTiles.SelectedItem as Tile;
-                        listTiles.Items[listTiles.SelectedIndex] = listTiles.Items[listTiles.SelectedIndex - 1];
-                        listTiles.Items[listTiles.SelectedIndex - 1] = tile;
-                        listTiles.SelectedIndex--;
-                    }
-                }
-            }
-
-            if (e.KeyCode == Keys.C)
-                Configs();
-
-            if (e.KeyCode == Keys.OemQuotes)
-            {
-                if (RenderClass.Tool == RenderClass.Tools.Pen)
-                    btBucket_Click(null, null);
-                else
-                    btPen_Click(null, null);
             }
         }
 
@@ -204,6 +161,58 @@ namespace WindowsFormsApp8
         {
             RenderClass.Tool = RenderClass.Tools.Bucket;
             imgUsedTool.Image = Resources.tool_bucket;
+        }
+
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+            Core.ControlKeyHelp = e.Control;
+
+            if (e.KeyCode == Keys.L)
+                RenderClass.LoadMap();
+
+            if (e.KeyCode == Keys.S)
+                RenderClass.SaveMap();
+
+            if (listTiles.SelectedIndex > -1)
+            {
+                if (listTiles.SelectedIndex < listTiles.Items.Count - 1)
+                {
+                    if (e.KeyCode == Keys.D1)
+                        listTiles.SelectedIndex++;
+                    if (e.KeyCode == Keys.Down)
+                    {
+                        Tile tile = listTiles.SelectedItem as Tile;
+                        listTiles.Items[listTiles.SelectedIndex] = listTiles.Items[listTiles.SelectedIndex + 1];
+                        listTiles.Items[listTiles.SelectedIndex + 1] = tile;
+                    }
+                }
+                if (listTiles.SelectedIndex > 0)
+                {
+                    if (e.Shift && e.KeyCode == Keys.D1)
+                        listTiles.SelectedIndex--;
+                    if (e.KeyCode == Keys.Up)
+                    {
+                        Tile tile = listTiles.SelectedItem as Tile;
+                        listTiles.Items[listTiles.SelectedIndex] = listTiles.Items[listTiles.SelectedIndex - 1];
+                        listTiles.Items[listTiles.SelectedIndex - 1] = tile;
+                    }
+                }
+            }
+
+            if (e.KeyCode == Keys.C)
+                Configs();
+
+            if (e.KeyCode == Keys.OemQuotes)
+            {
+                if (RenderClass.Tool == RenderClass.Tools.Pen)
+                    btBucket_Click(null, null);
+                else
+                    btPen_Click(null, null);
+            }
+        }
+        private void Form1_KeyUp(object sender, KeyEventArgs e)
+        {
+            Core.ControlKeyHelp = e.Control;
         }
     }
 }

@@ -21,11 +21,30 @@ namespace WindowsFormsApp8
         public static Palette Palette;
         public static ListBox ListTiles;
         public static PointF Cam;
+        public static bool ControlKeyHelp = false;
+        public static bool DisplayAllTiles = false;
+        public static Point TileToManuallySet = Point.Empty;
 
         public static int WT = 16;
         public static int HT = 16;
-        public static Point MouseTile => new Point(MousePosition.X / TileSz, MousePosition.Y / TileSz);
-        public static Point MouseSnap => new Point(MouseTile.X * TileSz, MouseTile.Y * TileSz);
+        public static Point Mouse => new Point(MousePosition.X + (int)Cam.X, MousePosition.Y + (int)Cam.Y);
+        public static Point MouseTile => new Point(Mouse.X / TileSz, Mouse.Y / TileSz);
+        public static Point MouseSnap => new Point(MouseTile.X * TileSz - (int)Cam.X, MouseTile.Y * TileSz - (int)Cam.Y);
         public static Rectangle CamTile => new Rectangle((int)Cam.X / TileSz, (int)Cam.Y / TileSz, RW / TileSz, RH / TileSz);
+        public static Point CamSnap => new Point(CamTile.X * TileSz, CamTile.Y * TileSz);
+
+
+        public static Tile ListTilesTile(int tileX, int tileY) => ListTilesTile(RenderClass.Tiles[tileX, tileY]);
+        public static Autotile.Autotile ListTilesAutotile(int tileX, int tileY) => ListTilesAutotile(RenderClass.Tiles[tileX, tileY]);
+        public static Tile ListTilesTile(int i)
+        {
+            if (i < 0 || i >= ListTiles.Items.Count) return ListTiles.Items[0] as Tile;
+            return ListTiles.Items[i] as Tile;
+        }
+        public static Autotile.Autotile ListTilesAutotile(int i)
+        {
+            if (i < 0 || i >= ListTiles.Items.Count) return ListTiles.Items[0] as Autotile.Autotile;
+            return ListTiles.Items[i] as Autotile.Autotile;
+        }
     }
 }

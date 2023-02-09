@@ -47,8 +47,9 @@
             this.listTiles.Name = "listTiles";
             this.listTiles.Size = new System.Drawing.Size(268, 667);
             this.listTiles.TabIndex = 1;
+            this.listTiles.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
+            this.listTiles.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyUp);
             this.listTiles.MouseDown += new System.Windows.Forms.MouseEventHandler(this.listTiles_MouseDown);
-            this.listTiles.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.Form_KeyDown);
             // 
             // btBucket
             // 
@@ -83,7 +84,6 @@
             this.Render.MouseLeave += new System.EventHandler(this.Render_MouseLeave);
             this.Render.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Render_MouseMove);
             this.Render.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Render_MouseUp);
-            this.Render.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.Form_KeyDown);
             // 
             // imgUsedTool
             // 
@@ -107,6 +107,8 @@
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Form1";
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
+            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyUp);
             ((System.ComponentModel.ISupportInitialize)(this.Render)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.imgUsedTool)).EndInit();
             this.ResumeLayout(false);
