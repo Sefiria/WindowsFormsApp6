@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace DOSBOX
+namespace WindowsFormsApp13
 {
     internal static class Program
     {
@@ -16,7 +16,7 @@ namespace DOSBOX
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new DOSBOX());
+            Application.Run(new Form1());
         }
     }
 }

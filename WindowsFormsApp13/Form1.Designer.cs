@@ -1,6 +1,6 @@
-﻿namespace DOSBOX
+﻿namespace WindowsFormsApp13
 {
-    partial class DOSBOX
+    partial class Form1
     {
         /// <summary>
         /// Required designer variable.
@@ -37,20 +37,19 @@
             this.Render.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Render.Location = new System.Drawing.Point(0, 0);
             this.Render.Name = "Render";
-            this.Render.Size = new System.Drawing.Size(320, 320);
+            this.Render.Size = new System.Drawing.Size(512, 512);
             this.Render.TabIndex = 0;
             this.Render.TabStop = false;
             // 
-            // DOSBOX
+            // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(320, 320);
+            this.ClientSize = new System.Drawing.Size(512, 512);
             this.Controls.Add(this.Render);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Name = "DOSBOX";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "DOSBOX";
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Name = "Form1";
+            this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.Render)).EndInit();
             this.ResumeLayout(false);
 

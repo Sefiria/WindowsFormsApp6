@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{AF79981D-A533-4AF5-9F6B-C65C03C30B37}</ProjectGuid>
+    <ProjectGuid>{76C7D3F9-DFBF-41B0-B07B-30BD9FE4B58A}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>DOSBOX</RootNamespace>
-    <AssemblyName>DOSBOX</AssemblyName>
+    <RootNamespace>WindowsFormsApp13</RootNamespace>
+    <AssemblyName>WindowsFormsApp13</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -22,7 +22,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -32,10 +31,8 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -47,11 +44,8 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Data.cs" />
-    <Compile Include="Core.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -60,24 +54,6 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Suggestions\Template.cs" />
-    <Compile Include="Suggestions\Breaker.cs" />
-    <Compile Include="Suggestions\Road.cs" />
-    <Compile Include="Suggestions\Suggestion.cs" />
-    <Compile Include="Utilities\Box.cs" />
-    <Compile Include="Utilities\Circle.cs" />
-    <Compile Include="Utilities\Dispf.cs" />
-    <Compile Include="Utilities\Disp.cs" />
-    <Compile Include="Utilities\effects\effect.cs" />
-    <Compile Include="Utilities\Graphic.cs" />
-    <Compile Include="Utilities\KB.cs" />
-    <Compile Include="Utilities\Maths.cs" />
-    <Compile Include="Utilities\Text.cs" />
-    <Compile Include="Utilities\vecf.cs" />
-    <Compile Include="Utilities\vec.cs" />
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
