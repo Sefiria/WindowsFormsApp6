@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace DOSBOX.Utilities
 {
-    public class Maths
+    public static class Maths
     {
         public static float Sq(float i) => i * i;
         public static unsafe float Sqrt(float number)
@@ -131,6 +134,60 @@ namespace DOSBOX.Utilities
             if (s1 * s2 < 0F)
                 return false;
             return true;
+        }
+
+        public static vecf Rotate(this vecf v, float degrees)
+        {
+            float rad = degrees.ToRadians();
+            vecf result = vecf.Zero;
+            result.x = v.x * (float)Math.Cos(rad) - v.y * (float)Math.Sin(rad);
+            result.y = v.x * (float)Math.Sin(rad) + v.y * (float)Math.Cos(rad);
+            return result;
+        }
+
+        public static float ToRadians(this float degrees) => (float)Math.PI * degrees / 180F;
+        public static vecf AngleToVecf(this float degrees) => new vecf((float) Math.Cos(degrees.ToRadians()), (float) Math.Sin(degrees.ToRadians()));
+
+        public static float Lerp(float v0, float v1, double t)
+        {
+            return (float)((1D - t) * (double)v0 + t * (double)v1);
+        }
+        public static vecf Lerp(vecf v0, vecf v1, double t)
+        {
+            return new vecf(Lerp(v0.x, v1.x, t), Lerp(v0.y, v1.y, t));
+        }
+
+        public static vecf GetRaycastLine(vecf v, vecf look, float bx, float by, float bw, float bh) => GetRaycastLine(v, look, new RectangleF(bx, by, bw, bh));
+        public static vecf GetRaycastLine(vecf v, vecf look, RectangleF bounds)
+        {
+            if (look == vecf.Zero)
+                return v;
+            vecf r = new vecf(v);
+            while (r.x > bounds.X && r.x < bounds.Width && r.y > bounds.Y && r.y < bounds.Height)
+                r += look;
+            if (r.x < bounds.X) r.x = bounds.X;
+            if (r.y < bounds.Y) r.y = bounds.Y;
+            if (r.x >= bounds.Width) r.x = bounds.Width - 1;
+            if (r.y >= bounds.Height) r.y = bounds.Height - 1;
+            return r;
+        }
+        public static vecf Raycast(vecf s, vecf look, Bitmap map, Color color)
+        {
+            bool check(vecf _v) => _v.x >= 0F && _v.y >= 0F && _v.x < map.Width && _v.y < map.Height;
+
+            vecf e = GetRaycastLine(s, look, 0, 0, map.Width, map.Height);
+            double length = new Vector(e.x - s.x, e.y - s.y).Length;
+            vecf v, prevv = new vecf(float.NaN, float.NaN);
+            for (double t = 0D; t <= 1D; t += 1D / length)
+            {
+                v = Lerp(s, e, t);
+                if (prevv != new vecf(float.NaN, float.NaN) && prevv == v)
+                    continue;
+                prevv = v;
+                if (check(v) && map.GetPixel((int)v.x, (int)v.y).ToArgb() != color.ToArgb())
+                    return v;
+            }
+            return vecf.Zero;
         }
     }
 }
