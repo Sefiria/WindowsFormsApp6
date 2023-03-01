@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
@@ -11,7 +12,7 @@ namespace DOSBOX.Utilities
     {
         public static void Clear(byte color, int layer)
         {
-            int w = 64, h = 64; 
+            int w = 64, h = 64;
             byte[,] px = new byte[w, h];
             for (int i = 0; i < w; i++)
                 for (int j = 0; j < h; j++)
@@ -47,6 +48,69 @@ namespace DOSBOX.Utilities
 
             new DispClass(px, x, y).Display(layer);
         }
+        public static void DisplayHorizontalLine(int Ax, int Bx, int y, byte color, int thickness, int layer)
+        {
+            int xmax = Math.Max(Ax, Bx);
+            int xmin = Math.Min(Ax, Bx);
+            int w = xmax - xmin;
+            int h = thickness;
+
+            byte[,] px = new byte[w, h];
+            for (int i = 0; i < w; i++)
+                for (int j = 0; j < h; j++)
+                    px[i, j] = color;
+
+            new DispClass(px, xmin, y).Display(layer);
+        }
+        public static void DisplayVerticalLine(int x, int Ay, int By, byte color, int thickness, int layer)
+        {
+            int ymax = Math.Max(Ay, By);
+            int ymin = Math.Min(Ay, By);
+            int w = thickness;
+            int h = ymax - ymin;
+
+            byte[,] px = new byte[w, h];
+            for (int i = 0; i < w; i++)
+                for (int j = 0; j < h; j++)
+                    px[i, j] = color;
+
+            new DispClass(px, x, ymin).Display(layer);
+        }
+        public static void DisplayLine(vecf start, vecf end, byte color, int layer) => DisplayLine(start.i, end.i, color, layer);
+        public static void DisplayLine(vec start, vec end, byte color, int layer)
+        {
+            int minx = Math.Min(start.x, end.x);
+            int maxx = Math.Max(start.x, end.x);
+            int miny = Math.Min(start.y, end.y);
+            int maxy = Math.Max(start.y, end.y);
+            var fstart = new vecf(minx, miny);
+            var fend = new vecf(maxx, maxy);
+
+            int w = maxx - minx + 1;
+            int h = maxy - miny + 1;
+            int length = Math.Max(w, h);
+
+            vec origin = new vec(start.x, start.y);
+            if (start.x > end.x) origin.x -= w;
+            if (start.y > end.y) origin.y -= h;
+
+            byte[,] px = new byte[w, h];
+            for (int i = 0; i < w; i++)
+                for (int j = 0; j < h; j++)
+                    px[i, j] = (byte)(layer == 0 ? 4 : 0);
+
+            vec pt;
+            for (float t = 0F; t <= 1F; t += 1F / length)
+            {
+                pt = Maths.Lerp(fstart, fend, t).i - fstart.i;
+                px[pt.x, pt.y] = color;
+            }
+
+            if(!(end.x < start.x || end.y < start.y) || (end.x < start.x && end.y < start.y))
+                new DispClass(px, origin.x, origin.y).DisplayExact(layer);
+            else
+                new DispClass(px, origin.x, origin.y).Display(layer);
+        }
 
         public static byte[,] GetGradientHorizontal(int w, int h, List<byte> ordered_colors)
         {
@@ -65,6 +129,22 @@ namespace DOSBOX.Utilities
                     for (int y = c; y < c + h / ordered_colors.Count; y++)
                         g[x, y] = ordered_colors[c];
             return g;
+        }
+
+        internal static byte InvertOf(byte b, int layer)
+        {
+            if (layer == 0)
+            {
+                if (b == 4) return 4;
+                return (byte)(3 - b);
+            }
+            else
+            {
+                var r = (byte)(b == 4 ? 0 : 3 - b);
+                if (r == 0)
+                    return 4;
+                return r;
+            }
         }
 
         public class DispClass : Disp

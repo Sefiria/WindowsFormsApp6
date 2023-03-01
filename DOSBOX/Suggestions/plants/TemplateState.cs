@@ -6,26 +6,10 @@ using System.Linq;
 
 namespace DOSBOX.Suggestions
 {
-    public class Template : ISuggestion
+    public class TemplateState : IState
     {
-        public static Template Instance;
-        public bool ShowHowToPlay { get; set; }
-
-
-        public void HowToPlay()
-        {
-
-            if (KB.IsKeyDown(KB.Key.Space))
-            {
-                Graphic.Clear(0, 0);
-                ShowHowToPlay = false;
-            }
-        }
-
         public void Init()
         {
-            Instance = this;
-
             Core.Layers.Clear();
             Core.Layers.Add(new byte[64, 64]); // BG
             Core.Layers.Add(new byte[64, 64]); // Sprites
@@ -37,13 +21,7 @@ namespace DOSBOX.Suggestions
         {
             if (KB.IsKeyPressed(KB.Key.Escape))
             {
-                Core.CurrentSuggestion = null;
-                return;
-            }
-
-            if (ShowHowToPlay)
-            {
-                HowToPlay();
+                Plants.Instance.CurrentState = null;
                 return;
             }
 

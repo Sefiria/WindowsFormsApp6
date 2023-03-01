@@ -14,6 +14,7 @@ namespace DOSBOX.Suggestions
     public class Road : ISuggestion
     {
         public static Road Instance;
+        public bool ShowHowToPlay { get; set; }
         public bg _bg;
         public car _car;
         public List<crate> crates;
@@ -23,6 +24,24 @@ namespace DOSBOX.Suggestions
 
         int Score;
 
+        public void HowToPlay()
+        {
+            int x = 2, y = 2;
+            Text.DisplayText("left", x, y, 0); y += 6;
+            Text.DisplayText(" ►go left", x, y, 0); y += 8;
+            Text.DisplayText("right", x, y, 0); y += 6;
+            Text.DisplayText(" ►go right", x, y, 0); y += 8;
+            Text.DisplayText("up", x, y, 0); y += 6;
+            Text.DisplayText(" ►go up", x, y, 0); y += 8;
+            Text.DisplayText("down", x, y, 0); y += 6;
+            Text.DisplayText(" ►go down", x, y, 0);
+
+            if (KB.IsKeyDown(KB.Key.Space))
+            {
+                Graphic.Clear(0, 0);
+                ShowHowToPlay = false;
+            }
+        }
 
         public void Init()
         {
@@ -55,8 +74,16 @@ namespace DOSBOX.Suggestions
         public void Update()
         {
             if (KB.IsKeyPressed(KB.Key.Escape))
+            {
                 Core.CurrentSuggestion = null;
+                return;
+            }
 
+            if (ShowHowToPlay)
+            {
+                HowToPlay();
+                return;
+            }
 
             if (_car.crashed)
             {
@@ -108,7 +135,6 @@ namespace DOSBOX.Suggestions
                 if (Core.RND.Next(2) == 0 && _bg.rx[0] > 4)
                 {
                     x = Core.RND.Next(0, _bg.rx[0] - 4);
-                    Console.WriteLine($"A {_bg.rx[0]} ♥ {_bg.rx[0] + _bg.rxs}  :  {x}");
                 }
                 else
                 {
@@ -117,7 +143,6 @@ namespace DOSBOX.Suggestions
                     if (min < max)
                     {
                         x = Core.RND.Next(min, max);
-                        Console.WriteLine($"B {_bg.rx[0]} ♥ {_bg.rx[0] + _bg.rxs}  :  {x}");
                     }
                 }
                 if (x > -1)

@@ -28,5 +28,7 @@ namespace WindowsFormsApp13
             w = Image.Width;
             h = Image.Height;
         }
+
+        public bool TestPixel(int x, int y) => !(x < 0 || y < 0 || x >= w || y >= h);
     }
 }

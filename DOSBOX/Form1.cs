@@ -37,6 +37,7 @@ namespace DOSBOX
                 Core.CurrentSuggestion = Core.NextSuggestion;
                 Core.NextSuggestion = null;
                 Core.CurrentSuggestion.Init();
+                Core.CurrentSuggestion.ShowHowToPlay = true;
             }
 
             if (Core.CurrentSuggestion == null)
@@ -103,7 +104,7 @@ namespace DOSBOX
 
             int length, factor;
 
-            for(int layer=0; layer<Core.Layers.Count; layer++)
+            for (int layer = 0; layer < Core.Layers.Count; layer++)
             {
                 length = Core.Layers[layer].GetLength(0);
                 factor = 256 / length;
@@ -113,7 +114,7 @@ namespace DOSBOX
                     {
                         if (layer > 0 && Core.Layers[layer][x / factor, y / factor] == 0)
                             continue;
-                        
+
                         pic.SetPixel(x, y, Core.Palette[Core.Layers[layer][x / factor, y / factor]]);
                     }
                 }

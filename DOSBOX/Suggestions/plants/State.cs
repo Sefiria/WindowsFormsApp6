@@ -6,12 +6,9 @@ using System.Threading.Tasks;
 
 namespace DOSBOX.Suggestions
 {
-    public interface ISuggestion
+    public interface IState
     {
-        bool ShowHowToPlay { get; set; }
-
         void Init();
         void Update();
-        void HowToPlay();
     }
 }

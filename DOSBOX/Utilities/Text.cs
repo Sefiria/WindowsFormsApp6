@@ -268,6 +268,41 @@ namespace DOSBOX.Utilities
             { 4, 4, 4, 4, 4}
         };
 
+        public static byte[,] _Dash = new byte[3, 5]
+        {
+            { 4, 4, 3, 4, 4},
+            { 4, 4, 3, 4, 4},
+            { 4, 4, 3, 4, 4}
+        };
+
+        public static byte[,] _ArrowLeft = new byte[3, 5]
+        {
+            { 4, 2, 3, 2, 4},
+            { 4, 1, 3, 1, 4},
+            { 4, 4, 3, 4, 4}
+        };
+
+        public static byte[,] _ArrowRight = new byte[3, 5]
+        {
+            { 4, 4, 3, 4, 4},
+            { 4, 1, 3, 1, 4},
+            { 4, 2, 3, 2, 4}
+        };
+
+        public static byte[,] _ParenthesisOpen = new byte[3, 5]
+        {
+            { 3, 4, 4, 4, 3},
+            { 2, 2, 4, 2, 2},
+            { 4, 2, 3, 2, 4},
+        };
+
+        public static byte[,] _ParenthesisClose = new byte[3, 5]
+        {
+            { 4, 2, 3, 2, 4},
+            { 2, 2, 4, 2, 2},
+            { 3, 4, 4, 4, 3},
+        };
+
         public static byte[,] template = new byte[3, 5]
         {
             { 4, 4, 4, 4, 4},
@@ -340,6 +375,11 @@ namespace DOSBOX.Utilities
                 case 'Y': return Y;
                 case 'Z': return Z;
                 case ' ': return _Space;
+                case '-': return _Dash;
+                case '←': case '◄': return _ArrowLeft;
+                case '→': case '►': return _ArrowRight;
+                case '(': return _ParenthesisOpen;
+                case ')': return _ParenthesisClose;
             }
         }
 

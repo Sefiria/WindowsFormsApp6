@@ -3,6 +3,7 @@ using DOSBOX.Utilities.effects;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Security.RightsManagement;
@@ -15,6 +16,7 @@ namespace DOSBOX.Suggestions
     public class Breaker : ISuggestion
     {
         public static Breaker Instance;
+        public bool ShowHowToPlay { get; set; }
         Bar bar;
         List<Ball> balls = new List<Ball>();
         List<Brick> bricks = new List<Brick>();
@@ -22,6 +24,24 @@ namespace DOSBOX.Suggestions
         List<Bullet> bullets = new List<Bullet>();
         int level, Score;
         List<List<Brick>> levels = new List<List<Brick>>();
+
+        public void HowToPlay()
+        {
+            int x = 2, y = 2;
+            Text.DisplayText("left", x, y, 0); y += 6;
+            Text.DisplayText(" ►go left", x, y, 0); y += 8;
+            Text.DisplayText("right", x, y, 0); y += 6;
+            Text.DisplayText(" ►go right", x, y, 0); y += 8;
+            Text.DisplayText("space", x, y, 0); y += 6;
+            Text.DisplayText(" ►shot (when", x, y, 0); y += 6;
+            Text.DisplayText("  powerup)", x, y, 0); y += 6;
+
+            if (KB.IsKeyDown(KB.Key.Space))
+            {
+                Graphic.Clear(0, 0);
+                ShowHowToPlay = false;
+            }
+        }
 
         public void Init()
         {
@@ -37,6 +57,7 @@ namespace DOSBOX.Suggestions
 
             balls.Clear();
 
+            bullets = new List<Bullet>();
             balls = new List<Ball>();
             bricks = new List<Brick>();
             powerups = new List<Powerup>();
@@ -95,7 +116,16 @@ namespace DOSBOX.Suggestions
         public void Update()
         {
             if (KB.IsKeyPressed(KB.Key.Escape))
+            {
                 Core.CurrentSuggestion = null;
+                return;
+            }
+
+            if (ShowHowToPlay)
+            {
+                HowToPlay();
+                return;
+            }
 
 
             if (bar.Lifes < 0)

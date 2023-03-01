@@ -8,6 +8,9 @@ namespace DOSBOX.Utilities
 {
     public abstract class Dispf
     {
+        protected bool DisplayModuloScreen = false;
+        protected bool DisplayCenterSprite = false;
+
         public vecf vec = new vecf{ x=0, y=0};
         public byte[,] g;
         public byte scale = 1;
@@ -20,6 +23,18 @@ namespace DOSBOX.Utilities
 
             int x = (int) vec.x + (srcLoc != null ? srcLoc.x : 0);
             int y = (int) vec.y + (srcLoc != null ? srcLoc.y : 0);
+
+            if(DisplayCenterSprite)
+            {
+                x -= _w / 2;
+                y -= _h / 2;
+            }
+
+            if(DisplayModuloScreen)
+            {
+                x = x % 64;
+                y = y % 64;
+            }
 
             for (int i = 0; i < _w * scale; i++)
                 for (int j = 0; j < _h * scale; j++)

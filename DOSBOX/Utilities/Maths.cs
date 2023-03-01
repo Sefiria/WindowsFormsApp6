@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,7 +8,7 @@ using System.Windows;
 
 namespace DOSBOX.Utilities
 {
-    public class Maths
+    public static class Maths
     {
         public static float Sq(float i) => i * i;
         public static unsafe float Sqrt(float number)
@@ -18,12 +19,26 @@ namespace DOSBOX.Utilities
             y = y * (1.5F - (number * 0.5F * y * y));
             return 1F / y * (1.5F - (number * 0.5F * y * y));
         }
+        public static float Length(vec v) => Sqrt(Sq(v.x) + Sq(v.y));
+        public static float Length(vecf v) => Sqrt(Sq(v.x) + Sq(v.y));
+        public static vec Normalized(vec v)
+        {
+            float distance = Length(v);
+            if (Math.Round(distance, 4) == 0F) return new vec(0, 0);
+            return new vec((int)(v.x / distance), (int)(v.y / distance));
+        }
+        public static vecf Normalized(vecf v)
+        {
+            float distance = Length(v);
+            if (Math.Round(distance, 4) == 0F) return new vecf(0F, 0F);
+            return new vecf(v.x / distance, v.y / distance);
+        }
         public static bool CollisionPointBox(float curseur_x, float curseur_y, Box box)
         {
             if (curseur_x >= box.x
-             && curseur_x < box.x + box.w
-             && curseur_y >= box.y
-             && curseur_y < box.y + box.h)
+                && curseur_x < box.x + box.w
+                && curseur_y >= box.y
+                && curseur_y < box.y + box.h)
                 return true;
             else
                 return false;
@@ -31,9 +46,9 @@ namespace DOSBOX.Utilities
         public static bool CollisionBoxBox(Box box1, Box box2)
         {
             if ((box2.x >= box1.x + box1.w) // trop à droite
-             || (box2.x + box2.w <= box1.x) // trop à gauche
-             || (box2.y >= box1.y + box1.h)  // trop en bas
-             || (box2.y + box2.h <= box1.y)) // trop en haut
+                || (box2.x + box2.w <= box1.x) // trop à gauche
+                || (box2.y >= box1.y + box1.h)  // trop en bas
+                || (box2.y + box2.h <= box1.y)) // trop en haut
                 return false;
             else
                 return true;
@@ -61,8 +76,8 @@ namespace DOSBOX.Utilities
             float CI = numerateur / denominateur;
             return CI < C.r;
         }
-        public static bool CollisionSegment(float Ax, float Ay, float Bx, float By, float Cx, float Cy, float Cr) => CollisionSegment(new vecf(Ax, Ay), new vecf (Bx, By), new Circle(Cx, Cy, Cr));
-        public static bool CollisionSegment(float Ax, float Ay, float Bx, float By, Circle C) => CollisionSegment(new vecf(Ax, Ay), new vecf (Bx, By), C);
+        public static bool CollisionSegment(float Ax, float Ay, float Bx, float By, float Cx, float Cy, float Cr) => CollisionSegment(new vecf(Ax, Ay), new vecf(Bx, By), new Circle(Cx, Cy, Cr));
+        public static bool CollisionSegment(float Ax, float Ay, float Bx, float By, Circle C) => CollisionSegment(new vecf(Ax, Ay), new vecf(Bx, By), C);
         public static bool CollisionSegment(vecf A, vecf B, Circle C)
         {
             if (CollisionDroite(A, B, C) == false)
@@ -78,7 +93,7 @@ namespace DOSBOX.Utilities
             float pscal2 = (-AB.x) * BC.x + (-AB.y) * BC.y;  // produit scalaire
             if (pscal1 >= 0F && pscal2 >= 0F)
                 return true;   // I entre A et B, ok.
-                               // dernière possibilité, A ou B dans le cercle
+                                // dernière possibilité, A ou B dans le cercle
             if (CollisionPointCercle(A.x, A.y, C))
                 return true;
             if (CollisionPointCercle(B.x, B.y, C))
@@ -100,22 +115,22 @@ namespace DOSBOX.Utilities
         public static int CollisionCercleBox(Circle C1, Box box)
         {
             Box boxCercle = new Box(C1);  // retourner la bounding box de l'image porteuse, ou calculer la bounding box.
-            // premier test :
+                                            // premier test :
             if (CollisionBoxBox(box, boxCercle) == false)
                 return 0;// no collision
-            // deuxieme test :
+                            // deuxieme test :
             if (CollisionPointCercle(box.x, box.y, C1)) return 1;// corner top-left
             if (CollisionPointCercle(box.x, box.y + box.h, C1)) return 2;// corner bottom-left
             if (CollisionPointCercle(box.x + box.w, box.y, C1)) return 3;// corner top-right
             if (CollisionPointCercle(box.x + box.w, box.y + box.h, C1)) return 4;// corner bottom-right
-            // cas E :
+                                                                                    // cas E :
             if (CollisionSegment(box.x + box.w, box.y, box.x, box.y, C1.x, C1.y + C1.r, C1.r)) return 6;// segment top
             if (CollisionSegment(box.x + box.w, box.y + box.h, box.x + box.w, box.y, C1.x - (int)(C1.r / 2), C1.y, C1.r)) return 7;// segment right
             if (CollisionSegment(box.x, box.y + box.h, box.x + box.w, box.y + box.h, C1.x, C1.y - (int)(C1.r / 2), C1.r)) return 8;// segment bottom
             if (CollisionSegment(box.x, box.y, box.x, box.y + box.h, C1.x + C1.r, C1.y, C1.r)) return 9;// segment left
-            // troisieme test :
+                                                                                                        // troisieme test :
             if (CollisionPointBox(C1.x, C1.y, box)) return 5;// one inside the other
-            // cas B :
+                                                                // cas B :
             return 0;// no collision
         }
         public static bool ProjectionSurSegment(float Cx, float Cy, float Ax, float Ay, float Bx, float By)
@@ -131,6 +146,60 @@ namespace DOSBOX.Utilities
             if (s1 * s2 < 0F)
                 return false;
             return true;
+        }
+
+        public static vecf Rotate(this vecf v, float degrees)
+        {
+            float rad = degrees.ToRadians();
+            vecf result = vecf.Zero;
+            result.x = v.x * (float)Math.Cos(rad) - v.y * (float)Math.Sin(rad);
+            result.y = v.x * (float)Math.Sin(rad) + v.y * (float)Math.Cos(rad);
+            return result;
+        }
+
+        public static float ToRadians(this float degrees) => (float)Math.PI * degrees / 180F;
+        public static vecf AngleToVecf(this float degrees) => new vecf((float)Math.Cos(degrees.ToRadians()), (float)Math.Sin(degrees.ToRadians()));
+
+        public static float Lerp(float v0, float v1, double t)
+        {
+            return (float)((1D - t) * (double)v0 + t * (double)v1);
+        }
+        public static vecf Lerp(vecf v0, vecf v1, double t)
+        {
+            return new vecf(Lerp(v0.x, v1.x, t), Lerp(v0.y, v1.y, t));
+        }
+
+        public static vecf GetRaycastLine(vecf v, vecf look, float bx, float by, float bw, float bh) => GetRaycastLine(v, look, new RectangleF(bx, by, bw, bh));
+        public static vecf GetRaycastLine(vecf v, vecf look, RectangleF bounds)
+        {
+            if (look == vecf.Zero)
+                return v;
+            vecf r = new vecf(v);
+            while (r.x > bounds.X && r.x < bounds.Width && r.y > bounds.Y && r.y < bounds.Height)
+                r += look;
+            if (r.x < bounds.X) r.x = bounds.X;
+            if (r.y < bounds.Y) r.y = bounds.Y;
+            if (r.x >= bounds.Width) r.x = bounds.Width - 1;
+            if (r.y >= bounds.Height) r.y = bounds.Height - 1;
+            return r;
+        }
+        public static vecf Raycast(vecf s, vecf look, Bitmap map, Color color)
+        {
+            bool check(vecf _v) => _v.x >= 0F && _v.y >= 0F && _v.x < map.Width && _v.y < map.Height;
+
+            vecf e = GetRaycastLine(s, look, 0, 0, map.Width, map.Height);
+            double length = new Vector(e.x - s.x, e.y - s.y).Length;
+            vecf v, prevv = new vecf(float.NaN, float.NaN);
+            for (double t = 0D; t <= 1D; t += 1D / length)
+            {
+                v = Lerp(s, e, t);
+                if (prevv != new vecf(float.NaN, float.NaN) && prevv == v)
+                    continue;
+                prevv = v;
+                if (check(v) && map.GetPixel((int)v.x, (int)v.y).ToArgb() != color.ToArgb())
+                    return v;
+            }
+            return vecf.Zero;
         }
     }
 }

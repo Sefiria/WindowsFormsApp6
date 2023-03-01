@@ -43,14 +43,25 @@ namespace WindowsFormsApp13
         internal void MoveForward()
         {
             if (found) return;
-            if(!Collides(vec, new vecf(vec.x + look.x * movespeed * 2F, vec.y + look.y * movespeed * 2F)))
-                vec += look * movespeed;
+
+            bool chk = false;
+            for(float i=0F; i<movespeed && !chk; i++)
+                if (!(chk = Collides(new vecf(vec.x + look.x * 12F, vec.y + look.y * 12F))))
+                    vec += look;
         }
         internal void MoveBackward()
         {
             if (found) return;
-            if(!Collides(vec, new vecf(vec.x - look.x * movespeed * 2F, vec.y - look.y * movespeed * 2F)))
-                vec -= look * movespeed;
+            bool chk = false;
+            for (float i = 0F; i < movespeed && !chk; i++)
+                if (!(chk = Collides(new vecf(vec.x - look.x * 12F, vec.y - look.y * 12F))))
+                    vec -= look;
+        }
+        internal bool Collides(vecf v)
+        {
+            if (!Core.Map.TestPixel((int)v.x, (int)v.y))
+                return true;
+            return Core.Map.Image.GetPixel((int)v.x, (int)v.y).ToArgb() != Color.Black.ToArgb();
         }
         internal bool Collides(vecf a, vecf b)
         {
