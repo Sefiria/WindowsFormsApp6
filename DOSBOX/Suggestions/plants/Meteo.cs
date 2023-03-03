@@ -82,7 +82,7 @@ namespace DOSBOX.Suggestions
                 return;
 
             int w = Core.Layers[0].GetLength(0);
-            for (int i = 0; i < 255; i++)
+            for (int i = 0; i < /*DEBUG*/255/*Previsions[0]*/; i++)
             {
                 vecf vec = new vecf( Core.RND.Next(0, w), 0F );
                 vecf look = new vecf((Core.RND.Next(0, 101) - 50F) / 100F, Core.RND.Next(0, 101) / 100F);
