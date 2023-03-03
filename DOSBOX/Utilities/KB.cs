@@ -55,5 +55,6 @@ namespace DOSBOX.Utilities
         public static void Update() => AvailableKeys.ForEach(k => Released[k] = !Keyboard.IsKeyDown(k));
         public static bool IsKeyDown(Key k) => Keyboard.IsKeyDown(AvailableKeys[(int)k]);
         public static bool IsKeyPressed(Key k) => Keyboard.IsKeyDown(AvailableKeys[(int)k]) && Released[AvailableKeys[(int)k]];
+        public static bool IsKeyUp(Key k) => !IsKeyDown(k);
     }
 }

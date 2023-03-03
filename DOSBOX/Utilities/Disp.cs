@@ -8,6 +8,8 @@ namespace DOSBOX.Utilities
 {
     public abstract class Disp
     {
+        protected bool DisplayAlwaysExact = false;
+
         public vec vec = new vec{ x=0, y=0};
         public byte[,] g;
         public byte scale = 1;
@@ -29,6 +31,12 @@ namespace DOSBOX.Utilities
         }
         public void Display(int layer, vec srcLoc = null)
         {
+            if (DisplayAlwaysExact)
+            {
+                DisplayExact(layer);
+                return;
+            }
+
             int w = Core.Layers[layer].GetLength(0);
             int h = Core.Layers[layer].GetLength(1);
 

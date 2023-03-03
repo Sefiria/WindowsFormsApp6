@@ -25,18 +25,10 @@ namespace DOSBOX.Suggestions
                 return;
             }
 
-
             DisplayUI();
-
-
-            Collisions();
         }
 
         private void DisplayUI()
-        {
-        }
-
-        private void Collisions()
         {
         }
     }

@@ -9,11 +9,11 @@ namespace DOSBOX.Suggestions
 {
     public class Branch
     {
-        public Plant OwnerPlant;
+        public IPlant OwnerPlant;
         public Branch OwnerBranch;
         public vecf endvec;
-        public bool HasFlower = false;
         public vecf startvecfrombranch = vecf.Zero;
+        public int maxbranches;
 
         public vecf startvec => OwnerBranch != null ? startvecfrombranch : OwnerPlant.vec;
         public bool IsMasterBranch => this == OwnerPlant.masterbranch;
@@ -30,15 +30,16 @@ namespace DOSBOX.Suggestions
             return level;
         }
 
-        List<Branch> tree_branches = new List<Branch>();
-        List<Leaf> tree_leaves = new List<Leaf>();
+        public List<Branch> tree_branches = new List<Branch>();
+        public List<Leaf> tree_leaves = new List<Leaf>();
+        public List<Fruit> fruits = new List<Fruit>();
 
         public Branch(Branch copy)
         {
             OwnerPlant = copy.OwnerPlant;
             OwnerBranch = copy.OwnerBranch;
         }
-        public Branch(Plant ownerPlant, Branch ownerBranch)
+        public Branch(IPlant ownerPlant, Branch ownerBranch)
         {
             OwnerPlant = ownerPlant;
             OwnerBranch = ownerBranch;
@@ -59,6 +60,7 @@ namespace DOSBOX.Suggestions
                 endvec = new vecf(startvec);
                 endvec.y--;
             }
+            maxbranches = Core.RND.Next(10, 50) / 10;
         }
 
         public void Update()
@@ -68,10 +70,18 @@ namespace DOSBOX.Suggestions
         }
         public void Display(int layer)
         {
-            Graphic.DisplayLine(startvec, endvec, 1, layer);
-
+            Graphic.DisplayLine(startvec, endvec, (byte) (OwnerPlant.water < OwnerPlant.waterneed ? 3 : 1), layer);
             new List<Branch>(tree_branches).ForEach(branch => branch.Display(layer));
+        }
+        public void DisplayLeaves(int layer)
+        {
             new List<Leaf>(tree_leaves).ForEach(leaf => leaf.Display(layer));
+            new List<Branch>(tree_branches).ForEach(branch => branch.DisplayLeaves(layer));
+        }
+        public void DisplayFruits(int layer)
+        {
+            new List<Fruit>(fruits).ForEach(fruit => fruit.Display(layer));
+            new List<Branch>(tree_branches).ForEach(branch => branch.DisplayFruits(layer));
         }
 
         public void Grow()
@@ -87,15 +97,16 @@ namespace DOSBOX.Suggestions
 
             if(IsMasterBranch ? endvec.y < Garden.FloorLevel - 4 : length > 4)
             {
-                if(length < lengthmax && Core.RND.Next(5) == 0 && tree_branches.Count < 8)
+                if(length < lengthmax && Core.RND.Next(5) == 0 && tree_branches.Count < maxbranches)
                 {
                     tree_branches.Add(new Branch(OwnerPlant, this));
                 }
 
-                if(!IsMasterBranch && Core.RND.Next(8) == 0 && tree_leaves.Count < 4)
-                {
+                if (!IsMasterBranch && Core.RND.Next(8) == 0 && tree_leaves.Count < 4)
                     tree_leaves.Add(new Leaf(this));
-                }
+
+                if (!IsMasterBranch && Core.RND.Next(256) == 128 && fruits.Count < 2)
+                    fruits.Add(OwnerPlant.CreateFruit(endvec));
             }
 
             tree_branches.ForEach(branch => branch.Grow());

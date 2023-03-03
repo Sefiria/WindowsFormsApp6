@@ -1,4 +1,5 @@
-﻿using DOSBOX.Utilities;
+﻿using DOSBOX.Suggestions.plants.Fruits;
+using DOSBOX.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,15 +11,16 @@ namespace DOSBOX.Suggestions
     public class User
     {
         vecf cursor = new vecf(32, 32);
-        List<(Plant plant, int count)> seeds = new List<(Plant plant, int count)>();
+        List<(IPlant plant, int count)> seeds = new List<(IPlant plant, int count)>();
         int selected_seed = 0;
 
         public User()
         {
             seeds.Clear();
-            seeds.Add((new Plant(vecf.Zero), 1));
+            seeds.Add((PlantFactory.CreateRandom(vecf.Zero), 1));
         }
 
+        bool fruittaken = false;
         public void Update()
         {
             float speed = 1.5F;
@@ -38,11 +40,32 @@ namespace DOSBOX.Suggestions
             if(cursor.y > 63) cursor.y = 63;
 
 
-            if (KB.IsKeyDown(KB.Key.Space))
+            if (KB.IsKeyUp(KB.Key.Space))
+                fruittaken = false;
+            if (KB.IsKeyPressed(KB.Key.Space))
+            {
+                var dic = Garden.Instance.GetPlantsFruits();
+                foreach (var kv in dic)
+                {
+                    var fruit = kv.Value.FirstOrDefault(f => f.IsHover(cursor));
+                    if (fruit != null)
+                    {
+                        kv.Key.fruits.Remove(fruit);
+                        string name = fruit.GetType().Name;
+                        if (plants.Data.Fruits.ContainsKey(name))
+                            plants.Data.Fruits[name]++;
+                        else
+                            plants.Data.Fruits[name] = 1;
+                        fruittaken = true;
+                        break;
+                    }
+                }
+            }
+            if (!fruittaken && KB.IsKeyDown(KB.Key.Space))
             {
                 if (cursor.y < Garden.FloorLevel)
                     WaterSprayShot();
-                else
+                else if(KB.IsKeyPressed(KB.Key.Space))
                     DropSeed();
             }
         }
@@ -63,18 +86,12 @@ namespace DOSBOX.Suggestions
 
         private void DropSeed()
         {
-            again:
-            if(seeds.Count == 0) return;
-            if (selected_seed >= seeds.Count) selected_seed = seeds.Count - 1;
-            if (seeds[selected_seed].count == 0)
+            if (!string.IsNullOrWhiteSpace(plants.Data.SelectedSeed))
             {
-                seeds.RemoveAt(selected_seed);
-                goto again;
+                var plant = plants.Data.DropSeed(cursor);
+                if(plant != null)
+                    Garden.Instance.ScenePlants.Add(plant);
             }
-            Garden.Instance.ScenePlants.Add((Plant)Activator.CreateInstance(seeds[selected_seed].plant.GetType(), new[] { cursor }));
-            seeds[selected_seed] = (seeds[selected_seed].plant, seeds[selected_seed].count - 1);
-            if (seeds[selected_seed].count == 0)
-                seeds.RemoveAt(selected_seed);
         }
 
         public void Display(int layer)
@@ -82,9 +99,9 @@ namespace DOSBOX.Suggestions
             for (int i = -2; i < 3; i++)
             {
                 if(cursor.x + i >= 0 && cursor.x + i < 64)
-                    Core.Layers[layer][cursor.i.x + i, cursor.i.y] = Graphic.InvertOf(Core.Layers[0][cursor.i.x + i, cursor.i.y], layer);
+                    Core.Layers[layer][cursor.i.x + i, cursor.i.y] = Graphic.InvertOfForeground(cursor.i.x + i, cursor.i.y);
                 if(cursor.y + i >= 0 && cursor.y + i < 64)
-                    Core.Layers[layer][cursor.i.x, cursor.i.y + i] = Graphic.InvertOf(Core.Layers[0][cursor.i.x, cursor.i.y + i], layer);
+                    Core.Layers[layer][cursor.i.x, cursor.i.y + i] = Graphic.InvertOfForeground(cursor.i.x, cursor.i.y + i);
             }
         }
     }

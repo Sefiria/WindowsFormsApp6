@@ -8,11 +8,12 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
 
 namespace DOSBOX.Suggestions
 {
-    public class Plant
+    public class Plant<T> : IPlant where T : Fruit
     {
-        public vecf vec;
-        public byte waterneed = 10, water;
-        public Branch masterbranch = null;
+        public vecf vec { get; set; }
+        public byte waterneed { get; set; } = 10;
+        public byte water { get; set; }
+    public Branch masterbranch { get; set; } = null;
 
         List<vec> px_seed = new List<vec>() { new vec(0, 0) };
 
@@ -62,6 +63,8 @@ namespace DOSBOX.Suggestions
             foreach (var px in px_seed)
                 Core.Layers[layer][vec.i.x + px.x, vec.i.y + px.y] = 4;
             masterbranch?.Display(layer);
+            masterbranch?.DisplayLeaves(layer);
+            masterbranch?.DisplayFruits(layer);
         }
 
 
@@ -96,5 +99,7 @@ namespace DOSBOX.Suggestions
                     masterbranch = new Branch(this, null);
             }
         }
+
+        public Fruit CreateFruit(vecf v) => (Fruit)Activator.CreateInstance(typeof(T), new[] { v });
     }
 }

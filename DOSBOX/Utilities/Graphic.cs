@@ -131,6 +131,17 @@ namespace DOSBOX.Utilities
             return g;
         }
 
+        internal static byte InvertOfForeground(int x, int y)
+        {
+            int layer = Core.Layers.Count - 2;
+            if (layer < 0) layer = 0;
+            byte b = Core.Layers[layer][x, y];
+            while (layer >= 0 && b == 0)
+            {
+                b = Core.Layers[layer--][x, y];
+            }
+            return InvertOf(b, ++layer);
+        }
         internal static byte InvertOf(byte b, int layer)
         {
             if (layer == 0)

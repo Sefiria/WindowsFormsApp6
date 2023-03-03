@@ -15,8 +15,9 @@ namespace DOSBOX.Suggestions
         public static int FloorLevel => 48;
         public User User;
         public List<WaterDrop> WaterDrops = new List<WaterDrop>();
-        public List<Plant> ScenePlants = new List<Plant>();
+        public List<IPlant> ScenePlants = new List<IPlant>();
         public int Ticks, TicksMax;
+        public byte[,] ActiveBG = new byte[64, FloorLevel];
 
         public void Init()
         {
@@ -35,11 +36,20 @@ namespace DOSBOX.Suggestions
 
             DisplayBG();
         }
+        public void InitActive()
+        {
+            for (int x = 0; x < 64; x++)
+                for (int y = 0; y < 64 - FloorLevel; y++)
+                    Core.Layers[0][x, FloorLevel + y] = ActiveBG[x, y];
+        }
 
         public void Update()
         {
             if (KB.IsKeyPressed(KB.Key.Escape))
             {
+                for (int x = 0; x < 64; x++)
+                    for (int y = 0; y < 64 - FloorLevel; y++)
+                        ActiveBG[x, y] = Core.Layers[0][x, FloorLevel + y];
                 Plants.Instance.CurrentState = null;
                 return;
             }
@@ -47,15 +57,15 @@ namespace DOSBOX.Suggestions
 
             User.Update();
             WaterDropsUpdate();
-            new List<Plant>(ScenePlants).ForEach(p => p.Update());
+            new List<IPlant>(ScenePlants).ForEach(p => p.Update());
             BGUpdate();
             TicksUpdate();
 
 
             WaterDropsDisplay();
             DisplayUI();
+            new List<IPlant>(ScenePlants).ForEach(p => p.Display(1));
             User.Display(2);
-            new List<Plant>(ScenePlants).ForEach(p => p.Display(1));
         }
 
         private void TicksUpdate()
@@ -109,6 +119,27 @@ namespace DOSBOX.Suggestions
 
         private void DisplayUI()
         {
+        }
+
+
+        public Dictionary<Branch, List<Fruit>> GetPlantsFruits()
+        {
+            Dictionary<Branch, List<Fruit>> fruitsPerBranch = new Dictionary<Branch, List<Fruit>>();
+            void subbranches(Branch b)
+            {
+                foreach (var fruit in b.fruits)
+                {
+                    if (!fruitsPerBranch.ContainsKey(b))
+                        fruitsPerBranch[b] = new List<Fruit>();
+                    fruitsPerBranch[b].Add(fruit);
+                }
+                foreach (var _b in b.tree_branches)
+                    subbranches(_b);
+            }
+            foreach(var plant in ScenePlants)
+                if(plant.masterbranch != null)
+                    subbranches(plant.masterbranch);
+            return fruitsPerBranch;
         }
     }
 }

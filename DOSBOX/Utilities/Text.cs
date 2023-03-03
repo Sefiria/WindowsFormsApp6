@@ -348,6 +348,16 @@ namespace DOSBOX.Utilities
             switch((""+c).ToUpper().First())
             {
                 default: return null;
+                case '0': return _0;
+                case '1': return _1;
+                case '2': return _2;
+                case '3': return _3;
+                case '4': return _4;
+                case '5': return _5;
+                case '6': return _6;
+                case '7': return _7;
+                case '8': return _8;
+                case '9': return _9;
                 case 'A': return A;
                 case 'B': return B;
                 case 'C': return C;

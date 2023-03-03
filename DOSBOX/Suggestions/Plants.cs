@@ -14,6 +14,8 @@ namespace DOSBOX.Suggestions
         public static List<(string Name, IState Instance)> States = new List<(string, IState)>()
         {
             ("Garden", new Garden()),
+            ("Fruits", new Fruits()),
+            ("Seeds", new Seeds()),
         };
 
 
@@ -32,6 +34,8 @@ namespace DOSBOX.Suggestions
         public void Init()
         {
             Instance = this;
+
+            plants.Data.Init();
 
             Core.Layers.Clear();
             Core.Layers.Add(new byte[64, 64]); // BG
@@ -52,7 +56,10 @@ namespace DOSBOX.Suggestions
             {
                 CurrentState = NextState;
                 NextState = null;
-                CurrentState.Init();
+                if (CurrentState != Garden.Instance)
+                    CurrentState.Init();
+                else
+                    Garden.Instance.InitActive();
             }
 
             if (CurrentState == null)
@@ -61,6 +68,7 @@ namespace DOSBOX.Suggestions
 
                 if (KB.IsKeyPressed(KB.Key.Escape))
                 {
+                    Garden.Instance = null;
                     Core.CurrentSuggestion = null;
                     return;
                 }

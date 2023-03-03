@@ -27,11 +27,15 @@ namespace DOSBOX.Suggestions
 
             if (vec.y >= Garden.FloorLevel)
             {
-                int y = 0;
+                int x = 0, y = 0;
                 while (vec.i.y + y < 64 && Core.Layers[0][vec.i.x, vec.i.y + y] == 3)
+                {
                     y++;
-                if (vec.i.y + y < 64)
-                    Core.Layers[0][vec.i.x, vec.i.y + y] = 3;
+                    if (Core.RND.Next(5) == 2)
+                        x += Core.RND.Next(64) % 2 == 0 ? 1 : -1;
+                }
+                if (vec.i.y + y < 64 && vec.i.x + x >= 0 && vec.i.x + x < 64)
+                    Core.Layers[0][vec.i.x + x, vec.i.y + y] = 3;
                 destroy = true;
                 return;
             }
