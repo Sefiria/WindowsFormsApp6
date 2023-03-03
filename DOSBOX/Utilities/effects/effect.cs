@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using static System.Windows.Forms.AxHost;
 
 namespace DOSBOX.Utilities.effects
@@ -16,6 +17,9 @@ namespace DOSBOX.Utilities.effects
         float frame = 0F;
         int framemax => g.Count;
         protected virtual float incr { get; set; } = 0.1F;
+        public int w(int frame) => getlength(frame, 0);
+        public int h(int frame) => getlength(frame, 1);
+        int getlength(int frame, int dimension) => (frame < 0 || frame >= g.Count) ? 0 : g[frame].GetLength(dimension);
 
         void Tick()
         {
@@ -36,6 +40,23 @@ namespace DOSBOX.Utilities.effects
             }
         }
 
+        public void Display(int layer, vecf vf = null, vec v = null)
+        {
+            if (vf == null && v == null) return;
+            Dispf df = null;
+            if (vf != null)
+            {
+                df = new DispfClass();
+                df.vec = vf;
+            }
+            Disp d = null;
+            if (v != null)
+            {
+                d = new DispClass();
+                d.vec = v;
+            }
+            Display(layer, df:df, d:d);
+        }
         public void Display(int layer, Dispf df = null, Disp d = null)
         {
             if(df == null && d == null) return;
@@ -56,6 +77,9 @@ namespace DOSBOX.Utilities.effects
 
             Tick();
         }
+
+        public class DispfClass : Dispf { }
+        public class DispClass : Disp { }
 
         public class crash : effect
         {
@@ -89,6 +113,83 @@ namespace DOSBOX.Utilities.effects
                     {3, 3, 2, 1, 1, 3, 0, 0 },
                     {0, 0, 3, 2, 2, 3, 3, 3 },
                     {0, 0, 0, 3, 3, 0, 3, 0 },
+                },
+            };
+        }
+        public class coin : effect
+        {
+            protected override bool pingpong { get; set; } = false;
+            protected override float incr { get; set; } = 0.5F;
+            protected override List<byte[,]> g { get; set; } = new List<byte[,]>()
+            {
+                new byte[4,4]
+                {
+                    {0, 1, 1, 0 },
+                    {1, 1, 1, 1 },
+                    {1, 3, 1, 1 },
+                    {0, 1, 1, 0 }
+                },
+                new byte[4,4]
+                {
+                    {0, 0, 0, 0 },
+                    {1, 1, 1, 1 },
+                    {1, 2, 1, 1 },
+                    {0, 1, 1, 0 }
+                },
+                new byte[4,4]
+                {
+                    {0, 0, 0, 0 },
+                    {1, 1, 1, 1 },
+                    {1, 1, 1, 1 },
+                    {0, 0, 0, 0 }
+                },
+                new byte[4,4]
+                {
+                    {0, 1, 1, 0 },
+                    {1, 2, 1, 1 },
+                    {1, 1, 1, 1 },
+                    {0, 0, 0, 0 }
+                },
+                new byte[4,4]
+                {
+                    {0, 1, 1, 0 },
+                    {1, 3, 1, 1 },
+                    {1, 1, 1, 1 },
+                    {0, 1, 1, 0 }
+                },
+                new byte[4,4]
+                {
+                    {0, 0, 0, 0 },
+                    {1, 1, 1, 1 },
+                    {1, 1, 1, 1 },
+                    {0, 1, 1, 0 }
+                },
+                new byte[4,4]
+                {
+                    {0, 0, 0, 0 },
+                    {1, 1, 1, 1 },
+                    {1, 1, 1, 1 },
+                    {0, 0, 0, 0 }
+                },
+                new byte[4,4]
+                {
+                    {0, 1, 1, 0 },
+                    {1, 1, 1, 1 },
+                    {1, 2, 1, 1 },
+                    {0, 0, 0, 0 }
+                },
+            };
+        }
+        public class waterdrop : effect
+        {
+            protected override float incr { get; set; } = 0.5F;
+            protected override List<byte[,]> g { get; set; } = new List<byte[,]>()
+            {
+                new byte[3,4]
+                {
+                    {0, 2, 3, 3 },
+                    {3, 0, 1, 3 },
+                    {0, 2, 3, 3 },
                 },
             };
         }

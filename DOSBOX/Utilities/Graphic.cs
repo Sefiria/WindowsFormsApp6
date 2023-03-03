@@ -22,6 +22,8 @@ namespace DOSBOX.Utilities
         public static void DisplayRect(int x, int y, int w, int h, byte color, int layer) => DisplayRectAndBounds(x, y, w, h, color, 0, 0, layer);
         public static void DisplayRectAndBounds(int x, int y, int w, int h, byte color, byte boundscolor, int thickness, int layer)
         {
+            if (w <= 0 || h <= 0)
+                return;
             byte[,] px = new byte[w, h];
 
             for (int i = 0; i < w; i++)
@@ -48,6 +50,12 @@ namespace DOSBOX.Utilities
 
             new DispClass(px, x, y).Display(layer);
         }
+        public static void DisplayHorizontalInfiniteLine(int y, byte color, int thickness, int layer)
+        {
+            int Ax = 0;
+            int Bx = Core.Layers[layer].GetLength(0);
+            DisplayHorizontalLine(Ax, Bx, y, color, thickness, layer);
+        }
         public static void DisplayHorizontalLine(int Ax, int Bx, int y, byte color, int thickness, int layer)
         {
             int xmax = Math.Max(Ax, Bx);
@@ -61,6 +69,12 @@ namespace DOSBOX.Utilities
                     px[i, j] = color;
 
             new DispClass(px, xmin, y).Display(layer);
+        }
+        public static void DisplayVerticalLineInfiniteLine(int x, byte color, int thickness, int layer)
+        {
+            int Ay = 0;
+            int By = Core.Layers[layer].GetLength(1);
+            DisplayHorizontalLine(x, Ay, By, color, thickness, layer);
         }
         public static void DisplayVerticalLine(int x, int Ay, int By, byte color, int thickness, int layer)
         {
@@ -131,16 +145,20 @@ namespace DOSBOX.Utilities
             return g;
         }
 
-        internal static byte InvertOfForeground(int x, int y)
+        internal static byte InvertOfForeground(int x, int y, int layer)
         {
-            int layer = Core.Layers.Count - 2;
-            if (layer < 0) layer = 0;
-            byte b = Core.Layers[layer][x, y];
-            while (layer >= 0 && b == 0)
+            int l = Core.Layers.Count - 2;
+            if (l < 0) l = 0;
+            byte b;
+            bool alphazero;
+            do
             {
-                b = Core.Layers[layer--][x, y];
+                b = Core.Layers[l][x, y];
+                alphazero = b == (l == 0 ? 4 : 0);
+                l--;
             }
-            return InvertOf(b, ++layer);
+            while (l >= 0 && alphazero);
+            return InvertOf(b, layer);
         }
         internal static byte InvertOf(byte b, int layer)
         {

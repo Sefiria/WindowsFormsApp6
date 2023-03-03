@@ -21,9 +21,9 @@ namespace DOSBOX.Utilities
         public static vecf Zero => new vecf(0F, 0F);
 
         public static bool operator ==(vecf a, vecf b) => a?.x == b?.x && a?.y == b?.y;
-        public static bool operator !=(vecf a, vecf b) => a.x != b.x || a.y != b.y;
-        public static vecf operator +(vecf a, vecf b) => new vecf(a.x + b.x, a.y + b.y);
-        public static vecf operator -(vecf a, vecf b) => new vecf(a.x - b.x, a.y - b.y);
-        public static vecf operator *(vecf a, float b) => new vecf(a.x * b, a.y * b);
+        public static bool operator !=(vecf a, vecf b) => a?.x != b?.x || a?.y != b?.y;
+        public static vecf operator +(vecf a, vecf b) => new vecf((float)(a?.x + b?.x), (float)(a?.y + b?.y));
+        public static vecf operator -(vecf a, vecf b) => new vecf((float)(a?.x - b?.x), (float)(a?.y - b?.y));
+        public static vecf operator *(vecf a, float b) => new vecf((float)(a?.x * b), (float)(a?.y * b));
     }
 }

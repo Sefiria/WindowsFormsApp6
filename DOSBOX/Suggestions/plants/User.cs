@@ -1,23 +1,23 @@
 ﻿using DOSBOX.Suggestions.plants.Fruits;
 using DOSBOX.Utilities;
+using DOSBOX.Utilities.effects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static DOSBOX.Utilities.effects.effect;
 
 namespace DOSBOX.Suggestions
 {
     public class User
     {
-        vecf cursor = new vecf(32, 32);
-        List<(IPlant plant, int count)> seeds = new List<(IPlant plant, int count)>();
-        int selected_seed = 0;
+        vecf cursor;
+        waterdrop waterdrop = new waterdrop();
 
         public User()
         {
-            seeds.Clear();
-            seeds.Add((PlantFactory.CreateRandom(vecf.Zero), 1));
+            cursor = new vecf(32, 32);
         }
 
         bool fruittaken = false;
@@ -34,10 +34,22 @@ namespace DOSBOX.Suggestions
             if (KB.IsKeyDown(KB.Key.Down))
                 cursor.y += speed;
 
-            if(cursor.x < 0) cursor.x = 0;
             if(cursor.y < 0) cursor.y = 0;
-            if(cursor.x > 63) cursor.x = 63;
-            if(cursor.y > 63) cursor.y = 63;
+            if (cursor.y > 63) cursor.y = 63;
+
+            var camx = Core.Cam.i.x;
+            if (cursor.x < 0)
+            {
+                cursor.x = 0;
+                if (camx > 0)
+                    Core.Cam.x--;
+            }
+            if (cursor.x > 63)
+            {
+                cursor.x = 63;
+                if (camx < Core.Layers[0].GetLength(0))
+                    Core.Cam.x++;
+            }
 
 
             if (KB.IsKeyUp(KB.Key.Space))
@@ -47,7 +59,7 @@ namespace DOSBOX.Suggestions
                 var dic = Garden.Instance.GetPlantsFruits();
                 foreach (var kv in dic)
                 {
-                    var fruit = kv.Value.FirstOrDefault(f => f.IsHover(cursor));
+                    var fruit = kv.Value.FirstOrDefault(f => f.IsHover(cursor + Core.Cam));
                     if (fruit != null)
                     {
                         kv.Key.fruits.Remove(fruit);
@@ -72,14 +84,20 @@ namespace DOSBOX.Suggestions
 
         private void WaterSprayShot()
         {
+            if (plants.Data.WaterBucket == 0)
+                return;
+            plants.Data.WaterBucket--;
+            if (plants.Data.WaterBucket < 0)
+                plants.Data.WaterBucket = 0;
+
             int count = 4;
-            float factor = 3F;
+            float spread = 3F;
             for (int i = 0; i < count; i++)
             {
                 Garden.Instance.WaterDrops.Add(new WaterDrop()
                 {
-                    vec = cursor,
-                    look = new vecf(((Core.RND.Next(21) - 10F) / 10F) * factor, (Core.RND.Next(5, 10) / 10F) * factor)
+                    vec = cursor + Core.Cam,
+                    look = new vecf(((Core.RND.Next(21) - 10F) / 10F) * spread, (Core.RND.Next(5, 10) / 10F) * spread)
                 });
             }
         }
@@ -88,7 +106,7 @@ namespace DOSBOX.Suggestions
         {
             if (!string.IsNullOrWhiteSpace(plants.Data.SelectedSeed))
             {
-                var plant = plants.Data.DropSeed(cursor);
+                var plant = plants.Data.DropSeed(cursor + Core.Cam);
                 if(plant != null)
                     Garden.Instance.ScenePlants.Add(plant);
             }
@@ -99,10 +117,16 @@ namespace DOSBOX.Suggestions
             for (int i = -2; i < 3; i++)
             {
                 if(cursor.x + i >= 0 && cursor.x + i < 64)
-                    Core.Layers[layer][cursor.i.x + i, cursor.i.y] = Graphic.InvertOfForeground(cursor.i.x + i, cursor.i.y);
+                    Core.Layers[layer][cursor.i.x + i, cursor.i.y] = Graphic.InvertOfForeground(Core.Cam.i.x + cursor.i.x + i, Core.Cam.i.y + cursor.i.y, layer);
                 if(cursor.y + i >= 0 && cursor.y + i < 64)
-                    Core.Layers[layer][cursor.i.x, cursor.i.y + i] = Graphic.InvertOfForeground(cursor.i.x, cursor.i.y + i);
+                    Core.Layers[layer][cursor.i.x, cursor.i.y + i] = Graphic.InvertOfForeground(Core.Cam.i.x + cursor.i.x, Core.Cam.i.y + cursor.i.y + i, layer);
             }
+
+            waterdrop.Display(layer, v: new vec(1, 1));
+            int y = 1 + waterdrop.h(0) + 1;
+            Graphic.DisplayRectAndBounds(1, y, waterdrop.w(0), Garden.FloorLevel - 2 - y, 2, 1, 1, layer);
+            int v = (int) ((Garden.FloorLevel - 4 - y) * (plants.Data.WaterBucket / (float)plants.Data.WaterBucketMax));
+            Graphic.DisplayRect(2, y + 1, waterdrop.w(0) - 2, Garden.FloorLevel - 4 - y - v, 4, layer);
         }
     }
 }

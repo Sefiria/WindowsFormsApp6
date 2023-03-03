@@ -38,6 +38,7 @@ namespace DOSBOX
                 Core.NextSuggestion = null;
                 Core.CurrentSuggestion.Init();
                 Core.CurrentSuggestion.ShowHowToPlay = true;
+                Core.Cam = vecf.Zero;
             }
 
             if (Core.CurrentSuggestion == null)
@@ -102,27 +103,28 @@ namespace DOSBOX
         {
             Bitmap pic = new Bitmap(256, 256, PixelFormat.Format32bppArgb);
 
-            int length, factor;
-
+            int factor, i, j, w, h;
             for (int layer = 0; layer < Core.Layers.Count; layer++)
             {
-                length = Core.Layers[layer].GetLength(0);
-                factor = 256 / length;
+                w = Core.Layers[layer].GetLength(0);
+                h = Core.Layers[layer].GetLength(1);
                 for (int x = 0; x < 256; x++)
                 {
                     for (int y = 0; y < 256; y++)
                     {
-                        if (layer > 0 && Core.Layers[layer][x / factor, y / factor] == 0)
+                        i = (w > 64 ? Core.Cam.i.x : 0) + x / 4;
+                        j = (h > 64 ? Core.Cam.i.y : 0) + y / 4;
+                        if (layer > 0 && Core.Layers[layer][i, j] == 0)
                             continue;
 
-                        pic.SetPixel(x, y, Core.Palette[Core.Layers[layer][x / factor, y / factor]]);
+                        pic.SetPixel(x, y, Core.Palette[Core.Layers[layer][i, j]]);
                     }
                 }
 
                 if (layer > 0)
                 {
-                    int w = Core.Layers[layer].GetLength(0);
-                    int h = Core.Layers[layer].GetLength(1);
+                    w = Core.Layers[layer].GetLength(0);
+                    h = Core.Layers[layer].GetLength(1);
                     Core.Layers[layer] = new byte[w, h];
                 }
             }

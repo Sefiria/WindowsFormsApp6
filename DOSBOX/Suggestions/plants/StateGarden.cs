@@ -17,7 +17,9 @@ namespace DOSBOX.Suggestions
         public List<WaterDrop> WaterDrops = new List<WaterDrop>();
         public List<IPlant> ScenePlants = new List<IPlant>();
         public int Ticks, TicksMax;
-        public byte[,] ActiveBG = new byte[64, FloorLevel];
+        public byte[,] ActiveBG;
+        public int MapWidth = 200;
+        public Meteo Meteo;
 
         public void Init()
         {
@@ -25,20 +27,27 @@ namespace DOSBOX.Suggestions
                 Instance = this;
 
             Core.Layers.Clear();
-            Core.Layers.Add(new byte[64, 64]); // BG
-            Core.Layers.Add(new byte[64, 64]); // Sprites
+            Core.Layers.Add(new byte[MapWidth, 64]); // BG
+            Core.Layers.Add(new byte[MapWidth, 64]); // Sprites
             Core.Layers.Add(new byte[64, 64]); // UI
 
             WaterDrops.Clear();
             ScenePlants.Clear();
+            Meteo = new Meteo();
             Ticks = 0; TicksMax = 9;
             User = new User();
 
+            ActiveBG = new byte[MapWidth, FloorLevel];
             DisplayBG();
         }
         public void InitActive()
         {
-            for (int x = 0; x < 64; x++)
+            Core.Layers.Clear();
+            Core.Layers.Add(new byte[MapWidth, 64]); // BG
+            Core.Layers.Add(new byte[MapWidth, 64]); // Sprites
+            Core.Layers.Add(new byte[64, 64]); // UI
+
+            for (int x = 0; x < MapWidth; x++)
                 for (int y = 0; y < 64 - FloorLevel; y++)
                     Core.Layers[0][x, FloorLevel + y] = ActiveBG[x, y];
         }
@@ -47,13 +56,14 @@ namespace DOSBOX.Suggestions
         {
             if (KB.IsKeyPressed(KB.Key.Escape))
             {
-                for (int x = 0; x < 64; x++)
+                for (int x = 0; x < MapWidth; x++)
                     for (int y = 0; y < 64 - FloorLevel; y++)
                         ActiveBG[x, y] = Core.Layers[0][x, FloorLevel + y];
                 Plants.Instance.CurrentState = null;
                 return;
             }
 
+            Meteo.Update();
 
             User.Update();
             WaterDropsUpdate();
@@ -89,12 +99,13 @@ namespace DOSBOX.Suggestions
         {
             new List<WaterDrop>(WaterDrops).ForEach(drop =>
             {
-                Core.Layers[1][drop.vec.i.x, drop.vec.i.y] = 2;
+                if(!Core.isout(drop.vec, 1, Core.Cam))
+                    Core.Layers[1][drop.vec.i.x, drop.vec.i.y] = 2;
             });
         }
 
         int sunimpact_y = FloorLevel;
-        int ticksimpact = 0, ticksimpact_max = 4;
+        int ticksimpact = 0, ticksimpact_max = 9;
         private void BGUpdate()
         {
             if(Ticks == TicksMax)
@@ -106,7 +117,7 @@ namespace DOSBOX.Suggestions
             if(ticksimpact == ticksimpact_max)
             {
                 ticksimpact = 0;
-                Graphic.DisplayHorizontalLine(0, 64, sunimpact_y, 2, 1, 0);
+                Graphic.DisplayHorizontalInfiniteLine(sunimpact_y, 2, 1, 0);
                 sunimpact_y++;
                 if (sunimpact_y >= 64)
                     sunimpact_y = FloorLevel;
@@ -114,7 +125,7 @@ namespace DOSBOX.Suggestions
         }
         private void DisplayBG()
         {
-            Graphic.DisplayRect(0, FloorLevel, 64, 64 - FloorLevel, 2, 0);
+            Graphic.DisplayRect(0, FloorLevel, MapWidth, 64 - FloorLevel, 2, 0);
         }
 
         private void DisplayUI()
@@ -136,6 +147,7 @@ namespace DOSBOX.Suggestions
                 foreach (var _b in b.tree_branches)
                     subbranches(_b);
             }
+            var list = ScenePlants.Where(p => p.vec.x >= Core.Cam.i.x && p.vec.x < Core.Cam.i.x + 64);
             foreach(var plant in ScenePlants)
                 if(plant.masterbranch != null)
                     subbranches(plant.masterbranch);

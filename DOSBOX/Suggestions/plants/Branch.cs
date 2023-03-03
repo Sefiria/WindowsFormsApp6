@@ -13,7 +13,7 @@ namespace DOSBOX.Suggestions
         public Branch OwnerBranch;
         public vecf endvec;
         public vecf startvecfrombranch = vecf.Zero;
-        public int maxbranches;
+        public int maxbranches, maxleaves;
 
         public vecf startvec => OwnerBranch != null ? startvecfrombranch : OwnerPlant.vec;
         public bool IsMasterBranch => this == OwnerPlant.masterbranch;
@@ -61,6 +61,7 @@ namespace DOSBOX.Suggestions
                 endvec.y--;
             }
             maxbranches = Core.RND.Next(10, 50) / 10;
+            maxleaves = Core.RND.Next(0, 40) / 10;
         }
 
         public void Update()
@@ -97,12 +98,12 @@ namespace DOSBOX.Suggestions
 
             if(IsMasterBranch ? endvec.y < Garden.FloorLevel - 4 : length > 4)
             {
-                if(length < lengthmax && Core.RND.Next(5) == 0 && tree_branches.Count < maxbranches)
+                if(tree_branches.Count < maxbranches && length < lengthmax && Core.RND.Next(5) == 0)
                 {
                     tree_branches.Add(new Branch(OwnerPlant, this));
                 }
 
-                if (!IsMasterBranch && Core.RND.Next(8) == 0 && tree_leaves.Count < 4)
+                if (tree_leaves.Count < maxleaves && !IsMasterBranch && Core.RND.Next(8) == 0)
                     tree_leaves.Add(new Leaf(this));
 
                 if (!IsMasterBranch && Core.RND.Next(256) == 128 && fruits.Count < 2)

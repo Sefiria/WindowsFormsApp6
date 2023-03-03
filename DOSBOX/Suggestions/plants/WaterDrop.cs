@@ -19,7 +19,7 @@ namespace DOSBOX.Suggestions
 
             vec += look;
 
-            if (Core.isout(vec))
+            if (Core.isout(vec, 1, Core.Cam))
             {
                 destroy = true;
                 return;
@@ -34,7 +34,7 @@ namespace DOSBOX.Suggestions
                     if (Core.RND.Next(5) == 2)
                         x += Core.RND.Next(64) % 2 == 0 ? 1 : -1;
                 }
-                if (vec.i.y + y < 64 && vec.i.x + x >= 0 && vec.i.x + x < 64)
+                if (vec.i.y + y - Core.Cam.i.y < 64 && vec.i.x + x - Core.Cam.i.x >= 0 && vec.i.x + x - Core.Cam.i.x < 64)
                     Core.Layers[0][vec.i.x + x, vec.i.y + y] = 3;
                 destroy = true;
                 return;

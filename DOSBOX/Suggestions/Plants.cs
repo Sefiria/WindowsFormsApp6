@@ -16,6 +16,7 @@ namespace DOSBOX.Suggestions
             ("Garden", new Garden()),
             ("Fruits", new Fruits()),
             ("Seeds", new Seeds()),
+            ("Shop", new Shop()),
         };
 
 
@@ -64,6 +65,7 @@ namespace DOSBOX.Suggestions
 
             if (CurrentState == null)
             {
+                Core.Cam = vecf.Zero;
                 UpdateMenu();
 
                 if (KB.IsKeyPressed(KB.Key.Escape))

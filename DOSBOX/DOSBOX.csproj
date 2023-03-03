@@ -93,6 +93,7 @@
     <Compile Include="Suggestions\Fusion.cs" />
     <Compile Include="Suggestions\Plants.cs" />
     <Compile Include="Suggestions\plants\Data.cs" />
+    <Compile Include="Suggestions\plants\Meteo.cs" />
     <Compile Include="Suggestions\plants\PlantFactory.cs" />
     <Compile Include="Suggestions\plants\Fruit.cs" />
     <Compile Include="Suggestions\plants\Fruits\Concombre.cs" />
@@ -102,6 +103,7 @@
     <Compile Include="Suggestions\plants\Leaf.cs" />
     <Compile Include="Suggestions\plants\Branch.cs" />
     <Compile Include="Suggestions\plants\Plant.cs" />
+    <Compile Include="Suggestions\plants\StateShop.cs" />
     <Compile Include="Suggestions\plants\StateSeeds.cs" />
     <Compile Include="Suggestions\plants\StateFruits.cs" />
     <Compile Include="Suggestions\plants\TemplateState.cs" />

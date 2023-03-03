@@ -11,20 +11,21 @@ namespace DOSBOX.Suggestions.plants
     {
         public static Dictionary<string, int> Fruits;
         public static Dictionary<string, int> Seeds;
-        public static string SelectedSeed = "";
+        public static string SelectedSeed;
+        public static int WaterBucket, WaterBucketMax;
+        public static int Coins;
 
         public static void Init()
         {
             Fruits = new Dictionary<string, int>();
             Seeds = new Dictionary<string, int>();
 
-            //debug
+            SelectedSeed = "";
+            WaterBucketMax = 100;
+            WaterBucket = WaterBucketMax / 2;
+            Coins = 40;
+
             Fruits["Pomme"] = 1;
-            Fruits["Tomate"] = 10;
-            Fruits["Concombre"] = 100;
-            Seeds["Pomme"] = 10;
-            Seeds["Tomate"] = 10;
-            Seeds["Concombre"] = 10;
         }
 
         public static int SelectedSeedCount => Seeds.ContainsKey(SelectedSeed) ? Seeds[SelectedSeed] : 0;

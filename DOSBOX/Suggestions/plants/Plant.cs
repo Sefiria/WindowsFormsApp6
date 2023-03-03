@@ -23,7 +23,7 @@ namespace DOSBOX.Suggestions
             water = waterneed;
         }
 
-        int ticksimpact = 0, ticksimpact_max = 1;
+        int ticksimpact = 0, ticksimpact_max = 4;
         public void Update()
         {
             if (Garden.Instance.Ticks == Garden.Instance.TicksMax)
@@ -61,7 +61,8 @@ namespace DOSBOX.Suggestions
         public void Display(int layer)
         {
             foreach (var px in px_seed)
-                Core.Layers[layer][vec.i.x + px.x, vec.i.y + px.y] = 4;
+                if(!Core.isout(vec.i.x + px.x, vec.i.y + px.y, layer, Core.Cam))
+                    Core.Layers[layer][vec.i.x + px.x, vec.i.y + px.y] = 4;
             masterbranch?.Display(layer);
             masterbranch?.DisplayLeaves(layer);
             masterbranch?.DisplayFruits(layer);
@@ -81,10 +82,10 @@ namespace DOSBOX.Suggestions
                         return;
                     if (Core.RND.Next(px_seed.Count) == 0)
                     {
-                        if (!Core.isout(vec.i.x + s.x - 1, vec.i.y + s.y) && !px_seed.Any(px => px.x == s.x - 1 && px.y == s.y) && Core.Layers[0][vec.i.x + s.x-1, vec.i.y + s.y] == 3) px_seed.Add(new vec(s.x-1, s.y));
-                        if (!Core.isout(vec.i.x + s.x + 1, vec.i.y + s.y) && !px_seed.Any(px => px.x == s.x + 1 && px.y == s.y) && px_seed.Count < 16 && Core.Layers[0][vec.i.x + s.x+1, vec.i.y + s.y] == 3) px_seed.Add(new vec(s.x+1, s.y));
-                        if (!Core.isout(vec.i.x + s.x, vec.i.y + s.y - 1) && !px_seed.Any(px => px.x == s.x && px.y == s.y - 1) && px_seed.Count < 16 && Core.Layers[0][vec.i.x + s.x, vec.i.y + s.y-1] == 3) px_seed.Add(new vec(s.x, s.y-1));
-                        if (!Core.isout(vec.i.x + s.x, vec.i.y + s.y + 1) && !px_seed.Any(px => px.x == s.x && px.y == s.y + 1) && px_seed.Count < 16 && Core.Layers[0][vec.i.x + s.x, vec.i.y + s.y+1] == 3) px_seed.Add(new vec(s.x, s.y+1));
+                        if (!Core.isout(vec.i.x + s.x - 1, vec.i.y + s.y, 0, Core.Cam) && !px_seed.Any(px => px.x == s.x - 1 && px.y == s.y) && Core.SafeGet(0, vec.i.x + s.x-1, vec.i.y + s.y) == 3) px_seed.Add(new vec(s.x-1, s.y));
+                        if (!Core.isout(vec.i.x + s.x + 1, vec.i.y + s.y, 0, Core.Cam) && !px_seed.Any(px => px.x == s.x + 1 && px.y == s.y) && px_seed.Count < 16 && Core.SafeGet(0, vec.i.x + s.x+1, vec.i.y + s.y) == 3) px_seed.Add(new vec(s.x+1, s.y));
+                        if (!Core.isout(vec.i.x + s.x, vec.i.y + s.y - 1, 0, Core.Cam) && !px_seed.Any(px => px.x == s.x && px.y == s.y - 1) && px_seed.Count < 16 && Core.SafeGet(0, vec.i.x + s.x, vec.i.y + s.y-1) == 3) px_seed.Add(new vec(s.x, s.y-1));
+                        if (!Core.isout(vec.i.x + s.x, vec.i.y + s.y + 1, 0, Core.Cam) && !px_seed.Any(px => px.x == s.x && px.y == s.y + 1) && px_seed.Count < 16 && Core.SafeGet(0, vec.i.x + s.x, vec.i.y + s.y+1) == 3) px_seed.Add(new vec(s.x, s.y+1));
                     }
                 });
             }
