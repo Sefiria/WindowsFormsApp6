@@ -20,6 +20,13 @@ namespace DOSBOX
         Timer TimerUpdate = new Timer() { Enabled = true, Interval = 10 };
         Timer TimerDraw = new Timer() { Enabled = true, Interval = 10 };
 
+        int marge = 4;
+        int buttonSz = 24;
+        Rectangle rectButtonMinimize => new Rectangle(marge, marge, buttonSz, buttonSz);
+        Rectangle rectButtonExit => new Rectangle(Width - marge - buttonSz, marge, buttonSz, buttonSz);
+        Pen penButtons = new Pen(Color.Black, 2F);
+
+
         public DOSBOX()
         {
             InitializeComponent();
@@ -95,8 +102,20 @@ namespace DOSBOX
             {
                 g.Clear(Color.FromArgb(140, 140, 140));
                 g.DrawImage(CreateRender(), 32, 32);
+                DrawHeader(g);
             }
             Render.Image = Image;
+        }
+        private void DrawHeader(Graphics g)
+        {
+            var rect = rectButtonMinimize;
+            g.DrawRectangle(penButtons, rectButtonMinimize);
+            g.DrawLine(penButtons, rect.X + rect.Width / 2 - buttonSz / 3, rect.Y + rect.Height / 2, rect.X + rect.Width / 2 + buttonSz / 3, rect.Y + rect.Height / 2);
+
+            rect = rectButtonExit;
+            g.DrawRectangle(penButtons, rectButtonExit);
+            g.DrawLine(penButtons, rect.X + rect.Width / 2 - buttonSz / 3, rect.Y + rect.Height / 2 - buttonSz / 3, rect.X + rect.Width / 2 + buttonSz / 3, rect.Y + rect.Height / 2 + buttonSz / 3);
+            g.DrawLine(penButtons, rect.X + rect.Width / 2 - buttonSz / 3, rect.Y + rect.Height / 2 + buttonSz / 3, rect.X + rect.Width / 2 + buttonSz / 3, rect.Y + rect.Height / 2 - buttonSz / 3);
         }
 
         Bitmap CreateRender()
@@ -132,6 +151,36 @@ namespace DOSBOX
 
 
             return pic;
+        }
+
+        bool mousedown = false;
+        Point mousepos;
+        private void Render_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            if (rectButtonMinimize.Contains(e.Location))
+            {
+                WindowState = FormWindowState.Minimized;
+                return;
+            }
+            if (rectButtonExit.Contains(e.Location))
+            {
+                Close();
+                return;
+            }
+
+
+            mousedown = true;
+            mousepos = e.Location;
+        }
+        private void Render_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            mousedown = false;
+        }
+        private void Render_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            if (!mousedown)
+                return;
+            Location = new Point(Location.X + (e.X - mousepos.X), Location.Y + (e.Y - mousepos.Y));
         }
     }
 }

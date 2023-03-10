@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace DOSBOX.Utilities
@@ -20,6 +21,7 @@ namespace DOSBOX.Utilities
             new DispClass(px, 0, 0).Display(layer);
         }
         public static void DisplayRect(int x, int y, int w, int h, byte color, int layer) => DisplayRectAndBounds(x, y, w, h, color, 0, 0, layer);
+        public static void DisplayRectAndBounds(Int32Rect rect, byte color, byte boundscolor, int thickness, int layer) => DisplayRectAndBounds(rect.X, rect.Y, rect.Width, rect.Height, color, boundscolor, thickness, layer);
         public static void DisplayRectAndBounds(int x, int y, int w, int h, byte color, byte boundscolor, int thickness, int layer)
         {
             if (w <= 0 || h <= 0)
@@ -50,13 +52,19 @@ namespace DOSBOX.Utilities
 
             new DispClass(px, x, y).Display(layer);
         }
-        public static void DisplayHorizontalInfiniteLine(int y, byte color, int thickness, int layer)
+        public static void DisplayHorizontalInfiniteLine(int y, byte color, int thickness, int layer, bool continuous = true)
         {
             int Ax = 0;
             int Bx = Core.Layers[layer].GetLength(0);
-            DisplayHorizontalLine(Ax, Bx, y, color, thickness, layer);
+            DisplayHorizontalLine(Ax, Bx, y, color, thickness, layer, continuous);
         }
-        public static void DisplayHorizontalLine(int Ax, int Bx, int y, byte color, int thickness, int layer)
+        public static void DisplayHorizontalInfiniteLine(int y, byte color, int thickness, byte[,] ActiveBG, bool continuous = true)
+        {
+            int Ax = 0;
+            int Bx = ActiveBG.GetLength(0);
+            DisplayHorizontalLine(Ax, Bx, y, color, thickness, 0, continuous, ActiveBG);
+        }
+        public static void DisplayHorizontalLine(int Ax, int Bx, int y, byte color, int thickness, int layer, bool continuous = true, byte[,] ActiveBG = null)
         {
             int xmax = Math.Max(Ax, Bx);
             int xmin = Math.Min(Ax, Bx);
@@ -66,17 +74,26 @@ namespace DOSBOX.Utilities
             byte[,] px = new byte[w, h];
             for (int i = 0; i < w; i++)
                 for (int j = 0; j < h; j++)
-                    px[i, j] = color;
+                    if(continuous || (Core.RND.Next(4) == 0))
+                        px[i, j] = color;
+                    else
+                        px[i, j] = (byte)(layer == 0 ? 4 : 0);
 
-            new DispClass(px, xmin, y).Display(layer);
+            new DispClass(px, xmin, y).Display(layer, null, ActiveBG);
         }
         public static void DisplayVerticalLineInfiniteLine(int x, byte color, int thickness, int layer)
         {
             int Ay = 0;
             int By = Core.Layers[layer].GetLength(1);
-            DisplayHorizontalLine(x, Ay, By, color, thickness, layer);
+            DisplayVerticalLine(x, Ay, By, color, thickness, layer);
         }
-        public static void DisplayVerticalLine(int x, int Ay, int By, byte color, int thickness, int layer)
+        public static void DisplayVerticalLineInfiniteLine(int x, byte color, int thickness, byte[,] ActiveBG)
+        {
+            int Ay = 0;
+            int By = ActiveBG.GetLength(1);
+            DisplayVerticalLine(x, Ay, By, color, thickness, 0, ActiveBG);
+        }
+        public static void DisplayVerticalLine(int x, int Ay, int By, byte color, int thickness, int layer, byte[,] ActiveBG = null)
         {
             int ymax = Math.Max(Ay, By);
             int ymin = Math.Min(Ay, By);
@@ -88,7 +105,7 @@ namespace DOSBOX.Utilities
                 for (int j = 0; j < h; j++)
                     px[i, j] = color;
 
-            new DispClass(px, x, ymin).Display(layer);
+            new DispClass(px, x, ymin).Display(layer, null, ActiveBG);
         }
         public static void DisplayLine(vecf start, vecf end, byte color, int layer) => DisplayLine(start.i, end.i, color, layer);
         public static void DisplayLine(vec start, vec end, byte color, int layer)

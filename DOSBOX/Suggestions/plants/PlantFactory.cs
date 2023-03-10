@@ -10,7 +10,7 @@ namespace DOSBOX.Suggestions
 {
     public class PlantFactory
     {
-        public static IPlant CreateRandom(vecf v)
+        public static ClassIPlant CreateRandom(vecf v)
         {
             switch (Core.RND.Next(3))
             {
@@ -20,7 +20,7 @@ namespace DOSBOX.Suggestions
                 case 2: return new Plant<Concombre>(v);
             };
         }
-        public static IPlant Create(string kind, vecf v)
+        public static ClassIPlant Create(string kind, vecf v)
         {
             switch (kind)
             {

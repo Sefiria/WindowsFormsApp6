@@ -1,7 +1,9 @@
-﻿using DOSBOX.Utilities;
-using DOSBOX.Utilities.effects;
+﻿using DOSBOX.Suggestions.plants;
+using DOSBOX.Utilities;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace DOSBOX.Suggestions
@@ -11,13 +13,27 @@ namespace DOSBOX.Suggestions
         public static Plants Instance;
         public bool ShowHowToPlay { get; set; }
         public IState CurrentState, NextState;
-        public static List<(string Name, IState Instance)> States = new List<(string, IState)>()
+        public static List<List<(string Name, IState Instance)>> PagesStates = new List<List<(string, IState)>>()
         {
-            ("Garden", new Garden()),
-            ("Fruits", new Fruits()),
-            ("Seeds", new Seeds()),
-            ("Shop", new Shop()),
+            new List<(string Name, IState Instance)>{
+                ("Garden", Garden.Instance),
+                ("Storage", new Storage()),
+                ("Seeds", new Seeds()),
+                ("Shop", new Shop()),
+                ("Sell", new Sell()),
+            },
+            new List<(string Name, IState Instance)>{
+                ("Save", null),
+                ("Load", null),
+                ("New", null),
+            },
+            new List<(string Name, IState Instance)>{
+                ("Labs", new Labs()),
+                ("LabsShop", new LabsShop()),
+            },
         };
+        public static int pagemax => PagesStates.Count - 1;
+        public static int page = 0;
 
 
         public void HowToPlay()
@@ -35,8 +51,6 @@ namespace DOSBOX.Suggestions
         public void Init()
         {
             Instance = this;
-
-            plants.Data.Init();
 
             Core.Layers.Clear();
             Core.Layers.Add(new byte[64, 64]); // BG
@@ -65,12 +79,14 @@ namespace DOSBOX.Suggestions
 
             if (CurrentState == null)
             {
+                Garden.Instance?.BackgroundWork();
                 Core.Cam = vecf.Zero;
                 UpdateMenu();
 
                 if (KB.IsKeyPressed(KB.Key.Escape))
                 {
-                    Garden.Instance = null;
+                    Garden.KillInstance();
+                    Data.KillInstance();
                     Core.CurrentSuggestion = null;
                     return;
                 }
@@ -85,6 +101,19 @@ namespace DOSBOX.Suggestions
         int menu_selection = 0;
         private void UpdateMenu()
         {
+            if (KB.IsKeyPressed(KB.Key.Left) && page > 0)
+            {
+                page--;
+                menu_selection = 0;
+            }
+            if (KB.IsKeyPressed(KB.Key.Right) && page < pagemax)
+            {
+                page++;
+                menu_selection = 0;
+            }
+
+            var States = PagesStates[page];
+
             if (KB.IsKeyPressed(KB.Key.Up) && menu_selection > 0)
                 menu_selection--;
             if (KB.IsKeyPressed(KB.Key.Down) && menu_selection < States.Count - 1)
@@ -101,8 +130,115 @@ namespace DOSBOX.Suggestions
                 y += h + 1;
             }
 
-            if (KB.IsKeyDown(KB.Key.Enter))
-                NextState = States[menu_selection].Instance;
+            if (KB.IsKeyPressed(KB.Key.Enter))
+            {
+                if (States[menu_selection].Instance != null && States[menu_selection].Name == "Garden")
+                    States[menu_selection] = ("Garden", Garden.Instance);
+                (string name, IState state) = States[menu_selection];
+                if (state != null)
+                {
+                    NextState = state;
+                }
+                else
+                {
+                    if (name == "Save")
+                        PlantsSave.Save();
+                    else if (name == "Load")
+                        PlantsSave.Load();
+                    else if (name == "New")
+                    {
+                        Garden.KillInstance();
+                        Data.KillInstance();
+                    }
+                }
+            }
+        }
+    }
+
+    public class PlantsSave
+    {
+        static string path = ".mem/.plts/plts.mem";
+
+        static JsonSerializerSettings options = new JsonSerializerSettings()
+        {
+            NullValueHandling = NullValueHandling.Ignore,
+            Formatting = Formatting.Indented,
+            TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
+            TypeNameHandling = TypeNameHandling.Objects,
+            ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+            PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+        };
+
+        public class savefile
+        {
+            public Data data { get; set; }
+            public List<vec> wetdirt = new List<vec>();
+
+            public void SaveWetDirt()
+            {
+                if (data == null) return;
+                int w = data.m_Garden.ActiveBG.GetLength(0);
+                int h = data.m_Garden.ActiveBG.GetLength(1);
+                for (int y = 0; y < h; y++)
+                    for (int x = 0; x < w; x++)
+                        if(data.m_Garden.ActiveBG[x, y] == 3)
+                            wetdirt.Add(new vec(x, y));
+            }
+            public void LoadWetDirt()
+            {
+                if(data.m_Garden.ActiveBG == null)
+                    data.m_Garden.ActiveBG = new byte[data.m_Garden.MapWidth, data.m_Garden.FloorLevel];
+                int w = data.m_Garden.ActiveBG.GetLength(0);
+                int h = data.m_Garden.ActiveBG.GetLength(1);
+                for (int y = 0; y < h; y++)
+                    for (int x = 0; x < w; x++)
+                        data.m_Garden.ActiveBG[x, y] = (byte)(wetdirt.FirstOrDefault(wd => wd.x == x && wd.y == y) != null ? 3 : 2);
+            }
+        }
+
+        public static void Save()
+        {
+            ChckPth();
+
+            savefile savefile = new savefile();
+            savefile.data = Data.Instance;
+            savefile.SaveWetDirt();
+
+            string contents = JsonConvert.SerializeObject(savefile, options);
+
+            File.WriteAllText(path, contents);
+        }
+        public static void Load()
+        {
+            ChckPth();
+
+            string contents = File.ReadAllText(path);
+
+            savefile savefile = JsonConvert.DeserializeObject<savefile>(contents, options);
+            savefile.LoadWetDirt();
+            Data.LoadInstance(savefile.data);
+
+            var _ = Data.Instance.ToString();// trigger Data Instance in case it's null
+        }
+
+        private static void ChckPth()
+        {
+            if(!Directory.Exists(path))
+            {
+                string[] cells = path.Split('/');
+                cells = cells.Take(cells.Length - 1).ToArray();
+
+                string cumulpath = "";
+                for (int i = 0; i < cells.Length; i++)
+                {
+                    cumulpath += cells[i];
+                    if (!Directory.Exists(cumulpath))
+                    {
+                        Directory.CreateDirectory(cumulpath);
+                    }
+                    cumulpath += '/';
+                }
+            }
         }
     }
 }

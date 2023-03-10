@@ -1,22 +1,24 @@
-﻿using DOSBOX.Utilities;
+﻿using DOSBOX.Suggestions.plants;
+using DOSBOX.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DOSBOX.Suggestions
 {
     public class Branch
     {
-        public IPlant OwnerPlant;
-        public Branch OwnerBranch;
-        public vecf endvec;
-        public vecf startvecfrombranch = vecf.Zero;
-        public int maxbranches, maxleaves;
+        public Guid OwnerPlantGuid { get; set; }
+        public ClassIPlant OwnerPlant => Data.Garden.ScenePlants.FirstOrDefault(p => p.Guid == OwnerPlantGuid);
+        public Branch OwnerBranch { get; set; }
+        public vecf endvec { get; set; }
+        public vecf startvecfrombranch { get; set; } = vecf.Zero;
+        public int maxbranches { get; set; }
+        public int maxleaves { get; set; }
+        public int maxfruits { get; set; } = 1;
 
-        public vecf startvec => OwnerBranch != null ? startvecfrombranch : OwnerPlant.vec;
-        public bool IsMasterBranch => this == OwnerPlant.masterbranch;
+        public vecf startvec => OwnerBranch != null ? startvecfrombranch : OwnerPlant?.vec;
+        public bool IsMasterBranch => this == OwnerPlant?.masterbranch;
 
         public int depttree()
         {
@@ -30,18 +32,19 @@ namespace DOSBOX.Suggestions
             return level;
         }
 
-        public List<Branch> tree_branches = new List<Branch>();
-        public List<Leaf> tree_leaves = new List<Leaf>();
-        public List<Fruit> fruits = new List<Fruit>();
+        public List<Branch> tree_branches { get; set; } = new List<Branch>();
+        public List<Leaf> tree_leaves { get; set; } = new List<Leaf>();
+        public List<Fruit> fruits { get; set; } = new List<Fruit>();
 
+        public Branch() { }
         public Branch(Branch copy)
         {
-            OwnerPlant = copy.OwnerPlant;
+            OwnerPlantGuid = copy.OwnerPlantGuid;
             OwnerBranch = copy.OwnerBranch;
         }
-        public Branch(IPlant ownerPlant, Branch ownerBranch)
+        public Branch(Guid ownerPlantGuid, Branch ownerBranch)
         {
-            OwnerPlant = ownerPlant;
+            OwnerPlantGuid = ownerPlantGuid;
             OwnerBranch = ownerBranch;
             if (ownerBranch != null)
             {
@@ -60,8 +63,9 @@ namespace DOSBOX.Suggestions
                 endvec = new vecf(startvec);
                 endvec.y--;
             }
-            maxbranches = Core.RND.Next(10, 50) / 10;
-            maxleaves = Core.RND.Next(0, 40) / 10;
+            maxbranches = Core.RND.Next(20, 50) / 10;
+            maxleaves = Core.RND.Next(10, 60) / 10;
+            maxfruits = Core.RND.Next(300) / 100;
         }
 
         public void Update()
@@ -96,21 +100,23 @@ namespace DOSBOX.Suggestions
                 endvec += look;
             }
 
-            if(IsMasterBranch ? endvec.y < Garden.FloorLevel - 4 : length > 4)
+            if(IsMasterBranch ? endvec.y < Data.Garden.FloorLevel - 4 : length > 4)
             {
                 if(tree_branches.Count < maxbranches && length < lengthmax && Core.RND.Next(5) == 0)
                 {
-                    tree_branches.Add(new Branch(OwnerPlant, this));
+                    tree_branches.Add(new Branch(OwnerPlantGuid, this));
                 }
 
                 if (tree_leaves.Count < maxleaves && !IsMasterBranch && Core.RND.Next(8) == 0)
                     tree_leaves.Add(new Leaf(this));
 
-                if (!IsMasterBranch && Core.RND.Next(256) == 128 && fruits.Count < 2)
+                if (!IsMasterBranch && Core.RND.Next(120) == 60 && fruits.Count < maxfruits)
                     fruits.Add(OwnerPlant.CreateFruit(endvec));
             }
 
             tree_branches.ForEach(branch => branch.Grow());
         }
+
+        internal int GetPotential() => maxfruits + tree_branches.Select(b => b.GetPotential()).Sum();
     }
 }

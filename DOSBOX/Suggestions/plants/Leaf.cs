@@ -9,8 +9,8 @@ namespace DOSBOX.Suggestions
 {
     public class Leaf
     {
-        public Branch Owner;
-        public vecf vec;
+        public Branch Owner { get; set; }
+        public vecf vec { get; set; }
 
         List<vec> px;
 
@@ -51,7 +51,7 @@ namespace DOSBOX.Suggestions
         public void Display(int layer)
         {
             foreach (var _px in px)
-                if(!Core.isout(_px.x, _px.y, 1, Core.Cam))
+                if(!Core.isout(_px.x, _px.y, 1))
                     Core.Layers[layer][_px.x, _px.y] = 2;
         }
     }

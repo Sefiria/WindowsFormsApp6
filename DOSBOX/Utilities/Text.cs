@@ -310,6 +310,13 @@ namespace DOSBOX.Utilities
             { 4, 4, 4, 2, 3}
         };
 
+        public static byte[,] DoubleDots = new byte[3, 5]
+        {
+            { 4, 4, 4, 4, 4},
+            { 4, 3, 4, 3, 4},
+            { 4, 4, 4, 4, 4}
+        };
+
         public static byte[,] template = new byte[3, 5]
         {
             { 4, 4, 4, 4, 4},
@@ -398,6 +405,7 @@ namespace DOSBOX.Utilities
                 case '(': return _ParenthesisOpen;
                 case ')': return _ParenthesisClose;
                 case '/': return _Slash;
+                case ':': return DoubleDots;
             }
         }
 

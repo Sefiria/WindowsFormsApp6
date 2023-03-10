@@ -9,7 +9,8 @@ namespace DOSBOX.Utilities
 {
     public class vecf
     {
-        public float x, y;
+        public float x { get; set; }
+        public float y { get; set; }
         public vecf() { x = y = 0F; }
         public vecf(vecf v) { x = v.x; y = v.y; }
         public vecf(int x, int y) { this.x = x; this.y = y; }

@@ -40,6 +40,9 @@
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.6.0.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -80,7 +83,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Data.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
@@ -93,6 +95,8 @@
     <Compile Include="Suggestions\Fusion.cs" />
     <Compile Include="Suggestions\Plants.cs" />
     <Compile Include="Suggestions\plants\Data.cs" />
+    <Compile Include="Suggestions\plants\Fiole.cs" />
+    <Compile Include="Suggestions\plants\Fruits\OGM.cs" />
     <Compile Include="Suggestions\plants\Meteo.cs" />
     <Compile Include="Suggestions\plants\PlantFactory.cs" />
     <Compile Include="Suggestions\plants\Fruit.cs" />
@@ -103,9 +107,15 @@
     <Compile Include="Suggestions\plants\Leaf.cs" />
     <Compile Include="Suggestions\plants\Branch.cs" />
     <Compile Include="Suggestions\plants\Plant.cs" />
+    <Compile Include="Suggestions\plants\SellCatalogue.cs" />
+    <Compile Include="Suggestions\plants\LabsAddIngredient.cs" />
+    <Compile Include="Suggestions\plants\StateSell.cs" />
+    <Compile Include="Suggestions\plants\StateLabsShop.cs" />
     <Compile Include="Suggestions\plants\StateShop.cs" />
     <Compile Include="Suggestions\plants\StateSeeds.cs" />
-    <Compile Include="Suggestions\plants\StateFruits.cs" />
+    <Compile Include="Suggestions\plants\StateLabsStorage.cs" />
+    <Compile Include="Suggestions\plants\StateStorage.cs" />
+    <Compile Include="Suggestions\plants\StateLabs.cs" />
     <Compile Include="Suggestions\plants\TemplateState.cs" />
     <Compile Include="Suggestions\plants\StateGarden.cs" />
     <Compile Include="Suggestions\plants\State.cs" />

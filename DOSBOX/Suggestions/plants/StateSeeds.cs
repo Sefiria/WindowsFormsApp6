@@ -1,22 +1,23 @@
-﻿using DOSBOX.Suggestions.plants.Fruits;
+﻿using DOSBOX.Suggestions.plants;
 using DOSBOX.Utilities;
-using DOSBOX.Utilities.effects;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace DOSBOX.Suggestions
 {
     public class Seeds : IState
     {
+        int pagemax => (int)Math.Ceiling(Data.Instance.Seeds.Count / 5D) - 1;
+        int page;
+
         public void Init()
         {
             Core.Layers.Clear();
             Core.Layers.Add(new byte[64, 64]); // BG
             Core.Layers.Add(new byte[64, 64]); // Sprites
             Core.Layers.Add(new byte[64, 64]); // UI
-            
+
+            page = 0;
         }
 
         public void Update()
@@ -27,11 +28,35 @@ namespace DOSBOX.Suggestions
                 return;
             }
 
-            int id = plants.Data.Seeds.Keys.ToList().IndexOf(plants.Data.SelectedSeed);
+            var seedsofpage = Data.Instance.Seeds.Keys.Skip(5 * page).Take(4).ToList();
+            int id = seedsofpage.IndexOf(Data.Instance.SelectedSeed);
+            if (id == -1 && seedsofpage.Count > 0)
+            {
+                id = 0;
+                Data.Instance.SelectedSeed = seedsofpage[id];
+            }
+            if (KB.IsKeyPressed(KB.Key.Left) && page > 0)
+            {
+                page--;
+                if (seedsofpage.Count > 0)
+                {
+                    id = 0;
+                    Data.Instance.SelectedSeed = seedsofpage[id];
+                }
+            }
+            if (KB.IsKeyPressed(KB.Key.Right) && page < pagemax)
+            {
+                page++;
+                if (seedsofpage.Count > 0)
+                {
+                    id = 0;
+                    Data.Instance.SelectedSeed = seedsofpage[id];
+                }
+            }
             if (KB.IsKeyPressed(KB.Key.Up) && id > 0)
-                plants.Data.SelectedSeed = plants.Data.Seeds.Keys.ToList()[id - 1];
-            if (KB.IsKeyPressed(KB.Key.Down) && id < plants.Data.Seeds.Keys.Count - 1)
-                plants.Data.SelectedSeed = plants.Data.Seeds.Keys.ToList()[id + 1];
+                Data.Instance.SelectedSeed = seedsofpage[id - 1];
+            if (KB.IsKeyPressed(KB.Key.Down) && id < seedsofpage.Count - 1)
+                Data.Instance.SelectedSeed = seedsofpage[id + 1];
 
             DisplayUI();
         }
@@ -40,16 +65,21 @@ namespace DOSBOX.Suggestions
         {
             Dispf obj;
 
+            if (string.IsNullOrWhiteSpace(Data.Instance.SelectedSeed) && Data.Instance.Seeds.Count > 0)
+                Data.Instance.SelectedSeed = Data.Instance.Seeds.ElementAt(0).Key;
+
             Graphic.DisplayRectAndBounds(0, 0, 64, 64, 2, 3, 1, 0);
             Graphic.DisplayRectAndBounds(1, 1, 62, 62, 1, 2, 1, 0);
 
             int x = 4, y = 4;
             int i = 0;
-            int id = plants.Data.Seeds.Keys.ToList().IndexOf(plants.Data.SelectedSeed);
+            var seedsofpage = Data.Instance.Seeds.Skip(5 * page).Take(4).ToDictionary(pair => pair.Key, pair => pair.Value);
+            int id = seedsofpage.Keys.ToList().IndexOf(Data.Instance.SelectedSeed);
 
             void disp(string what)
             {
-                if (!plants.Data.Seeds.ContainsKey(what))
+                //string name = what.Split('_')[0];
+                if (!seedsofpage.ContainsKey(what))
                     return;
 
                 Type type = Type.GetType($"DOSBOX.Suggestions.plants.Fruits.{what}");
@@ -66,13 +96,13 @@ namespace DOSBOX.Suggestions
                 x+=2;y+=2;
                 obj.vec = new vecf(x, y);
                 obj.Display(1);
-                string txt = "" + plants.Data.Seeds[what];
+                string txt = "" + seedsofpage[what];
                 Text.DisplayText(txt, 60 - 5 * txt.Length, y, 1);
                 x = 4;
                 y += h + 3;
             }
 
-            foreach (var seed in plants.Data.Seeds.Keys)
+            foreach (var seed in seedsofpage.Keys)
             {
                 disp(seed);
                 i++;

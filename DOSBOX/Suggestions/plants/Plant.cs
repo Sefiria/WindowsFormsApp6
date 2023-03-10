@@ -1,32 +1,24 @@
-﻿using DOSBOX.Utilities;
+﻿using DOSBOX.Suggestions.plants;
+using DOSBOX.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
 
 namespace DOSBOX.Suggestions
 {
-    public class Plant<T> : IPlant where T : Fruit
+    public class Plant<T> : ClassIPlant where T : Fruit
     {
-        public vecf vec { get; set; }
-        public byte waterneed { get; set; } = 10;
-        public byte water { get; set; }
-    public Branch masterbranch { get; set; } = null;
-
-        List<vec> px_seed = new List<vec>() { new vec(0, 0) };
-
         public Plant(vecf vec)
         {
             this.vec = new vecf(vec);
+            waterneed = 9;
             water = waterneed;
         }
 
         int ticksimpact = 0, ticksimpact_max = 4;
-        public void Update()
+        public override void Update(byte[,] ActiveBG = null)
         {
-            if (Garden.Instance.Ticks == Garden.Instance.TicksMax)
+            if (Data.Garden.Ticks == Data.Garden.TicksMax)
             {
                 ticksimpact++;
                 while (ticksimpact > ticksimpact_max)
@@ -35,19 +27,37 @@ namespace DOSBOX.Suggestions
             if (ticksimpact == ticksimpact_max)
             {
                 ticksimpact = 0;
-                CheckWater();
-                Grow();
+                if (ActiveBG == null)
+                {
+                    CheckWater();
+                    Grow();
+                }
+                else
+                {
+                    CheckWater(ActiveBG);
+                    Grow(ActiveBG);
+                }
             }
 
             masterbranch?.Update();
         }
 
-        private void CheckWater()
+        private void CheckWater(byte[,] ActiveBG = null)
         {
             int c = 0;
             foreach (var px in px_seed)
-                if (Core.Layers[0][vec.i.x + px.x, vec.i.y + px.y] == 3)
-                    c++;
+            {
+                if(ActiveBG == null)
+                {
+                    if (Core.Layers[0][vec.i.x + px.x, vec.i.y + px.y] == 3)
+                        c++;
+                }
+                else
+                {
+                    if (ActiveBG[vec.i.x + px.x, 63 - vec.i.y - px.y] == 3)
+                        c++;
+                }
+            }
             float percent = c / (float)px_seed.Count;
             if (percent < 0.5F)
             {
@@ -58,23 +68,32 @@ namespace DOSBOX.Suggestions
                 water++;
         }
 
-        public void Display(int layer)
+        public override void Display(int layer)
         {
             foreach (var px in px_seed)
                 if(!Core.isout(vec.i.x + px.x, vec.i.y + px.y, layer, Core.Cam))
                     Core.Layers[layer][vec.i.x + px.x, vec.i.y + px.y] = 4;
             masterbranch?.Display(layer);
             masterbranch?.DisplayLeaves(layer);
+
             masterbranch?.DisplayFruits(layer);
         }
 
 
-        private void Grow()
+        private void Grow(byte[,] ActiveBG = null)
         {
             if (water < waterneed)
                 return;
 
-            if(px_seed.Count < 16)
+
+            byte SafeGetOnActiveBG(int x, int y, vecf cam = null)
+            {
+                if (cam == null) cam = vecf.Zero;
+                return !(x - cam.i.x < 0 || y < 0 || x >= ActiveBG.GetLength(0) || y - cam.i.y >= ActiveBG.GetLength(1)) ? ActiveBG[x - cam.i.x, y - cam.i.y] : (byte)4;
+            }
+            byte SafeGet(int x, int y, vecf cam = null) => ActiveBG == null ? Core.SafeGet(0, x, y, cam) : SafeGetOnActiveBG(x, y, cam);
+
+            if (px_seed.Count < 16)
             {
                 new List<vec>(px_seed).ForEach(s =>
                 {
@@ -82,10 +101,10 @@ namespace DOSBOX.Suggestions
                         return;
                     if (Core.RND.Next(px_seed.Count) == 0)
                     {
-                        if (!Core.isout(vec.i.x + s.x - 1, vec.i.y + s.y, 0, Core.Cam) && !px_seed.Any(px => px.x == s.x - 1 && px.y == s.y) && Core.SafeGet(0, vec.i.x + s.x-1, vec.i.y + s.y) == 3) px_seed.Add(new vec(s.x-1, s.y));
-                        if (!Core.isout(vec.i.x + s.x + 1, vec.i.y + s.y, 0, Core.Cam) && !px_seed.Any(px => px.x == s.x + 1 && px.y == s.y) && px_seed.Count < 16 && Core.SafeGet(0, vec.i.x + s.x+1, vec.i.y + s.y) == 3) px_seed.Add(new vec(s.x+1, s.y));
-                        if (!Core.isout(vec.i.x + s.x, vec.i.y + s.y - 1, 0, Core.Cam) && !px_seed.Any(px => px.x == s.x && px.y == s.y - 1) && px_seed.Count < 16 && Core.SafeGet(0, vec.i.x + s.x, vec.i.y + s.y-1) == 3) px_seed.Add(new vec(s.x, s.y-1));
-                        if (!Core.isout(vec.i.x + s.x, vec.i.y + s.y + 1, 0, Core.Cam) && !px_seed.Any(px => px.x == s.x && px.y == s.y + 1) && px_seed.Count < 16 && Core.SafeGet(0, vec.i.x + s.x, vec.i.y + s.y+1) == 3) px_seed.Add(new vec(s.x, s.y+1));
+                        if (!Core.isout(vec.i.x + s.x - 1, vec.i.y + s.y, 0, Core.Cam) && !px_seed.Any(px => px.x == s.x - 1 && px.y == s.y) && SafeGet(vec.i.x + s.x-1, vec.i.y + s.y) == 3) px_seed.Add(new vec(s.x-1, s.y));
+                        if (!Core.isout(vec.i.x + s.x + 1, vec.i.y + s.y, 0, Core.Cam) && !px_seed.Any(px => px.x == s.x + 1 && px.y == s.y) && px_seed.Count < 16 && SafeGet(vec.i.x + s.x+1, vec.i.y + s.y) == 3) px_seed.Add(new vec(s.x+1, s.y));
+                        if (!Core.isout(vec.i.x + s.x, vec.i.y + s.y - 1, 0, Core.Cam) && !px_seed.Any(px => px.x == s.x && px.y == s.y - 1) && px_seed.Count < 16 && SafeGet(vec.i.x + s.x, vec.i.y + s.y-1) == 3) px_seed.Add(new vec(s.x, s.y-1));
+                        if (!Core.isout(vec.i.x + s.x, vec.i.y + s.y + 1, 0, Core.Cam) && !px_seed.Any(px => px.x == s.x && px.y == s.y + 1) && px_seed.Count < 16 && SafeGet(vec.i.x + s.x, vec.i.y + s.y+1) == 3) px_seed.Add(new vec(s.x, s.y+1));
                     }
                 });
             }
@@ -97,10 +116,12 @@ namespace DOSBOX.Suggestions
             else
             {
                 if (px_seed.Count > 6 && Core.RND.Next(17 - px_seed.Count) == 0)
-                    masterbranch = new Branch(this, null);
+                    masterbranch = new Branch(Guid, null);
             }
         }
 
-        public Fruit CreateFruit(vecf v) => (Fruit)Activator.CreateInstance(typeof(T), new[] { v });
+        public override Fruit CreateFruit(vecf v) => (Fruit)Activator.CreateInstance(typeof(T), new[] { v });
+
+        public override int GetPotential() => masterbranch?.GetPotential() ?? 0;
     }
 }
