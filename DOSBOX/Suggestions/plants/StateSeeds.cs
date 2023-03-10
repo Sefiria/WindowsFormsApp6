@@ -78,14 +78,14 @@ namespace DOSBOX.Suggestions
 
             void disp(string what)
             {
-                //string name = what.Split('_')[0];
-                if (!seedsofpage.ContainsKey(what))
-                    return;
+                string[] split = what.Split('_');
+                string name = split[0];
+                string dna = split[1];
 
-                Type type = Type.GetType($"DOSBOX.Suggestions.plants.Fruits.{what}");
+                Type type = Type.GetType($"DOSBOX.Suggestions.plants.Fruits.{name}");
                 if (type == null)
                     return;
-                obj = (Dispf)Activator.CreateInstance(type, new[] { new vecf(x, y) });
+                obj = (Dispf)Activator.CreateInstance(type, dna != null ? new object[] { new vecf(x, y), dna } : new[] { new vecf(x, y) });
 
                 int h = Math.Max(obj._h, 5) + 2;
 

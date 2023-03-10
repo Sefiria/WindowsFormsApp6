@@ -63,9 +63,9 @@ namespace DOSBOX.Suggestions
                 endvec = new vecf(startvec);
                 endvec.y--;
             }
-            maxbranches = Core.RND.Next(20, 50) / 10;
-            maxleaves = Core.RND.Next(10, 60) / 10;
-            maxfruits = Core.RND.Next(300) / 100;
+            maxbranches = OwnerPlant.ForceMaxBranches == 0 ? OwnerPlant.ForceMaxBranches : (OwnerPlant.ForceMaxBranches > -1 ? Core.RND.Next(OwnerPlant.ForceMaxBranches) : Core.RND.Next(20, 50) / 10);
+            maxleaves = OwnerPlant.ForceMaxLeaves == 0 ? OwnerPlant.ForceMaxLeaves : (OwnerPlant.ForceMaxLeaves > -1 ? Core.RND.Next(OwnerPlant.ForceMaxLeaves) : Core.RND.Next(10, 60) / 10);
+            maxfruits = OwnerPlant.ForceMaxFruits == 0 ? OwnerPlant.ForceMaxFruits : (OwnerPlant.ForceMaxFruits > -1 ? Core.RND.Next(OwnerPlant.ForceMaxFruits) : Core.RND.Next(300) / 100);
         }
 
         public void Update()
@@ -111,7 +111,7 @@ namespace DOSBOX.Suggestions
                     tree_leaves.Add(new Leaf(this));
 
                 if (!IsMasterBranch && Core.RND.Next(120) == 60 && fruits.Count < maxfruits)
-                    fruits.Add(OwnerPlant.CreateFruit(endvec));
+                    fruits.Add(OwnerPlant.CreateFruit(endvec, OwnerPlant.DNA));
             }
 
             tree_branches.ForEach(branch => branch.Grow());

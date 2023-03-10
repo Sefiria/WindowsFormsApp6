@@ -78,11 +78,14 @@ namespace DOSBOX.Suggestions
             void disp(KeyValuePair<string, int> item)
             {
                 bool own = Data.Instance.FruitsAndItems.ContainsKey(item.Key);
+                string[] split = item.Key.Split('_');
+                string name = split[0];
+                string dna = split[1];
 
-                Type type = Type.GetType($"DOSBOX.Suggestions.plants.Fruits.{item.Key}");
+                Type type = Type.GetType($"DOSBOX.Suggestions.plants.Fruits.{name}");
                 if (type == null)
                     return;
-                obj = (Dispf)Activator.CreateInstance(type, new[] { new vecf(x, y) });
+                obj = (Dispf)Activator.CreateInstance(type, dna != null ? new object[] { new vecf(x, y), dna } : new[] { new vecf(x, y) });
 
                 byte c = (byte)(own ? 0 : 1);
 

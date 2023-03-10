@@ -1,4 +1,5 @@
 ﻿using DOSBOX.Suggestions.plants;
+using DOSBOX.Suggestions.plants.Fruits;
 using DOSBOX.Utilities;
 using System.Linq;
 using static DOSBOX.Utilities.effects.effect;
@@ -60,7 +61,13 @@ namespace DOSBOX.Suggestions
                 var plant = Data.Garden.ScenePlants.FirstOrDefault(p => p.px_seed.Any(px => px == (cursor + Core.Cam - p.vec).i));
                 if (plant != null)
                 {
-                    Data.Instance.Coins += plant.GetPotential() * SellCatalogue.FruitsPrice[plant.CreateFruit(vecf.Zero).GetType().Name];
+                    string dna = (plant as Plant<OGM>)?.DNA;
+                    int fruitsPrice = 0;
+                    if (dna == null)
+                        fruitsPrice  = SellCatalogue.FruitsPrice[plant.CreateFruit(vecf.Zero).GetType().Name];
+                    else
+                        fruitsPrice = SellCatalogue.PriceOf($"OGM_{dna}");
+                        Data.Instance.Coins += plant.GetPotential() + fruitsPrice;
                     Data.Garden.ScenePlants.Remove(plant);
                 }
             }
@@ -77,6 +84,8 @@ namespace DOSBOX.Suggestions
                     {
                         kv.Key.fruits.Remove(fruit);
                         string name = fruit.GetType().Name;
+                        if (name == "OGM")
+                            name += $"_{(fruit as OGM).dna}";
                         if (Data.Instance.Fruits.ContainsKey(name))
                             Data.Instance.Fruits[name]++;
                         else

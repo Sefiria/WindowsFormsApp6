@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DOSBOX.Suggestions.plants.Fruits;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,6 +37,16 @@ namespace DOSBOX.Suggestions.plants
         };
         public static string NameOf(ItemsName item) => ItemsString[item];
         public static int PriceOf(ItemsName item) => ItemsPrice[item];
-        public static int PriceOf(string item) => FruitsPrice.ContainsKey(item) ? FruitsPrice[item] : ItemsPrice[GetItemNameByString(item)];
+        public static int PriceOf(string item) => item.StartsWith("OGM") ? GetOGMPrice(item) : FruitsPrice.ContainsKey(item) ? FruitsPrice[item] : ItemsPrice[GetItemNameByString(item)];
+        public static int GetOGMPrice(string item)
+        {
+            string dna = item.Split('_')[1];
+            var stats = OGM.DecodeMutators(dna);
+            int price = 0;
+            price += stats.maxbranches;
+            price += stats.maxleaves * 2;
+            price += stats.maxfruits * 10;
+            return price;
+        }
     }
 }

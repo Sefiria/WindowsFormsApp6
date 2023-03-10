@@ -16,6 +16,7 @@ namespace DOSBOX.Suggestions
         }
 
         int ticksimpact = 0, ticksimpact_max = 4;
+
         public override void Update(byte[,] ActiveBG = null)
         {
             if (Data.Garden.Ticks == Data.Garden.TicksMax)
@@ -120,7 +121,7 @@ namespace DOSBOX.Suggestions
             }
         }
 
-        public override Fruit CreateFruit(vecf v) => (Fruit)Activator.CreateInstance(typeof(T), new[] { v });
+        public override Fruit CreateFruit(vecf v, string dna = null) => (Fruit)Activator.CreateInstance(typeof(T), dna != null ? new object[] { v, dna } : new[] { v });
 
         public override int GetPotential() => masterbranch?.GetPotential() ?? 0;
     }

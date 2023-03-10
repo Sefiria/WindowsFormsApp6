@@ -9,20 +9,26 @@ namespace DOSBOX.Suggestions.plants.Fruits
 {
     public class OGM : Fruit
     {
-        public OGM(vecf vec) : base(vec)
+        public string dna;
+        public Stats stats;
+
+        public OGM(vecf vec, string dna) : base(vec)
         {
+            this.dna = dna;
+            stats = DecodeMutators(this.dna);
             CreateGraphics();
         }
 
         private void CreateGraphics()
         {
-            const int w = 1;
-            const int h = 1;
+            int w = 1 + stats.maxbranches;
+            int h = 1 + stats.maxleaves;
             g = new byte[w, h];
             for(int x=0; x<w; x++)
             {
                 for (int y = 0; y < h; y++)
                 {
+                    g[x, y] = (byte)(stats.maxfruits / 2);
                 }
             }
         }
@@ -48,7 +54,7 @@ namespace DOSBOX.Suggestions.plants.Fruits
                         qualityBranches -= 8;
                         qualityFruits += 32;
                         break;
-                    case "0":
+                    case "O":
                         qualityLeaves += 64;
                         qualityBranches -= 16;
                         qualityFruits += 0;

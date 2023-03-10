@@ -205,6 +205,7 @@ namespace DOSBOX.Suggestions
         void CreateSeed()
         {
             Data.Instance.Seeds.Add($"OGM_{OGM.EncodeGenetic(Ingredients)}", 1);
+            Ingredients.Clear();
         }
     }
 }
