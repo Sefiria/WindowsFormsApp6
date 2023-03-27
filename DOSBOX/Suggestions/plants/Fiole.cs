@@ -15,7 +15,7 @@ namespace DOSBOX.Suggestions
 
         public Fiole(vec vec)
         {
-            this.vec = vec;
+            this.vec = new vec(vec);
             CreateGraphics();
         }
 

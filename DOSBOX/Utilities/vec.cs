@@ -11,6 +11,7 @@ namespace DOSBOX.Utilities
         public vec(int x, int y) { this.x = x; this.y = y; }
         [JsonIgnore]
         public vecf f => new vecf(x, y);
+        public static vec Zero => new vec(0, 0);
 
         public static bool operator ==(vec a, vec b) => a?.x == b?.x && a?.y == b?.y;
         public static bool operator !=(vec a, vec b) => a?.x != b?.x || a?.y != b?.y;

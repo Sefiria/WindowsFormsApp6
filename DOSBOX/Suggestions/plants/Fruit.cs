@@ -13,7 +13,7 @@ namespace DOSBOX.Suggestions
         public bool IsHover(vecf v) => v.x >= vec.x && v.y >= vec.y && v.x < vec.x + _w && v.y < vec.y + _h;
         public Fruit(vecf vec)
         {
-            this.vec = vec;
+            this.vec = new vecf(vec);
         }
     }
 }

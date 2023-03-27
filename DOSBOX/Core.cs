@@ -40,6 +40,7 @@ namespace DOSBOX
             ("Breaker", new Breaker()),
             ("Fusion", new Fusion()),
             ("Plants", new Plants()),
+            ("City", new City()),
         };
 
         public static byte SafeGet(int layer, int x, int y, vecf cam = null)

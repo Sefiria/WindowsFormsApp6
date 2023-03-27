@@ -4,7 +4,7 @@ using DOSBOX.Utilities;
 using System.Linq;
 using static DOSBOX.Utilities.effects.effect;
 
-namespace DOSBOX.Suggestions
+namespace DOSBOX.Suggestions.plants
 {
     public class User
     {

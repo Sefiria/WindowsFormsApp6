@@ -14,7 +14,7 @@ namespace DOSBOX.Suggestions
         {
             class DispClass : Disp
             {
-                public DispClass(byte[,] g, vec vec) : base() { this.g = g; this.vec = vec; }
+                public DispClass(byte[,] g, vec vec) : base() { this.g = g; this.vec = new vec(vec); }
             }
 
             public string text;
@@ -31,7 +31,7 @@ namespace DOSBOX.Suggestions
             public button(string text, vec vec, byte graphicId, Action Do, Func<bool> enableCondition)
             {
                 this.text = text;
-                this.vec = vec;
+                this.vec = new vec(vec);
                 this.graphicId = graphicId;
                 this.Do = Do;
                 EnableCondition = enableCondition;

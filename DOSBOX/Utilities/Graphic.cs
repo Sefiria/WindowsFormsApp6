@@ -20,6 +20,35 @@ namespace DOSBOX.Utilities
                     px[i, j] = color;
             new DispClass(px, 0, 0).Display(layer);
         }
+        /// <summary>
+        /// Rotate to 0, 45, 90, 135, 180, 225, 270, and 315 degrees (only).
+        /// </summary>
+        /// <param name="fixed_degrees">Can only worth 0, 45, 90, 135, 180, 225, 270, or 315 degrees.</param>
+        public static byte[,] Rotated(byte[,] g, float fixed_degrees)
+        {
+            int w = g.GetLength(0);
+            int h = g.GetLength(1);
+            vec centerPoint = new vec(w / 2, h / 2);
+            var result = new byte[w, h];
+            double angleInRadians = fixed_degrees * (Math.PI / 180);
+            vec pointToRotate, theta, rotated;
+            for (int x = 0; x < w; x++)
+            {
+                for (int y = 0; y < h; y++)
+                {
+                    pointToRotate = new vec(x, y);
+                    theta = new vec((int)Math.Cos(angleInRadians), (int)Math.Sin(angleInRadians));
+                    rotated = vec.Zero;
+                    rotated.x = pointToRotate.x * theta.x - pointToRotate.y * theta.y;
+                    rotated.x = pointToRotate.x * theta.y - pointToRotate.y * theta.x;
+                    rotated.x += centerPoint.x;
+                    rotated.y += centerPoint.y;
+                    if (x >= 0 && x < w && y >= 0 && y < h)
+                        result[rotated.x, rotated.y] = g[x, y];
+                }
+            }
+            return result;
+        }
         public static void DisplayRect(int x, int y, int w, int h, byte color, int layer) => DisplayRectAndBounds(x, y, w, h, color, 0, 0, layer);
         public static void DisplayRectAndBounds(Int32Rect rect, byte color, byte boundscolor, int thickness, int layer) => DisplayRectAndBounds(rect.X, rect.Y, rect.Width, rect.Height, color, boundscolor, thickness, layer);
         public static void DisplayRectAndBounds(int x, int y, int w, int h, byte color, byte boundscolor, int thickness, int layer)
