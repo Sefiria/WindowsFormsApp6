@@ -6,6 +6,11 @@ namespace WindowsFormsApp15.Utilities
 {
     public static class Maths
     {
+        public static float Distance(float x1, float y1, int x2, int y2) => Distance(x1, y1, (float)x2, (float)y2);
+        public static float Distance(int x1, int y1, float x2, float y2) => Distance((float)x1, (float)y1, x2, y2);
+        public static float Distance(int x1, int y1, int x2, int y2) => Distance((float)x1, (float)y1, (float)x2, (float)y2);
+        public static float Distance(float x1, float y1, float x2, float y2) => Sq(x2 - x1) + Sq(y2 - y1) == 0 ? 0F : Sqrt(Sq(x2 - x1) + Sq(y2 - y1));
+        public static float Normalize(float K) => K / Sqrt(Sq(K));
         public static float Sq(float i) => i * i;
         public static unsafe float Sqrt(float number)
         {

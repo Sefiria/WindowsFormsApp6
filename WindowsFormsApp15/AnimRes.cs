@@ -29,6 +29,7 @@ namespace WindowsFormsApp15
             tileset_static.MakeTransparent(Color.White);
 
             var list = new List<Bitmap>();
+            var listfront = new List<Bitmap>();
             var vertical = new List<Bitmap>();
             var horizontal = new List<Bitmap>();
             int sz = 16, targetsz = Core.TSZ;
@@ -53,17 +54,19 @@ namespace WindowsFormsApp15
 
 
 
-            void addAt(int x, int y) => list.Add(tileset.Clone(new Rectangle(sz * x, sz * y, sz, sz), tileset.PixelFormat).Resize(targetsz));
-            void add2At(int x, int y) => list.Add(tileset.Clone(new Rectangle(sz * x, sz * 2 * y, sz, sz * 2), tileset.PixelFormat).Resize(targetsz, targetsz * 2));
+            void addAt(int x, int y, bool front = false) => (front ? listfront : list).Add(tileset.Clone(new Rectangle(sz * x, sz * y, sz, sz), tileset.PixelFormat).Resize(targetsz));
+            void add2At(int x, int y, bool front = false) => (front ? listfront : list).Add(tileset.Clone(new Rectangle(sz * x, sz * 2 * y, sz, sz * 2), tileset.PixelFormat).Resize(targetsz, targetsz * 2));
 
             list = new List<Bitmap>();
             addAt(2, 0);
             addAt(2, 1);
             drill = new anim(0.1F, list);
             list = new List<Bitmap>();
-            add2At(3, 0);
-            add2At(3, 1);
-            furnace = new anim(0.1F, list);
+            add2At(3, 0, true);
+            add2At(3, 1, true);
+            add2At(3, 2);
+            add2At(3, 3);
+            furnace = new anim(0.1F, list, listfront);
 
             Bitmap get(int x, int y) => tileset_static.Clone(new Rectangle(sz * x, sz * y, sz, sz), tileset_static.PixelFormat).Resize(targetsz);
             void set(ref Dictionary<Ores, Bitmap> dict, int x)
@@ -96,7 +99,8 @@ namespace WindowsFormsApp15
         {
             switch(item)
             {
-                case Items.Ore: w = h = 8; break;
+                case Items.Ore: w = h = 10; break;
+                case Items.Plate: w = h = 16; break;
             }
         }
     }

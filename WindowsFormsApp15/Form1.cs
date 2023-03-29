@@ -16,6 +16,7 @@ namespace WindowsFormsApp15
         Timer TimerUpdate = new Timer() { Enabled = true, Interval = 10 };
         Timer TimerDraw = new Timer() { Enabled = true, Interval = 10 };
         UserUI user = null;
+        MouseEventArgs LastMouseEventArgs = null;
 
         public Form1()
         {
@@ -45,6 +46,9 @@ namespace WindowsFormsApp15
 
             new List<Structure>(Data.Instance.Structures.Values).ForEach(s => s.Update());
             new List<Item>(Data.Instance.Items).ForEach(o => o.Update());
+
+            if(LastMouseEventArgs != null)
+                Render_MouseMove(null, LastMouseEventArgs);
 
             user.Update();
 
@@ -76,6 +80,7 @@ namespace WindowsFormsApp15
         private void Render_MouseUp(object sender, MouseEventArgs e)
         {
             Core.MouseHolding = false;
+            user.MouseInput(e, true);
         }
         private void Render_MouseLeave(object sender, EventArgs e)
         {
@@ -83,6 +88,7 @@ namespace WindowsFormsApp15
         }
         private void Render_MouseMove(object sender, MouseEventArgs e)
         {
+            LastMouseEventArgs = e;
             Core.MouseLocation = e.Location;
 
             if (Core.MouseHolding)

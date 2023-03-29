@@ -37,11 +37,13 @@ namespace WindowsFormsApp15
             if (Unmovable)
                 return;
 
+            vecf nextvec = new vecf(vec);
+
             bool checknotvoidOrOccupied(float x, float y)
             {
                 var where = new vecf(x, y).snap();
                 var @struct = Data.Instance.GetStructureAt(where);
-                if(@struct is IMoveStructure)
+                if(@struct is IMoveInfos)
                 {
                     var rect = new RectangleF(x - hw, y - hh, _w, _h);
                     if (@struct.ItemsOnTile.Except(new List<Item>{this}).Any(item => item.rect.IntersectsWith(rect)) == false)
@@ -51,23 +53,23 @@ namespace WindowsFormsApp15
                 }
                 return false;
             }
-            void move(IMoveStructure s)
+            void move(IMoveInfos s)
             {
                 var way = s.Way;
                 var speed = s.Speed;
                 switch (way)
                 {
-                    case Way.Down: if (checknotvoidOrOccupied(vec.x, vec.y + speed + hh)) vec.y += speed; break;
-                    case Way.Up: if (checknotvoidOrOccupied(vec.x, vec.y - speed - hh)) vec.y -= speed; break;
-                    case Way.Left: if (checknotvoidOrOccupied(vec.x - speed - hw, vec.y)) vec.x -= speed; break;
-                    case Way.Right: if (checknotvoidOrOccupied(vec.x + speed + hw, vec.y)) vec.x += speed; break;
+                    case Way.Down: if (checknotvoidOrOccupied(vec.x, vec.y + speed + hh)) nextvec.y += speed; break;
+                    case Way.Up: if (checknotvoidOrOccupied(vec.x, vec.y - speed - hh)) nextvec.y -= speed; break;
+                    case Way.Left: if (checknotvoidOrOccupied(vec.x - speed - hw, vec.y)) nextvec.x -= speed; break;
+                    case Way.Right: if (checknotvoidOrOccupied(vec.x + speed + hw, vec.y)) nextvec.x += speed; break;
                 }
             }
 
-            var a = Data.Instance.GetStructureAt(TopLeft.snap()) as IMoveStructure;
-            var e = Data.Instance.GetStructureAt(TopRight.snap()) as IMoveStructure;
-            var w = Data.Instance.GetStructureAt(BottomLeft.snap()) as IMoveStructure;
-            var c = Data.Instance.GetStructureAt(BottomRight.snap()) as IMoveStructure;
+            var a = Data.Instance.GetStructureAt(TopLeft.snap()) as IMoveInfos;
+            var e = Data.Instance.GetStructureAt(TopRight.snap()) as IMoveInfos;
+            var w = Data.Instance.GetStructureAt(BottomLeft.snap()) as IMoveInfos;
+            var c = Data.Instance.GetStructureAt(BottomRight.snap()) as IMoveInfos;
 
             if (a == e && e == w && w == c && a != null)
                 move(a);
@@ -80,6 +82,8 @@ namespace WindowsFormsApp15
                 move(c);
             if (c == w && w != null && c != e && w != a && (c.Way == Way.Down || c.Way == Way.Up))
                 move(c);
+
+            vec = nextvec;
         }
 
         public void Display()

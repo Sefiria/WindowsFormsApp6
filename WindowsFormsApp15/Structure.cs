@@ -13,7 +13,7 @@ namespace WindowsFormsApp15
 {
     internal class Structure
     {
-        public anim anim, frontanim = null;
+        public anim anim;
         public vecf vec;
 
         public List<Item> ItemsOnTile => Data.Instance.Items.Where(i => i.rect.IntersectsWith(new RectangleF(vec.x, vec.y, Core.TSZ, Core.TSZ))).ToList();
@@ -23,7 +23,7 @@ namespace WindowsFormsApp15
             this.vec = new vecf(vec);
         }
 
-        public virtual void Update() { }
+        public virtual void Update() {}
 
         public void Display()
         {
@@ -31,7 +31,7 @@ namespace WindowsFormsApp15
         }
         public void FrontDisplay()
         {
-            frontanim?.Display(vec.snap(Core.TSZ));
+            anim?.Display(vec.snap(Core.TSZ), true);
         }
     }
 }

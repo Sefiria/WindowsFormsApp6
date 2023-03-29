@@ -21,9 +21,15 @@ namespace WindowsFormsApp15.structure
         {
             anim = drill;
         }
-        public StructureDrill(vecf vec) : base(vec)
+        public StructureDrill(vecf vec, int way) : base(vec)
         {
             anim = drill;
+            Way = (Way)way;
+        }
+        public StructureDrill(vecf vec, Way way) : base(vec)
+        {
+            anim = drill;
+            Way = way;
         }
         public override void Update()
         {

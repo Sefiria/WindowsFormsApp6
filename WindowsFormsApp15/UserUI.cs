@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Windows.Forms;
+using WindowsFormsApp15.items;
 using WindowsFormsApp15.structure;
 using WindowsFormsApp15.Utilities;
 using static WindowsFormsApp15.AnimRes;
@@ -13,6 +15,7 @@ namespace WindowsFormsApp15
         Structure InHand = null;
         sbyte Rotation = 0;
         List<Structure> PossibleCrafts = null;
+        sbyte TimeToDestroy = sbyte.MaxValue;
 
         int hand_selection = 0;
 
@@ -36,12 +39,45 @@ namespace WindowsFormsApp15
             InHand = (Structure)Activator.CreateInstance(PossibleCrafts[hand_selection].GetType());
         }
 
-        public void MouseInput(MouseEventArgs e)
+        public void MouseInput(MouseEventArgs e, bool up = false)
         {
-            if(e.Button== MouseButtons.Left && (!Data.Instance.ThereStructureAt(Core.MouseSnap) || Data.Instance.GetStructureAt(Core.MouseSnap) is StructureConveyor))
+            if(up)
+            {
+                TimeToDestroy = sbyte.MaxValue;
+                return;
+            }
+
+            DestroyStructure(e);
+            AddStructure(e);
+        }
+        private void DestroyStructure(MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right && Data.Instance.ThereStructureAt(Core.MouseSnap))
+            {
+                if (TimeToDestroy <= 0)
+                {
+                    Data.Instance.Structures.Remove(Core.MouseSnap);
+                    TimeToDestroy = sbyte.MaxValue;
+                }
+                else
+                {
+                    var s = Data.Instance.GetStructureAt(Core.MouseSnap);
+                    TimeToDestroy -= (sbyte)(s is StructureConveyor ? 10 : (s is IMoveInfos ? 2 : 1));
+                }
+            }
+            else
+                TimeToDestroy = sbyte.MaxValue;
+        }
+        private void AddStructure(MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left && (!Data.Instance.ThereStructureAt(Core.MouseSnap) || Data.Instance.GetStructureAt(Core.MouseSnap) is StructureConveyor))
             {
                 object structure;
-                if (PossibleCrafts[hand_selection] is StructureConveyor)
+                var rotationStructures = new List<Type> {
+                    typeof(StructureConveyor),
+                    typeof(StructureDrill),
+                    typeof(StructureFurnace) };
+                if (rotationStructures.Contains(PossibleCrafts[hand_selection].GetType()))
                     structure = Activator.CreateInstance(PossibleCrafts[hand_selection].GetType(), new object[] { Core.MouseSnap, Rotation });
                 else
                     structure = Activator.CreateInstance(PossibleCrafts[hand_selection].GetType(), new object[] { Core.MouseSnap });
@@ -50,7 +86,6 @@ namespace WindowsFormsApp15
                 Data.Instance.Structures.Add(Core.MouseSnap, (Structure)structure);
             }
         }
-
         public void Update()
         {
             if (KB.IsKeyPressed(KB.Key.R))
@@ -71,6 +106,12 @@ namespace WindowsFormsApp15
             InHand.FrontDisplay();
 
             Core.g.DrawImage(arrows[(Way)Rotation], Core.MouseVec.snap(Core.TSZ).pt);
+
+            if (TimeToDestroy < sbyte.MaxValue)
+            {
+                var ofst = 10F;
+                Core.g.DrawLine(new Pen(Color.Red, 3F), ofst, Core.rh - ofst, ofst + (Core.rw - ofst) * (1F - TimeToDestroy / (float)sbyte.MaxValue), Core.rh - ofst);
+            }
         }
     }
 }

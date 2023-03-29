@@ -1,15 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Windows.Media.Media3D;
 using WindowsFormsApp15.utilities;
 
 namespace WindowsFormsApp15.Utilities
 {
     public class anim
     {
-        public anim(float incr, List<Bitmap> g, bool pingpong = false)
+        public anim(float incr, List<Bitmap> list, List<Bitmap> listfront = null, bool pingpong = false)
         {
-            this.g = g;
+            this.g = new List<Bitmap>(list);
+            this.front = listfront == null ? new List<Bitmap>() : new List<Bitmap>(listfront);
             this.incr = incr;
             this.pingpong = pingpong;
         }
@@ -20,6 +22,7 @@ namespace WindowsFormsApp15.Utilities
             this.pingpong = pingpong;
         }
         public List<Bitmap> g = new List<Bitmap>();
+        public List<Bitmap> front = new List<Bitmap>();
         public int scale = 1;
         public bool pingpong = false;
         bool reverse = false;
@@ -49,9 +52,12 @@ namespace WindowsFormsApp15.Utilities
             }
         }
 
-        public void Display(vecf vf)
+        public void Display(vecf vf, bool isfront = false)
         {
-            Core.g.DrawImage(g[(int)frame], vf.x, vf.y);
+            if(!isfront)
+                Core.g.DrawImage(g[(int)frame], vf.x, vf.y - (front.Count>0?front[0].Height-Core.TSZ:0));
+            else if(front.Count > 0)
+                Core.g.DrawImage(front[(int)frame], vf.x, vf.y - (front[0].Height - Core.TSZ));
         }
     }
 }

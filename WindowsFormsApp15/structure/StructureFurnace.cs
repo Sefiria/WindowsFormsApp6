@@ -30,7 +30,7 @@ namespace WindowsFormsApp15.structure
             }
             public bool Tick()
             {
-                if (ticks < tickmax)
+                if (ticks >= tickmax)
                 {
                     Item.Unmovable = false;
                     return true;
@@ -46,14 +46,21 @@ namespace WindowsFormsApp15.structure
         public float Speed { get; set; } = 1F;
 
         public List<ItemJob> Queue = new List<ItemJob>();
+        public List<Item> Done = new List<Item>();
 
         public StructureFurnace() : base(vecf.Zero)
         {
             anim = furnace;
         }
-        public StructureFurnace(vecf vec) : base(vec)
+        public StructureFurnace(vecf vec, int way) : base(vec)
         {
             anim = furnace;
+            Way = (Way)way;
+        }
+        public StructureFurnace(vecf vec, Way way) : base(vec)
+        {
+            anim = furnace;
+            Way = way;
         }
         public override void Update()
         {
@@ -66,12 +73,18 @@ namespace WindowsFormsApp15.structure
             RectangleF rect = new RectangleF(vec.x, vec.y, Core.TSZ, Core.TSZ);
             var items = Data.Instance.Items.Where(i => i.rect.IntersectsWith(rect))
                                                             .Except(Queue.Select(qj => qj.Item))
+                                                            .Except(Done.Select(item => item))
                                                             .ToList();
             items.ForEach(i =>
             {
-                if (Maths.Length(i.vec - vec) <= 2)
+                if (Maths.Length(i.vec - vec) <= 20)
                     Queue.Add(new ItemJob(i));
             });
+
+            var _done = new List<Item>(Done);
+            foreach (var item in _done)
+                if (!ItemsOnTile.Contains(item))
+                    Done.Remove(item);
         }
         private void UpdateQueue()
         {
@@ -79,17 +92,18 @@ namespace WindowsFormsApp15.structure
             {
                 if (qj.Tick())
                 {
-                    Transform(ref qj.Item);
+                    Transform(qj.Item);
+                    Done.Add(qj.Item);
                     Queue.Remove(qj);
                 }
             });
         }
 
-        private void Transform(ref Item item)
+        private void Transform(Item item)
         {
             switch(item)
             {
-                case Ore ore: item = new Plate(ore.OreType, item.vec); break; 
+                case Ore ore: item = Data.Instance.Items[Data.Instance.Items.IndexOf(item)] = new Plate(ore.OreType, item.vec); break; 
             }
         }
     }
