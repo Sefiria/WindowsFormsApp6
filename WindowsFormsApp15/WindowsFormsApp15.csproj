@@ -61,6 +61,7 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="Item.cs" />
+    <Compile Include="items\Liquid.cs" />
     <Compile Include="items\Plate.cs" />
     <Compile Include="items\Ore.cs" />
     <Compile Include="Program.cs" />
@@ -69,7 +70,9 @@
     <Compile Include="structure\IMoveInfos.cs" />
     <Compile Include="structure\IOStructure.cs" />
     <Compile Include="structure\IMoveStructure.cs" />
-    <Compile Include="structure\StructureFurnace.cs" />
+    <Compile Include="structure\StructureTransformer.cs" />
+    <Compile Include="structure\StructureLiquefer.cs" />
+    <Compile Include="structure\StructureCompressor.cs" />
     <Compile Include="structure\StructureDrill.cs" />
     <Compile Include="structure\StructureConveyor.cs" />
     <Compile Include="UserUI.cs" />

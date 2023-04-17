@@ -11,8 +11,8 @@ namespace WindowsFormsApp2
 {
     public static class MapGen
     {
-        private static readonly int LuckChest = 100;
-        private static readonly int LuckMob = 100;
+        private static readonly int LuckChest = 50;
+        private static readonly int LuckMob = 25;
 
         public static void SetFromStrings(this Map map, List<string> lines)
         {
@@ -80,24 +80,25 @@ namespace WindowsFormsApp2
         {
             var content = new Dictionary<Item, int>();
 
-            content[new Knife(MaterialQuality.Wood)] = Tools.RND.Next(10, 20);
+            int amount = Tools.RND.Next(1, 5);
 
-            //content[new Item(Items.Coin)] = Tools.RND.Next(1, 28);
-
-            //switch(Tools.RND.Next(0, 3))
-            //{
-            //    case 0:
-            //        content[new Item(Items.Coin)] = Tools.RND.Next(1, 100);
-            //        content[new Knife(MaterialQuality.Wood)] = Tools.RND.Next(10, 20);
-            //        break;
-            //    case 1:
-            //        break;
-            //    case 2:
-            //        content[new Item(Items.Coin)] = Tools.RND.Next(1, 100);
-            //        content[new PlantAquarus()] = Tools.RND.Next(1, 4);
-            //        content[new PlantSelanium()] = Tools.RND.Next(1, 10);
-            //        break;
-            //}
+            for (int i = 0; i < amount; i++)
+            {
+                switch (Tools.RND.Next(0, 3))
+                {
+                    case 0:
+                        content[new Item(Items.Coin)] = Tools.RND.Next(1, 20);
+                        content[new Knife(MaterialQuality.Wood)] = Tools.RND.Next(2, 5);
+                        break;
+                    case 1:
+                        break;
+                    case 2:
+                        content[new Item(Items.Coin)] = Tools.RND.Next(1, 20);
+                        content[new PlantAquarus()] = Tools.RND.Next(1, 2);
+                        content[new PlantSelanium()] = Tools.RND.Next(1, 6);
+                        break;
+                }
+            }
 
             return content;
         }

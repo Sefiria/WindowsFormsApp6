@@ -16,6 +16,7 @@ namespace WindowsFormsApp15.Utilities
             Right,
             Z,Q,S,D,
             R,
+            Num1, Num2,Num3,Num4,Num5,Num6,Num7,Num8,Num9, Num0, CharDegree, CharPlus,
         }
 
         static Dictionary<System.Windows.Input.Key, bool> Released = new Dictionary<System.Windows.Input.Key, bool>()
@@ -32,6 +33,18 @@ namespace WindowsFormsApp15.Utilities
             [System.Windows.Input.Key.S] = true,
             [System.Windows.Input.Key.D] = true,
             [System.Windows.Input.Key.R] = true,
+            [System.Windows.Input.Key.D1] = true,
+            [System.Windows.Input.Key.D2] = true,
+            [System.Windows.Input.Key.D3] = true,
+            [System.Windows.Input.Key.D4] = true,
+            [System.Windows.Input.Key.D5] = true,
+            [System.Windows.Input.Key.D6] = true,
+            [System.Windows.Input.Key.D7] = true,
+            [System.Windows.Input.Key.D8] = true,
+            [System.Windows.Input.Key.D9] = true,
+            [System.Windows.Input.Key.D0] = true,
+            [System.Windows.Input.Key.Oem4] = true,
+            [System.Windows.Input.Key.OemPlus] = true,
         };
 
         static readonly List<System.Windows.Input.Key> AvailableKeys = new List<System.Windows.Input.Key>()
@@ -48,6 +61,18 @@ namespace WindowsFormsApp15.Utilities
             System.Windows.Input.Key.S,
             System.Windows.Input.Key.D,
             System.Windows.Input.Key.R,
+            System.Windows.Input.Key.D1,
+            System.Windows.Input.Key.D2,
+            System.Windows.Input.Key.D3,
+            System.Windows.Input.Key.D4,
+            System.Windows.Input.Key.D5,
+            System.Windows.Input.Key.D6,
+            System.Windows.Input.Key.D7,
+            System.Windows.Input.Key.D8,
+            System.Windows.Input.Key.D9,
+            System.Windows.Input.Key.D0,
+            System.Windows.Input.Key.Oem4,
+            System.Windows.Input.Key.OemPlus,
         };
 
         public static void Init() => Update();

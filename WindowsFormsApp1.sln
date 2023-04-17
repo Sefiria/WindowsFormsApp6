@@ -45,6 +45,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsCardsApp15", "Window
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsFormsApp15", "WindowsFormsApp15\WindowsFormsApp15.csproj", "{F3EA50F9-5251-4565-9B3F-CFDA232040C7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsFormsApp16", "WindowsFormsApp16\WindowsFormsApp16.csproj", "{3BFF897D-967A-48DF-8B34-5AC2C2E95BB7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsFormsApp17", "WindowsFormsApp17\WindowsFormsApp17.csproj", "{1AD5207A-2CB4-4C86-822C-9B2BBD70CBC2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsFormsApp18", "WindowsFormsApp18\WindowsFormsApp18.csproj", "{DD93F340-1821-453D-A28A-C730ABC18F7D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssetMake", "AssetMake\AssetMake.csproj", "{2618F9AC-92FD-4856-A4B4-11FFD019182F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsFormsApp19", "WindowsFormsApp19\WindowsFormsApp19.csproj", "{2EFDA662-D939-49E4-91C5-F195CD07DF38}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -135,6 +145,26 @@ Global
 		{F3EA50F9-5251-4565-9B3F-CFDA232040C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F3EA50F9-5251-4565-9B3F-CFDA232040C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F3EA50F9-5251-4565-9B3F-CFDA232040C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3BFF897D-967A-48DF-8B34-5AC2C2E95BB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BFF897D-967A-48DF-8B34-5AC2C2E95BB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BFF897D-967A-48DF-8B34-5AC2C2E95BB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3BFF897D-967A-48DF-8B34-5AC2C2E95BB7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1AD5207A-2CB4-4C86-822C-9B2BBD70CBC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AD5207A-2CB4-4C86-822C-9B2BBD70CBC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1AD5207A-2CB4-4C86-822C-9B2BBD70CBC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1AD5207A-2CB4-4C86-822C-9B2BBD70CBC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD93F340-1821-453D-A28A-C730ABC18F7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD93F340-1821-453D-A28A-C730ABC18F7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD93F340-1821-453D-A28A-C730ABC18F7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD93F340-1821-453D-A28A-C730ABC18F7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2618F9AC-92FD-4856-A4B4-11FFD019182F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2618F9AC-92FD-4856-A4B4-11FFD019182F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2618F9AC-92FD-4856-A4B4-11FFD019182F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2618F9AC-92FD-4856-A4B4-11FFD019182F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2EFDA662-D939-49E4-91C5-F195CD07DF38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2EFDA662-D939-49E4-91C5-F195CD07DF38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2EFDA662-D939-49E4-91C5-F195CD07DF38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2EFDA662-D939-49E4-91C5-F195CD07DF38}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

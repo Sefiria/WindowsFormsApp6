@@ -12,6 +12,7 @@ namespace WindowsFormsApp15
 {
     internal class Item
     {
+        public Ores OreType;
         public Items ItemType;
         public vecf vec;
         public anim anim;

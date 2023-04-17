@@ -13,8 +13,6 @@ namespace WindowsFormsApp15.items
 {
     internal class Ore : Item
     {
-        public Ores OreType;
-
         public Ore(Ores ore, vecf vec) : base(Items.Ore, vec)
         {
             OreType = ore;

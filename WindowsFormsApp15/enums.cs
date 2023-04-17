@@ -18,7 +18,7 @@ namespace WindowsFormsApp15
         }
         public enum Items
         {
-            Ore = 0, Plate,
+            Ore = 0, Plate, Liquid,
         }
         public static Ores GetRandomOre() => (Ores)Core.RND.Next(Enum.GetNames(typeof(Ores)).Length);
     }

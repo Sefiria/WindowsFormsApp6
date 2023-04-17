@@ -17,9 +17,10 @@ namespace WindowsFormsApp15
 
         public static Dictionary<Way, anim> conveyors = new Dictionary<Way, anim>();
         public static Dictionary<Way, Bitmap> arrows = new Dictionary<Way, Bitmap>();
-        public static anim drill, furnace;
+        public static anim drill, compressor, liquefer;
         public static Dictionary<Ores, Bitmap> ores = new Dictionary<Ores, Bitmap>();
         public static Dictionary<Ores, Bitmap> plates = new Dictionary<Ores, Bitmap>();
+        public static Dictionary<Ores, Bitmap> liquids = new Dictionary<Ores, Bitmap>();
 
         private static void InitConveyors()
         {
@@ -66,7 +67,14 @@ namespace WindowsFormsApp15
             add2At(3, 1, true);
             add2At(3, 2);
             add2At(3, 3);
-            furnace = new anim(0.1F, list, listfront);
+            compressor = new anim(0.1F, list, listfront);
+            list = new List<Bitmap>();
+            listfront = new List<Bitmap>();
+            addAt(4, 0, true);
+            addAt(4, 1, true);
+            addAt(4, 2);
+            addAt(4, 3);
+            liquefer = new anim(0.1F, list, listfront);
 
             Bitmap get(int x, int y) => tileset_static.Clone(new Rectangle(sz * x, sz * y, sz, sz), tileset_static.PixelFormat).Resize(targetsz);
             void set(ref Dictionary<Ores, Bitmap> dict, int x)
@@ -79,6 +87,7 @@ namespace WindowsFormsApp15
             }
             set(ref ores, 4);
             set(ref plates, 7);
+            set(ref liquids, 10);
         }
         public static void Init()
         {
@@ -89,7 +98,7 @@ namespace WindowsFormsApp15
             List<anim> list = new List<anim>(conveyors.Values)
             {
                 drill,
-                furnace,
+                compressor,
             };
             foreach (var anim in list)
                 anim.Tick();
@@ -101,6 +110,7 @@ namespace WindowsFormsApp15
             {
                 case Items.Ore: w = h = 10; break;
                 case Items.Plate: w = h = 16; break;
+                case Items.Liquid: w = h = 16; break;
             }
         }
     }

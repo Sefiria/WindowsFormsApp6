@@ -12,11 +12,10 @@ using WindowsFormsApp15.utilities.tiles;
 using WindowsFormsApp15.Utilities;
 using static WindowsFormsApp15.AnimRes;
 using static WindowsFormsApp15.enums;
-using static WindowsFormsApp15.structure.StructureFurnace;
 
 namespace WindowsFormsApp15.structure
 {
-    internal class StructureFurnace : Structure, IOStructure
+    internal class StructureTransformer : Structure, IOStructure
     {
         public class ItemJob
         {
@@ -41,6 +40,7 @@ namespace WindowsFormsApp15.structure
             }
         }
 
+        public Dictionary<Type, Type> InOut;
         public List<Way> WaysIn { get; set; }
         public Way Way { get; set; } = Way.Down;
         public float Speed { get; set; } = 1F;
@@ -48,18 +48,20 @@ namespace WindowsFormsApp15.structure
         public List<ItemJob> Queue = new List<ItemJob>();
         public List<Item> Done = new List<Item>();
 
-        public StructureFurnace() : base(vecf.Zero)
+        public StructureTransformer() : base(vecf.Zero)
         {
-            anim = furnace;
+            InOut = new Dictionary<Type, Type>();
         }
-        public StructureFurnace(vecf vec, int way) : base(vec)
+        public StructureTransformer(Dictionary<Type, Type> inout, anim _anim, vecf vec, int way) : base(vec)
         {
-            anim = furnace;
+            anim = _anim;
+            InOut = inout;
             Way = (Way)way;
         }
-        public StructureFurnace(vecf vec, Way way) : base(vec)
+        public StructureTransformer(Dictionary<Type, Type> inout, anim _anim, vecf vec, Way way) : base(vec)
         {
-            anim = furnace;
+            anim = _anim;
+            InOut = inout;
             Way = way;
         }
         public override void Update()
@@ -101,10 +103,8 @@ namespace WindowsFormsApp15.structure
 
         private void Transform(Item item)
         {
-            switch(item)
-            {
-                case Ore ore: item = Data.Instance.Items[Data.Instance.Items.IndexOf(item)] = new Plate(ore.OreType, item.vec); break; 
-            }
+            if (InOut.ContainsKey(item.GetType()))
+                Data.Instance.Items[Data.Instance.Items.IndexOf(item)] = (Item)Activator.CreateInstance(InOut[item.GetType()], new object[] { item.OreType, item.vec });
         }
     }
 }
