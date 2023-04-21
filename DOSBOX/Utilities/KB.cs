@@ -18,7 +18,8 @@ namespace DOSBOX.Utilities
             Down,
             Left,
             Right,
-            Z,Q,S,D
+            Z,Q,S,D,
+            LeftCtrl
         }
 
         static Dictionary<System.Windows.Input.Key, bool> Released = new Dictionary<System.Windows.Input.Key, bool>()
@@ -34,6 +35,7 @@ namespace DOSBOX.Utilities
             [System.Windows.Input.Key.Q] = true,
             [System.Windows.Input.Key.S] = true,
             [System.Windows.Input.Key.D] = true,
+            [System.Windows.Input.Key.LeftCtrl] = true,
         };
 
         static readonly List<System.Windows.Input.Key> AvailableKeys = new List<System.Windows.Input.Key>()
@@ -49,6 +51,7 @@ namespace DOSBOX.Utilities
             System.Windows.Input.Key.Q,
             System.Windows.Input.Key.S,
             System.Windows.Input.Key.D,
+            System.Windows.Input.Key.LeftCtrl,
         };
 
         public static void Init() => Update();

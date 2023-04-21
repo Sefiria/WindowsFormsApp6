@@ -50,8 +50,10 @@ namespace DOSBOX.Suggestions
                 return;
             }
 
+            Data.Instance.map.Update();
             Data.Instance.user.Update();
 
+            Data.Instance.map.Display();
             Data.Instance.user.Display();
             DisplayUI();
 

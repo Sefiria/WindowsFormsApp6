@@ -92,7 +92,14 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Suggestions\CityEditor.cs" />
+    <Compile Include="Suggestions\city\IndexedBlocks.cs" />
     <Compile Include="Suggestions\city\Data.cs" />
+    <Compile Include="Suggestions\city\CityMap.cs" />
+    <Compile Include="Suggestions\city\indexed_blocks\template.cs" />
+    <Compile Include="Suggestions\city\indexed_blocks\rootlight.cs" />
+    <Compile Include="Suggestions\city\indexed_blocks\rootfilled.cs" />
+    <Compile Include="Suggestions\city\Tile.cs" />
     <Compile Include="Suggestions\city\User.cs" />
     <Compile Include="Suggestions\Fusion.cs" />
     <Compile Include="Suggestions\Plants.cs" />

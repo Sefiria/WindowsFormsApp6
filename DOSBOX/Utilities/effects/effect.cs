@@ -17,8 +17,8 @@ namespace DOSBOX.Utilities.effects
         float frame = 0F;
         int framemax => g.Count;
         protected virtual float incr { get; set; } = 0.1F;
-        public int w(int frame) => getlength(frame, 0);
-        public int h(int frame) => getlength(frame, 1);
+        public int w(int frame = 0) => getlength(frame, 0);
+        public int h(int frame = 0) => getlength(frame, 1);
         int getlength(int frame, int dimension) => (frame < 0 || frame >= g.Count) ? 0 : g[frame].GetLength(dimension);
 
         void Tick()

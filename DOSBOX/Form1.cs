@@ -92,7 +92,12 @@ namespace DOSBOX
             }
 
             if (KB.IsKeyDown(KB.Key.Enter))
-                Core.NextSuggestion = Core.Suggestions[menu_selection].Instance;
+            {
+                if(Keyboard.IsKeyDown(Key.LeftCtrl) && Core.Suggestions[menu_selection].Name == "City")
+                    Core.NextSuggestion = new CityEditor();
+                else
+                    Core.NextSuggestion = Core.Suggestions[menu_selection].Instance;
+            }
         }
 
         private void Draw(object _, EventArgs e)

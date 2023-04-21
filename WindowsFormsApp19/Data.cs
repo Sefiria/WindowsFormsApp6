@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
+using WindowsFormsApp19.Map;
 using WindowsFormsApp19.Utilities;
 
 namespace WindowsFormsApp19
@@ -17,50 +18,14 @@ namespace WindowsFormsApp19
             }
         }
 
-        public Map map;
+        public MapMgr MapMgr;
         public vecf cam;
-        //public List<car> cars;
+        public User User;
 
         public void Init()
         {
-            map = new Map(/*Resources.tileset_static*/);
-            //cars = new List<car>();
-            //cars.Add(new car(50, 50, 10, 20));
-            //cars.Add(new car(150, 50, 10, 20));
-        }
-    }
-
-    public class Mur
-    {
-        public vecf A { get; set; }
-        public vecf B { get; set; }
-        public vecf Normale { get; set; } = vecf.Zero;
-        public Mur(vecf a, vecf b)
-        {
-            A = a;
-            B = b;
-            Normale = Maths.Normale(A, B);
-        }
-    }
-    public class Map
-    {
-        public List<Mur> murs { get; set; } = new List<Mur>();
-
-        public Map()
-        {
-        }
-
-        public void Draw()
-        {
-            foreach (var mur in murs)
-                Core.g.DrawLine(new Pen(Color.FromArgb(Core.RND.Next(256), Core.RND.Next(256), Core.RND.Next(256)), 4F), mur.A.pt, mur.B.pt);
-        }
-    }
-    public class JsonData
-    {
-        public Map map { get; set; } = new Map();
-        public JsonData()
-        {
+            MapMgr = new MapMgr();
+            User = new User((MapMgr.w / 2 - 0.5F) * MapMgr.ChunkSz * Core.TSZ, (MapMgr.h / 2 - 0.5F) * MapMgr.ChunkSz * Core.TSZ);
         }
     }
 }

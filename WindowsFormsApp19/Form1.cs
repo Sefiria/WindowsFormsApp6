@@ -33,6 +33,8 @@ namespace WindowsFormsApp19
             //new List<Structure>(Data.Instance.Structures.Values).ForEach(s => s.Update());
             //new List<Item>(Data.Instance.Items).ForEach(o => o.Update());
 
+            Data.Instance.User.Update();
+
             if(LastMouseEventArgs != null)
                 Render_MouseMove(null, LastMouseEventArgs);
 
@@ -55,13 +57,14 @@ namespace WindowsFormsApp19
             DrawMap();
 
             //Data.Instance.cars.ForEach(car => car.Display());
+            Data.Instance.User.Draw();
 
             Render.Image = Core.Image;
         }
 
         private void DrawMap()
         {
-            Data.Instance.map.Draw();
+            Data.Instance.MapMgr.Draw();
         }
 
         private void Render_MouseDown(object sender, MouseEventArgs e)

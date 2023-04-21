@@ -30,10 +30,12 @@ namespace DOSBOX.Suggestions.city
 
 
         public User user;
+        public CityMap map;
 
 
         private void Init()
         {
+            map = new CityMap();
             user = new User();
         }
     }

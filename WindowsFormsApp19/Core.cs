@@ -8,8 +8,9 @@ namespace WindowsFormsApp19
 {
     internal class Core
     {
-        public static int TSZ => 24;
+        public static int TSZ => 12;
         public static int rw, rh;
+        public static vecf MidScreen => new vecf(rw / 2, rh / 2).snap(TSZ);
         public static Bitmap Image;
         public static Graphics g;
         public static Random RND = new Random((int)DateTime.UtcNow.Ticks);
