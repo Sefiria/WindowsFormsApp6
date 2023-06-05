@@ -1,8 +1,10 @@
 ﻿using DOSBOX.Suggestions.city;
 using DOSBOX.Utilities;
 using DOSBOX.Utilities.effects;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace DOSBOX.Suggestions
@@ -32,7 +34,8 @@ namespace DOSBOX.Suggestions
             Core.Layers.Clear();
             Core.Layers.Add(new byte[64, 64]); // BG
             Core.Layers.Add(new byte[64, 64]); // UI
-            
+
+            Data.Instance.ToString();// trigger Data Instance
         }
 
         public void Update()
@@ -43,6 +46,13 @@ namespace DOSBOX.Suggestions
                 return;
             }
 
+            if (KB.IsKeyDown(KB.Key.LeftCtrl))
+            {
+                if (KB.IsKeyPressed(KB.Key.S))
+                    CitySave.Save();
+                if (KB.IsKeyPressed(KB.Key.L))
+                    CitySave.Load();
+            }
 
             selcol++;
             if (selcol > 3) selcol = 0;
@@ -84,11 +94,13 @@ namespace DOSBOX.Suggestions
                 if (seltile.y < 0) seltile.y = 0;
                 if (seltile.y == yamount)
                 {
-                    if (seltile.x >= wc - IndexedBlocks.RefTiles.Count % wc) seltile.x = wc - IndexedBlocks.RefTiles.Count % wc - 1;
+                    if (seltile.x >= IndexedBlocks.RefTiles.Count % wc)
+                        seltile.x = IndexedBlocks.RefTiles.Count % wc - 1;
                 }
                 else
                 {
-                    if (seltile.x >= wc) seltile.x = wc - 1;
+                    if (seltile.x >= wc)
+                        seltile.x = wc - 1;
                 }
                 if (seltile.y >= yamount + 1) seltile.y = yamount;
             }
@@ -106,7 +118,7 @@ namespace DOSBOX.Suggestions
                 if (left) Core.Cam.x -= move_speed;
                 else if (right) Core.Cam.x += move_speed;
 
-                if(KB.IsKeyDown(KB.Key.Space))
+                if (KB.IsKeyDown(KB.Key.Space))
                 {
                     int x = (int)(Core.Cam.x / Tile.TSZ);
                     int y = (int)(Core.Cam.y / Tile.TSZ);
@@ -125,6 +137,9 @@ namespace DOSBOX.Suggestions
                 Display_Tiles();
             else
                 Display_Map();
+
+            Text.DisplayText("                                ", 0, 0, 0);
+            Text.DisplayText(Core.Cam.ToString(), 0, 0, 0);
         }
 
         private void Display_Map()
@@ -162,11 +177,11 @@ namespace DOSBOX.Suggestions
                 for (int i = 0; i < Tile.TSZ; i++)
                 {
                     Core.Layers[1][_x + i, _y] = selcol;
-                    Core.Layers[1][_x+ i, _y + sz - 1] = selcol;
+                    Core.Layers[1][_x + i, _y + sz - 1] = selcol;
                 }
                 for (int j = 0; j < Tile.TSZ; j++)
                 {
-                    Core.Layers[1][_x, _y+ j] = selcol;
+                    Core.Layers[1][_x, _y + j] = selcol;
                     Core.Layers[1][(_x + sz) - 1, _y + j] = selcol;
                 }
             }
@@ -179,13 +194,14 @@ namespace DOSBOX.Suggestions
             int yamount = IndexedBlocks.RefTiles.Count / wc;
             for (int y = 0; y < yamount + 1; y++)
             {
-                for (int x = 0; x < (y == yamount ? wc - IndexedBlocks.RefTiles.Count % wc : wc); x++)
+                for (int x = 0; x < (y == yamount ? IndexedBlocks.RefTiles.Count % wc : wc); x++)
                 {
                     for (int i = 0; i < Tile.TSZ; i++)
                     {
                         for (int j = 0; j < Tile.TSZ; j++)
                         {
-                            Core.Layers[0][x * sz + i, y * sz + j] = IndexedBlocks.RefTiles[y * wc + x].Pixels[i, j];
+                            if (x * sz + i >= 0 && x * sz + i < 64 && y * sz + j >= 0 && y * sz + j < 64)
+                                Core.Layers[0][x * sz + i, y * sz + j] = IndexedBlocks.RefTiles[y * wc + x].Pixels[i, j];
                         }
                     }
                 }
@@ -201,6 +217,69 @@ namespace DOSBOX.Suggestions
             {
                 Core.Layers[1][seltile.x * sz, seltile.y * sz + j] = selcol;
                 Core.Layers[1][(seltile.x + 1) * sz - 1, seltile.y * sz + j] = selcol;
+            }
+        }
+
+
+        public class CitySave
+        {
+            static string path = ".mem/.city/city.mem";
+
+            static JsonSerializerSettings options = new JsonSerializerSettings()
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                Formatting = Formatting.Indented,
+                TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
+                TypeNameHandling = TypeNameHandling.Objects,
+                ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+                PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+            };
+            public class savefile
+            {
+                public Data data { get; set; }
+            }
+
+            public static void Save()
+            {
+                ChckPth();
+
+                savefile savefile = new savefile();
+                savefile.data = Data.Instance;
+
+                string contents = JsonConvert.SerializeObject(savefile, options);
+
+                File.WriteAllText(path, contents);
+            }
+            public static void Load()
+            {
+                ChckPth();
+
+                string contents = File.ReadAllText(path);
+
+                savefile savefile = JsonConvert.DeserializeObject<savefile>(contents, options);
+                Data.LoadInstance(savefile.data);
+
+                var _ = Data.Instance.ToString();// trigger Data Instance in case it's null
+            }
+
+            private static void ChckPth()
+            {
+                if (!Directory.Exists(path))
+                {
+                    string[] cells = path.Split('/');
+                    cells = cells.Take(cells.Length - 1).ToArray();
+
+                    string cumulpath = "";
+                    for (int i = 0; i < cells.Length; i++)
+                    {
+                        cumulpath += cells[i];
+                        if (!Directory.Exists(cumulpath))
+                        {
+                            Directory.CreateDirectory(cumulpath);
+                        }
+                        cumulpath += '/';
+                    }
+                }
             }
         }
     }

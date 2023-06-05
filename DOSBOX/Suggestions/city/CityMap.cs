@@ -11,7 +11,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.ProgressBar;
 
 namespace DOSBOX.Suggestions.city
 {
-    internal class CityMap
+    public class CityMap
     {
         public byte[,] Blocks;
         public const int w = 128;
@@ -180,8 +180,12 @@ namespace DOSBOX.Suggestions.city
                             {
                                 int X = 32 + x * Tile.TSZ + i - (int)(Core.Cam.x % Tile.TSZ);
                                 int Y = 32 + y * Tile.TSZ + j - (int)(Core.Cam.y % Tile.TSZ);
-                                if(X >= 0 && X < 64 && Y >= 0 && Y < 64)
-                                    Core.Layers[0][X, Y] = IndexedBlocks.RefTiles[Blocks[_x, _y]].Pixels[i, j];
+                                if (X >= 0 && X < 64 && Y >= 0 && Y < 64)
+                                {
+                                    Tile tile = IndexedBlocks.RefTiles[Blocks[_x, _y]];
+                                    int layer = tile.Type == Tile.TYPE.FRONT ? 2 : 0;
+                                    Core.Layers[layer][X, Y] = tile.Pixels[i, j];
+                                }
                             }
                         }
                     }

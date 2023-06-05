@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DOSBOX.Suggestions.city
 {
-    internal class Data
+    public class Data
     {
 
         private static Data m_Instance = null;

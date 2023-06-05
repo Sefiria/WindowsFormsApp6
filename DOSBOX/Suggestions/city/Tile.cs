@@ -13,6 +13,7 @@ namespace DOSBOX.Suggestions.city
         {
             GROUND = 0,
             SOLID,
+            FRONT,
         }
 
         public byte[,] Pixels;

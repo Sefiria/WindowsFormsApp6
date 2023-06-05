@@ -18,6 +18,8 @@ namespace DOSBOX.Suggestions.city
             RefTiles.Add(new Tile() { Type = Tile.TYPE.GROUND, Pixels = new byte[8, 8] });
             RefTiles.AddRange(GetRootFilled());
             RefTiles.AddRange(GetRootLight());
+            RefTiles.AddRange(GetExt());
+            RefTiles.AddRange(GetStructures());
         }
     }
 }

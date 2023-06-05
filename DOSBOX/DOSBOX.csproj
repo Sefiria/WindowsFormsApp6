@@ -96,6 +96,8 @@
     <Compile Include="Suggestions\city\IndexedBlocks.cs" />
     <Compile Include="Suggestions\city\Data.cs" />
     <Compile Include="Suggestions\city\CityMap.cs" />
+    <Compile Include="Suggestions\city\indexed_blocks\ext.cs" />
+    <Compile Include="Suggestions\city\indexed_blocks\structures.cs" />
     <Compile Include="Suggestions\city\indexed_blocks\template.cs" />
     <Compile Include="Suggestions\city\indexed_blocks\rootlight.cs" />
     <Compile Include="Suggestions\city\indexed_blocks\rootfilled.cs" />

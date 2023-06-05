@@ -10,7 +10,7 @@ using static DOSBOX.Suggestions.city.User;
 
 namespace DOSBOX.Suggestions.city
 {
-    internal class User
+    public class User
     {
         public class IdleH_anim : effect
         {
@@ -110,6 +110,7 @@ namespace DOSBOX.Suggestions.city
 
         public User()
         {
+            Core.KeepCamCoords = true;
             Core.Cam = new vecf(Data.Instance.map.Blocks.GetLength(0) / 2F * Tile.TSZ, Data.Instance.map.Blocks.GetLength(1) / 2F * Tile.TSZ);
         }
 

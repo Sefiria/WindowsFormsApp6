@@ -45,7 +45,9 @@ namespace DOSBOX
                 Core.NextSuggestion = null;
                 Core.CurrentSuggestion.Init();
                 Core.CurrentSuggestion.ShowHowToPlay = true;
-                Core.Cam = vecf.Zero;
+                if(!Core.KeepCamCoords)
+                    Core.Cam = vecf.Zero;
+                Core.KeepCamCoords = false;
             }
 
             if (Core.CurrentSuggestion == null)
