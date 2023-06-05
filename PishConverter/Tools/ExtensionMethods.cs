@@ -1,6 +1,5 @@
 ﻿using System.Drawing;
 using System.Numerics;
-using static System.Windows.Forms.AxHost;
 
 namespace PishConverter.Tools
 {
