@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C5A91EE0-4513-4961-BA25-8938918EEA17}</ProjectGuid>
+    <ProjectGuid>{0B646896-D4CE-4F11-BDE9-9D8BC6D9C383}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>PishConverter</RootNamespace>
-    <AssemblyName>PishConverter</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <RootNamespace>PointAnima</RootNamespace>
+    <AssemblyName>PointAnima</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
@@ -22,6 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -31,12 +32,11 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -49,18 +49,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common\BulletSpec\Bullet.cs" />
-    <Compile Include="Common\PartSpec\Particle.cs" />
-    <Compile Include="Common\Drawable.cs" />
-    <Compile Include="Common\Entity.cs" />
-    <Compile Include="Common\IHit.cs" />
-    <Compile Include="Common\MapSpec\Map.cs" />
-    <Compile Include="Common\PowerUpTransformInfo.cs" />
-    <Compile Include="Common\ShpeSpec\Shpe.cs" />
-    <Compile Include="Common\StatsInfo.cs" />
-    <Compile Include="Common\UserSpec\User.cs" />
-    <Compile Include="Global.cs" />
-    <Compile Include="Data.cs" />
+    <Compile Include="Anima.cs" />
+    <Compile Include="Ext.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -69,8 +59,8 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tools\ExtensionMethods.cs" />
-    <Compile Include="Tools\KB.cs" />
+    <Compile Include="Tools\Maths.cs" />
+    <Compile Include="Tools\Tools.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -96,6 +86,5 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

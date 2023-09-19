@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ComputeSharp;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -20,6 +21,7 @@ namespace WindowsFormsApp5
         Point PrevMouseLocation = Point.Empty;
         int W, H;
         MouseButtons MouseButton = MouseButtons.None;
+        static int pw = 10;
 
         public Form1()
         {
@@ -47,7 +49,14 @@ namespace WindowsFormsApp5
 
         private void _Draw()
         {
-            Render.Image = PreRender.Resized(Render.Width, Render.Height);
+            var img = PreRender.Resized(Render.Width, Render.Height);
+            var stream = img.ToMemoryStream();
+            using (var texture = GraphicsDevice.GetDefault().LoadReadWriteTexture2D<Bgra32, Float4>(stream))
+            {
+                GraphicsDevice.GetDefault().For(texture.Width, texture.Height, 5);
+                texture.Save(stream, ImageFormat.Png);
+                Render.Image = Image.FromStream(stream);
+            }
         }
 
         private void _Update()
@@ -96,8 +105,15 @@ namespace WindowsFormsApp5
             {
                 g.DrawImage(UndoRender, 0, 0);
             }
+            //if (e.KeyCode == Keys.Down && pw > 2)
+            //{
+            //    pw--;
+            //}
+            //if (e.KeyCode == Keys.Up && pw < 50)
+            //{
+            //    pw++;
+            //}
         }
-
         private void Render_MouseMove(object sender, MouseEventArgs e)
         {
             if (MouseDown)
@@ -108,22 +124,37 @@ namespace WindowsFormsApp5
                     int ys = PrevMouseLocation.Y;
                     int xe = e.Location.X;
                     int ye = e.Location.Y;
-                    g.DrawLine(Pens.White, xs, ys, xe, ye);
+
+                    pw = (Math.Max(xe, W / 2) - Math.Min(xe, W / 2) + (Math.Max(ye, H / 2) - Math.Min(ye, H / 2))) / 10;
+                    int v = (int)(200 - (pw * 10F / (W / 2F + H / 2F)) * 255);
+                    if (v > 255) v = 255;
+                    if (v < 0) v = 0;
+                    Pen pen = new Pen(Color.FromArgb(50, v, v, v), pw);
+
+                    void d()
+                    {
+                        g.DrawLine(pen, xs, ys, xe, ye);
+                        g.DrawLine(pen, xs - (pw / 2), ys - (pw / 2), xe - (pw / 2), ye - (pw / 2));
+                        g.DrawLine(pen, xs + (pw / 2), ys - (pw / 2), xe + (pw / 2), ye - (pw / 2));
+                        g.DrawLine(pen, xs + (pw / 2), ys - (pw / 2), xe + (pw / 2), ye - (pw / 2));
+                        g.DrawLine(pen, xs + (pw / 2), ys + (pw / 2), xe + (pw / 2), ye + (pw / 2));
+                    }
+                    d();
                     xs = W - PrevMouseLocation.X;
                     ys = PrevMouseLocation.Y;
                     xe = W - e.Location.X;
                     ye = e.Location.Y;
-                    g.DrawLine(Pens.White, xs, ys, xe, ye);
+                    d();
                     xs = PrevMouseLocation.X;
                     ys = H - PrevMouseLocation.Y;
                     xe = e.Location.X;
                     ye = H - e.Location.Y;
-                    g.DrawLine(Pens.White, xs, ys, xe, ye);
+                    d();
                     xs = W - PrevMouseLocation.X;
                     ys = H - PrevMouseLocation.Y;
                     xe = W - e.Location.X;
                     ye = H - e.Location.Y;
-                    g.DrawLine(Pens.White, xs, ys, xe, ye);
+                    d();
                 }
             }
             PrevMouseLocation = e.Location;

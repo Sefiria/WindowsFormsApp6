@@ -50,7 +50,7 @@ namespace PishConverter.Common.MapSpec
                 int x = Global.RND.Next(14, Global.W - 15);
                 new Shpe(0, new Vector2(x - 10, -10), new StatsInfo() { HP = 1, MoveSpeed = 0.4F });
                 new Shpe(0, new Vector2(x + 10, -10), new StatsInfo() { HP = 1, MoveSpeed = 0.4F });
-                new Shpe(1, new Vector2(x, -10), new StatsInfo() { HP = 4, MoveSpeed = 0.15F });
+                new Shpe(1, new Vector2(x, -10), new StatsInfo() { HP = 3, MoveSpeed = 0.15F });
             }
 
 

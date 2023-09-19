@@ -16,7 +16,14 @@ namespace PishConverter.Common
 
         public Particle() : base()
         {
-            Position = new Vector2(Global.RND.Next(Global.W), 0);
+            if (Global.SpaceParticlesLook.Y == 1)
+                Position = new Vector2(Global.RND.Next(Global.W), 0);
+            if (Global.SpaceParticlesLook.Y == -1)
+                Position = new Vector2(Global.RND.Next(Global.W), Global.H - 1);
+            if (Global.SpaceParticlesLook.X == 1)
+                Position = new Vector2(0, Global.RND.Next(Global.H));
+            if (Global.SpaceParticlesLook.X == -1)
+                Position = new Vector2(Global.W - 1, Global.RND.Next(Global.H));
             CreateTexture();
             move_speed = Global.RND.Next(50, 200) / 10F;
         }
@@ -33,7 +40,7 @@ namespace PishConverter.Common
 
         public override void Update()
         {
-            Position.Y += move_speed;
+            Position += Global.SpaceParticlesLook * move_speed;
 
             if (Y >= Global.H)
                 Exists = false;

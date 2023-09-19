@@ -56,13 +56,31 @@ namespace PishConverter.Common
 
         private void Controls()
         {
-            if (KB.IsKeyDown(KB.Key.Z) && Y >= Global.H * 0.66F + StatsInfo.MoveSpeed)
+            bool z = KB.IsKeyDown(KB.Key.Z);
+            bool q = KB.IsKeyDown(KB.Key.Q);
+            bool s = KB.IsKeyDown(KB.Key.S);
+            bool d = KB.IsKeyDown(KB.Key.D);
+
+            if (!z && !q && !s && !d)
+            {
+                Global.SpaceParticlesLook = new Vector2(0, 0.04F);
+            }
+            else
+            {
+                Global.SpaceParticlesLook = Vector2.Zero;
+                if (z) Global.SpaceParticlesLook.Y = 1;
+                if (q) Global.SpaceParticlesLook.X = 1;
+                if (s) Global.SpaceParticlesLook.Y = -1;
+                if (d) Global.SpaceParticlesLook.X = -1;
+            }
+
+            if (z && Y >= Global.H * 0.66F + StatsInfo.MoveSpeed)
                 Position.Y -= StatsInfo.MoveSpeed;
-            if (KB.IsKeyDown(KB.Key.S) && Y + H < Global.H - 1F - StatsInfo.MoveSpeed)
+            if (s && Y + H < Global.H - 1F - StatsInfo.MoveSpeed)
                 Position.Y += StatsInfo.MoveSpeed;
-            if (KB.IsKeyDown(KB.Key.Q) && X >= StatsInfo.MoveSpeed)
+            if (q && X >= StatsInfo.MoveSpeed)
                 Position.X -= StatsInfo.MoveSpeed;
-            if (KB.IsKeyDown(KB.Key.D) && X + W < Global.W - 1F - StatsInfo.MoveSpeed)
+            if (d && X + W < Global.W - 1F - StatsInfo.MoveSpeed)
                 Position.X += StatsInfo.MoveSpeed;
 
             if (KB.IsKeyPressed(KB.Key.Space))
@@ -82,9 +100,9 @@ namespace PishConverter.Common
                 Exists = false;
         }
 
-        public void GivePowerUp(PowerUpTransformInfo info)
+        public void GivePowerUp(PowerUpTransformInfo transform)
         {
-
+            transform.Transform(ref StatsInfo);
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -70,6 +71,13 @@ namespace WindowsFormsApp5
                     e.X++;
                 }
             }
+        }
+
+        public static MemoryStream ToMemoryStream(this Bitmap b)
+        {
+            MemoryStream ms = new MemoryStream();
+            b.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+            return ms;
         }
     }
 }

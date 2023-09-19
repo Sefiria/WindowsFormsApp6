@@ -1,4 +1,4 @@
-﻿namespace PishConverter
+﻿namespace WindowsFormsApp21
 {
     partial class Form1
     {
@@ -37,7 +37,7 @@
             this.Render.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Render.Location = new System.Drawing.Point(0, 0);
             this.Render.Name = "Render";
-            this.Render.Size = new System.Drawing.Size(372, 347);
+            this.Render.Size = new System.Drawing.Size(800, 450);
             this.Render.TabIndex = 0;
             this.Render.TabStop = false;
             // 
@@ -45,10 +45,9 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(372, 347);
+            this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.Render);
             this.Name = "Form1";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.Render)).EndInit();
             this.ResumeLayout(false);
