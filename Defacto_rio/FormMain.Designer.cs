@@ -40,7 +40,7 @@
             // 
             // btItems
             // 
-            this.btItems.Location = new System.Drawing.Point(15, 235);
+            this.btItems.Location = new System.Drawing.Point(16, 168);
             this.btItems.Margin = new System.Windows.Forms.Padding(6);
             this.btItems.Name = "btItems";
             this.btItems.Size = new System.Drawing.Size(212, 44);
@@ -51,7 +51,7 @@
             // 
             // btGroups
             // 
-            this.btGroups.Location = new System.Drawing.Point(15, 179);
+            this.btGroups.Location = new System.Drawing.Point(16, 112);
             this.btGroups.Margin = new System.Windows.Forms.Padding(6);
             this.btGroups.Name = "btGroups";
             this.btGroups.Size = new System.Drawing.Size(212, 44);
@@ -62,7 +62,7 @@
             // 
             // btSubGroups
             // 
-            this.btSubGroups.Location = new System.Drawing.Point(239, 179);
+            this.btSubGroups.Location = new System.Drawing.Point(240, 112);
             this.btSubGroups.Margin = new System.Windows.Forms.Padding(6);
             this.btSubGroups.Name = "btSubGroups";
             this.btSubGroups.Size = new System.Drawing.Size(212, 44);
@@ -74,7 +74,7 @@
             // lbProjectName
             // 
             this.lbProjectName.AutoSize = true;
-            this.lbProjectName.Location = new System.Drawing.Point(350, 29);
+            this.lbProjectName.Location = new System.Drawing.Point(184, 9);
             this.lbProjectName.Name = "lbProjectName";
             this.lbProjectName.Size = new System.Drawing.Size(101, 25);
             this.lbProjectName.TabIndex = 1;
@@ -83,7 +83,7 @@
             // btCreate
             // 
             this.btCreate.Font = new System.Drawing.Font("Segoe UI", 12F);
-            this.btCreate.Location = new System.Drawing.Point(237, 70);
+            this.btCreate.Location = new System.Drawing.Point(71, 50);
             this.btCreate.Margin = new System.Windows.Forms.Padding(6);
             this.btCreate.Name = "btCreate";
             this.btCreate.Size = new System.Drawing.Size(101, 35);
@@ -95,7 +95,7 @@
             // btOpen
             // 
             this.btOpen.Font = new System.Drawing.Font("Segoe UI", 12F);
-            this.btOpen.Location = new System.Drawing.Point(350, 70);
+            this.btOpen.Location = new System.Drawing.Point(184, 50);
             this.btOpen.Margin = new System.Windows.Forms.Padding(6);
             this.btOpen.Name = "btOpen";
             this.btOpen.Size = new System.Drawing.Size(101, 35);
@@ -107,7 +107,7 @@
             // btSave
             // 
             this.btSave.Font = new System.Drawing.Font("Segoe UI", 12F);
-            this.btSave.Location = new System.Drawing.Point(463, 70);
+            this.btSave.Location = new System.Drawing.Point(297, 50);
             this.btSave.Margin = new System.Windows.Forms.Padding(6);
             this.btSave.Name = "btSave";
             this.btSave.Size = new System.Drawing.Size(101, 35);
@@ -118,7 +118,7 @@
             // 
             // btRecipes
             // 
-            this.btRecipes.Location = new System.Drawing.Point(237, 235);
+            this.btRecipes.Location = new System.Drawing.Point(238, 168);
             this.btRecipes.Margin = new System.Windows.Forms.Padding(6);
             this.btRecipes.Name = "btRecipes";
             this.btRecipes.Size = new System.Drawing.Size(212, 44);
@@ -131,7 +131,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(876, 404);
+            this.ClientSize = new System.Drawing.Size(466, 226);
             this.Controls.Add(this.lbProjectName);
             this.Controls.Add(this.btSubGroups);
             this.Controls.Add(this.btSave);

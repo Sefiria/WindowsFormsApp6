@@ -8,14 +8,11 @@ using static Defacto_rio.PropertyTypes;
 
 namespace Defacto_rio
 {
-    public class RecipePrototype
+    public class RecipePrototype : Prototype
     {
-        public string name;
-        public string type;
-        public List<Ingredient> ingredients;
-        public List<Result> results;
-        public int energy_required;
-        public string localised_description;
+        public string ingredients;
+        public string results;
+        public string energy_required;
         public string category;
         public string group;
         public string subgroup;
@@ -23,7 +20,7 @@ namespace Defacto_rio
 
         public override string ToString()
         {
-            return name;
+            return name ?? "";
         }
     }
 }

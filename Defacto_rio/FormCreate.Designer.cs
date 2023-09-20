@@ -39,14 +39,29 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.numBuild = new System.Windows.Forms.NumericUpDown();
+            this.tbTitle = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.tbAuthor = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.numFBuild = new System.Windows.Forms.NumericUpDown();
+            this.numFMin = new System.Windows.Forms.NumericUpDown();
+            this.numFMaj = new System.Windows.Forms.NumericUpDown();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.rtbDescription = new System.Windows.Forms.RichTextBox();
             ((System.ComponentModel.ISupportInitialize)(this.numMajor)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numMinor)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numBuild)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numFBuild)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numFMin)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numFMaj)).BeginInit();
             this.SuspendLayout();
             // 
             // btValidate
             // 
-            this.btValidate.Location = new System.Drawing.Point(28, 214);
+            this.btValidate.Location = new System.Drawing.Point(28, 543);
             this.btValidate.Margin = new System.Windows.Forms.Padding(6);
             this.btValidate.Name = "btValidate";
             this.btValidate.Size = new System.Drawing.Size(138, 44);
@@ -70,12 +85,12 @@
             this.tbName.Location = new System.Drawing.Point(140, 33);
             this.tbName.Margin = new System.Windows.Forms.Padding(6);
             this.tbName.Name = "tbName";
-            this.tbName.Size = new System.Drawing.Size(302, 32);
+            this.tbName.Size = new System.Drawing.Size(553, 32);
             this.tbName.TabIndex = 2;
             // 
             // btCancel
             // 
-            this.btCancel.Location = new System.Drawing.Point(304, 214);
+            this.btCancel.Location = new System.Drawing.Point(555, 543);
             this.btCancel.Margin = new System.Windows.Forms.Padding(6);
             this.btCancel.Name = "btCancel";
             this.btCancel.Size = new System.Drawing.Size(138, 44);
@@ -87,7 +102,7 @@
             // lbError
             // 
             this.lbError.AutoSize = true;
-            this.lbError.Location = new System.Drawing.Point(23, 154);
+            this.lbError.Location = new System.Drawing.Point(23, 112);
             this.lbError.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.lbError.Name = "lbError";
             this.lbError.Size = new System.Drawing.Size(88, 25);
@@ -97,7 +112,7 @@
             // lbVersion
             // 
             this.lbVersion.AutoSize = true;
-            this.lbVersion.Location = new System.Drawing.Point(23, 92);
+            this.lbVersion.Location = new System.Drawing.Point(23, 71);
             this.lbVersion.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.lbVersion.Name = "lbVersion";
             this.lbVersion.Size = new System.Drawing.Size(128, 25);
@@ -106,14 +121,14 @@
             // 
             // numMajor
             // 
-            this.numMajor.Location = new System.Drawing.Point(150, 90);
+            this.numMajor.Location = new System.Drawing.Point(150, 69);
             this.numMajor.Name = "numMajor";
             this.numMajor.Size = new System.Drawing.Size(53, 32);
             this.numMajor.TabIndex = 3;
             // 
             // numMinor
             // 
-            this.numMinor.Location = new System.Drawing.Point(236, 90);
+            this.numMinor.Location = new System.Drawing.Point(236, 69);
             this.numMinor.Name = "numMinor";
             this.numMinor.Size = new System.Drawing.Size(53, 32);
             this.numMinor.TabIndex = 3;
@@ -122,7 +137,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
-            this.label1.Location = new System.Drawing.Point(212, 92);
+            this.label1.Location = new System.Drawing.Point(212, 71);
             this.label1.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(17, 25);
@@ -133,7 +148,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
-            this.label2.Location = new System.Drawing.Point(298, 92);
+            this.label2.Location = new System.Drawing.Point(298, 71);
             this.label2.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(17, 25);
@@ -142,16 +157,135 @@
             // 
             // numBuild
             // 
-            this.numBuild.Location = new System.Drawing.Point(324, 90);
+            this.numBuild.Location = new System.Drawing.Point(324, 69);
             this.numBuild.Name = "numBuild";
             this.numBuild.Size = new System.Drawing.Size(53, 32);
             this.numBuild.TabIndex = 3;
+            // 
+            // tbTitle
+            // 
+            this.tbTitle.Location = new System.Drawing.Point(140, 180);
+            this.tbTitle.Margin = new System.Windows.Forms.Padding(6);
+            this.tbTitle.Name = "tbTitle";
+            this.tbTitle.Size = new System.Drawing.Size(553, 32);
+            this.tbTitle.TabIndex = 5;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(23, 183);
+            this.label3.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(57, 25);
+            this.label3.TabIndex = 4;
+            this.label3.Text = "Title :";
+            // 
+            // tbAuthor
+            // 
+            this.tbAuthor.Location = new System.Drawing.Point(140, 224);
+            this.tbAuthor.Margin = new System.Windows.Forms.Padding(6);
+            this.tbAuthor.Name = "tbAuthor";
+            this.tbAuthor.Size = new System.Drawing.Size(553, 32);
+            this.tbAuthor.TabIndex = 7;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(23, 227);
+            this.label4.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(79, 25);
+            this.label4.TabIndex = 6;
+            this.label4.Text = "Author :";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(23, 271);
+            this.label5.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(156, 25);
+            this.label5.TabIndex = 8;
+            this.label5.Text = "Factorio Version :";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(23, 315);
+            this.label6.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(117, 25);
+            this.label6.TabIndex = 10;
+            this.label6.Text = "Description :";
+            // 
+            // numFBuild
+            // 
+            this.numFBuild.Location = new System.Drawing.Point(350, 269);
+            this.numFBuild.Name = "numFBuild";
+            this.numFBuild.Size = new System.Drawing.Size(53, 32);
+            this.numFBuild.TabIndex = 13;
+            // 
+            // numFMin
+            // 
+            this.numFMin.Location = new System.Drawing.Point(262, 269);
+            this.numFMin.Name = "numFMin";
+            this.numFMin.Size = new System.Drawing.Size(53, 32);
+            this.numFMin.TabIndex = 14;
+            // 
+            // numFMaj
+            // 
+            this.numFMaj.Location = new System.Drawing.Point(176, 269);
+            this.numFMaj.Name = "numFMaj";
+            this.numFMaj.Size = new System.Drawing.Size(53, 32);
+            this.numFMaj.TabIndex = 15;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
+            this.label7.Location = new System.Drawing.Point(324, 271);
+            this.label7.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(17, 25);
+            this.label7.TabIndex = 11;
+            this.label7.Text = ".";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
+            this.label8.Location = new System.Drawing.Point(238, 271);
+            this.label8.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(17, 25);
+            this.label8.TabIndex = 12;
+            this.label8.Text = ".";
+            // 
+            // rtbDescription
+            // 
+            this.rtbDescription.Location = new System.Drawing.Point(150, 315);
+            this.rtbDescription.Name = "rtbDescription";
+            this.rtbDescription.Size = new System.Drawing.Size(543, 205);
+            this.rtbDescription.TabIndex = 16;
+            this.rtbDescription.Text = "";
             // 
             // FormCreate
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(470, 273);
+            this.ClientSize = new System.Drawing.Size(708, 602);
+            this.Controls.Add(this.rtbDescription);
+            this.Controls.Add(this.numFBuild);
+            this.Controls.Add(this.numFMin);
+            this.Controls.Add(this.numFMaj);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.label8);
+            this.Controls.Add(this.label6);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.tbAuthor);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.tbTitle);
+            this.Controls.Add(this.label3);
             this.Controls.Add(this.numBuild);
             this.Controls.Add(this.numMinor);
             this.Controls.Add(this.numMajor);
@@ -171,6 +305,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.numMajor)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numMinor)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numBuild)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numFBuild)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numFMin)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numFMaj)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -189,5 +326,17 @@
         public System.Windows.Forms.NumericUpDown numMajor;
         public System.Windows.Forms.NumericUpDown numMinor;
         public System.Windows.Forms.NumericUpDown numBuild;
+        public System.Windows.Forms.TextBox tbTitle;
+        private System.Windows.Forms.Label label3;
+        public System.Windows.Forms.TextBox tbAuthor;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label6;
+        public System.Windows.Forms.NumericUpDown numFBuild;
+        public System.Windows.Forms.NumericUpDown numFMin;
+        public System.Windows.Forms.NumericUpDown numFMaj;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.RichTextBox rtbDescription;
     }
 }

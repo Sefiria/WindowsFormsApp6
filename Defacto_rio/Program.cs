@@ -16,7 +16,20 @@ namespace Defacto_rio
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new FormMain());
+            int crashcount = 0;
+            while (crashcount < 4)
+            {
+                try
+                {
+                    Application.Run(new FormMain());
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"{ex.Message}{Environment.NewLine}{Environment.NewLine}{ex.InnerException}", "Fatal Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    crashcount++;
+                }
+            }
         }
     }
 }

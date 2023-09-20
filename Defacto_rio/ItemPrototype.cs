@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace Defacto_rio
 {
-    public class ItemPrototype
+    public class ItemPrototype : Prototype
     {
-        public string name;
-        public string type;
         public string icon;
         public string icon_size;
         public string stack_size;

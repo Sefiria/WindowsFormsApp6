@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Defacto_rio
 {
-    public class SubGroup
+    public class SubGroup : Prototype
     {
     }
 }
