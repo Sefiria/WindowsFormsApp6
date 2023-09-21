@@ -108,6 +108,7 @@
       <DependentUpon>FormCreate.cs</DependentUpon>
     </Compile>
     <Compile Include="PropertyTypes.cs" />
+    <Compile Include="Technology.cs" />
     <Compile Include="RecipePrototype.cs" />
     <Compile Include="SubGroup.cs" />
     <Compile Include="Group.cs" />

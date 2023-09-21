@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Defacto_rio.Common;
-using static Defacto_rio.PropertyTypes;
-
-namespace Defacto_rio
+﻿namespace Defacto_rio
 {
     public class RecipePrototype : Prototype
     {

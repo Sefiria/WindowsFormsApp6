@@ -36,6 +36,7 @@
             this.btOpen = new System.Windows.Forms.Button();
             this.btSave = new System.Windows.Forms.Button();
             this.btRecipes = new System.Windows.Forms.Button();
+            this.btTechs = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btItems
@@ -127,11 +128,23 @@
             this.btRecipes.UseVisualStyleBackColor = true;
             this.btRecipes.Click += new System.EventHandler(this.btRecipes_Click);
             // 
+            // btTechs
+            // 
+            this.btTechs.Location = new System.Drawing.Point(128, 224);
+            this.btTechs.Margin = new System.Windows.Forms.Padding(6);
+            this.btTechs.Name = "btTechs";
+            this.btTechs.Size = new System.Drawing.Size(212, 44);
+            this.btTechs.TabIndex = 2;
+            this.btTechs.Text = "TECHNOLOGIES";
+            this.btTechs.UseVisualStyleBackColor = true;
+            this.btTechs.Click += new System.EventHandler(this.btTechs_Click);
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(466, 226);
+            this.ClientSize = new System.Drawing.Size(466, 283);
+            this.Controls.Add(this.btTechs);
             this.Controls.Add(this.lbProjectName);
             this.Controls.Add(this.btSubGroups);
             this.Controls.Add(this.btSave);
@@ -160,6 +173,7 @@
         private System.Windows.Forms.Button btOpen;
         private System.Windows.Forms.Button btSave;
         private System.Windows.Forms.Button btRecipes;
+        private System.Windows.Forms.Button btTechs;
     }
 }
 

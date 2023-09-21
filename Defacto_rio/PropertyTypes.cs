@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-
-namespace Defacto_rio
+﻿namespace Defacto_rio
 {
     public class PropertyTypes
     {
@@ -24,5 +17,27 @@ namespace Defacto_rio
             }
         }
         public class Result : Ingredient { public Result() { } public Result(string type, string name, string amount) : base(type, name, amount) { } }
+        public class Unit : Property
+        {
+            public string ingredients = "";
+            public string count = "";
+            public Unit() { }
+            public Unit(string ingredients, string count)
+            {
+                this.ingredients = ingredients;
+                this.count = count;
+            }
+        }
+        public class Effect : Property
+        {
+            public string type = "";
+            public string recipe = "";
+            public Effect() { }
+            public Effect(string type, string recipe)
+            {
+                this.type = type;
+                this.recipe = recipe;
+            }
+        }
     }
 }

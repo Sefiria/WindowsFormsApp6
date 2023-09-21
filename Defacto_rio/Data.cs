@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Defacto_rio
 {
@@ -31,6 +29,7 @@ namespace Defacto_rio
         public static List<SubGroup> SubGroups = new List<SubGroup>();
         public static List<ItemPrototype> Items = new List<ItemPrototype>();
         public static List<RecipePrototype> Recipes = new List<RecipePrototype>();
+        public static List<Technology> Technologies = new List<Technology>();
 
         internal static void CreatePrototypesFiles(string path)
         {
@@ -52,6 +51,7 @@ namespace Defacto_rio
             Write(SubGroups, "subgroups");
             Write(Items, "items");
             Write(Recipes, "recipes");
+            Write(Technologies, "techs");
         }
 
         //public static string CreateDataLua()

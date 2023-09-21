@@ -1,12 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Defacto_rio
@@ -79,6 +73,10 @@ namespace Defacto_rio
         private void btRecipes_Click(object sender, EventArgs e)
         {
             GoPrototypes(Data.Recipes);
+        }
+        private void btTechs_Click(object sender, EventArgs e)
+        {
+            GoPrototypes(Data.Technologies);
         }
         private void GoPrototypes<T>(List<T> data) where T : Prototype
         {

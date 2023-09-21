@@ -100,8 +100,37 @@ namespace Defacto_rio
 
         private void dgv_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Right && e.RowIndex == -1)
-                cbbColumnsSelected.SelectedIndex = e.ColumnIndex;
+            if (e.Button == MouseButtons.Right)
+            {
+                if (e.RowIndex == -1)
+                {
+                    cbbColumnsSelected.SelectedIndex = e.ColumnIndex;
+                }
+                else if (e.ColumnIndex > -1)
+                {
+                    void Edit()
+                    {
+                        new FormProperties(dgv[e.ColumnIndex, e.RowIndex]).ShowDialog(this);
+                    }
+                    void Create(string template)
+                    {
+                        dgv[e.ColumnIndex, e.RowIndex].Value = Common.GetTemplateJson(template);
+                        Edit();
+                    }
+                    ToolStripDropDown pop = new ToolStripDropDown();
+                    pop.Items.Add("Edit Properties", null, (_s, _e) => Edit());
+                    pop.Items.Add(new ToolStripSeparator());
+                    pop.Items.Add("Create Template : Results", null, (_s, _e) => Create("Result"));
+                    pop.Items.Add("Create Template : Ingredients", null, (_s, _e) => Create("Ingredient"));
+                    pop.Items.Add("Create Template : Units", null, (_s, _e) => Create("Unit"));
+                    pop.Items.Add("Create Template : Effects", null, (_s, _e) => Create("Effect"));
+                    pop.Items.Add(new ToolStripSeparator());
+                    pop.Items.Add("Empty Content", null, (_s, _e) => dgv[e.ColumnIndex, e.RowIndex].Value = "");
+                    Rectangle loc = dgv.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
+                    pop.Font = Font;
+                    pop.Show(this, new Point(dgv.Location.X + loc.X + e.X, dgv.Location.Y + loc.Y + e.Y));
+                }
+            }
         }
     }
 }

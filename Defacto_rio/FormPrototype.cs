@@ -103,6 +103,8 @@ namespace Defacto_rio
                 pop.Items.Add(new ToolStripSeparator());
                 pop.Items.Add("Create Template : Results", null, (_s, _e) => Create("Result"));
                 pop.Items.Add("Create Template : Ingredients", null, (_s, _e) => Create("Ingredient"));
+                pop.Items.Add("Create Template : Units", null, (_s, _e) => Create("Unit"));
+                pop.Items.Add("Create Template : Effects", null, (_s, _e) => Create("Effect"));
                 pop.Items.Add(new ToolStripSeparator());
                 pop.Items.Add("Empty Content", null, (_s, _e) => dgv[e.ColumnIndex, e.RowIndex].Value = "");
                 Rectangle loc = dgv.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
