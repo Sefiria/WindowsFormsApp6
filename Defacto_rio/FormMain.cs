@@ -22,11 +22,33 @@ namespace Defacto_rio
         }
         private void btOpen_Click(object sender, EventArgs e)
         {
-
+            MessageBox.Show(this, "Please select the Factorio mod folder to open");
+            var dialog = new FolderBrowserDialog();
+            dialog.RootFolder = Environment.SpecialFolder.ApplicationData;
+            if (dialog.ShowDialog(this) == DialogResult.OK)
+            {
+                var path = dialog.SelectedPath;
+                bool CheckFolder(string subdir) { if (!Directory.Exists(Path.Combine(path, subdir))) { MessageBox.Show(this, $"Missing root folder '{subdir}'{Environment.NewLine}Path: {path}"); return false; } return true; }
+                bool CheckFile(string subdir, string filename) { var p = subdir != "" ? Path.Combine(path, subdir, filename) : Path.Combine(path, filename); if (!File.Exists(p)) { MessageBox.Show(this, $"Missing file '{filename}' in '{subdir}'{Environment.NewLine}Path: {path}"); return false; } return true; }
+                if (!CheckFolder("graphics")) return;
+                if (!CheckFolder("locale")) return;
+                if (!CheckFolder("prototypes")) return;
+                if (!CheckFile("", "info.json")) return;
+                var errors = Data.Load(path);
+                if (errors.Count == 0)
+                    MessageBox.Show(this, "Successfully Loaded");
+                else
+                {
+                    string err = "";
+                    foreach (var kv in errors)
+                        err += $"{kv.Key} : {kv.Value}" + Environment.NewLine;
+                    MessageBox.Show(this, $"Loading failed due to one or more issues :{Environment.NewLine}{err}");
+                }
+            }
         }
         private void btSave_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Please select Factorio mods folder");
+            MessageBox.Show(this, "Please select Factorio mods folder");
             var dialog = new FolderBrowserDialog();
             dialog.RootFolder = Environment.SpecialFolder.ApplicationData;
             if(dialog.ShowDialog(this) == DialogResult.OK)
@@ -55,6 +77,7 @@ namespace Defacto_rio
                 //CreateFileIfNotExist(Path.Combine(path, "data.lua"), Data.CreateDataLua());
 
                 Data.CreatePrototypesFiles(Path.Combine(path, "prototypes"));
+                MessageBox.Show(this, "Successfully Saved");
             }
         }
 

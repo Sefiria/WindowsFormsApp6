@@ -9,7 +9,7 @@ namespace Defacto_rio
 {
     public static class Common
     {
-        static JsonSerializerOptions options = new JsonSerializerOptions() { AllowTrailingCommas = true };
+        public static JsonSerializerOptions JsonOptions = new JsonSerializerOptions() { AllowTrailingCommas = true };
         public static Random Rnd = new Random((int)DateTime.UtcNow.Ticks);
 
         public static void Create(this DataGridView dgv, Type dataType)
@@ -40,7 +40,7 @@ namespace Defacto_rio
         {
             List<Dictionary<string, string>> intermediary = new List<Dictionary<string, string>>();
             data.ForEach(dict => { if (dict.Any(kv => kv.Value != null)) intermediary.Add(dict); });
-            return JsonSerializer.Serialize(intermediary, options);
+            return JsonSerializer.Serialize(intermediary, JsonOptions);
         }
         public static List<Dictionary<string, string>> ParseJson(this string json_src)
         {
@@ -53,13 +53,13 @@ namespace Defacto_rio
 
             try
             {
-                return JsonSerializer.Deserialize<List<Dictionary<string, string>>>(json, options);
+                return JsonSerializer.Deserialize<List<Dictionary<string, string>>>(json, JsonOptions);
             }
             catch (JsonException) { }
 
             try
             {
-                var data = JsonSerializer.Deserialize<Dictionary<string, string>>(json, options);
+                var data = JsonSerializer.Deserialize<Dictionary<string, string>>(json, JsonOptions);
                 var result = new List<Dictionary<string, string>>() { data };
                 return result;
             }

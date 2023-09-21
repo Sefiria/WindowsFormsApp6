@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Defacto_rio
 {
@@ -54,9 +56,44 @@ namespace Defacto_rio
             Write(Technologies, "techs");
         }
 
-        //public static string CreateDataLua()
-        //{
-        //    return "";
-        //}
+        // 1 file 1 type thing... not good
+        internal static Dictionary<string, string> Load(string path)
+        {
+            Dictionary<string, string> errorList = new Dictionary<string, string>();
+            string project_info = File.ReadAllText(Path.Combine(path, ""));
+            try { Project = JsonSerializer.Deserialize<ProjectInfos>(project_info, Common.JsonOptions); } catch (Exception) { errorList["info.json[ROOT]"] = "Cannot Deserialize with type 'ProjectInfos'"; return errorList; }
+
+            string[] files = Directory.GetFiles(Path.Combine(path, "prototypes"));
+            string content;
+            foreach (var file in files)
+            {
+                content = File.ReadAllText(file);
+                var props = JsonSerializer.Deserialize<Dictionary<string, string>>(content, Common.JsonOptions);
+                if (!props.ContainsKey("type")) { errorList[Path.GetFileName(file)] = "Missing property 'type'"; continue; }
+                try
+                {
+                    switch (props["type"])
+                    {
+                        case "item": Items.Add(JsonSerializer.Deserialize<ItemPrototype>(content, Common.JsonOptions)); break;
+                        case "recipe": Recipes.Add(JsonSerializer.Deserialize<RecipePrototype>(content, Common.JsonOptions)); break;
+                        case "technology": Technologies.Add(JsonSerializer.Deserialize<Technology>(content, Common.JsonOptions)); break;
+                        case "entity": break;
+                        case "fluid": break;
+                        case "tile": break;
+                            // not even sure about these below in real prod
+                        case "group": Groups.Add(JsonSerializer.Deserialize<Group>(content, Common.JsonOptions)); break;
+                        case "subgroup": SubGroups.Add(JsonSerializer.Deserialize<SubGroup>(content, Common.JsonOptions)); break;
+
+                        default: errorList[Path.GetFileName(file)] = "Unknown 'type'"; continue;
+                    }
+                }
+                catch(Exception)
+                {
+                    errorList[Path.GetFileName(file)] = $"Cannot Deserialize with type '{props["type"]}'";
+                    continue;
+                }
+            }
+            return errorList;
+        }
     }
 }
