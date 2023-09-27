@@ -27,7 +27,7 @@ namespace Defacto_rio
         {
             MessageBox.Show(this, "Please select the Factorio mod folder to open");
             var dialog = new FolderBrowserDialog();
-            dialog.RootFolder = Environment.SpecialFolder.ApplicationData;
+            dialog.RootFolder = SpecialFolder.ApplicationData;
             if (dialog.ShowDialog(this) == DialogResult.OK)
             {
                 var path = dialog.SelectedPath;
