@@ -27,10 +27,9 @@ namespace MiniKube
             Core.g = Graphics.FromImage(Core.Image);
 
             Core.Inventory = new Inventory();
-            Core.Inventory.AddItem<ItemIronPlate>(111);
-            Core.Inventory.AddItem<ItemIronRod>(30);
-            Core.Inventory.AddItem<ItemIronScrew>(9);
             Core.Inventory.AddItem<Input<ItemIronPlate>>(1);
+            Core.Inventory.AddItem<Input<ConveyorMk1>>(1);
+            Core.Inventory.AddItem<ConveyorMk1>(18);
         }
 
         private void Update(object _, EventArgs e)

@@ -20,6 +20,7 @@ namespace DOSBOX.Utilities
             Right,
             Z,Q,S,D,
             LeftCtrl,
+            LeftAlt,
             L
         }
 
@@ -37,6 +38,7 @@ namespace DOSBOX.Utilities
             [System.Windows.Input.Key.S] = true,
             [System.Windows.Input.Key.D] = true,
             [System.Windows.Input.Key.LeftCtrl] = true,
+            [System.Windows.Input.Key.LeftAlt] = true,
             [System.Windows.Input.Key.L] = true,
         };
 
@@ -54,6 +56,7 @@ namespace DOSBOX.Utilities
             System.Windows.Input.Key.S,
             System.Windows.Input.Key.D,
             System.Windows.Input.Key.LeftCtrl,
+            System.Windows.Input.Key.LeftAlt,
             System.Windows.Input.Key.L,
         };
 

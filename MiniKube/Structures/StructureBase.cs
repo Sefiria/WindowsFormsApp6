@@ -14,7 +14,7 @@ namespace MiniKube.Structures
         public StructureBase() : base()
         {
         }
-        public StructureBase(string resource) : base(resource)
+        public StructureBase(string resource, int split_x = 0, int split_y = 0) : base(resource, split_x, split_y)
         {
         }
         public override void Draw(PointF? offset = null)

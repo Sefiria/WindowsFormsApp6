@@ -1,5 +1,6 @@
 ﻿using MiniKube.Entities;
 using MiniKube.Structures;
+using MiniKube.utilities;
 using System;
 using System.Drawing;
 
@@ -8,12 +9,14 @@ namespace MiniKube.Items
     public class Item : Entity
     {
         public Item() { }
-        public Item(string resource)
+        public Item(string resource, int split_x=0, int split_y=0)
         {
             if (Properties.Resources.ResourceManager.GetObject(resource) == null)
                 throw new Exception($"MiniKube.Items.Item/ Resource does not exist : '{resource}'");
             tex = Properties.Resources.ResourceManager.GetObject(resource) as Bitmap;
-            tex.MakeTransparent(System.Drawing.Color.White);
+            if (split_x > 0 && split_y > 0)
+                tex = tex.Split(split_x, split_y)[0];
+            tex.MakeTransparent(Color.White);
         }
 
         public override void Draw(PointF? offset = null)

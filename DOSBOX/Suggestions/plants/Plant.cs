@@ -1,4 +1,5 @@
 ﻿using DOSBOX.Suggestions.plants;
+using DOSBOX.Suggestions.plants.Fruits;
 using DOSBOX.Utilities;
 using System;
 using System.Collections.Generic;
@@ -121,7 +122,7 @@ namespace DOSBOX.Suggestions
             }
         }
 
-        public override Fruit CreateFruit(vecf v, string dna = null) => (Fruit)Activator.CreateInstance(typeof(T), dna != null ? new object[] { v, dna } : new[] { v });
+        public override Fruit CreateFruit(vecf v, string dna = null) => (Fruit)Activator.CreateInstance(typeof(T), typeof(T) == typeof(OGM) && dna != null ? new object[] { v, dna } : new[] { v });
 
         public override int GetPotential() => masterbranch?.GetPotential() ?? 0;
     }

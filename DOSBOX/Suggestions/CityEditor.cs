@@ -108,24 +108,34 @@ namespace DOSBOX.Suggestions
             {
                 float move_speed = 2F;
 
-                bool up = KB.IsKeyDown(KB.Key.Z);
-                bool down = KB.IsKeyDown(KB.Key.S);
-                bool left = KB.IsKeyDown(KB.Key.Q);
-                bool right = KB.IsKeyDown(KB.Key.D);
+                bool up = KB.IsKeyDown(KB.Key.Up);
+                bool down = KB.IsKeyDown(KB.Key.Down);
+                bool left = KB.IsKeyDown(KB.Key.Left);
+                bool right = KB.IsKeyDown(KB.Key.Right);
 
                 if (up) Core.Cam.y -= move_speed;
                 else if (down) Core.Cam.y += move_speed;
                 if (left) Core.Cam.x -= move_speed;
                 else if (right) Core.Cam.x += move_speed;
-
+                
                 if (KB.IsKeyDown(KB.Key.Space))
                 {
                     int x = (int)(Core.Cam.x / Tile.TSZ);
                     int y = (int)(Core.Cam.y / Tile.TSZ);
-                    if (x >= 0 && y >= 0 && x < w && y < h)
+                    if (KB.IsKeyDown(KB.Key.LeftAlt))
                     {
-                        byte id = (byte)(seltile.y * (64 / Tile.TSZ - 1) + seltile.x);
-                        Blocks[x, y] = id;
+                        var id = Blocks[x, y];
+                        //seltile.y * (64 / Tile.TSZ - 1) + seltile.x
+                        seltile.y =  id / (64 / Tile.TSZ - 1);
+                        seltile.x = id - (id / (64 / Tile.TSZ - 1) * (64 / Tile.TSZ - 1));
+                    }
+                    else
+                    {
+                        if (x >= 0 && y >= 0 && x < w && y < h)
+                        {
+                            byte id = (byte)(seltile.y * (64 / Tile.TSZ - 1) + seltile.x);
+                            Blocks[x, y] = id;
+                        }
                     }
                 }
             }
@@ -138,8 +148,12 @@ namespace DOSBOX.Suggestions
             else
                 Display_Map();
 
-            Text.DisplayText("                                ", 0, 0, 0);
-            Text.DisplayText(Core.Cam.ToString(), 0, 0, 0);
+            Text.DisplayText("                                ", 0, 7 * Tile.TSZ, 0);
+            Text.DisplayText(Core.Cam.ToString(), 0, 7 * Tile.TSZ, 0);
+
+            for (int i = 0; i < Tile.TSZ; i++)
+                for (int j = 0; j < Tile.TSZ; j++)
+                    Core.Layers[0][7 * Tile.TSZ + i, 7 * Tile.TSZ + j] = IndexedBlocks.RefTiles[seltile.y * (64 / Tile.TSZ - 1) + seltile.x].Pixels[i, j];
         }
 
         private void Display_Map()

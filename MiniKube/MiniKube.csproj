@@ -68,6 +68,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AnimMgr.cs" />
+    <Compile Include="Structures\Conveyors.cs" />
     <Compile Include="Structures\Input.cs" />
     <Compile Include="Structures\StructureBase.cs" />
     <Compile Include="TexMgr.cs" />
