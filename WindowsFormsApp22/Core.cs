@@ -43,6 +43,6 @@ namespace WindowsFormsApp22
         public static float hh => RH / 2F;
         public static PointF CenterPoint => new PointF((int)hw, (int)hh);
 
-        public static byte Ticks = 0;
+        public static long Ticks = 0;
     }
 }

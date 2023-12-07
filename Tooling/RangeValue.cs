@@ -36,6 +36,11 @@ namespace Tooling
             this.max_included = max_included;
             Value = v;
         }
+
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
     }
 
     public class RangeValueF
@@ -66,11 +71,16 @@ namespace Tooling
         }
         public RangeValueF(float min, float v, float max, bool max_included = true)
         {
-            Value = v;
             this.min = min;
             this.max = max;
             if(this.max < this.min) this.max = max_included ? this.min : this.min + 1;
             this.max_included = max_included;
+            Value = v;
+        }
+
+        public override string ToString()
+        {
+            return Value.ToString();
         }
     }
 }

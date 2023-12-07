@@ -29,6 +29,7 @@ namespace Tooling
             return sum;
         }
         public static float Diagonal(int w, int h) => Sqrt(Sq(w) + Sq(h));
+        public static float Diagonal(float w, float h) => Sqrt(Sq(w) + Sq(h));
         public static float Diagonal(ISized c) => Diagonal((int)c.W, (int)c.H);
         public static float DiagonalSum(List<ISized> list)
         {
@@ -42,9 +43,13 @@ namespace Tooling
         public static float Distance(int x1, int y1, float x2, float y2) => Distance((float)x1, (float)y1, x2, y2);
         public static float Distance(int x1, int y1, int x2, int y2) => Distance((float)x1, (float)y1, (float)x2, (float)y2);
         public static float Distance(PointF a, PointF b) => Distance(a.X, a.Y, b.X, b.Y);
+        public static float Distance(PointF pt_to_center) => Distance(0, 0, pt_to_center.X, pt_to_center.Y);
         public static float Distance(vec a, vec b) => Distance(a.x, a.y, b.x, b.y);
         public static float Distance(vecf a, vecf b) => Distance(a.x, a.y, b.x, b.y);
         public static float Distance(ICoords a, ICoords b) => Distance(a.X, a.Y, b.X, b.Y);
+        public static float DistanceFromLine(PointF pt, float ax, float by, float c) => Abs(ax * pt.X + by * pt.Y + c) / Sqrt(Sq(ax) + Sq(by));
+        public static float ScalarProduct(PointF AB, PointF AP) => AB.X * AP.X + AB.Y * AP.Y;
+        public static float ScalarProduct(PointF A, PointF B, PointF P) => ScalarProduct(B.Minus(A), P.Minus(A));
         public static float Abs(float K) => Sqrt(Sq(K));
         public static float Sign(float K) => (float)Math.Round(K / Abs(K));
         public static float Normalize(float K) => K / Abs(K);
@@ -134,6 +139,20 @@ namespace Tooling
                 return false;
             return true;
         }
+        public static PointF ProjectionSurSegment(PointF segmentPointA, PointF segmentPointB, PointF pointAProjeter)
+        {
+            var A = segmentPointA;
+            var B = segmentPointB;
+            var P = pointAProjeter;
+            var AB = B.Minus(A);
+            var AP = P.Minus(A);
+            // t = produit_scalaire( AP, AB ) / norme( AB )^2
+            float scal = ScalarProduct(AB, AP) / Sq(AB.Length());
+            // t = min( max( 0, t ), 1 )
+            scal = Math.Min(Math.Max(0F, scal), 1F);
+            // P' = A + AB*t
+            return  A.PlusF(AB.x(scal));
+        }
 
         public static PointF Rotate(this PointF v, float degrees)
         {
@@ -148,6 +167,7 @@ namespace Tooling
         public static float ToDegrees(this float radians) => radians / (float)Math.PI * 180F;
         public static PointF AngleToPointF(this float degrees) => new PointF((float)Math.Cos(degrees.ToRadians()), (float)Math.Sin(degrees.ToRadians()));
         public static float GetAngle(this PointF pt) => ((float)Math.Atan2(pt.Y, pt.X)).ToDegrees();
+        public static float GetAngleWith(this ICoords self, ICoords other) => new PointF(other.X - self.X, other.Y - self.Y).GetAngle();
 
         public static float Lerp(float v0, float v1, double t)
         {

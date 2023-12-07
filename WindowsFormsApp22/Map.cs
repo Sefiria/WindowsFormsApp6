@@ -11,6 +11,7 @@ namespace WindowsFormsApp22
     internal partial class Map
     {
         public List<Entity> Entities = new List<Entity>();
+        public List<Entity> OrphanEntities => Entities.Where(e => e.Parent == null).ToList();
         public List<Entity> VisibleEntities => Entities.Where(e => e.IsDrawable && Core.VisibleBounds.Contains(e.iPos)).ToList();
         public List<Behaviored> Bullets => Entities.Where(e => e is Behaviored &&  (e.Name?.Contains("bullet") ?? false)).Cast<Behaviored>().ToList();
         public Behaviored obj_colliders;
@@ -22,7 +23,7 @@ namespace WindowsFormsApp22
         {
             obj_colliders = new Behaviored("obj_colliders");
             obj_colliders.IsDrawable = false;
-            Action<List<object>> behavior = list => { var e = list[0] as Entity; if (e == obj_colliders) return; if (VisibleEntities.Where(_e => _e.HasParent(obj_colliders) && _e != e).FirstOrDefault(ve => { return Maths.Distance(ve, e) < Maths.SmallestSum(new List<ISized>() { ve, e }); }) != null) (list[0] as Entity).Exist = false; };
+            Action<List<object>> behavior = list => { var e = list[0] as Entity; if (e == obj_colliders) return; if (VisibleEntities.Where(_e => !(_e is IAtk) && _e.HasParent(obj_colliders) && _e != e).FirstOrDefault(ve => { return Maths.Distance(ve, e) < Maths.SmallestSum(new List<ISized>() { ve, e }); }) != null) (list[0] as Entity).Exist = false; };
             obj_colliders.Behavior = behavior;
         }
 

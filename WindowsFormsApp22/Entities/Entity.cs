@@ -47,7 +47,7 @@ namespace WindowsFormsApp22.Entities
         public float W { get => m_W > 0 ? m_W : m_W = TexMgr.Load(tex).GetBounds().Width; set => m_W = value; }
         public float H { get => m_H > 0 ? m_H : m_H = TexMgr.Load(tex).GetBounds().Height; set => m_H = value; }
         public float RescaleW = 1F, RescaleH = 1F;
-        public PointF DrawPoint => Core.CenterPoint.PlusF(Pos);
+        public PointF DrawPoint => new PointF(Core.CenterPoint.X + Pos.X - Core.cam_ofs.x - Core.Player.X, Core.CenterPoint.Y + Pos.Y - Core.cam_ofs.y - Core.Player.Y);
         public virtual Rectangle Bounds => new Rectangle((int)Pos.X, (int)Pos.Y, (int)W, (int)H);
         public RectangleF BoundsF => new RectangleF(Pos.X, Pos.Y, W, H);
         public PointF Tile => Pos.DivF(Core.Cube);
@@ -83,9 +83,10 @@ namespace WindowsFormsApp22.Entities
             {
                 var path = TexMgr.Load(tex);
                 var matrix = new Matrix();
-                matrix.Translate(Core.hw - W / 2F + Pos.X - Core.cam_ofs.x - Core.Player.X, Core.hh - H / 2F + Pos.Y - Core.cam_ofs.y - Core.Player.Y);
+                var pt = DrawPoint;
+                matrix.Translate(pt.X, pt.Y);
                 matrix.Scale(W * RescaleW, H * RescaleH);
-                matrix.RotateAt(Angle.Value, new PointF(0.5F, 0.5F));
+                matrix.Rotate(Angle.Value);
                 path.Transform(matrix);
                 g.FillPath(Brushes.Black, path);
                 g.DrawPath(new Pen(color), path);

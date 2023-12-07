@@ -80,6 +80,7 @@ namespace Tooling
         public static vec V(this Size size) => new vec(size.Width, size.Height);
         public static ICoords IC(this (int X, int Y) data) => ICoordsFactory.Create(data.X, data.Y);
         public static ICoords IC(this (float X, float Y) data) => ICoordsFactory.Create(data.X, data.Y);
+        public static float DistanceFromLine(this PointF self, float ax, float by, float c) => Maths.DistanceFromLine(self, ax, by, c);
 
 
         public static Rectangle ToIntRect(this RectangleF rect) => new Rectangle((int)rect.X, (int)rect.Y, (int)rect.Width, (int)rect.Height);
@@ -90,5 +91,6 @@ namespace Tooling
         public static Color Reversed(this Color c) => Color.FromArgb(255 - c.R, 255 - c.G, 255 - c.B);
 
         public static PointF norm(this PointF v) => Maths.Normalized(v);
+        public static float Length(this PointF self) => Maths.Length(self);
     }
 }

@@ -27,7 +27,7 @@ namespace WindowsFormsApp22
             {
                 if (count <= 10)
                 {
-                    cooldown = max_cooldown - count * 5 * wave + 500000;
+                    cooldown = max_cooldown - count * 5 * wave;
                     var what = What();
                     Pending.Add(what);
                     var where = Where(what);
@@ -59,10 +59,10 @@ namespace WindowsFormsApp22
             switch (side)
             {
                 default:
-                case 0: x = -w / 2 + RandomThings.rnd(w); y = -h  / 2 - what.H + what.weight; break;
-                case 1: y = -h  / 2 + RandomThings.rnd(h); x = -w / 2 - what.W + what.weight; break;
-                case 2: x = -w / 2 + RandomThings.rnd(w); y =  h / 2 + what.H + what.weight; break;
-                case 3: y = -h  / 2 + RandomThings.rnd(h); x =  w / 2 + what.W + what.weight; break;
+                case 0: x = Core.Player.X - w / 2 + RandomThings.rnd(w); y = Core.Player.Y - h  / 2 - what.H * 10F; break;
+                case 1: y = Core.Player.Y - h  / 2 + RandomThings.rnd(h); x = Core.Player.X - w / 2 - what.W * 10F; break;
+                case 2: x = Core.Player.X - w / 2 + RandomThings.rnd(w); y = Core.Player.Y + h / 2 + what.H * 10F; break;
+                case 3: y = Core.Player.Y - h  / 2 + RandomThings.rnd(h); x = Core.Player.X + w / 2 + what.W * 10F; break;
             }
             return (x, y);
         }

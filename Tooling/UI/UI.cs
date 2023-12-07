@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace Tooling.UI
@@ -10,6 +11,7 @@ namespace Tooling.UI
         public vecf Position { get; set; }
         public vecf Size { get; set; }
         public RectangleF Bounds => new RectangleF(GetGlobalPosition().pt, Size.sz);
+        public Action<UI> UpdateValue;
 
         public vecf GetGlobalPosition()
         {
@@ -31,6 +33,7 @@ namespace Tooling.UI
         public virtual void Update()
         {
             if (Bounds.Contains(MouseStates.Position)) UIMgt.CurrentHover = this;
+            UpdateValue.Invoke(this);
         }
         public virtual void Draw(Graphics g) { }
         public virtual void Click() { UIMgt.CurrentClicked = this; }

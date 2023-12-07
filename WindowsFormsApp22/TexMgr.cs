@@ -11,7 +11,7 @@ namespace WindowsFormsApp22
     {
         static GraphicsPath shape_101 = new GraphicsPath(new PointF[]
         {
-            (0,0).P(), (1,0).P(), (1,1).P(), (0,1).P(), (0,0).P()
+            (-0.5F,-0.5F).P(), (0.5F,-0.5F).P(), (0.5F,0.5F).P(), (-0.5F,0.5F).P(), (-0.5F,-0.5F).P()
         }, new byte[] {
             0, 1, 1, 1, 1
         });
@@ -26,7 +26,7 @@ namespace WindowsFormsApp22
                 case "101": return (GraphicsPath)shape_101.Clone();
                 case "circle":
                     var path = new GraphicsPath();
-                    path.AddEllipse(0, 0, 1, 1);
+                    path.AddEllipse(-0.5F, -0.5F, 1, 1);
                     return path;
             }
         }

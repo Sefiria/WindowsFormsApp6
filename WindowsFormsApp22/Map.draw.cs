@@ -8,6 +8,7 @@ using Tooling;
 using WindowsFormsApp22.Entities;
 //using ComputeSharp;
 using System.Drawing.Drawing2D;
+using System.Numerics;
 //using static System.Windows.Forms.VisualStyles.VisualStyleElement.Tab;
 
 namespace WindowsFormsApp22
@@ -147,74 +148,105 @@ namespace WindowsFormsApp22
             float cb = 16F;
             float hblsz = 8F;
 
+            var p = Core.Player;
             int tw = (int)(Core.RW / cb) + 1, th = (int)(Core.RH / cb) + 1;
             List<Entity> entities = new List<Entity>(Core.Map.Entities).Where(e => e.IsDrawable).OrderByDescending(b => b.Y).ToList();
             Bitmap img = new Bitmap((int)g.VisibleClipBounds.Width, (int)g.VisibleClipBounds.Height);
             float modx = Core.Cam.X % cb;
             float mody = Core.Cam.Y % cb;
             Brush brush = new SolidBrush(Color.FromArgb(50, 50, 50));
+            var ev = Core.EvtMgr;
+            var c = ev.cooldown;
+            var mc = ev.max_cooldown;
+            var cn = ev.count;
+            var w = ev.wave;
+            var pending = ev.Pending;
+
             using (Graphics _g = Graphics.FromImage(img))
             {
-                for (int y = -1; y < th; y++)
+                PointF A = PointF.Empty, B = PointF.Empty, P, P_, PP_;
+                if (Core.Player.IsSpecialShoting)
                 {
-                    for (int x = -1; x < tw; x++)
+                    A = p.DrawPoint;
+                    B = Maths.GetRayToolingLine(p.DrawPoint, p.specialAngle.AngleToPointF(), Core.VisibleBounds);
+                }
+                for (int y = -2; y < th + 2; y++)
+                {
+                    for (int x = -2; x < tw + 2; x++)
                     {
                         float node_weight = 0F;
                         foreach (var entity in entities)
                         {
-                            float _x = Core.hw + (entity is Player ? -Core.Player.W/2F : entity.X - Core.Player.X - entity.W) - Core.cam_ofs.x;
-                            float _y = Core.hh + (entity is Player ? -Core.Player.H : entity.Y - Core.Player.Y - entity.H) - Core.cam_ofs.y;
-                            float d = Maths.Distance((_x, _y).P(), (x * cb-modx, y * cb-mody).P());
+                            float d = Maths.Distance(entity.DrawPoint, (x * cb - modx, y * cb - mody).P());
                             node_weight += (entity.weight * cb) / d;
+                        }
+                        if (Core.Player.IsSpecialShoting)
+                        {
+                            P = new PointF(x * cb, y * cb);
+                            P_ = Maths.ProjectionSurSegment(A, B, P);
+                            PP_ = P_.Minus(P);
+                            var d = PP_.Length();
+                            node_weight += 5000F * p.specialRaySize / d;
                         }
                         if (node_weight == 0 || (node_weight > 0.0001F && node_weight <= cb * hblsz))
                         {
-                            int v = 10 + (int)(node_weight/(cb*hblsz)*180);
+                            int v = 10 + (int)(node_weight / (cb * hblsz) * 180);
                             _g.FillRectangle(Brushes.Black, x * cb - modx, y * cb + node_weight - mody, hblsz * 2F, hblsz * 2F);
                             _g.FillEllipse(new SolidBrush(Color.FromArgb(v, v, v)), x * cb - modx, y * cb + node_weight - mody, hblsz * 2F, hblsz * 2F);
                         }
                     }
                 }
-            }
-
-            img.MakeTransparent(Color.White);
-            g.DrawImage(img, Point.Empty);
-
-            {
-                var ev = Core.EvtMgr;
-                var c = ev.cooldown;
-                var mc = ev.max_cooldown;
-                var cn = ev.count;
-                var w = ev.wave;
-                var p = ev.Pending;
-                var txt = $"~{w}/{cn} ({mc - cn * 5 * w - c}/{mc - cn * 5 * w}), still {{{p.Count}}}";
-                g.DrawString(txt, Core.Font, Brushes.White, (10, 20).P());
 
                 void draw(Entity e)
                 {
-                    if (!e.IsDrawable || !Core.VisibleBounds.Contains(e.iPos))
+                    if (!e.IsDrawable || Core.VisibleBounds.Contains(e.iPos))
                         return;
-                    var path =new GraphicsPath(new PointF[]
+                    var path = new GraphicsPath(new PointF[]
                     {
-                        (-1F,0.5F).P(), (0F,-0.5F).P(), (1F,0.5F).P()
+                    (-1F,0.5F).P(), (0F,-0.5F).P(), (1F,0.5F).P()
                     }, new byte[] {
-                        0, 1, 1
+                    0, 1, 1
                     });
                     var matrix = new Matrix();
-                    var d = Maths.Distance((0, 0).IC(), e);
-                    matrix.Rotate(e.Pos.GetAngle());
-                    var to = e.Pos.norm().x(Math.Min(Core.hw, Core.hh) - 10);
-                    Console.WriteLine(to);
-                    matrix.Translate(to.X / 2, to.Y / 2);
+                    var d = Maths.Distance(Core.CenterPoint, e.DrawPoint);
+                    matrix.Rotate(e.DrawPoint.Minus(Core.CenterPoint).GetAngle() + 90, MatrixOrder.Prepend);
+                    var lk = e.DrawPoint.Minus(Core.CenterPoint).norm();
+                    var to = Maths.GetRayToolingLine(e.DrawPoint, lk, 10, 60, Core.RW - 10, Core.RH - 10);
+                    matrix.Translate(to.X, to.Y, MatrixOrder.Append);
                     matrix.Scale(5F, 5F);
                     path.Transform(matrix);
-                    RangeValue v = new RangeValue(255 - (int)(d / 100), 0, 255);
-                    var b = new SolidBrush(Color.FromArgb(v.Value, 0, 0));
-                    g.FillPath(b, path);
+                    var l = Math.Max(Core.iRW, Core.iRH) / 2;
+                    RangeValue v = new RangeValue((int)(255 * ((d - l) / (l * 2))), 0, 255);
+                    var b = new SolidBrush(Color.FromArgb(255, v.Value, 0));
+                    _g.FillPath(b, path);
                 }
-                p.ForEach(e => draw(e));
+                pending.ForEach(e => draw(e));
+
+                // player's special
+
+                if (p.IsSpecialShoting)
+                {
+                    var color = Color.FromArgb(100, 0, (int)(p.specialRaySize / 2F * 255), (int)(p.specialRaySize * 255));
+                    var pen = new Pen(color, p.specialRaySize * p.specialRaySizeBase * 2F);
+                    var ptA = p.DrawPoint;
+                    PointF ptB;
+                    void draw_special(float a_ofst)
+                    {
+                        ptB = Maths.GetRayToolingLine(p.DrawPoint, (p.specialAngle - a_ofst).AngleToPointF(), Core.VisibleBounds);
+                        _g.DrawLine(pen, ptA, ptB);
+                    }
+                    float step = 0.2F;
+                    for(float t = -step; t <= 1F; t += step)
+                        draw_special(p.specialRaySizeBase * t);
+                }
             }
 
+            img = img.SetOpacity(Core.Player.IsBlind_Visibility.Value);
+            img.MakeTransparent(Color.White);
+            g.DrawImage(img, Point.Empty);
+
+            var txt = $"~{w}/{cn} ({mc - cn * 5 * w - c}/{mc - cn * 5 * w}), still {{{pending.Count}}}";
+            g.DrawString(txt, Core.Font, Brushes.White, (10, 20).P());
         }
 
             //[ThreadGroupSize(DefaultThreadGroupSizes.X)]

@@ -91,6 +91,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Angle.cs" />
+    <Compile Include="BitmapExtensions.cs" />
     <Compile Include="Box.cs" />
     <Compile Include="Circle.cs" />
     <Compile Include="Collider.cs" />

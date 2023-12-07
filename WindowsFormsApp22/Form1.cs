@@ -14,7 +14,7 @@ namespace WindowsFormsApp22
         Timer TimerDraw = new Timer { Enabled = true, Interval = 10 };
 
         UIPanel UIPanel_playerui;
-        UIBar UIBar_cooldown_shot;
+        UIBar UIBar_cooldown_shotA, UIBar_cooldown_shotB;
 
 
         public Form1()
@@ -39,10 +39,17 @@ namespace WindowsFormsApp22
         private void CreateUI()
         {
             UIPanel_playerui = new UIPanel() { Name = "playerui", Position = vecf.Zero, Size = RenderBounds.Size.Vf() };
-            UIBar_cooldown_shot = new UIBar() { Name = "cooldown_shot", Position = (10F, 5F).Vf(), Size = (iRW - 20F, 5F).Vf(), OutlineColor = Color.White, FillColor = Color.White };
+            UIBar_cooldown_shotA = new UIBar() { Name = "cooldown_shotA", Position = (10F, 5F).Vf(), Size = (iRW - 20F, 5F).Vf(), OutlineColor = Color.White, FillColor = Color.White };
+            UIBar_cooldown_shotB = new UIBar() { Name = "cooldown_shotB", Position = (10F, 15F).Vf(), Size = (iRW - 20F, 5F).Vf(), OutlineColor = Color.White, FillColor = Color.Yellow };
+            
+            UIBar_cooldown_shotA.UpdateValue = (ui) => (ui as UIBar).RangeValue.Value = Core.Player.cooldownA / (float)Core.Player.cooldown_maxA;
+            UIBar_cooldown_shotB.UpdateValue = (ui) => (ui as UIBar).RangeValue.Value = Core.Player.cooldownB / (float)Core.Player.cooldown_maxB;
+            UIBar_cooldown_shotA.RangeValue.Value = Core.Player.cooldownA;
+            UIBar_cooldown_shotB.RangeValue.Value = Core.Player.cooldownB;
+            
+            UIPanel_playerui.Content.Add(UIBar_cooldown_shotA);
+            UIPanel_playerui.Content.Add(UIBar_cooldown_shotB);
 
-            UIBar_cooldown_shot.RangeValue.Value = Core.Player.cooldown;
-            UIPanel_playerui.Content.Add(UIBar_cooldown_shot);
             UIMgt.UI.Add(UIPanel_playerui);
         }
 
@@ -51,7 +58,6 @@ namespace WindowsFormsApp22
             MouseStates.Position = Render.PointToClient(MousePosition);
 
             MgControls();
-            UIBar_cooldown_shot.RangeValue.Value = Core.Player.cooldown / (float)Core.Player.cooldown_max;
 
             Core.Map.Update();
 
@@ -90,7 +96,7 @@ namespace WindowsFormsApp22
 
         private void Render_MouseDown(object sender, MouseEventArgs e)
         {
-            MouseStates.ButtonDown = MouseButtons.Left;
+            MouseStates.ButtonDown = e.Button;
         }
     }
 }
