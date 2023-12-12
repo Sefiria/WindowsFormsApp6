@@ -66,12 +66,13 @@ namespace WindowsFormsApp22.Entities
             else if (IsKeyDown(Key.D))
             { X += speed_move; cam_ofs.x -= speed_move / 2F; }
             else cam_ofs.x = Maths.Round(cam_ofs.x * 0.97F, 4);
+            if (IsKeyPressed(Key.B)) IsBlind = !IsBlind;// DEBUG
 
             if (cooldownA == 0)
             {
                 if (MouseStates.ButtonDown == MouseButtons.Left)
                 {
-                    var bullet = new Behaviored("bullet", Color.Red, X, Y, 4, 4, Behaviored.Default_AddLook(CalculateLook(), 5F));
+                    var bullet = new Behaviored("player_bullet", Color.Red, X, Y, 4, 4, Behaviored.Default_AddLook(CalculateLook(), 5F));
                     bullet.Parent = Core.Map.obj_colliders;
                     bullet.weight = 20;
                     cooldownA += cooldown_maxA;
@@ -109,17 +110,17 @@ namespace WindowsFormsApp22.Entities
                                                     .ForEach(atk => atk.Exist = false);
 
                     if (specialTime <= 0F)
-                    {
                         IsUsingSpecial = false;
-                        IsSpecialShoting = false;
-                    }
                     else specialTime -= 0.01F;
                 }
             }
+            else
+            {
+                if (specialRaySize > 0F)
+                    specialRaySize -= 0.05F;
+                else IsSpecialShoting = false;
+            }
 
-            // DEBUG
-
-            if (IsKeyPressed(Key.B)) IsBlind = !IsBlind;
             IsBlind_Visibility.Value += (IsBlind ? -1F : 1F) * 0.01F;
         }
     }

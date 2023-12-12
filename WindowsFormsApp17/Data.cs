@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
+﻿using System;
+using System.Collections.Generic;
+using Tooling;
 using WindowsFormsApp17.items;
-using WindowsFormsApp17.Utilities;
 using static WindowsFormsApp17.enums;
 
 namespace WindowsFormsApp17
@@ -42,8 +41,15 @@ namespace WindowsFormsApp17
 
     public class Map
     {
+        public struct fluid
+        {
+            public byte type;
+            public float quantity;
+        }
+
         public int w;
         public int h;
+        public fluid[,] fluids;
         public byte[,] tiles;
         public byte[,] bg_tiles;
 
@@ -51,6 +57,7 @@ namespace WindowsFormsApp17
         {
             this.w = w;
             this.h = h;
+            fluids = new fluid[w, h];
             tiles = new byte[w, h];
             bg_tiles = new byte[w, h];
         }
@@ -68,13 +75,60 @@ namespace WindowsFormsApp17
 
             if (check(x, y)) tiles[x, y] = v;
         }
-        public void reset(int x, int y)
+        public void reset(float _x, float _y)
         {
+            int x = (int)_x;
+            int y = (int)_y;
             if (check(x, y))
             {
                 if(tiles[x, y] > (int)TileName.DirtyGrass)
                     bg_tiles[x, y] = tiles[x, y];
                 tiles[x, y] = 0;
+            }
+        }
+
+        float fluiddiff(int x, int y, int ofst_x, int ofst_y)
+        {
+            float diff = fluids[x, y].quantity - fluids[x + ofst_x, y + ofst_y].quantity;
+            return diff > 0.01F ? diff : 0F;
+        }
+        public void FluidUpdate()
+        {
+            for (int y = 0; y < h; y++)
+            {
+                for (int x = 0; x < w; x++)
+                {
+                    if (tiles[x, y] > 0)
+                        continue;
+                    if (fluids[x, y].quantity == 0F)
+                        continue;
+
+                    bool bottom = y < h - 1 && tiles[x, y + 1] == 0 && fluids[x, y + 1].quantity < 1F;
+                    bool left = x > 0 && tiles[x - 1, y] == 0 && fluids[x - 1, y].quantity < 1F;
+                    bool right = x < w-1 && tiles[x + 1, y] == 0 && fluids[x + 1, y].quantity < 1F;
+                    bool top = y > 0 && tiles[x, y - 1] == 0 && fluids[x, y].quantity > 1F && fluids[x, y - 1].quantity < 1F;
+                    float d, d2, q, spd = 0.1F;
+
+                    void move(int ofst_x, int ofst_y, float _d)
+                    {
+                        if (_d <= 0F) return;
+                        q = Math.Max(0.02F, _d);
+                        fluids[x, y].quantity -= q;
+                        if (fluids[x, y].quantity < 0F) fluids[x, y].quantity = 0F;
+                        fluids[x + ofst_x, y + ofst_y].quantity += q;
+                    }
+                    void job(int ofst_x, int ofst_y, bool isdiff = true)
+                    {
+                        move(ofst_x, ofst_y, isdiff ? fluiddiff(x, y, ofst_x, ofst_y) * spd : fluids[x, y].quantity * 0.25F);
+                    }
+
+                    if (bottom) job(0, 1, false);
+                    else if (left && right) { d = fluiddiff(x, y, -1, 0) * spd; d2 = fluiddiff(x, y, 1, 0) * spd; move(-1, 0, d); move(1, 0, d2); }
+                    else if (left) job(-1, 0);
+                    else if (right) job(1, 0);
+                    else if (top) job(0, -1);
+                    else if (fluids[x, y].quantity > 1F) fluids[x, y].quantity = 1F;
+                }
             }
         }
     }

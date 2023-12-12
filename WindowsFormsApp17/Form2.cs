@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using Tooling;
 using WindowsFormsApp17.items;
-using WindowsFormsApp17.Utilities;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
 
 namespace WindowsFormsApp17
 {

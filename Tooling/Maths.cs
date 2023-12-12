@@ -309,5 +309,68 @@ namespace Tooling
             //return Maths.Distance();
             return false;
         }
+
+        public static bool CollisionBoxBox(Box box1, Box box2)
+        {
+            if ((box2.x >= box1.x + box1.w) // trop à droite
+                || (box2.x + box2.w <= box1.x) // trop à gauche
+                || (box2.y >= box1.y + box1.h)  // trop en bas
+                || (box2.y + box2.h <= box1.y)) // trop en haut
+                return false;
+            else
+                return true;
+        }
+        public static bool CollisionPointCercle(float x, float y, Circle C)
+        {
+            float d2 = (x - C.x) * (x - C.x) + (y - C.y) * (y - C.y);
+            if (d2 > C.r * C.r)
+                return false;
+            else
+                return true;
+        }
+        public static bool CollisionPointBox(float curseur_x, float curseur_y, Box box)
+        {
+            if (curseur_x >= box.x
+                && curseur_x < box.x + box.w
+                && curseur_y >= box.y
+                && curseur_y < box.y + box.h)
+                return true;
+            else
+                return false;
+        }
+        public static int CollisionCercleBox(Circle C1, Box box)
+        {
+            Box boxCercle = new Box(C1);  // retourner la bounding box de l'image porteuse, ou calculer la bounding box.
+                                          // premier test :
+            if (CollisionBoxBox(box, boxCercle) == false)
+                return 0;// no collision
+                         // deuxieme test :
+            if (CollisionPointCercle(box.x, box.y, C1)) return 1;// corner top-left
+            if (CollisionPointCercle(box.x, box.y + box.h, C1)) return 2;// corner bottom-left
+            if (CollisionPointCercle(box.x + box.w, box.y, C1)) return 3;// corner top-right
+            if (CollisionPointCercle(box.x + box.w, box.y + box.h, C1)) return 4;// corner bottom-right
+                                                                                 // cas E :
+            if (CollisionSegment(box.x + box.w, box.y, box.x, box.y, C1.x, C1.y + C1.r, C1.r)) return 6;// segment top
+            if (CollisionSegment(box.x + box.w, box.y + box.h, box.x + box.w, box.y, C1.x - (int)(C1.r / 2), C1.y, C1.r)) return 7;// segment right
+            if (CollisionSegment(box.x, box.y + box.h, box.x + box.w, box.y + box.h, C1.x, C1.y - (int)(C1.r / 2), C1.r)) return 8;// segment bottom
+            if (CollisionSegment(box.x, box.y, box.x, box.y + box.h, C1.x + C1.r, C1.y, C1.r)) return 9;// segment left
+                                                                                                        // troisieme test :
+            if (CollisionPointBox(C1.x, C1.y, box)) return 5;// one inside the other
+                                                             // cas B :
+            return 0;// no collision
+        }
+        public static bool CollisionCercleCercle(Circle C1, Circle C2)
+        {
+            return Length(C2.vec - C1.vec) < C1.r + C2.r;
+        }
+
+        public static bool Collides(ICoords Ac, ISized Asz, ICoords Bc, ISized Bsz) => Distance(Ac, Bc) < SmallestSum(new List<ISized>() { Asz, Bsz });
+
+        public static float Range(float min, float max, float value)
+        {
+            if (value < min) value = min;
+            if (value > max) value = max;
+            return value;
+        }
     }
 }

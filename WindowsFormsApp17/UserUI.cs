@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Collections.Generic;
 using System.Windows.Forms;
-using WindowsFormsApp17.Utilities;
-using static WindowsFormsApp17.enums;
+using Tooling;
 
 namespace WindowsFormsApp17
 {
@@ -35,13 +32,15 @@ namespace WindowsFormsApp17
                 return;
             }
 
-            DestroyStructure(e);
-            AddStructure(e);
+            if (MouseStates.ButtonDown == MouseButtons.Left)
+                //AddStructure(e);
+                AddWater(e);
+            else if (e.Button == MouseButtons.Right)
+                DestroyStructure(e);
         }
         private void DestroyStructure(MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Right)
-                Data.Instance.map.reset(Core.MouseCamTile.x, Core.MouseCamTile.y);
+            Data.Instance.map.reset(Core.MouseCamTile.x, Core.MouseCamTile.y);
             //if (e.Button == MouseButtons.Right && Data.Instance.ThereStructureAt(Core.MouseSnap))
             //{
             //    if (TimeToDestroy <= 0)
@@ -60,24 +59,35 @@ namespace WindowsFormsApp17
         }
         private void AddStructure(MouseEventArgs e)
         {
-        //    if (InHand == null)
-        //        return;
-        //    if (e.Button == MouseButtons.Left && (!Data.Instance.ThereStructureAt(Core.MouseSnap) || Data.Instance.GetStructureAt(Core.MouseSnap) is StructureConveyor))
-        //    {
-        //        object structure;
-        //        var rotationStructures = new List<Type> {
-        //            typeof(StructureConveyor),
-        //            typeof(StructureDrill),
-        //            typeof(StructureCompressor),
-        //            typeof(StructureLiquefer) };
-        //        if (rotationStructures.Contains(PossibleCrafts[hand_selection].GetType()))
-        //            structure = Activator.CreateInstance(PossibleCrafts[hand_selection].GetType(), new object[] { Core.MouseSnap, Rotation });
-        //        else
-        //            structure = Activator.CreateInstance(PossibleCrafts[hand_selection].GetType(), new object[] { Core.MouseSnap });
-        //        if (Data.Instance.ThereStructureAt(Core.MouseSnap))
-        //            Data.Instance.Structures.Remove(Core.MouseSnap);
-        //        Data.Instance.Structures.Add(Core.MouseSnap, (Structure)structure);
-        //    }
+            //    if (InHand == null)
+            //        return;
+            //    if (e.Button == MouseButtons.Left && (!Data.Instance.ThereStructureAt(Core.MouseSnap) || Data.Instance.GetStructureAt(Core.MouseSnap) is StructureConveyor))
+            //    {
+            //        object structure;
+            //        var rotationStructures = new List<Type> {
+            //            typeof(StructureConveyor),
+            //            typeof(StructureDrill),
+            //            typeof(StructureCompressor),
+            //            typeof(StructureLiquefer) };
+            //        if (rotationStructures.Contains(PossibleCrafts[hand_selection].GetType()))
+            //            structure = Activator.CreateInstance(PossibleCrafts[hand_selection].GetType(), new object[] { Core.MouseSnap, Rotation });
+            //        else
+            //            structure = Activator.CreateInstance(PossibleCrafts[hand_selection].GetType(), new object[] { Core.MouseSnap });
+            //        if (Data.Instance.ThereStructureAt(Core.MouseSnap))
+            //            Data.Instance.Structures.Remove(Core.MouseSnap);
+            //        Data.Instance.Structures.Add(Core.MouseSnap, (Structure)structure);
+            //    }
+        }
+        private void AddWater(MouseEventArgs e)
+        {
+            int x = (int)Core.MouseCamTile.x;
+            int y = (int)Core.MouseCamTile.y;
+            if (Data.Instance.map.check(x,y) && Data.Instance.map.tiles[x, y] == 0)
+            {
+                //Console.WriteLine($"Add water [{x},{y}]");
+                Data.Instance.map.fluids[x, y].type = 0;
+                Data.Instance.map.fluids[x, y].quantity = 1F;
+            }
         }
         public void Update()
         {

@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using WindowsFormsApp17.Properties;
-using WindowsFormsApp17.utilities;
-using WindowsFormsApp17.Utilities;
 
 namespace WindowsFormsApp17
 {

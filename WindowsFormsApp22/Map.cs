@@ -23,7 +23,13 @@ namespace WindowsFormsApp22
         {
             obj_colliders = new Behaviored("obj_colliders");
             obj_colliders.IsDrawable = false;
-            Action<List<object>> behavior = list => { var e = list[0] as Entity; if (e == obj_colliders) return; if (VisibleEntities.Where(_e => !(_e is IAtk) && _e.HasParent(obj_colliders) && _e != e).FirstOrDefault(ve => { return Maths.Distance(ve, e) < Maths.SmallestSum(new List<ISized>() { ve, e }); }) != null) (list[0] as Entity).Exist = false; };
+            Action<List<object>> behavior = list =>
+            {
+                var e = list[0] as Entity;
+                if (e == obj_colliders)
+                    return;
+                if (VisibleEntities.Where(_e => !(_e is IAtk) && _e.HasParent(obj_colliders) && _e != e && ((e is IAtk && _e.Name != "atk_bullet") || (e is Player && _e.Name == "atk_bullet"))).FirstOrDefault(ve => { return Maths.Collides(ve, ve, e, e); }) != null) e.Exist = false;
+            };
             obj_colliders.Behavior = behavior;
         }
 

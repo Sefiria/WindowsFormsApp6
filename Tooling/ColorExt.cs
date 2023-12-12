@@ -196,5 +196,15 @@ namespace Tooling
 
             image.UnlockBits(data);
         }
+        public static Color ShadeWith(this Color self, Color other, float t, bool include_alpha = false)
+        {
+            byte a = self.A;
+            if (include_alpha)
+                a = (byte)Maths.Range(byte.MinValue, byte.MaxValue, Maths.Lerp(self.A, other.A, t));
+            byte r = (byte)Maths.Range(byte.MinValue, byte.MaxValue, Maths.Lerp(self.R, other.R, t));
+            byte g = (byte)Maths.Range(byte.MinValue, byte.MaxValue, Maths.Lerp(self.G, other.G, t));
+            byte b = (byte)Maths.Range(byte.MinValue, byte.MaxValue, Maths.Lerp(self.B, other.B, t));
+            return Color.FromArgb(a, r, g, b);
+        }
     }
 }

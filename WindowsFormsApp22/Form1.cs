@@ -31,6 +31,8 @@ namespace WindowsFormsApp22
             Core.Image = new Bitmap(Core.iRW, Core.iRH);
             Core.g = Graphics.FromImage(Core.Image);
 
+            Core.Map.draw_init();
+
             Core.Player = new Player();
 
             CreateUI();

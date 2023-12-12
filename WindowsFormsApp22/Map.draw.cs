@@ -15,6 +15,17 @@ namespace WindowsFormsApp22
 {
     internal partial class Map
     {
+        float cb = 16F;
+        float hblsz = 8F;
+        int tw => (int)(Core.RW / cb) + 1;
+        int th => (int)(Core.RH / cb) + 1;
+        //(float value, float force)[,] dots;
+
+        public void draw_init()
+        {
+            //dots = new (float value, float force)[tw + 4, th + 4];
+        }
+
         void draw_grid_old_old(Graphics g)
         {
             Bitmap img = new Bitmap((int)g.VisibleClipBounds.Width, (int)g.VisibleClipBounds.Height);
@@ -145,11 +156,7 @@ namespace WindowsFormsApp22
         }
         void draw_grid(Graphics g)
         {
-            float cb = 16F;
-            float hblsz = 8F;
-
             var p = Core.Player;
-            int tw = (int)(Core.RW / cb) + 1, th = (int)(Core.RH / cb) + 1;
             List<Entity> entities = new List<Entity>(Core.Map.Entities).Where(e => e.IsDrawable).OrderByDescending(b => b.Y).ToList();
             Bitmap img = new Bitmap((int)g.VisibleClipBounds.Width, (int)g.VisibleClipBounds.Height);
             float modx = Core.Cam.X % cb;
@@ -168,13 +175,13 @@ namespace WindowsFormsApp22
                 if (Core.Player.IsSpecialShoting)
                 {
                     A = p.DrawPoint;
-                    B = Maths.GetRayToolingLine(p.DrawPoint, p.specialAngle.AngleToPointF(), Core.VisibleBounds);
+                    B = Maths.GetRayToolingLine(p.DrawPoint, p.specialAngle.AngleToPointF(), Core.RenderBounds);
                 }
                 for (int y = -2; y < th + 2; y++)
                 {
                     for (int x = -2; x < tw + 2; x++)
                     {
-                        float node_weight = 0F;
+                        float node_weight = 0;//dots[x + 2, y + 2].value;
                         foreach (var entity in entities)
                         {
                             float d = Maths.Distance(entity.DrawPoint, (x * cb - modx, y * cb - mody).P());
@@ -188,12 +195,26 @@ namespace WindowsFormsApp22
                             var d = PP_.Length();
                             node_weight += 5000F * p.specialRaySize / d;
                         }
-                        if (node_weight == 0 || (node_weight > 0.0001F && node_weight <= cb * hblsz))
-                        {
-                            int v = 10 + (int)(node_weight / (cb * hblsz) * 180);
-                            _g.FillRectangle(Brushes.Black, x * cb - modx, y * cb + node_weight - mody, hblsz * 2F, hblsz * 2F);
-                            _g.FillEllipse(new SolidBrush(Color.FromArgb(v, v, v)), x * cb - modx, y * cb + node_weight - mody, hblsz * 2F, hblsz * 2F);
-                        }
+                        node_weight.Round(4);
+                        if (node_weight < -1000F) node_weight = -1000F;
+                        if (node_weight > 1000F) node_weight = 1000F;
+                        //if (dots[x + 2, y + 2].force < node_weight)
+                        //{
+                        //    dots[x + 2, y + 2].force = node_weight;
+                        //}
+                        //else
+                        //{
+                        //    dots[x + 2, y + 2].value += (dots[x + 2, y + 2].value < 0F ? 1F : -1F) * dots[x + 2, y + 2].force * 0.1F;
+                        //    dots[x + 2, y + 2].force *= 0.8F;
+                        //}
+                        //if (node_weight == 0 || node_weight <= cb * hblsz))
+                        //{
+                        int v = 10 + (int)(node_weight / (cb * hblsz) * 180);
+                        if (v < 0) v = 0;
+                        if (v > 255) v = 255;
+                        _g.FillRectangle(Brushes.Black, x * cb - modx, y * cb + node_weight - mody, hblsz * 2F, hblsz * 2F);
+                        _g.FillEllipse(new SolidBrush(Color.FromArgb(v, v, v)), x * cb - modx, y * cb + node_weight - mody, hblsz * 2F, hblsz * 2F);
+                        //}
                     }
                 }
 
@@ -232,7 +253,7 @@ namespace WindowsFormsApp22
                     PointF ptB;
                     void draw_special(float a_ofst)
                     {
-                        ptB = Maths.GetRayToolingLine(p.DrawPoint, (p.specialAngle - a_ofst).AngleToPointF(), Core.VisibleBounds);
+                        ptB = Maths.GetRayToolingLine(p.DrawPoint, (p.specialAngle - a_ofst).AngleToPointF(), Core.RenderBounds);
                         _g.DrawLine(pen, ptA, ptB);
                     }
                     float step = 0.2F;
