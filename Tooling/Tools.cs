@@ -147,7 +147,7 @@ namespace Tooling
             {
                 for (int j = 0; j < h / y; j++)
                     for (int i = 0; i < w / x; i++)
-                        result.Add(tex.Clone(new Rectangle(i, j, x, y), tex.PixelFormat));
+                        result.Add(tex.Clone(new Rectangle(i*x, j*y, x, y), tex.PixelFormat));
             }
 
             return result;

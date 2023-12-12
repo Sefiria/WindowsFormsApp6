@@ -1,6 +1,6 @@
 ﻿namespace WindowsFormsApp17
 {
-    partial class Form2
+    partial class test_1
     {
         /// <summary>
         /// Required designer variable.

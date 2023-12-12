@@ -5,7 +5,7 @@ using Tooling;
 
 namespace WindowsFormsApp17
 {
-    public partial class Form1 : Form
+    public partial class FormConfig : Form
     {
         Bitmap img;
 
@@ -14,7 +14,7 @@ namespace WindowsFormsApp17
         UserUI user = null;
         MouseEventArgs LastMouseEventArgs = null;
 
-        public Form1()
+        public FormConfig()
         {
             InitializeComponent();
 
@@ -22,8 +22,7 @@ namespace WindowsFormsApp17
             Core.rh = Render.Height;
             img = new Bitmap(Core.rw, Core.rh);
             Core.g = Graphics.FromImage(img);
-
-            ResMgr.Init();
+            Core.res = 1F;
 
             Data.Instance.Init();
             KB.Init();
@@ -158,7 +157,6 @@ namespace WindowsFormsApp17
         private void Render_MouseMove(object sender, MouseEventArgs e)
         {
             LastMouseEventArgs = e;
-            Core.MouseLocation = e.Location;
 
             if (Core.MouseHolding)
             {

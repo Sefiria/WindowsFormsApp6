@@ -10,13 +10,13 @@ using System.Windows.Forms;
 
 namespace WindowsFormsApp17
 {
-    public partial class Form3 : Form
+    public partial class test_2 : Form
     {
         Timer timer1 = new Timer() { Enabled = true, Interval = 1};
         byte[,] tiles;
         const int rows = 50;
         const int cols = 50;
-        public Form3()
+        public test_2()
         {
             SetStyle(ControlStyles.ResizeRedraw, true);
             InitializeComponent();

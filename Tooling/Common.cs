@@ -25,6 +25,7 @@ namespace Tooling
         public static List<Bitmap> Resize(this List<Bitmap> imgs, int w, int h) => imgs.Select(img => img.Resize(w, h)).ToList();
         public static List<Bitmap> Resize(this List<Bitmap> imgs, int sz) => imgs.Select(img => img.Resize(sz)).ToList();
         public static vecf vecf(this Point pt) => new vecf(pt.X, pt.Y);
+        public static vecf vecf(this PointF pt) => new vecf(pt.X, pt.Y);
         public static bool IsPositive(this float v) => v > 0F;
         public static bool IsNegative(this float v) => v < 0F;// 0 isn't positive or negative, no entry into the possible condition if 0
         public static vec Normalized(this vec vec) => Maths.Normalized(vec.f).i;

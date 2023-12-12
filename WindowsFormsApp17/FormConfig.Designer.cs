@@ -1,6 +1,6 @@
 ﻿namespace WindowsFormsApp17
 {
-    partial class Form1
+    partial class FormConfig
     {
         /// <summary>
         /// Required designer variable.

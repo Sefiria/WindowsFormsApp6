@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Input;
 
 namespace WindowsFormsApp17
 {
@@ -16,7 +17,18 @@ namespace WindowsFormsApp17
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            if(Keyboard.IsKeyDown(Key.LeftAlt))
+            {
+                var set = new FormConfig();
+                Application.Run(set);
+                set.BringToFront();
+            }
+            else
+            {
+                var run = new FormCatch();
+                Application.Run(run);
+                run.BringToFront();
+            }
         }
     }
 }

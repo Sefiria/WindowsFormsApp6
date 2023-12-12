@@ -7,7 +7,7 @@ using WindowsFormsApp17.items;
 
 namespace WindowsFormsApp17
 {
-    public partial class Form2 : Form
+    public partial class test_1 : Form
     {
         Bitmap img;
 
@@ -18,7 +18,7 @@ namespace WindowsFormsApp17
         int ticks, tickmax = 10;
         bool canuse_addfluid;
 
-        public Form2()
+        public test_1()
         {
             InitializeComponent();
 

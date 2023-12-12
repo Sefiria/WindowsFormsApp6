@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
 using Tooling;
 using WindowsFormsApp17.items;
+using WindowsFormsApp17.Properties;
 using static WindowsFormsApp17.enums;
 
 namespace WindowsFormsApp17
@@ -23,8 +26,12 @@ namespace WindowsFormsApp17
         public vecf cam;
         public List<mur> murs;
         public fluidmgr fluidmgr;
+        public Player player;
+        public List<Entity> Entities = new List<Entity>();
+        public List<Entity> OrphanEntities => Entities.Where(e => e.Parent == null).ToList();
+        public List<Entity> VisibleEntities => Entities.Where(e => e.IsDrawable && Core.VisibleBounds.Contains(e.iPos)).ToList();
 
-        public void Init()
+        public void Init(bool isrun = false)
         {
             map = new Map();
             MapGen.GenerateTiles();
@@ -36,6 +43,88 @@ namespace WindowsFormsApp17
                 new mur(x + ssz + lsz, y, ssz, lsz),
             };
             fluidmgr = new fluidmgr();
+            if(isrun)
+            {
+                Core.TSZ = 32;
+                player = new Player(16);
+            }
+            ResMgr.Init();
+        }
+
+        public void UpdateRun()
+        {
+            player.Update();
+            cam = player.Pos.vecf();
+        }
+
+        public void DrawRun()
+        {
+            DrawRunMap();
+            //user.Display();
+        }
+
+        #region DrawMap internals
+        Color[] colors_waters = new Color[3]{
+                Color.Cyan,
+                Color.DodgerBlue,
+                Color.MidnightBlue
+            };
+        int[] water_level = new int[] { 15, 30, 50 };
+        Brush calc_water_brush(int __y)
+        {
+            Color _c;
+            if (__y < water_level[0]) _c = colors_waters[0];
+            else if (__y < water_level[1]) { _c = colors_waters[0].ShadeWith(colors_waters[1], (__y - water_level[0]) / (water_level[1] - water_level[0] - 1F)); }
+            else if (__y < water_level[2]) { _c = colors_waters[1].ShadeWith(colors_waters[2], (__y - water_level[1]) / (water_level[2] - water_level[1] - 1F)); }
+            else _c = colors_waters[2];
+            return new SolidBrush(_c);
+        }
+        #endregion
+        private void DrawRunMap()
+        {
+            Core.g.Clear(map.bg);
+
+            int tsz = Core.TSZ;
+            var tcam = cam.tile(tsz);
+            int hrtw = Core.w / tsz / 2;
+            int hrth = Core.h / tsz / 2;
+
+            int _x, _y, id;
+            Bitmap tile;
+            for (int x = -hrtw - 1; x < hrtw + 3; x++)
+            {
+                for (int y = -hrth - 1; y < hrth + 3; y++)
+                {
+                    _x = (int)(tcam.x + x);
+                    _y = (int)(tcam.y + y);
+                    id = map[_x, _y];
+                    if (id == 0)
+                    {
+                        // draw bg instead if exists
+                        int bg_id = map.GetBgTile(_x, _y);
+                        if (bg_id > 0)
+                            Core.g.DrawImage(ResMgr.GetBGTile(bg_id), (hrtw + x) * tsz - cam.x % tsz, (hrth + y) * tsz - cam.y % tsz);
+                        if (map.check(_x, _y))
+                        {
+                            Map.fluid fluid = map.fluids[_x, _y];
+                            float q = Math.Min(1F, fluid.quantity);
+                            if (q > 0F) Core.g.FillRectangle(calc_water_brush(_y), (hrtw + x) * tsz - cam.x % tsz, (hrth + y) * tsz - cam.y % tsz + tsz * (1F - q), tsz, tsz * q);
+                        }
+                    }
+                    else
+                    {
+                        tile = ResMgr.GetTile(id);
+                        Core.g.DrawImage(tile, (hrtw + x) * tsz - cam.x % tsz, (hrth + y) * tsz - cam.y % tsz);
+                    }
+                }
+            }
+
+            float i = Core.MouseCamTile.x;
+            float j = Core.MouseCamTile.y;
+            Core.g.DrawRectangle(Pens.Cyan, (hrtw + i) * tsz - cam.x, (hrth + j) * tsz - cam.y, tsz, tsz);
+
+
+            VisibleEntities.ForEach(e => e.Draw(Core.g));
         }
     }
 
@@ -52,6 +141,7 @@ namespace WindowsFormsApp17
         public fluid[,] fluids;
         public byte[,] tiles;
         public byte[,] bg_tiles;
+        public Color bg;
 
         public Map(int w = 64, int h = 64)
         {
@@ -60,6 +150,7 @@ namespace WindowsFormsApp17
             fluids = new fluid[w, h];
             tiles = new byte[w, h];
             bg_tiles = new byte[w, h];
+            bg = Color.LightCyan;
         }
 
         public bool check(int x, int y) => !(x < 0 || y < 0 || x >= w || y >= h);

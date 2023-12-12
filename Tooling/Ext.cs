@@ -92,5 +92,8 @@ namespace Tooling
 
         public static PointF norm(this PointF v) => Maths.Normalized(v);
         public static float Length(this PointF self) => Maths.Length(self);
+
+
+        public static int ToInt(this bool boolean) => boolean ? 1 : 0;
     }
 }
