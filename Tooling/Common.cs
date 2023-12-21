@@ -35,5 +35,33 @@ namespace Tooling
         public static PointF TopRight(this RectangleF box) => (box.Right, box.Top).P();
         public static PointF BottomLeft(this RectangleF box) => (box.Left, box.Bottom).P();
         public static PointF BottomRight(this RectangleF box) => (box.Right, box.Bottom).P();
+
+
+        /// <summary>
+        /// Warning : long process but exact, w & h need to be > to src ones
+        /// </summary>
+        public static Bitmap ResizeExact(this Bitmap img, int w, int h)
+        {
+            Bitmap output = new Bitmap(w, h);
+            int pw = w / img.Width;
+            int ph = h / img.Height;
+            Color px;
+
+            for (int y = 0; y < img.Height; y++)
+            {
+                for (int x = 0; x < img.Width; x++)
+                {
+                    px = img.GetPixel(x, y);
+                    for (int j = 0; j < ph; j++)
+                    {
+                        for (int i = 0; i < pw; i++)
+                        {
+                            output.SetPixel(x * pw + i, y * ph + j, px);
+                        }
+                    }
+                }
+            }
+            return output;
+        }
     }
 }

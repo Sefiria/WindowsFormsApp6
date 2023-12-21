@@ -49,10 +49,12 @@ namespace WindowsFormsApp17
         public float W { get => m_W > 0 ? m_W : m_W = Images[0].Width; set => m_W = value; }
         public float H { get => m_H > 0 ? m_H : m_H = Images[0].Height; set => m_H = value; }
         public float RescaleW = 1F, RescaleH = 1F;
-        public PointF DrawPoint => Core.CenterPoint.PlusF(Pos).Minus(W/2, H/2).Minus(Data.Instance.cam);
+        public virtual PointF DrawPoint => Utils.DrawPoint(Pos);
         public virtual Rectangle Bounds => new Rectangle((int)Pos.X, (int)Pos.Y, (int)W, (int)H);
         public RectangleF BoundsF => new RectangleF(Pos.X, Pos.Y, W, H);
-        public Point Tile => Pos.Div(Core.TSZ);
+        public virtual Point Tile => Pos.Div(Core.TSZ);
+        public PointF DrawTile => Utils.DrawPoint(Pos.PlusF(W / 2, H / 2).Snap(Core.TSZ));
+        //public Point DrawTile => DrawPoint.Snap(Core.TSZ);
         public virtual PointF CalculateLook() => Maths.AngleToPointF(Angle.Value).Round();
         public List<PointF> Edges => new List<PointF>() { Pos.Minus(W/2, H/2), Pos.PlusF(W/2, -H/2), Pos.PlusF(-H/2, H/2), Pos.PlusF(W/2, H/2) };
         public bool IsVisible => Core.RenderBounds.Contains(DrawPoint.ToPoint());
@@ -88,7 +90,6 @@ namespace WindowsFormsApp17
 
         public virtual void Draw(Graphics g, PointF? position = null)
         {
-            Console.WriteLine(anim_frame);
             var img = new Bitmap(Images[anim_frame]);
             if (anim_last_dir < 0) img.RotateFlip(RotateFlipType.RotateNoneFlipX);
             g.DrawImage(img, DrawPoint);

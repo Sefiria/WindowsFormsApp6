@@ -1,6 +1,6 @@
-﻿namespace WindowsFormsApp17
+﻿namespace LayerPx
 {
-    partial class FormCatch
+    partial class Form1
     {
         /// <summary>
         /// Required designer variable.
@@ -34,22 +34,20 @@
             // 
             // Render
             // 
-            this.Render.Cursor = System.Windows.Forms.Cursors.Default;
             this.Render.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Render.Location = new System.Drawing.Point(0, 0);
             this.Render.Name = "Render";
-            this.Render.Size = new System.Drawing.Size(512, 512);
-            this.Render.TabIndex = 0;
+            this.Render.Size = new System.Drawing.Size(800, 450);
+            this.Render.TabIndex = 1;
             this.Render.TabStop = false;
             // 
-            // FormCatch
+            // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(512, 512);
+            this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.Render);
-            this.Name = "FormCatch";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Name = "Form1";
             this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.Render)).EndInit();
             this.ResumeLayout(false);

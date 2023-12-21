@@ -45,6 +45,7 @@ namespace Tooling
         public static PointF PlusF(this Point a, vecf b) => new PointF(a.X + b.x, a.Y + b.y);
         public static PointF PlusF(this int n, PointF pt) => new PointF(n + pt.X, n + pt.Y);
         public static PointF PlusF(this PointF pt, int n) => new PointF(n + pt.X, n + pt.Y);
+        public static PointF PlusF(this PointF pt, float n) => new PointF(n + pt.X, n + pt.Y);
         public static PointF PlusF(this int n, Point pt) => new PointF(n + pt.X, n + pt.Y);
         public static PointF PlusF(this PointF pt, float x, float y) => new PointF(pt.X + x, pt.Y + y);
 

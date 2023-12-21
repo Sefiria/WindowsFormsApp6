@@ -13,6 +13,7 @@ namespace WindowsFormsApp17
 
         public FormCatch()
         {
+            Cursor.Hide();
             InitializeComponent();
 
             Core.rw = Render.Width;

@@ -21,7 +21,7 @@ namespace WindowsFormsApp17
         public static vecf MouseVec => MouseLocation.vecf();
         public static vecf MouseTile => MouseVec.tile(TSZ);
         public static vecf MouseSnap => MouseVec.snap(TSZ);
-        public static vecf MouseCamTile => (Data.Instance.cam - new vecf(w / 2F, h / 2F)).tile(TSZ) + MouseTile + (-1, 1).Vf();
+        public static vecf MouseCamTile => (Data.Instance.cam - new vecf(w / 2F, h / 2F) - Data.Instance.cam % TSZ).tile(TSZ) + MouseTile;
         public static bool MouseHolding = false;
         public static PointF CenterPoint => (w/2F,h/2F).P();
         public static RectangleF RenderBounds = new RectangleF(0, 0, w, h);

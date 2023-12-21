@@ -30,6 +30,7 @@ namespace WindowsFormsApp17
         public List<Entity> Entities = new List<Entity>();
         public List<Entity> OrphanEntities => Entities.Where(e => e.Parent == null).ToList();
         public List<Entity> VisibleEntities => Entities.Where(e => e.IsDrawable && Core.VisibleBounds.Contains(e.iPos)).ToList();
+        public static vecf Cam => Instance.cam;
 
         public void Init(bool isrun = false)
         {
@@ -55,6 +56,7 @@ namespace WindowsFormsApp17
         {
             player.Update();
             cam = player.Pos.vecf();
+            //cam = (2 * Core.TSZ, 5 * Core.TSZ).Vf();
         }
 
         public void DrawRun()
@@ -91,6 +93,7 @@ namespace WindowsFormsApp17
 
             int _x, _y, id;
             Bitmap tile;
+            PointF getDrawPoint(int x, int y) => Core.CenterPoint.PlusF(x * Core.TSZ, y * Core.TSZ).Minus(cam);
             for (int x = -hrtw - 1; x < hrtw + 3; x++)
             {
                 for (int y = -hrth - 1; y < hrth + 3; y++)
@@ -103,7 +106,7 @@ namespace WindowsFormsApp17
                         // draw bg instead if exists
                         int bg_id = map.GetBgTile(_x, _y);
                         if (bg_id > 0)
-                            Core.g.DrawImage(ResMgr.GetBGTile(bg_id), (hrtw + x) * tsz - cam.x % tsz, (hrth + y) * tsz - cam.y % tsz);
+                            Core.g.DrawImage(ResMgr.GetBGTile(bg_id), getDrawPoint(_x, _y));
                         if (map.check(_x, _y))
                         {
                             Map.fluid fluid = map.fluids[_x, _y];
@@ -114,14 +117,14 @@ namespace WindowsFormsApp17
                     else
                     {
                         tile = ResMgr.GetTile(id);
-                        Core.g.DrawImage(tile, (hrtw + x) * tsz - cam.x % tsz, (hrth + y) * tsz - cam.y % tsz);
+                        Core.g.DrawImage(tile, getDrawPoint(_x, _y));
                     }
                 }
             }
 
-            float i = Core.MouseCamTile.x;
-            float j = Core.MouseCamTile.y;
-            Core.g.DrawRectangle(Pens.Cyan, (hrtw + i) * tsz - cam.x, (hrth + j) * tsz - cam.y, tsz, tsz);
+            var pt = Utils.DrawPoint(Core.MouseCamTile.pt.x(Core.TSZ));
+            Core.g.DrawRectangle(Pens.Black, pt.X, pt.Y, tsz, tsz);
+            Core.g.DrawRectangle(Pens.Cyan, pt.X+1, pt.Y+1, tsz, tsz);
 
 
             VisibleEntities.ForEach(e => e.Draw(Core.g));
@@ -222,5 +225,10 @@ namespace WindowsFormsApp17
                 }
             }
         }
+
+        public static bool IsAir(int x, int y) => Data.Instance.map[x, y] == 0;
+        public static bool IsBlock(int x, int y) => !IsAir(x, y);
+        public static bool IsWorldAir(float x, float y) => IsAir((int)(x / Core.TSZ), (int)(y / Core.TSZ));
+        public static bool IsWorldBlock(float x, float y) => !IsWorldAir(x, y);
     }
 }
