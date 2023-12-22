@@ -15,7 +15,7 @@ namespace LayerPx
     {
         public static Form1 Instance = null;
         public Queue<Point> draw_refresh_queue = new Queue<Point>();
-        public byte layer_at_first_press = 128;
+        public int layer_at_first_press = DATA_LAYERS / 2;
         public ToolModes Mode = ToolModes.Normal;
 
         enum Tools
@@ -46,14 +46,15 @@ namespace LayerPx
         bool ShowGrid = false;
         DATA data;
         Color[] pal = new Color[16];// 0 is transparent
-        byte pal_index_primary = 1;
-        byte pen_size = 1;
-        byte holding_layer_target = 128;
+        int pal_index_primary = 1;
+        int pen_size = 1;
+        int holding_layer_target = DATA_LAYERS / 2;
         bool holding_layer_released = true;
-        byte fixed_layer = 128;
-        int layer_gap = 16;
+        int fixed_layer = DATA_LAYERS / 2;
+        int layer_gap = 1;
         bool mouseleft_released = true;
 
+        const int DATA_LAYERS = 16, DATA_WIDTH = 64, DATA_HEIGHT = 64;
         const float CAM_MOV_SPD = 3F;
         const float SCALE_GAP = 0.5F;
 
@@ -96,7 +97,7 @@ namespace LayerPx
 
             pal[0] = Color.Black;
             pal[1] = Color.White;
-            data = new DATA();
+            data = new DATA(DATA_LAYERS, DATA_WIDTH, DATA_HEIGHT);
 
             ResetGx();
             ResetGxRender();
@@ -123,7 +124,7 @@ namespace LayerPx
                         if (MouseStates.ButtonDown == MouseButtons.Left)
                         {
                             (UIMgt.UI.First(_ui => _ui is UIButton && _ui.Name == pal_index_primary.ToString()) as UIButton).BoundsColor = Color.White;
-                            pal_index_primary = (byte)id;
+                            pal_index_primary = id;
                             (UIMgt.UI.First(_ui => _ui is UIButton && _ui.Name == pal_index_primary.ToString()) as UIButton).BoundsColor = Color.Cyan;
                         }
                         else if (MouseStates.ButtonDown == MouseButtons.Right)
@@ -192,18 +193,18 @@ namespace LayerPx
 
             if (IsKeyDown(Key.LeftCtrl))
             {
-                if (IsKeyPressed(Key.Up)) layer_gap = (byte)Maths.Range(0, byte.MaxValue, layer_gap + (IsKeyDown(Key.LeftShift) ? 10 : 1));
-                if (IsKeyPressed(Key.Down)) layer_gap = (byte)Maths.Range(0, byte.MaxValue, layer_gap - (IsKeyDown(Key.LeftShift) ? 10 : 1));
+                if (IsKeyPressed(Key.Up)) layer_gap = (int)Maths.Range(0, DATA_LAYERS - 1, layer_gap + (IsKeyDown(Key.LeftShift) ? 10 : 1));
+                if (IsKeyPressed(Key.Down)) layer_gap = (int)Maths.Range(0, DATA_LAYERS - 1, layer_gap - (IsKeyDown(Key.LeftShift) ? 10 : 1));
             }
             else
             {
-                if (IsKeyPressed(Key.Up)) fixed_layer = (byte)Maths.Range(0, byte.MaxValue, fixed_layer + layer_gap);
-                if (IsKeyPressed(Key.Down)) fixed_layer = (byte)Maths.Range(0, byte.MaxValue, fixed_layer - layer_gap);
+                if (IsKeyPressed(Key.Up)) fixed_layer = (int)Maths.Range(0, DATA_LAYERS, fixed_layer + layer_gap);
+                if (IsKeyPressed(Key.Down)) fixed_layer = (int)Maths.Range(0, DATA_LAYERS, fixed_layer - layer_gap);
             }
 
             if (MouseStates.ButtonDown == MouseButtons.Middle)
             {
-                byte index = data.Pointedindex(get_pos_ms());
+                int index = data.Pointedindex(get_pos_ms());
                 if (index > 0)
                 {
                     (UIMgt.UI.First(_ui => _ui is UIButton && _ui.Name == pal_index_primary.ToString()) as UIButton).BoundsColor = Color.White;
@@ -221,7 +222,7 @@ namespace LayerPx
                 }
                 else
                 {
-                    pen_size += (byte)((MouseStates.Delta < 0 ? -1 : 1) * Amplitude);
+                    pen_size += (int)((MouseStates.Delta < 0 ? -1 : 1) * Amplitude);
                 }
             }
 
@@ -237,29 +238,29 @@ namespace LayerPx
                 mouseleft_released = false;
                 var m = get_pos_ms();
                 Console.Write(m);
-                byte v = MouseStates.ButtonDown == MouseButtons.Left ? pal_index_primary : (byte)0;
+                int v = MouseStates.ButtonDown == MouseButtons.Left ? pal_index_primary : 0;
                 RangeValue x, y;
                 if (MouseStates.OldPosition != Point.Empty && MouseStates.PositionChanged)
                 {
                     var old = get_pos_oldms();
                     for (float t = 0F; t <= 1F; t += 1F / MouseStates.LenghtDiff)
                     {
-                        x = new RangeValue((int)Maths.Lerp(old.X, m.X, t), byte.MinValue, byte.MaxValue);
-                        y = new RangeValue((int)Maths.Lerp(old.Y, m.Y, t), byte.MinValue, byte.MaxValue);
-                        UseTool((byte)x.Value, (byte)y.Value, v);
+                        x = new RangeValue((int)Maths.Lerp(old.X, m.X, t), 0, DATA_WIDTH - 1);
+                        y = new RangeValue((int)Maths.Lerp(old.Y, m.Y, t), 0, DATA_HEIGHT - 1);
+                        UseTool(x.Value, y.Value, v);
                     }
                 }
                 else
                 {
                     var pos = get_pos_ms();
-                    UseTool((byte)pos.X, (byte)pos.Y, v);
+                    UseTool(pos.X, pos.Y, v);
                 }
             }
             KB.Update();
             MouseStates.Update();
             UIMgt.Update();
         }
-        void UseTool(byte x, byte y, byte v)
+        void UseTool(int x, int y, int v)
         {
             if (Mode != ToolModes.Normal)
             {
@@ -272,8 +273,8 @@ namespace LayerPx
                 switch (Tool)
                 {
                     default: break;
-                    case Tools.PenCircle: data.SetCircle(holding_layer_target, x, y, v, pen_size); break;
-                    case Tools.PenSquare: data.SetSquare(holding_layer_target, x, y, v, pen_size); break;
+                    case Tools.PenCircle: data.SetCircleWithLayer(holding_layer_target, x, y, v, pen_size); break;
+                    case Tools.PenSquare: data.SetSquareWithLayer(holding_layer_target, x, y, v, pen_size); break;
                 }
             }
             else
@@ -281,8 +282,8 @@ namespace LayerPx
                 switch (Tool)
                 {
                     default: break;
-                    case Tools.PenCircle: data.SetCircle(fixed_layer, x, y, v, pen_size); break;
-                    case Tools.PenSquare: data.SetSquare(fixed_layer, x, y, v, pen_size); break;
+                    case Tools.PenCircle: data.SetCircleWithLayer(fixed_layer, x, y, v, pen_size); break;
+                    case Tools.PenSquare: data.SetSquareWithLayer(fixed_layer, x, y, v, pen_size); break;
                 }
             }
         }
@@ -300,12 +301,12 @@ namespace LayerPx
         }
         void ResetDraw()
         {
-            for (int y = 0; y < byte.MaxValue + 1; y++)
+            for (int y = 0; y < DATA_HEIGHT; y++)
             {
-                for (int x = 0; x < byte.MaxValue + 1; x++)
+                for (int x = 0; x < DATA_WIDTH; x++)
                 {
-                    byte l = data.PointedLayer(x, y);
-                    if (data[l, (byte)x, (byte)y] == 0)
+                    int l = data.PointedLayer(x, y);
+                    if (data[l, x, y] == 0)
                         continue;
                     var dt = data.PointedData(x, y);
                     var sat = Maths.Diff(128, dt.layer) / 255F;
@@ -321,7 +322,7 @@ namespace LayerPx
                 Point pt = draw_refresh_queue.Dequeue();
                 int x = pt.X, y = pt.Y;
                 var dt = data.PointedData(x, y);
-                byte l = dt.layer;
+                int l = dt.layer;
                 var brightness = dt.layer / 255F;
                 g.FillRectangle(new SolidBrush(pal[dt.index].WithBrightness(brightness)), x * scale.Value, y * scale.Value, scale.Value, scale.Value);
             }
@@ -400,6 +401,3 @@ namespace LayerPx
         }
     }
 }
-
-// TODO : UP/DOWN TOO FAST ON HOLDING CLICK
-//        HAS TO MANAGE RELEASED CLICK FOR IT

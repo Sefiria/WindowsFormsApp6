@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="DATA.cs.OLD" />
     <Compile Include="DATA.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>

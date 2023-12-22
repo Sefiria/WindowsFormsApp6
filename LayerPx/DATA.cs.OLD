@@ -5,41 +5,35 @@ namespace LayerPx
 {
     internal class DATA
     {
-        public byte[] data;
-        public int LAYERS, W, H;
-        public int convert(int layer, int x, int y) => layer * LAYERS * H * W + y * H * W + x;
-        public int convert(int layer, Point xy) => convert(layer, xy.X, xy.Y);
-        public byte this[int layer, int x, int y] { get => data[convert(layer, x, y)]; set => data[convert(layer, x, y)] = value; }
-        public byte this[int layer, Point xy] { get => data[convert(layer, xy)]; set => data[convert(layer, xy)] = value; }
-        public DATA(int LAYERS, int W, int H)
+        public byte[,,] data;
+        public byte this[byte layer, byte x, byte y] { get => data[layer, x, y]; set => data[layer, x, y] = value; }
+        public byte this[byte layer, Point xy] { get => data[layer, (byte)xy.X, (byte)xy.Y]; set => data[layer, (byte)xy.X, (byte)xy.Y] = value; }
+        public DATA()
         {
-            this.LAYERS = LAYERS;
-            this.W = W;
-            this.H = H;
-            data = new byte[LAYERS * H * W];
+            data = new byte[byte.MaxValue+1, byte.MaxValue+1, byte.MaxValue+1];
         }
-        public bool check_fail(int x, int y) => x < 0 || y < 0 || x >= W || y >= H;
+        public bool check_fail(int x, int y) => x < 0 || y < 0 || x > byte.MaxValue || y > byte.MaxValue;
         public bool check_pass(int x, int y) => !check_fail(x, y);
-        public (int layer, int x, int y, int index) PointedData(int x, int y)
+        public (byte layer, byte x, byte y, byte index) PointedData(int x, int y)
         {
             if (check_fail(x,y))
-                return (0,x,y,0);
-            int l = LAYERS - 1;
+                return (0,(byte)x, (byte)y,0);
+            byte l = byte.MaxValue;
             while(l > 0)
             {
-                if (this[l, x, y] > 0)
-                    return (l, x, y, this[l, x, y]);
+                if (data[l, x, y] > 0)
+                    return (l, (byte)x, (byte)y, data[l, x, y]);
                 l--;
             }
-            return (0,x,y,0);
+            return (0,(byte)x, (byte)y,0);
         }
-        public (int layer, int x, int y, int index) PointedData(Point xy) => PointedData(xy.X, xy.Y);
-        public int PointedLayer(int x, int y) => PointedData(x, y).layer;
-        public int PointedLayer(Point xy) => PointedLayer(xy.X, xy.Y);
-        public int Pointedindex(int x, int y) => PointedData(x, y).index;
-        public int Pointedindex(Point xy) => Pointedindex(xy.X, xy.Y);
-        public void Set(int l, int x, int y, int v) => this[l, x, y] = (byte)Maths.Range(0, byte.MaxValue, v);
-        public void SetSquareWithLayer(int l, int x, int y, int v, int size)
+        public (byte layer, byte x, byte y, byte index) PointedData(Point xy) => PointedData(xy.X, xy.Y);
+        public byte PointedLayer(int x, int y) => PointedData(x, y).layer;
+        public byte PointedLayer(Point xy) => PointedLayer(xy.X, xy.Y);
+        public byte Pointedindex(int x, int y) => PointedData(x, y).index;
+        public byte Pointedindex(Point xy) => Pointedindex(xy.X, xy.Y);
+        public void Set(int l, int x, int y, int v) => data[(byte)l, (byte)x, (byte)y] = (byte)v;
+        public void SetSquare(byte l, int x, int y, int v, int size)
         {
             if (size == 1)
             {
@@ -52,7 +46,7 @@ namespace LayerPx
                     if(check_pass(x - i, y - j))
                         set_single(l, x-i, y-j, v);
         }
-        public void SetCircleWithLayer(int l, int x, int y, int v, int diameter)
+        public void SetCircle(byte l, int x, int y, int v, int diameter)
         {
             if (diameter == 1)
             {
@@ -66,7 +60,7 @@ namespace LayerPx
                     if (check_pass(x - i, y - j) && Maths.Distance((i, j).P()) <= radius)
                         set_single(l, x-i, y-j, v);
         }
-        public void SetSquareWithDirection(int direction, int x, int y, int v, int size)
+        public void SetSquare(int direction, int x, int y, int v, int size)
         {
             if(size == 1)
             {
@@ -79,7 +73,7 @@ namespace LayerPx
                     if (check_pass(x - i, y - j))
                         set_single(direction, x - i, y - j, v);
         }
-        public void SetCircleWithDirection(int direction, int x, int y, int v, int diameter)
+        public void SetCircle(int direction, int x, int y, int v, int diameter)
         {
             if (diameter == 1)
             {
@@ -93,29 +87,29 @@ namespace LayerPx
                     if (check_pass(x - i, y - j) && Maths.Distance((i, j).P()) <= radius)
                         set_single(direction, x - i, y - j, v);
         }
-        public (int old, int @new) calc_layer(int direction, int x, int y)
+        public (byte old, byte @new) calc_layer(int direction, int x, int y)
         {
-            int old, layer;
+            byte old, layer;
             old = layer = PointedLayer(x, y);
-            layer = layer == 0 ? LAYERS / 2 : new RangeValue(layer + direction, 0, LAYERS).Value;
+            layer = layer == 0 ? (byte)128 : (byte)new RangeValue(layer + direction, byte.MinValue, byte.MaxValue).Value;
             return (old, layer);
         }
         public void set_single(int direction, int x, int y, int v)
         {
-            (int old, int @new) = calc_layer(direction, x, y);
+            (byte old, byte @new) = calc_layer(direction, x, y);
             if (Form1.Instance.Mode != Form1.ToolModes.Normal && old != Form1.Instance.layer_at_first_press)
                 return;
-            this[old, x, y] = 0;
-            this[@new, x, y] = (byte)v;
+            data[old, (byte)x, (byte)y] = 0;
+            data[@new, (byte)x, (byte)y] = (byte)v;
             Form1.Instance.draw_refresh_queue.Enqueue((x, y).iP());
         }
         public void set_single(byte @new, int x, int y, int v)
         {
-            int old = PointedLayer(x, y);
+            byte old = PointedLayer(x, y);
             if (Form1.Instance.Mode != Form1.ToolModes.Normal && old != Form1.Instance.layer_at_first_press)
                 return;
-            this[old, x, y] = 0;
-            this[@new, x, y] = (byte)v;
+            data[old, (byte)x, (byte)y] = 0;
+            data[@new, (byte)x, (byte)y] = (byte)v;
             Form1.Instance.draw_refresh_queue.Enqueue((x, y).iP());
         }
     }
