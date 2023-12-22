@@ -20,6 +20,9 @@ namespace Tooling.UI
             CurrentClicked = null;
             CurrentHover = null;
             UI.ForEach(ui => ui.Update());
+
+            if (MouseStates.IsDown)
+                UI.Where(ui => ui.IsHover).ToList().ForEach(ui => ui.Click());
         }
 
         public static void Draw(Graphics g)
@@ -27,10 +30,11 @@ namespace Tooling.UI
             UI.ForEach(ui => ui.Draw(g));
         }
 
-        public static void MouseDown()
-        {
-            if (MouseStates.IsDown && MouseStates.ButtonDown == MouseButtons.Left)
-                UI.Where(ui => ui.Bounds.Contains(MouseStates.Position)).ToList().ForEach(ui => ui.Click());
-        }
+        // moved to Update
+        //public static void MouseDown()
+        //{
+        //    if (MouseStates.IsDown && MouseStates.ButtonDown == MouseButtons.Left)
+        //        UI.Where(ui => ui.Bounds.Contains(MouseStates.Position)).ToList().ForEach(ui => ui.Click());
+        //}
     }
 }

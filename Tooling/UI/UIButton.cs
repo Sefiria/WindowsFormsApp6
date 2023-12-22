@@ -16,22 +16,24 @@ namespace Tooling.UI
             }
         }
         public PointF TexPos { get; private set; }
-        public Color BackgroundColor = Color.Gray;
-        public Action OnClick;
+        public Color BackgroundColor = Color.Gray, BoundsColor = Color.White;
+        public bool SleepTransparent = false;
+        public Action<UI> OnClick;
 
         public override void Click()
         {
             base.Click();
-            OnClick?.Invoke();
+            OnClick?.Invoke(this);
         }
 
         public override void Draw(Graphics g)
         {
             var pos = GetGlobalPosition();
-            Brush brush = new SolidBrush(Bounds.Contains(MouseStates.Position) ? BackgroundColor.Mod(20 * (MouseStates.IsDown ? -1 : 1)) : BackgroundColor);
+            var bc = SleepTransparent && !IsHover ? Color.FromArgb(128, BackgroundColor) : BackgroundColor;
+            Brush brush = new SolidBrush(Bounds.Contains(MouseStates.Position) ? bc.Mod(20 * (MouseStates.IsDown ? -1 : 1)) : bc);
             g.FillRectangle(brush, Bounds);
-            if(Tex != null) g.DrawImage(Tex, pos.x + TexPos.X, pos.y + TexPos.Y);
-            g.DrawRectangle(Pens.White, Bounds.ToIntRect());
+            if(Tex != null) g.DrawImage(SleepTransparent && !IsHover ? Tex.WithOpacity(128) : Tex, pos.x + TexPos.X, pos.y + TexPos.Y);
+            g.DrawRectangle(new Pen(BoundsColor, IsHover ? 2F : 1F), Bounds.ToIntRect());
         }
 
         public override void Update()

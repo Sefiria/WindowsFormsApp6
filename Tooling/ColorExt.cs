@@ -10,6 +10,11 @@ namespace Tooling
 {
     public static class ColorExt
     {
+        public static Color ChangeSaturation(this Color c, float percent)
+        {
+            float s = SetToMaxOrMin(percent + c.GetSaturation());
+            return ColorFromAhsb(c.A, c.GetHue(), s, c.GetBrightness());
+        }
         public static Color ChangeSaturation(this Color c, int amount)
         {
             float s = SetToMaxOrMin(amount * 0.01f + c.GetSaturation());
@@ -206,5 +211,31 @@ namespace Tooling
             byte b = (byte)Maths.Range(byte.MinValue, byte.MaxValue, Maths.Lerp(self.B, other.B, t));
             return Color.FromArgb(a, r, g, b);
         }
+        public static Bitmap WithOpacity(this Bitmap src, float opacity)
+        {
+            int w = src.Width;
+            int h = src.Height;
+            if (w < 1) w = 1;
+            if (h < 1) h = 1;
+            Bitmap copy = new Bitmap(w, h);
+            copy.SetResolution(src.HorizontalResolution, src.VerticalResolution);
+            using (Graphics g = Graphics.FromImage(copy))
+            {
+                //create a color matrix object  
+                ColorMatrix matrix = new ColorMatrix();
+                //set the opacity  
+                matrix.Matrix33 = opacity;
+                //create image attributes  
+                ImageAttributes attributes = new ImageAttributes();
+                //set the color(opacity) of the image  
+                attributes.SetColorMatrix(matrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+
+                // draw the image  
+                g.DrawImage(src, new Rectangle(0, 0, w, h), 0, 0, src.Width, src.Height, GraphicsUnit.Pixel, attributes);
+            }
+
+            return copy;
+        }
+        public static Bitmap WithOpacity(this Bitmap src, byte alpha) => src.WithOpacity((float)alpha / byte.MaxValue);
     }
 }

@@ -8,7 +8,9 @@ namespace Tooling
         public static MouseButtons ButtonDown = MouseButtons.None;
         public static bool IsDown => ButtonDown != MouseButtons.None;
         public static bool IsUp => !IsDown;
-        public static PointF Position = PointF.Empty;
+        public static bool PositionChanged => Position != OldPosition;
+        public static float LenghtDiff => Position.Minus(OldPosition).Length();
+        public static PointF Position = PointF.Empty, OldPosition = PointF.Empty;
         public static int Delta = 0;
         public static void Update()
         {

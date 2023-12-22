@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
+using ILGPU.Runtime.Cuda;
 
 namespace Tooling
 {
@@ -154,5 +155,12 @@ namespace Tooling
         }
 
         public static int Range(int min, int val, int max) => Math.Max(min, Math.Min(max, val));
+        public static Bitmap CreateRectBitmap(int size, Color color)
+        {
+            Bitmap output = new Bitmap(size, size);
+            using (Graphics g = Graphics.FromImage(output))
+                g.FillRectangle(new SolidBrush(color), 0, 0, size, size);
+            return output;
+        }
     }
 }

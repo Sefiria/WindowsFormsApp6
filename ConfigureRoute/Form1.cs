@@ -41,7 +41,7 @@ namespace ConfigureRoute
 
             MgControls();
 
-            UIMgt.MouseDown();
+            //UIMgt.MouseDown();
             if (MouseStates.IsDown) MouseClick();
 
             //if (KB.IsKeyPressed(KB.Key.E))
@@ -189,7 +189,7 @@ namespace ConfigureRoute
         private void Render_MouseDown(object sender, MouseEventArgs e)
         {
             MouseStates.ButtonDown = e.Button;
-            UIMgt.MouseDown();
+            //UIMgt.MouseDown();
             FirstClickHoldNotOnUI = UIMgt.CurrentClicked == null;
             if (Tool != RouteTools.Sign)
             {

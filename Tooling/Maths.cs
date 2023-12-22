@@ -372,5 +372,7 @@ namespace Tooling
             if (value > max) value = max;
             return value;
         }
+
+        public static int Diff(int a, int b) => Math.Max(a, b) - Math.Min(a, b);
     }
 }
