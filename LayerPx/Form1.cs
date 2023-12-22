@@ -13,6 +13,11 @@ namespace LayerPx
 {
     public partial class Form1 : Form
     {
+        public static Form1 Instance = null;
+        public Queue<Point> draw_refresh_queue = new Queue<Point>();
+        public byte layer_at_first_press = 128;
+        public ToolModes Mode = ToolModes.Normal;
+
         enum Tools
         {
             PenCircle = 0,//C
@@ -21,9 +26,16 @@ namespace LayerPx
             Eraser,//E
             EyeDrop//mouse middle (instant)
         }
+        public enum ToolModes
+        {
+            Normal = 0,
+            Up,
+            Down,
+            Auto
+        }
 
         Bitmap img, Output;
-        Graphics g;
+        Graphics g_render, g;
         Timer TimerUpdate = new Timer() { Enabled = true, Interval = 10 };
         Timer TimerDraw = new Timer() { Enabled = true, Interval = 10 };
 
@@ -36,22 +48,27 @@ namespace LayerPx
         Color[] pal = new Color[16];// 0 is transparent
         byte pal_index_primary = 1;
         byte pen_size = 1;
+        byte holding_layer_target = 128;
+        bool holding_layer_released = true;
+        byte fixed_layer = 128;
+        int layer_gap = 16;
+        bool mouseleft_released = true;
 
         const float CAM_MOV_SPD = 3F;
         const float SCALE_GAP = 0.5F;
 
         RangeValueF scale = new RangeValueF(1F, 2F, 10F);
 
-        PointF get_pos(Bitmap img) => Center.Minus(img.Width, img.Height).Minus(Cam.x(scale.Value));
-        Point get_pos_ms()
+        PointF get_pos(Bitmap _img) => Center.Minus(_img.Width / 2, _img.Height / 2).Minus(Cam.x(scale.Value));
+        Point get_pos_ms(PointF pos)
         {
-            var m = MouseStates.Position;
-            var c = Center;
             var o = get_pos(Output);
-            var x = new RangeValue((int)((m.X - o.X) / scale.Value), byte.MinValue, byte.MaxValue).Value;
-            var y = new RangeValue((int)((m.Y - o.Y) / scale.Value), byte.MinValue, byte.MaxValue).Value;
+            var x = new RangeValue((int)((pos.X - o.X) / scale.Value), byte.MinValue, byte.MaxValue).Value;
+            var y = new RangeValue((int)((pos.Y - o.Y) / scale.Value), byte.MinValue, byte.MaxValue).Value;
             return new Point(x, y);
         }
+        Point get_pos_ms() => get_pos_ms(MouseStates.Position);
+        Point get_pos_oldms() => get_pos_ms(MouseStates.OldPosition);
         float Amplitude => IsKeyDown(Key.LeftShift) ? 5F : 1F;
         float imgw_scaled => (imgw * scale.Value);
         float imgh_scaled => (imgh * scale.Value);
@@ -59,6 +76,7 @@ namespace LayerPx
         public Form1()
         {
             InitializeComponent();
+            Instance = this;
             Initialize();
         }
 
@@ -71,10 +89,6 @@ namespace LayerPx
             imgw = 256;
             imgh = 256;
 
-            Output = new Bitmap(imgw, imgh);
-            using (Graphics _g = Graphics.FromImage(Output))
-                _g.Clear(Color.FromArgb(120, 150, 200));
-
             W = Render.Width;
             H = Render.Height;
 
@@ -85,6 +99,7 @@ namespace LayerPx
             data = new DATA();
 
             ResetGx();
+            ResetGxRender();
             KB.Init();
 
             create_ui();
@@ -130,9 +145,16 @@ namespace LayerPx
 
         private void ResetGx()
         {
-            img = new Bitmap(W, H);
-            g = Graphics.FromImage(img);
+            Output = new Bitmap((int)imgw_scaled, (int)imgh_scaled);
+            g = Graphics.FromImage(Output);
             g.Clear(Color.FromArgb(12, 12, 16));
+            ResetDraw();
+        }
+        private void ResetGxRender()
+        {
+            img = new Bitmap(W, H);
+            g_render = Graphics.FromImage(img);
+            g_render.Clear(Color.FromArgb(12, 12, 16));
         }
         private bool def_pal_col(int pal_index)
         {
@@ -164,6 +186,21 @@ namespace LayerPx
             if (IsKeyPressed(Key.P)) Tool = Tools.PenSquare;
             if (IsKeyPressed(Key.B)) Tool = Tools.Bucket;
             if (IsKeyPressed(Key.E)) Tool = Tools.Eraser;
+
+            if (IsKeyPressed(Key.Left)) Mode = (ToolModes)Maths.Range(0, (int)ToolModes.Auto, (int)Mode - 1);
+            if (IsKeyPressed(Key.Right)) Mode = (ToolModes)Maths.Range(0, (int)ToolModes.Auto, (int)Mode + 1);
+
+            if (IsKeyDown(Key.LeftCtrl))
+            {
+                if (IsKeyPressed(Key.Up)) layer_gap = (byte)Maths.Range(0, byte.MaxValue, layer_gap + (IsKeyDown(Key.LeftShift) ? 10 : 1));
+                if (IsKeyPressed(Key.Down)) layer_gap = (byte)Maths.Range(0, byte.MaxValue, layer_gap - (IsKeyDown(Key.LeftShift) ? 10 : 1));
+            }
+            else
+            {
+                if (IsKeyPressed(Key.Up)) fixed_layer = (byte)Maths.Range(0, byte.MaxValue, fixed_layer + layer_gap);
+                if (IsKeyPressed(Key.Down)) fixed_layer = (byte)Maths.Range(0, byte.MaxValue, fixed_layer - layer_gap);
+            }
+
             if (MouseStates.ButtonDown == MouseButtons.Middle)
             {
                 byte index = data.Pointedindex(get_pos_ms());
@@ -180,6 +217,7 @@ namespace LayerPx
                 if (IsKeyDown(Key.LeftAlt))
                 {
                     scale.Value += SCALE_GAP * (MouseStates.Delta < 0 ? -1F : 1F) * Amplitude;
+                    ResetGx();
                 }
                 else
                 {
@@ -187,19 +225,27 @@ namespace LayerPx
                 }
             }
 
-            if (MouseStates.IsDown && MouseStates.ButtonDown != MouseButtons.Middle)
+            if (MouseStates.IsDown == false)
             {
-                var m = MouseStates.Position;
-                var o = get_pos(Output);
+                mouseleft_released = true;
+                holding_layer_released = true;
+            }
+            else if (MouseStates.ButtonDown != MouseButtons.Middle)
+            {
+                if(mouseleft_released)
+                    layer_at_first_press = data.PointedLayer(get_pos_ms());
+                mouseleft_released = false;
+                var m = get_pos_ms();
+                Console.Write(m);
                 byte v = MouseStates.ButtonDown == MouseButtons.Left ? pal_index_primary : (byte)0;
                 RangeValue x, y;
                 if (MouseStates.OldPosition != Point.Empty && MouseStates.PositionChanged)
                 {
-                    var old = MouseStates.OldPosition;
-                    for (float t = 0F; t <= 1F; t+=1F/MouseStates.LenghtDiff)
+                    var old = get_pos_oldms();
+                    for (float t = 0F; t <= 1F; t += 1F / MouseStates.LenghtDiff)
                     {
-                        x = new RangeValue((int)Maths.Lerp((old.X - o.X) / scale.Value, (m.X - o.X) / scale.Value, t), byte.MinValue, byte.MaxValue);
-                        y = new RangeValue((int)Maths.Lerp((old.Y - o.Y) / scale.Value, (m.Y - o.Y) / scale.Value, t), byte.MinValue, byte.MaxValue);
+                        x = new RangeValue((int)Maths.Lerp(old.X, m.X, t), byte.MinValue, byte.MaxValue);
+                        y = new RangeValue((int)Maths.Lerp(old.Y, m.Y, t), byte.MinValue, byte.MaxValue);
                         UseTool((byte)x.Value, (byte)y.Value, v);
                     }
                 }
@@ -209,19 +255,35 @@ namespace LayerPx
                     UseTool((byte)pos.X, (byte)pos.Y, v);
                 }
             }
-
             KB.Update();
             MouseStates.Update();
             UIMgt.Update();
         }
         void UseTool(byte x, byte y, byte v)
         {
-            int direction = IsKeyDown(Key.LeftShift) ? 1 : -1;// !! has to be integer-typed !!
-            switch (Tool)
+            if (Mode != ToolModes.Normal)
             {
-                default: break;
-                case Tools.PenCircle: data.SetCircle(direction, x, y, v, pen_size); break;
-                case Tools.PenSquare: data.SetSquare(direction, x, y, v, pen_size); break;
+                if (holding_layer_released)
+                {
+                    holding_layer_released = false;
+                    int direction = (Mode == ToolModes.Auto ? (IsKeyDown(Key.LeftCtrl) ? -1 : 1) : (Mode == ToolModes.Up ? 1 : -1)) * layer_gap;
+                    holding_layer_target = data.calc_layer(direction, x, y).@new;
+                }
+                switch (Tool)
+                {
+                    default: break;
+                    case Tools.PenCircle: data.SetCircle(holding_layer_target, x, y, v, pen_size); break;
+                    case Tools.PenSquare: data.SetSquare(holding_layer_target, x, y, v, pen_size); break;
+                }
+            }
+            else
+            {
+                switch (Tool)
+                {
+                    default: break;
+                    case Tools.PenCircle: data.SetCircle(fixed_layer, x, y, v, pen_size); break;
+                    case Tools.PenSquare: data.SetSquare(fixed_layer, x, y, v, pen_size); break;
+                }
             }
         }
 
@@ -230,32 +292,46 @@ namespace LayerPx
 
         private void GlobalDraw(object sender, EventArgs e)
         {
-            ResetGx();
+            ResetGxRender();
             Draw();
+            g_render.DrawImage(Output, get_pos(Output));
             DrawUI();
             Render.Image = img;
         }
+        void ResetDraw()
+        {
+            for (int y = 0; y < byte.MaxValue + 1; y++)
+            {
+                for (int x = 0; x < byte.MaxValue + 1; x++)
+                {
+                    byte l = data.PointedLayer(x, y);
+                    if (data[l, (byte)x, (byte)y] == 0)
+                        continue;
+                    var dt = data.PointedData(x, y);
+                    var sat = Maths.Diff(128, dt.layer) / 255F;
+                    g.FillRectangle(new SolidBrush(pal[dt.index].ChangeSaturation(sat)), x * scale.Value, y * scale.Value, scale.Value, scale.Value);
+                }
+            }
+        }
         void Draw()
         {
-            //g.DrawImage(Output.Resize((int)imgw_scaled, (int)imgh_scaled), get_pos(Output));
-            for (int y = 0; y < byte.MaxValue+1; y++)
+            //Console.WriteLine($"{MouseStates.Position} - {pos}");
+            while(draw_refresh_queue.Count > 0)
             {
-                for (int x = 0; x < byte.MaxValue+1; x++)
-                {
-                    if (data[128, (byte)x, (byte)y] == 0)
-                        continue;
-                    var pos = get_pos(Output);
-                    var dt = data.PointedData(x, y);
-                    var sat = Maths.Diff(128, dt.layer) / 128F;
-                    g.FillRectangle(new SolidBrush(pal[dt.index].ChangeSaturation(sat)), pos.X + x * scale.Value, pos.Y + y * scale.Value, scale.Value, scale.Value);
-                }
+                Point pt = draw_refresh_queue.Dequeue();
+                int x = pt.X, y = pt.Y;
+                var dt = data.PointedData(x, y);
+                byte l = dt.layer;
+                var brightness = dt.layer / 255F;
+                g.FillRectangle(new SolidBrush(pal[dt.index].WithBrightness(brightness)), x * scale.Value, y * scale.Value, scale.Value, scale.Value);
             }
         }
         void DrawUI()
         {
             draw_grid_and_img();
+            draw_modes();
             draw_cursor();
-            UIMgt.Draw(g);
+            UIMgt.Draw(g_render);
         }
         void draw_grid_and_img()
         {
@@ -265,31 +341,42 @@ namespace LayerPx
                 int img_sz = 8;
                 int sz = img_sz * (int)scale.Value;
                 for (int y = 0; y < imgw_scaled; y += sz)
-                    g.DrawLine(Pens.DimGray, pos.X, pos.Y + y, pos.X + imgw_scaled, pos.Y + y);
+                    g_render.DrawLine(Pens.DimGray, pos.X, pos.Y + y, pos.X + imgw_scaled, pos.Y + y);
                 for (int x = 0; x < imgh_scaled; x += sz)
-                    g.DrawLine(Pens.DimGray, pos.X + x, pos.Y, pos.X + x, pos.Y + imgh_scaled);
+                    g_render.DrawLine(Pens.DimGray, pos.X + x, pos.Y, pos.X + x, pos.Y + imgh_scaled);
             }
-            g.DrawRectangle(Pens.White, new Rectangle((int)pos.X, (int)pos.Y, (int)imgw_scaled, (int)imgh_scaled));
+            g_render.DrawRectangle(Pens.White, new Rectangle((int)pos.X, (int)pos.Y, (int)imgw_scaled, (int)imgh_scaled));
         }
         void draw_cursor()
         {
             var ms = MouseStates.Position;
             int lgh = 16;
             int hlgh = lgh / 2;
-            g.DrawLine(Pens.White, ms.X, ms.Y, ms.X + lgh, ms.Y + lgh);
-            g.DrawLine(Pens.White, ms.X, ms.Y, ms.X + lgh - 1, ms.Y + lgh);
-            g.DrawLine(Pens.Black, ms.X + 1, ms.Y, ms.X + lgh + 1, ms.Y + lgh);
-            g.DrawLine(Pens.Black, ms.X + 1, ms.Y, ms.X + lgh + 2, ms.Y + lgh);
-            g.FillEllipse(new SolidBrush(pal[pal_index_primary]), ms.X + lgh, ms.Y + lgh, hlgh, hlgh);
-            g.DrawEllipse(Pens.White, ms.X + lgh, ms.Y + lgh, hlgh, hlgh);
-            g.DrawEllipse(Pens.Black, ms.X + lgh + 1, ms.Y + lgh, hlgh, hlgh);
+            g_render.DrawLine(Pens.White, ms.X, ms.Y, ms.X + lgh, ms.Y + lgh);
+            g_render.DrawLine(Pens.White, ms.X, ms.Y, ms.X + lgh - 1, ms.Y + lgh);
+            g_render.DrawLine(Pens.Black, ms.X + 1, ms.Y, ms.X + lgh + 1, ms.Y + lgh);
+            g_render.DrawLine(Pens.Black, ms.X + 1, ms.Y, ms.X + lgh + 2, ms.Y + lgh);
+            g_render.FillEllipse(new SolidBrush(pal[pal_index_primary]), ms.X + lgh, ms.Y + lgh, hlgh, hlgh);
+            g_render.DrawEllipse(Pens.White, ms.X + lgh, ms.Y + lgh, hlgh, hlgh);
+            g_render.DrawEllipse(Pens.Black, ms.X + lgh + 1, ms.Y + lgh, hlgh, hlgh);
 
             var pos = get_pos(Output);
             var pointed = data.PointedData(get_pos_ms());
             if(Tool == Tools.PenCircle)
-                g.DrawEllipse(Pens.Gray, pos.X + (pointed.x - pen_size / 2) * scale.Value, pos.Y + (pointed.y - pen_size / 2) * scale.Value, pen_size * scale.Value, pen_size * scale.Value);
+                g_render.DrawEllipse(Pens.Gray, pos.X + (pointed.x - pen_size / 2) * scale.Value, pos.Y + (pointed.y - pen_size / 2) * scale.Value, pen_size * scale.Value, pen_size * scale.Value);
             else if (Tool == Tools.PenSquare)
-                g.DrawRectangle(Pens.Gray, pos.X + (pointed.x - pen_size / 2) * scale.Value, pos.Y + (pointed.y - pen_size / 2) * scale.Value, pen_size * scale.Value, pen_size * scale.Value);
+                g_render.DrawRectangle(Pens.Gray, pos.X + (pointed.x - pen_size / 2) * scale.Value, pos.Y + (pointed.y - pen_size / 2) * scale.Value, pen_size * scale.Value, pen_size * scale.Value);
+        }
+        void draw_modes()
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                g_render.FillRectangle(i == (int)Mode ? Brushes.Gray : Brushes.DimGray, W - 10 - (4 - i) * 22, 10, 20, 20);
+                g_render.DrawString($"{Enum.GetName(typeof(ToolModes), Mode)[0]}", DefaultFont, i == (int)Mode ? Brushes.White : Brushes.Gray, W - 10 - (4 - i) * 22 + 4, 10+3);
+            }
+
+            g_render.DrawString($"gap:{layer_gap}", DefaultFont, Brushes.White, W - 60, 40);
+            g_render.DrawString($"layer:{fixed_layer}", DefaultFont, Brushes.White, W - 60, 60);
         }
 
 

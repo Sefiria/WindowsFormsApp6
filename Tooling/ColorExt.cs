@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Windows.Media;
 using Color = System.Drawing.Color;
 using Image = System.Drawing.Image;
 using PixelFormat = System.Drawing.Imaging.PixelFormat;
@@ -237,5 +238,13 @@ namespace Tooling
             return copy;
         }
         public static Bitmap WithOpacity(this Bitmap src, byte alpha) => src.WithOpacity((float)alpha / byte.MaxValue);
+        public static Color WithBrightness(this Color src, float brightness)
+        {
+            brightness = Maths.Range(0F, 1F, brightness);
+            byte R = (byte)(src.R * brightness);
+            byte G = (byte)(src.G * brightness);
+            byte B = (byte)(src.B * brightness);
+            return Color.FromArgb(src.A, R, G, B);
+        }
     }
 }

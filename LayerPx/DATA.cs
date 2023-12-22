@@ -35,26 +35,30 @@ namespace LayerPx
         public void Set(int l, int x, int y, int v) => data[(byte)l, (byte)x, (byte)y] = (byte)v;
         public void SetSquare(byte l, int x, int y, int v, int size)
         {
-            for(int j= -size/2; j<size/2; j++)
+            if (size == 1)
             {
-                for (int i = -size / 2; i < size / 2; i++)
-                {
-                    if(check_pass(x - i, y - j))
-                        data[l, (byte)(x - i), (byte)(y - j)] = (byte)v;
-                }
+                set_single(l, x, y, v);
+                return;
             }
+
+            for (int j= -size/2; j<size/2; j++)
+                for (int i = -size / 2; i < size / 2; i++)
+                    if(check_pass(x - i, y - j))
+                        set_single(l, x-i, y-j, v);
         }
         public void SetCircle(byte l, int x, int y, int v, int diameter)
         {
+            if (diameter == 1)
+            {
+                set_single(l, x, y, v);
+                return;
+            }
+
             int radius = diameter / 2;
             for (int j = -radius; j < radius; j++)
-            {
                 for (int i = -radius; i < radius; i++)
-                {
                     if (check_pass(x - i, y - j) && Maths.Distance((i, j).P()) <= radius)
-                        data[l, (byte)(x - i), (byte)(y - j)] = (byte)v;
-                }
-            }
+                        set_single(l, x-i, y-j, v);
         }
         public void SetSquare(int direction, int x, int y, int v, int size)
         {
@@ -83,18 +87,30 @@ namespace LayerPx
                     if (check_pass(x - i, y - j) && Maths.Distance((i, j).P()) <= radius)
                         set_single(direction, x - i, y - j, v);
         }
-        (byte old, byte @new) calc_layer(int direction, int x, int y)
+        public (byte old, byte @new) calc_layer(int direction, int x, int y)
         {
             byte old, layer;
             old = layer = PointedLayer(x, y);
             layer = layer == 0 ? (byte)128 : (byte)new RangeValue(layer + direction, byte.MinValue, byte.MaxValue).Value;
             return (old, layer);
         }
-        void set_single(int direction, int x, int y, int v)
+        public void set_single(int direction, int x, int y, int v)
         {
             (byte old, byte @new) = calc_layer(direction, x, y);
+            if (Form1.Instance.Mode != Form1.ToolModes.Normal && old != Form1.Instance.layer_at_first_press)
+                return;
             data[old, (byte)x, (byte)y] = 0;
             data[@new, (byte)x, (byte)y] = (byte)v;
+            Form1.Instance.draw_refresh_queue.Enqueue((x, y).iP());
+        }
+        public void set_single(byte @new, int x, int y, int v)
+        {
+            byte old = PointedLayer(x, y);
+            if (Form1.Instance.Mode != Form1.ToolModes.Normal && old != Form1.Instance.layer_at_first_press)
+                return;
+            data[old, (byte)x, (byte)y] = 0;
+            data[@new, (byte)x, (byte)y] = (byte)v;
+            Form1.Instance.draw_refresh_queue.Enqueue((x, y).iP());
         }
     }
 }
