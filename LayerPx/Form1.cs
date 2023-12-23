@@ -54,18 +54,18 @@ namespace LayerPx
         int layer_gap = 1;
         bool mouseleft_released = true;
 
-        const int DATA_LAYERS = 16, DATA_WIDTH = 64, DATA_HEIGHT = 64;
+        const int DATA_LAYERS = 15, DATA_WIDTH = 63, DATA_HEIGHT = 63;
         const float CAM_MOV_SPD = 3F;
         const float SCALE_GAP = 0.5F;
 
         RangeValueF scale = new RangeValueF(1F, 2F, 10F);
 
-        PointF get_pos(Bitmap _img) => Center.Minus(_img.Width / 2, _img.Height / 2).Minus(Cam.x(scale.Value));
+        PointF get_pos(Bitmap _img) => Center.Minus(imgw_scaled / 2, imgh_scaled / 2).Minus(Cam.x(scale.Value));
         Point get_pos_ms(PointF pos)
         {
             var o = get_pos(Output);
-            var x = new RangeValue((int)((pos.X - o.X) / scale.Value), byte.MinValue, byte.MaxValue).Value;
-            var y = new RangeValue((int)((pos.Y - o.Y) / scale.Value), byte.MinValue, byte.MaxValue).Value;
+            var x = new RangeValue((int)((pos.X - o.X) / scale.Value), 0, DATA_WIDTH).Value;
+            var y = new RangeValue((int)((pos.Y - o.Y) / scale.Value), 0, DATA_HEIGHT).Value;
             return new Point(x, y);
         }
         Point get_pos_ms() => get_pos_ms(MouseStates.Position);
@@ -87,8 +87,8 @@ namespace LayerPx
         {
             Cursor.Hide();
 
-            imgw = 256;
-            imgh = 256;
+            imgw = DATA_WIDTH;
+            imgh = DATA_HEIGHT;
 
             W = Render.Width;
             H = Render.Height;
@@ -193,8 +193,8 @@ namespace LayerPx
 
             if (IsKeyDown(Key.LeftCtrl))
             {
-                if (IsKeyPressed(Key.Up)) layer_gap = (int)Maths.Range(0, DATA_LAYERS - 1, layer_gap + (IsKeyDown(Key.LeftShift) ? 10 : 1));
-                if (IsKeyPressed(Key.Down)) layer_gap = (int)Maths.Range(0, DATA_LAYERS - 1, layer_gap - (IsKeyDown(Key.LeftShift) ? 10 : 1));
+                if (IsKeyPressed(Key.Up)) layer_gap = (int)Maths.Range(0, DATA_LAYERS, layer_gap + (IsKeyDown(Key.LeftShift) ? 10 : 1));
+                if (IsKeyPressed(Key.Down)) layer_gap = (int)Maths.Range(0, DATA_LAYERS, layer_gap - (IsKeyDown(Key.LeftShift) ? 10 : 1));
             }
             else
             {
@@ -245,8 +245,8 @@ namespace LayerPx
                     var old = get_pos_oldms();
                     for (float t = 0F; t <= 1F; t += 1F / MouseStates.LenghtDiff)
                     {
-                        x = new RangeValue((int)Maths.Lerp(old.X, m.X, t), 0, DATA_WIDTH - 1);
-                        y = new RangeValue((int)Maths.Lerp(old.Y, m.Y, t), 0, DATA_HEIGHT - 1);
+                        x = new RangeValue((int)Maths.Lerp(old.X, m.X, t), 0, DATA_WIDTH);
+                        y = new RangeValue((int)Maths.Lerp(old.Y, m.Y, t), 0, DATA_HEIGHT);
                         UseTool(x.Value, y.Value, v);
                     }
                 }
@@ -309,8 +309,8 @@ namespace LayerPx
                     if (data[l, x, y] == 0)
                         continue;
                     var dt = data.PointedData(x, y);
-                    var sat = Maths.Diff(128, dt.layer) / 255F;
-                    g.FillRectangle(new SolidBrush(pal[dt.index].ChangeSaturation(sat)), x * scale.Value, y * scale.Value, scale.Value, scale.Value);
+                    var brightness = dt.layer / (float)DATA_LAYERS;
+                    g.FillRectangle(new SolidBrush(pal[dt.index].WithBrightness(brightness)), x * scale.Value, y * scale.Value, scale.Value, scale.Value);
                 }
             }
         }
@@ -323,7 +323,7 @@ namespace LayerPx
                 int x = pt.X, y = pt.Y;
                 var dt = data.PointedData(x, y);
                 int l = dt.layer;
-                var brightness = dt.layer / 255F;
+                var brightness = dt.layer / (float)DATA_LAYERS;
                 g.FillRectangle(new SolidBrush(pal[dt.index].WithBrightness(brightness)), x * scale.Value, y * scale.Value, scale.Value, scale.Value);
             }
         }
