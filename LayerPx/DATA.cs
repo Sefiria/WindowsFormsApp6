@@ -1,4 +1,6 @@
 ﻿using System.Drawing;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using Tooling;
 
 namespace LayerPx
@@ -7,7 +9,7 @@ namespace LayerPx
     {
         public byte[] data;
         public int LAYERS, W, H;
-        public int convert(int layer, int x, int y) => layer * LAYERS * H * W + y * H * W + x;
+        public int convert(int layer, int x, int y) => layer * H * W + y * W + x;
         public int convert(int layer, Point xy) => convert(layer, xy.X, xy.Y);
         public byte this[int layer, int x, int y] { get => data[convert(layer, x, y)]; set => data[convert(layer, x, y)] = value; }
         public byte this[int layer, Point xy] { get => data[convert(layer, xy)]; set => data[convert(layer, xy)] = value; }
@@ -98,7 +100,7 @@ namespace LayerPx
             int old, layer;
             old = layer = PointedLayer(x, y);
             layer = layer == 0 ? LAYERS / 2 : new RangeValue(layer + direction, 0, LAYERS).Value;
-            return (old, layer);
+            return (old, (int)Maths.Range(0, LAYERS, layer));
         }
         public void set_single(int direction, int x, int y, int v)
         {
