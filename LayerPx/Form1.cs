@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Windows.Forms;
 using Tooling;
 using Tooling.UI;
@@ -29,9 +27,10 @@ namespace LayerPx
         public enum ToolModes
         {
             Normal = 0,
+            Force,
+            Auto,
             Up,
             Down,
-            Auto
         }
 
         Bitmap img, Output;
@@ -39,7 +38,7 @@ namespace LayerPx
         Timer TimerUpdate = new Timer() { Enabled = true, Interval = 10 };
         Timer TimerDraw = new Timer() { Enabled = true, Interval = 10 };
 
-        int W, H, imgw, imgh;
+        int imgw, imgh;
         PointF Center = PointF.Empty;
         PointF Cam = PointF.Empty;
         Tools Tool = Tools.PenSquare;
@@ -57,7 +56,7 @@ namespace LayerPx
         PointF sun;
         bool is_moving_sun = false;
 
-        const int DATA_LAYERS = 15, DATA_WIDTH = 63, DATA_HEIGHT = 63;
+        const int DATA_LAYERS = 8, DATA_WIDTH = 127, DATA_HEIGHT = 127;
         const float CAM_MOV_SPD = 3F, SUN_MOV_SPD = 2F;
         const float SCALE_GAP = 0.5F;
 
@@ -81,6 +80,8 @@ namespace LayerPx
         float Amplitude => IsKeyDown(Key.LeftShift) ? 5F : 1F;
         float imgw_scaled => (imgw * scale.Value);
         float imgh_scaled => (imgh * scale.Value);
+        int W => Render.Width;
+        int H => Render.Height;
 
         public Form1()
         {
@@ -97,9 +98,6 @@ namespace LayerPx
 
             imgw = DATA_WIDTH + 1;
             imgh = DATA_HEIGHT + 1;
-
-            W = Render.Width;
-            H = Render.Height;
 
             Center = new PointF(W / 2F, H / 2F);
 
@@ -118,6 +116,7 @@ namespace LayerPx
             TimerUpdate.Tick += GlobalUpdate;
             TimerDraw.Tick += GlobalDraw;
             MouseWheel += Render_MouseWheel;
+            Resize += (s, e) => { ResetGx(); ResetGxRender(); };
         }
         void create_ui()
         {
@@ -173,7 +172,10 @@ namespace LayerPx
             ColorDialog dial = new ColorDialog() { Color = pal[pal_index] };
             var success = dial.ShowDialog() == DialogResult.OK;
             if (success)
+            {
                 pal[pal_index] = dial.Color;
+                ResetDraw();
+            }
             Cursor.Hide();
             return success;
         }
@@ -206,8 +208,8 @@ namespace LayerPx
             if (IsKeyPressed(Key.B)) Tool = Tools.Bucket;
             if (IsKeyPressed(Key.E)) Tool = Tools.Eraser;
 
-            if (IsKeyPressed(Key.Left)) Mode = (ToolModes)Maths.Range(0, (int)ToolModes.Auto, (int)Mode - 1);
-            if (IsKeyPressed(Key.Right)) Mode = (ToolModes)Maths.Range(0, (int)ToolModes.Auto, (int)Mode + 1);
+            if (IsKeyPressed(Key.Left)) Mode = (ToolModes)Maths.Range(0, Enum.GetNames(typeof(ToolModes)).Count()-1, (int)Mode - 1);
+            if (IsKeyPressed(Key.Right)) Mode = (ToolModes)Maths.Range(0, Enum.GetNames(typeof(ToolModes)).Count() - 1, (int)Mode + 1);
 
             if (IsKeyDown(Key.LeftCtrl))
             {
@@ -281,7 +283,7 @@ namespace LayerPx
         }
         void UseTool(int x, int y, int v)
         {
-            if (Mode != ToolModes.Normal)
+            if (!new List<ToolModes>() { ToolModes.Normal, ToolModes.Force }.Contains(Mode))
             {
                 if (holding_layer_released)
                 {
@@ -298,11 +300,12 @@ namespace LayerPx
             }
             else
             {
+                bool f = Mode == ToolModes.Force;
                 switch (Tool)
                 {
                     default: break;
-                    case Tools.PenCircle: data.SetCircleWithLayer(fixed_layer, x, y, v, pen_size); break;
-                    case Tools.PenSquare: data.SetSquareWithLayer(fixed_layer, x, y, v, pen_size); break;
+                    case Tools.PenCircle: data.SetCircleWithLayer(fixed_layer, x, y, v, pen_size, force: f); break;
+                    case Tools.PenSquare: data.SetSquareWithLayer(fixed_layer, x, y, v, pen_size, force: f); break;
                 }
             }
             refresh_shadows = true;
@@ -321,7 +324,7 @@ namespace LayerPx
             DrawUI();
             Render.Image = img;
         }
-        void ResetDraw()
+        void ResetDraw(string sender = "")
         {
             for (int y = 0; y < DATA_HEIGHT; y++)
             {
@@ -335,6 +338,8 @@ namespace LayerPx
                     g.FillRectangle(new SolidBrush(pal[dt.index].WithBrightness(brightness)), x * scale.Value, y * scale.Value, scale.Value, scale.Value);
                 }
             }
+            if(sender != nameof(draw_shadow))
+                refresh_shadows = true;
         }
         void Draw()
         {
@@ -392,10 +397,10 @@ namespace LayerPx
         }
         void draw_modes()
         {
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 5; i++)
             {
-                g_render.FillRectangle(i == (int)Mode ? Brushes.Gray : Brushes.DimGray, W - 10 - (4 - i) * 22, 10, 20, 20);
-                g_render.DrawString($"{Enum.GetName(typeof(ToolModes), Mode)[0]}", DefaultFont, i == (int)Mode ? Brushes.White : Brushes.Gray, W - 10 - (4 - i) * 22 + 4, 10+3);
+                g_render.FillRectangle(i == (int)Mode ? Brushes.Gray : Brushes.DimGray, W - 10 - (5 - i) * 22, 10, 20, 20);
+                g_render.DrawString($"{Enum.GetName(typeof(ToolModes), Mode)[0]}", DefaultFont, i == (int)Mode ? Brushes.White : Brushes.Gray, W - 10 - (5 - i) * 22 + 4, 10+3);
             }
 
             g_render.DrawString($"gap:{layer_gap}", DefaultFont, Brushes.White, W - 60, 40);
@@ -420,7 +425,7 @@ namespace LayerPx
             if (!ShowShadows || !refresh_shadows)
                 return;
 
-            ResetGx();
+            ResetDraw(nameof(draw_shadow));
             var sun_pos = get_sun_projection;
             var center = get_pos(Output).PlusF(imgw_scaled / 2F, imgh_scaled / 2F);
             var look = center.Minus(sun_pos).norm();
@@ -430,7 +435,7 @@ namespace LayerPx
             {
                 for (int y = 0; y < DATA_HEIGHT + 1; y++)
                 {
-                    for (int x = 0; x < DATA_HEIGHT + 1; x++)
+                    for (int x = 0; x < DATA_WIDTH + 1; x++)
                     {
                         i = data[l, x, y];
                         if (i == 0) continue;

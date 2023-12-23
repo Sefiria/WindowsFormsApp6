@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System.Collections.Generic;
+using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using Tooling;
@@ -41,24 +42,24 @@ namespace LayerPx
         public int Pointedindex(int x, int y) => PointedData(x, y).index;
         public int Pointedindex(Point xy) => Pointedindex(xy.X, xy.Y);
         public void Set(int l, int x, int y, int v) => this[l, x, y] = (byte)Maths.Range(0, byte.MaxValue, v);
-        public void SetSquareWithLayer(int l, int x, int y, int v, int size)
+        public void SetSquareWithLayer(int l, int x, int y, int v, int size, bool force = false)
         {
             if (size == 1)
             {
-                set_single_bylayer(l, x, y, v);
+                set_single_bylayer(l, x, y, v, force);
                 return;
             }
 
             for (int j= -size/2; j<size/2; j++)
                 for (int i = -size / 2; i < size / 2; i++)
                     if(check_pass(x - i, y - j))
-                        set_single_bylayer(l, x-i, y-j, v);
+                        set_single_bylayer(l, x-i, y-j, v, force);
         }
-        public void SetCircleWithLayer(int l, int x, int y, int v, int diameter)
+        public void SetCircleWithLayer(int l, int x, int y, int v, int diameter, bool force = false)
         {
             if (diameter == 1)
             {
-                set_single_bylayer(l, x, y, v);
+                set_single_bylayer(l, x, y, v, force);
                 return;
             }
 
@@ -66,7 +67,7 @@ namespace LayerPx
             for (int j = -radius; j < radius; j++)
                 for (int i = -radius; i < radius; i++)
                     if (check_pass(x - i, y - j) && Maths.Distance((i, j).P()) <= radius)
-                        set_single_bylayer(l, x-i, y-j, v);
+                        set_single_bylayer(l, x-i, y-j, v, force);
         }
         public void SetSquareWithDirection(int direction, int x, int y, int v, int size)
         {
@@ -111,12 +112,13 @@ namespace LayerPx
             this[@new, x, y] = (byte)v;
             Form1.Instance.draw_refresh_queue.Enqueue((x, y).iP());
         }
-        public void set_single_bylayer(int @new, int x, int y, int v)
+        public void set_single_bylayer(int @new, int x, int y, int v, bool force = false)
         {
             int old = PointedLayer(x, y);
-            if (Form1.Instance.Mode != Form1.ToolModes.Normal && old != Form1.Instance.layer_at_first_press)
+            if (!new List<Form1.ToolModes>() { Form1.ToolModes.Normal, Form1.ToolModes.Force }.Contains(Form1.Instance.Mode) && (!force || old != Form1.Instance.layer_at_first_press))
                 return;
-            this[old, x, y] = 0;
+            if(force)
+                this[old, x, y] = 0;
             this[@new, x, y] = (byte)v;
             Form1.Instance.draw_refresh_queue.Enqueue((x, y).iP());
         }

@@ -37,7 +37,7 @@
             this.Render.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Render.Location = new System.Drawing.Point(0, 0);
             this.Render.Name = "Render";
-            this.Render.Size = new System.Drawing.Size(800, 450);
+            this.Render.Size = new System.Drawing.Size(1085, 704);
             this.Render.TabIndex = 1;
             this.Render.TabStop = false;
             this.Render.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Render_MouseDown);
@@ -48,7 +48,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(1085, 704);
             this.Controls.Add(this.Render);
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
