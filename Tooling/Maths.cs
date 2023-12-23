@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ILGPU.IR.Rewriting;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -374,5 +375,39 @@ namespace Tooling
         }
 
         public static int Diff(int a, int b) => Math.Max(a, b) - Math.Min(a, b);
+
+        public static PointF ProjectionSurRectangle(Rectangle rect, PointF pt)
+        {
+            int rx = rect.X, ry = rect.Y, rw = rect.Width, rh = rect.Height;
+            var pt_norm = pt.Minus(rx + rw / 2F, ry + rh / 2F);
+
+            if(Sq(pt.X) > Sq(pt.Y))
+            {
+                if(pt_norm.X < 0)
+                    return ProjectionSurSegment((rx, ry).P(), (rx, ry + rh).P(), pt);
+                else
+                    return ProjectionSurSegment((rx + rw, ry).P(), (rx + rw, ry + rh).P(), pt);
+
+            }
+            else
+            {
+                if (pt_norm.Y < 0)
+                    return ProjectionSurSegment((rx, ry).P(), (rx + rw, ry).P(), pt);
+                else
+                    return ProjectionSurSegment((rx, ry + rh).P(), (rx + rw, ry + rh).P(), pt);
+            }
+        }
+        public static PointF ProjectionSurRectangleSimple(Rectangle rect, PointF pt)
+        {
+            float rx = rect.X, ry = rect.Y, rw = rect.Width, rh = rect.Height;
+            var pt_fromcenter = pt.Minus(rx + rw / 2F, ry + rh / 2F);
+
+            if (Sq(pt_fromcenter.X) > Sq(pt_fromcenter.Y))
+                return new PointF(rx + (pt_fromcenter.X < 0F ? 0F : rw), Range(ry, ry + rh, pt.Y));
+            else
+                return new PointF(Range(rx, rx + rw, pt.X), ry + (pt_fromcenter.Y < 0 ? 0F : rh));
+        }
+        public static PointF ProjectionSurRectangle(RectangleF rect, PointF pt) => ProjectionSurRectangle(rect.ToIntRect(), pt);
+        public static PointF ProjectionSurRectangleSimple(RectangleF rect, PointF pt) => ProjectionSurRectangleSimple(rect.ToIntRect(), pt);
     }
 }

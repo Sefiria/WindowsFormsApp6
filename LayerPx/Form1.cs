@@ -43,7 +43,8 @@ namespace LayerPx
         PointF Center = PointF.Empty;
         PointF Cam = PointF.Empty;
         Tools Tool = Tools.PenSquare;
-        bool ShowGrid = false;
+        bool ShowGrid = false, ShowSun = false, ShowShadows = true;
+        bool refresh_shadows = false;
         DATA data;
         Color[] pal = new Color[16];// 0 is transparent
         int pal_index_primary = 1;
@@ -53,14 +54,21 @@ namespace LayerPx
         int fixed_layer = DATA_LAYERS / 2;
         int layer_gap = 1;
         bool mouseleft_released = true;
+        PointF sun;
+        bool is_moving_sun = false;
 
         const int DATA_LAYERS = 15, DATA_WIDTH = 63, DATA_HEIGHT = 63;
-        const float CAM_MOV_SPD = 3F;
+        const float CAM_MOV_SPD = 3F, SUN_MOV_SPD = 2F;
         const float SCALE_GAP = 0.5F;
 
         RangeValueF scale = new RangeValueF(1F, 2F, 10F);
+        PointF get_world_sun => get_pos(sun);
+        PointF get_sun_projection => Maths.ProjectionSurRectangleSimple(new RectangleF(get_pos_x(Output), get_pos_y(Output), imgw_scaled, imgh_scaled), get_world_sun);
 
+        PointF get_pos(PointF pt) => Center.PlusF(pt.Minus(Cam).x(scale.Value));
         PointF get_pos(Bitmap _img) => Center.Minus(imgw_scaled / 2, imgh_scaled / 2).Minus(Cam.x(scale.Value));
+        float get_pos_x(Bitmap _img) => Center.X - imgw_scaled / 2F - Cam.X * scale.Value;
+        float get_pos_y(Bitmap _img) => Center.Y - imgh_scaled / 2F - Cam.Y * scale.Value;
         Point get_pos_ms(PointF pos)
         {
             var o = get_pos(Output);
@@ -87,8 +95,8 @@ namespace LayerPx
         {
             Cursor.Hide();
 
-            imgw = DATA_WIDTH;
-            imgh = DATA_HEIGHT;
+            imgw = DATA_WIDTH + 1;
+            imgh = DATA_HEIGHT + 1;
 
             W = Render.Width;
             H = Render.Height;
@@ -98,6 +106,8 @@ namespace LayerPx
             pal[0] = Color.Black;
             pal[1] = Color.White;
             data = new DATA(DATA_LAYERS, DATA_WIDTH, DATA_HEIGHT);
+
+            sun = (0F, 0F).P();
 
             ResetGx();
             ResetGxRender();
@@ -176,12 +186,20 @@ namespace LayerPx
             MouseStates.OldPosition = MouseStates.Position;
             MouseStates.Position = Render.PointToClient(MousePosition);
 
-            if (IsKeyDown(Key.Z)) Cam = Cam.Minus(0F, CAM_MOV_SPD * Amplitude);
-            if (IsKeyDown(Key.Q)) Cam = Cam.Minus(CAM_MOV_SPD * Amplitude, 0F);
-            if (IsKeyDown(Key.S)) Cam = Cam.PlusF(0F, CAM_MOV_SPD * Amplitude);
-            if (IsKeyDown(Key.D)) Cam = Cam.PlusF(CAM_MOV_SPD * Amplitude, 0F);
+            if (IsKeyDown(Key.Z)) { Cam = Cam.Minus(0F, CAM_MOV_SPD * Amplitude); refresh_shadows = true; }
+            if (IsKeyDown(Key.Q)) { Cam = Cam.Minus(CAM_MOV_SPD * Amplitude, 0F); refresh_shadows = true; }
+            if (IsKeyDown(Key.S)) { Cam = Cam.PlusF(0F, CAM_MOV_SPD * Amplitude); refresh_shadows = true; }
+            if (IsKeyDown(Key.D)) { Cam = Cam.PlusF(CAM_MOV_SPD * Amplitude, 0F); refresh_shadows = true; }
+
+            if (IsKeyDown(Key.Numpad8)) { sun = sun.Minus(0F, SUN_MOV_SPD * Amplitude); is_moving_sun = true; }
+            if (IsKeyDown(Key.Numpad4)) { sun = sun.Minus(SUN_MOV_SPD * Amplitude, 0F); is_moving_sun = true; }
+            if (IsKeyDown(Key.Numpad2)) { sun = sun.PlusF(0F, SUN_MOV_SPD * Amplitude); is_moving_sun = true; }
+            if (IsKeyDown(Key.Numpad6)) { sun = sun.PlusF(SUN_MOV_SPD * Amplitude, 0F); is_moving_sun = true; }
+            if (!new List<Key>() { Key.Numpad8, Key.Numpad4, Key.Numpad2, Key.Numpad6 }.Any(k => IsKeyDown(k)) && is_moving_sun) { is_moving_sun = false; refresh_shadows = true; }
 
             if (IsKeyPressed(Key.G)) ShowGrid = !ShowGrid;
+            if (IsKeyPressed(Key.H)) ShowSun = !ShowSun; if (ShowSun);
+            if (IsKeyPressed(Key.J)) { ShowShadows = !ShowShadows; if (ShowShadows) refresh_shadows = true; }
 
             if (IsKeyPressed(Key.C)) Tool = Tools.PenCircle;
             if (IsKeyPressed(Key.P)) Tool = Tools.PenSquare;
@@ -219,6 +237,7 @@ namespace LayerPx
                 {
                     scale.Value += SCALE_GAP * (MouseStates.Delta < 0 ? -1F : 1F) * Amplitude;
                     ResetGx();
+                    refresh_shadows = true;
                 }
                 else
                 {
@@ -286,6 +305,7 @@ namespace LayerPx
                     case Tools.PenSquare: data.SetSquareWithLayer(fixed_layer, x, y, v, pen_size); break;
                 }
             }
+            refresh_shadows = true;
         }
 
 
@@ -295,7 +315,9 @@ namespace LayerPx
         {
             ResetGxRender();
             Draw();
+            draw_shadows();
             g_render.DrawImage(Output, get_pos(Output));
+            draw_sun();
             DrawUI();
             Render.Image = img;
         }
@@ -378,6 +400,53 @@ namespace LayerPx
 
             g_render.DrawString($"gap:{layer_gap}", DefaultFont, Brushes.White, W - 60, 40);
             g_render.DrawString($"layer:{fixed_layer}", DefaultFont, Brushes.White, W - 60, 60);
+        }
+        void draw_sun()
+        {
+            if (!ShowSun)
+                return;
+            var sun_radius = 8F;
+            var sun_pos = get_sun_projection;
+            var center = get_pos(Output).PlusF(imgw_scaled / 2F, imgh_scaled / 2F);
+            g_render.DrawEllipse(Pens.Yellow, sun_pos.X - sun_radius, sun_pos.Y - sun_radius, sun_radius * 2F, sun_radius * 2F);
+            g_render.DrawEllipse(Pens.Orange, get_world_sun.X - sun_radius, get_world_sun.Y - sun_radius, sun_radius * 2F, sun_radius * 2F);
+            g_render.DrawLine(Pens.Yellow, sun_pos, center);
+            var look = center.Minus(sun_pos).norm();
+            g_render.DrawLine(Pens.Yellow, center, center.PlusF(look.Rotate(-135F).x(10F)));
+            g_render.DrawLine(Pens.Yellow, center, center.PlusF(look.Rotate(135F).x(10F)));
+        }
+        void draw_shadows()
+        {
+            if (!ShowShadows || !refresh_shadows)
+                return;
+
+            ResetGx();
+            var sun_pos = get_sun_projection;
+            var center = get_pos(Output).PlusF(imgw_scaled / 2F, imgh_scaled / 2F);
+            var look = center.Minus(sun_pos).norm();
+            int i, j, _x, _y;
+
+            for(int l=2; l<DATA_LAYERS+1; l++)
+            {
+                for (int y = 0; y < DATA_HEIGHT + 1; y++)
+                {
+                    for (int x = 0; x < DATA_HEIGHT + 1; x++)
+                    {
+                        i = data[l, x, y];
+                        if (i == 0) continue;
+                        _x = x + (int)Maths.Round(look.X*2, 1);
+                        _y = y + (int)Maths.Round(look.Y*2, 1);
+                        j = data.PointedLayer(_x, _y);
+                        if (j >= l || j == 0 || (x == _x && y == _y)) continue;
+                        draw_shadow(pal[i], (l - 2) / (float)DATA_LAYERS, _x, _y);
+                    }
+                }
+            }
+            refresh_shadows = false;
+        }
+        void draw_shadow(Color c, float b, int x, int y)
+        {
+            g.FillRectangle(new SolidBrush(c.WithBrightness(b)), x * scale.Value, y * scale.Value, scale.Value, scale.Value);
         }
 
 
