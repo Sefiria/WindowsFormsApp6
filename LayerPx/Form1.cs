@@ -62,7 +62,6 @@ namespace LayerPx
 
         RangeValueF scale = new RangeValueF(1F, 2F, 10F);
         PointF get_world_sun => get_pos(sun);
-        PointF get_sun_projection => Maths.ProjectionSurRectangleSimple(new RectangleF(get_pos_x(Output), get_pos_y(Output), imgw_scaled, imgh_scaled), get_world_sun);
 
         PointF get_pos(PointF pt) => Center.PlusF(pt.Minus(Cam).x(scale.Value));
         PointF get_pos(Bitmap _img) => Center.Minus(imgw_scaled / 2, imgh_scaled / 2).Minus(Cam.x(scale.Value));
@@ -411,12 +410,10 @@ namespace LayerPx
             if (!ShowSun)
                 return;
             var sun_radius = 8F;
-            var sun_pos = get_sun_projection;
             var center = get_pos(Output).PlusF(imgw_scaled / 2F, imgh_scaled / 2F);
-            g_render.DrawEllipse(Pens.Yellow, sun_pos.X - sun_radius, sun_pos.Y - sun_radius, sun_radius * 2F, sun_radius * 2F);
             g_render.DrawEllipse(Pens.Orange, get_world_sun.X - sun_radius, get_world_sun.Y - sun_radius, sun_radius * 2F, sun_radius * 2F);
-            g_render.DrawLine(Pens.Yellow, sun_pos, center);
-            var look = center.Minus(sun_pos).norm();
+            g_render.DrawLine(Pens.Yellow, get_world_sun, center);
+            var look = center.Minus(get_world_sun).norm();
             g_render.DrawLine(Pens.Yellow, center, center.PlusF(look.Rotate(-135F).x(10F)));
             g_render.DrawLine(Pens.Yellow, center, center.PlusF(look.Rotate(135F).x(10F)));
         }
@@ -426,9 +423,10 @@ namespace LayerPx
                 return;
 
             ResetDraw(nameof(draw_shadow));
-            var sun_pos = get_sun_projection;
+            var sun_pos = get_world_sun;
             var center = get_pos(Output).PlusF(imgw_scaled / 2F, imgh_scaled / 2F);
-            var look = center.Minus(sun_pos).norm();
+            var lenght = (center.Minus(sun_pos).Length() / (Maths.Diagonal(imgw_scaled, imgh_scaled) / 2F)) * 4F;
+            Point look_lenght = center.Minus(sun_pos).norm().x(lenght).ToPoint();
             int i, j, _x, _y;
 
             for(int l=2; l<DATA_LAYERS+1; l++)
@@ -439,8 +437,8 @@ namespace LayerPx
                     {
                         i = data[l, x, y];
                         if (i == 0) continue;
-                        _x = x + (int)Maths.Round(look.X*2, 1);
-                        _y = y + (int)Maths.Round(look.Y*2, 1);
+                        _x = x + look_lenght.X;
+                        _y = y + look_lenght.Y;
                         j = data.PointedLayer(_x, _y);
                         if (j >= l || j == 0 || (x == _x && y == _y)) continue;
                         draw_shadow(pal[i], (l - 2) / (float)DATA_LAYERS, _x, _y);
