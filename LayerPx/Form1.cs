@@ -54,7 +54,6 @@ namespace LayerPx
         int layer_gap = 1;
         bool mouseleft_released = true;
         PointF sun;
-        bool is_moving_sun = false;
 
         const int DATA_LAYERS = 8, DATA_WIDTH = 127, DATA_HEIGHT = 127;
         const float CAM_MOV_SPD = 3F, SUN_MOV_SPD = 2F;
@@ -192,11 +191,10 @@ namespace LayerPx
             if (IsKeyDown(Key.S)) { Cam = Cam.PlusF(0F, CAM_MOV_SPD * Amplitude); refresh_shadows = true; }
             if (IsKeyDown(Key.D)) { Cam = Cam.PlusF(CAM_MOV_SPD * Amplitude, 0F); refresh_shadows = true; }
 
-            if (IsKeyDown(Key.Numpad8)) { sun = sun.Minus(0F, SUN_MOV_SPD * Amplitude); is_moving_sun = true; }
-            if (IsKeyDown(Key.Numpad4)) { sun = sun.Minus(SUN_MOV_SPD * Amplitude, 0F); is_moving_sun = true; }
-            if (IsKeyDown(Key.Numpad2)) { sun = sun.PlusF(0F, SUN_MOV_SPD * Amplitude); is_moving_sun = true; }
-            if (IsKeyDown(Key.Numpad6)) { sun = sun.PlusF(SUN_MOV_SPD * Amplitude, 0F); is_moving_sun = true; }
-            if (!new List<Key>() { Key.Numpad8, Key.Numpad4, Key.Numpad2, Key.Numpad6 }.Any(k => IsKeyDown(k)) && is_moving_sun) { is_moving_sun = false; refresh_shadows = true; }
+            if (IsKeyDown(Key.Numpad8)) { sun = sun.Minus(0F, SUN_MOV_SPD * Amplitude); refresh_shadows = true; }
+            if (IsKeyDown(Key.Numpad4)) { sun = sun.Minus(SUN_MOV_SPD * Amplitude, 0F); refresh_shadows = true; }
+            if (IsKeyDown(Key.Numpad2)) { sun = sun.PlusF(0F, SUN_MOV_SPD * Amplitude); refresh_shadows = true; }
+            if (IsKeyDown(Key.Numpad6)) { sun = sun.PlusF(SUN_MOV_SPD * Amplitude, 0F); refresh_shadows = true; }
 
             if (IsKeyPressed(Key.G)) ShowGrid = !ShowGrid;
             if (IsKeyPressed(Key.H)) ShowSun = !ShowSun; if (ShowSun);
@@ -299,7 +297,7 @@ namespace LayerPx
             }
             else
             {
-                bool f = Mode == ToolModes.Force;
+                bool f = Mode != ToolModes.Normal;
                 switch (Tool)
                 {
                     default: break;

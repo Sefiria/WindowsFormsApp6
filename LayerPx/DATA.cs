@@ -42,7 +42,7 @@ namespace LayerPx
         public int Pointedindex(int x, int y) => PointedData(x, y).index;
         public int Pointedindex(Point xy) => Pointedindex(xy.X, xy.Y);
         public void Set(int l, int x, int y, int v) => this[l, x, y] = (byte)Maths.Range(0, byte.MaxValue, v);
-        public void SetSquareWithLayer(int l, int x, int y, int v, int size, bool force = false)
+        public void SetSquareWithLayer(int l, int x, int y, int v, int size, bool force = true)
         {
             if (size == 1)
             {
@@ -55,7 +55,7 @@ namespace LayerPx
                     if(check_pass(x - i, y - j))
                         set_single_bylayer(l, x-i, y-j, v, force);
         }
-        public void SetCircleWithLayer(int l, int x, int y, int v, int diameter, bool force = false)
+        public void SetCircleWithLayer(int l, int x, int y, int v, int diameter, bool force = true)
         {
             if (diameter == 1)
             {
@@ -106,16 +106,16 @@ namespace LayerPx
         public void set_single_bydir(int direction, int x, int y, int v)
         {
             (int old, int @new) = calc_layer(direction, x, y);
-            if (Form1.Instance.Mode != Form1.ToolModes.Normal && old != Form1.Instance.layer_at_first_press)
+            if (old != Form1.Instance.layer_at_first_press)
                 return;
             this[old, x, y] = 0;
             this[@new, x, y] = (byte)v;
             Form1.Instance.draw_refresh_queue.Enqueue((x, y).iP());
         }
-        public void set_single_bylayer(int @new, int x, int y, int v, bool force = false)
+        public void set_single_bylayer(int @new, int x, int y, int v, bool force = true)
         {
             int old = PointedLayer(x, y);
-            if (!new List<Form1.ToolModes>() { Form1.ToolModes.Normal, Form1.ToolModes.Force }.Contains(Form1.Instance.Mode) && (!force || old != Form1.Instance.layer_at_first_press))
+            if (force && old != Form1.Instance.layer_at_first_press)
                 return;
             if(force)
                 this[old, x, y] = 0;
