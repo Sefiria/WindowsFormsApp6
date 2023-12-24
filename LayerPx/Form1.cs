@@ -32,6 +32,13 @@ namespace LayerPx
             Up,
             Down,
         }
+        public enum MirrorMode
+        {
+            None = 0,
+            X,
+            Y,
+            XY,
+        }
 
         Bitmap img, Output;
         Graphics g_render, g;
@@ -41,8 +48,11 @@ namespace LayerPx
         int imgw, imgh;
         PointF Center = PointF.Empty;
         PointF Cam = PointF.Empty;
+        PointF sun;
+        PointF mirror_src;
         Tools Tool = Tools.PenSquare;
-        bool ShowGrid = false, ShowSun = false, ShowShadows = true;
+        MirrorMode mirror_mode = MirrorMode.None;
+        bool ShowGrid = false, ShowSunAndMirror = false, ShowShadows = true;
         bool refresh_shadows = false;
         DATA data;
         Color[] pal = new Color[16];// 0 is transparent
@@ -53,14 +63,14 @@ namespace LayerPx
         int fixed_layer = DATA_LAYERS / 2;
         int layer_gap = 1;
         bool mouseleft_released = true;
-        PointF sun;
 
         const int DATA_LAYERS = 8, DATA_WIDTH = 127, DATA_HEIGHT = 127;
         const float CAM_MOV_SPD = 3F, SUN_MOV_SPD = 2F;
         const float SCALE_GAP = 0.5F;
 
         RangeValueF scale = new RangeValueF(1F, 2F, 10F);
-        PointF get_world_sun => get_pos(sun);
+        PointF get_world_sun => get_pos(sun); 
+        PointF get_world_mirror => get_pos(mirror_src); 
 
         PointF get_pos(PointF pt) => Center.PlusF(pt.Minus(Cam).x(scale.Value));
         PointF get_pos(Bitmap _img) => Center.Minus(imgw_scaled / 2, imgh_scaled / 2).Minus(Cam.x(scale.Value));
@@ -191,13 +201,26 @@ namespace LayerPx
             if (IsKeyDown(Key.S)) { Cam = Cam.PlusF(0F, CAM_MOV_SPD * Amplitude); refresh_shadows = true; }
             if (IsKeyDown(Key.D)) { Cam = Cam.PlusF(CAM_MOV_SPD * Amplitude, 0F); refresh_shadows = true; }
 
-            if (IsKeyDown(Key.Numpad8)) { sun = sun.Minus(0F, SUN_MOV_SPD * Amplitude); refresh_shadows = true; }
-            if (IsKeyDown(Key.Numpad4)) { sun = sun.Minus(SUN_MOV_SPD * Amplitude, 0F); refresh_shadows = true; }
-            if (IsKeyDown(Key.Numpad2)) { sun = sun.PlusF(0F, SUN_MOV_SPD * Amplitude); refresh_shadows = true; }
-            if (IsKeyDown(Key.Numpad6)) { sun = sun.PlusF(SUN_MOV_SPD * Amplitude, 0F); refresh_shadows = true; }
+            if(ShowSunAndMirror)
+            {
+                if (IsKeyDown(Key.LeftCtrl))
+                {
+                    if (IsKeyDown(Key.Numpad8)) { sun = sun.Minus(0F, SUN_MOV_SPD * Amplitude); refresh_shadows = true; }
+                    if (IsKeyDown(Key.Numpad4)) { sun = sun.Minus(SUN_MOV_SPD * Amplitude, 0F); refresh_shadows = true; }
+                    if (IsKeyDown(Key.Numpad2)) { sun = sun.PlusF(0F, SUN_MOV_SPD * Amplitude); refresh_shadows = true; }
+                    if (IsKeyDown(Key.Numpad6)) { sun = sun.PlusF(SUN_MOV_SPD * Amplitude, 0F); refresh_shadows = true; }
+                }
+                else
+                {
+                    if (IsKeyDown(Key.Numpad8)) mirror_src = mirror_src.Minus(0F, SUN_MOV_SPD * Amplitude);
+                    if (IsKeyDown(Key.Numpad4)) mirror_src = mirror_src.Minus(SUN_MOV_SPD * Amplitude, 0F);
+                    if (IsKeyDown(Key.Numpad2)) mirror_src = mirror_src.PlusF(0F, SUN_MOV_SPD * Amplitude);
+                    if (IsKeyDown(Key.Numpad6)) mirror_src = mirror_src.PlusF(SUN_MOV_SPD * Amplitude, 0F);
+                }
+            }
 
             if (IsKeyPressed(Key.G)) ShowGrid = !ShowGrid;
-            if (IsKeyPressed(Key.H)) ShowSun = !ShowSun; if (ShowSun);
+            if (IsKeyPressed(Key.H)) ShowSunAndMirror = !ShowSunAndMirror;
             if (IsKeyPressed(Key.J)) { ShowShadows = !ShowShadows; if (ShowShadows) refresh_shadows = true; }
 
             if (IsKeyPressed(Key.C)) Tool = Tools.PenCircle;
@@ -205,8 +228,16 @@ namespace LayerPx
             if (IsKeyPressed(Key.B)) Tool = Tools.Bucket;
             if (IsKeyPressed(Key.E)) Tool = Tools.Eraser;
 
-            if (IsKeyPressed(Key.Left)) Mode = (ToolModes)Maths.Range(0, Enum.GetNames(typeof(ToolModes)).Count()-1, (int)Mode - 1);
-            if (IsKeyPressed(Key.Right)) Mode = (ToolModes)Maths.Range(0, Enum.GetNames(typeof(ToolModes)).Count() - 1, (int)Mode + 1);
+            if(IsKeyDown(Key.LeftCtrl))
+            {
+                if (IsKeyPressed(Key.Left)) mirror_mode = (MirrorMode)Maths.Range(0, Enum.GetNames(typeof(MirrorMode)).Count() - 1, (int)mirror_mode - 1);
+                if (IsKeyPressed(Key.Right)) mirror_mode = (MirrorMode)Maths.Range(0, Enum.GetNames(typeof(MirrorMode)).Count() - 1, (int)mirror_mode + 1);
+            }
+            else
+            {
+                if (IsKeyPressed(Key.Left)) Mode = (ToolModes)Maths.Range(0, Enum.GetNames(typeof(ToolModes)).Count() - 1, (int)Mode - 1);
+                if (IsKeyPressed(Key.Right)) Mode = (ToolModes)Maths.Range(0, Enum.GetNames(typeof(ToolModes)).Count() - 1, (int)Mode + 1);
+            }
 
             if (IsKeyDown(Key.LeftCtrl))
             {
@@ -317,7 +348,7 @@ namespace LayerPx
             Draw();
             draw_shadows();
             g_render.DrawImage(Output, get_pos(Output));
-            draw_sun();
+            draw_sun_and_mirror();
             DrawUI();
             Render.Image = img;
         }
@@ -397,23 +428,42 @@ namespace LayerPx
             for (int i = 0; i < 5; i++)
             {
                 g_render.FillRectangle(i == (int)Mode ? Brushes.Gray : Brushes.DimGray, W - 10 - (5 - i) * 22, 10, 20, 20);
-                g_render.DrawString($"{Enum.GetName(typeof(ToolModes), Mode)[0]}", DefaultFont, i == (int)Mode ? Brushes.White : Brushes.Gray, W - 10 - (5 - i) * 22 + 4, 10+3);
+                g_render.DrawString($"{Enum.GetName(typeof(ToolModes), (ToolModes)i)[0]}", DefaultFont, i == (int)Mode ? Brushes.White : Brushes.Gray, W - 10 - (5 - i) * 22 + 4, 10+3);
             }
+            g_render.DrawString($"draw mode :", DefaultFont, Brushes.White, W - 190, 13);
 
-            g_render.DrawString($"gap:{layer_gap}", DefaultFont, Brushes.White, W - 60, 40);
-            g_render.DrawString($"layer:{fixed_layer}", DefaultFont, Brushes.White, W - 60, 60);
+            for (int i = 0; i < 4; i++)
+                g_render.FillRectangle(i == (int)mirror_mode ? Brushes.LightSteelBlue : Brushes.LightSlateGray, W - 10 - (4 - i) * 27, 40, 25, 20);
+            g_render.DrawString($"mirror mode :", DefaultFont, Brushes.White, W - 190, 43);
+            g_render.DrawString($"_", DefaultFont, Brushes.Black, W - 7 - 4 * 27 + 4, 40 + 3);
+            g_render.DrawString($"X", DefaultFont, Brushes.Black, W - 7 - 3 * 27 + 4, 40 + 3);
+            g_render.DrawString($"Y", DefaultFont, Brushes.Black, W - 7 - 2 * 27 + 4, 40 + 3);
+            g_render.DrawString($"XY", DefaultFont, Brushes.Black, W - 10 - 1 * 27 + 4, 40 + 3);
+
+            g_render.DrawString($"gap:{layer_gap}", DefaultFont, Brushes.White, W - 60, 70);
+            g_render.DrawString($"layer:{fixed_layer}", DefaultFont, Brushes.White, W - 60, 90);
         }
-        void draw_sun()
+        void draw_sun_and_mirror()
         {
-            if (!ShowSun)
+            if (!ShowSunAndMirror)
                 return;
-            var sun_radius = 8F;
+
+            // SUN
+
+            var gizmo_radius = 8F;
             var center = get_pos(Output).PlusF(imgw_scaled / 2F, imgh_scaled / 2F);
-            g_render.DrawEllipse(Pens.Orange, get_world_sun.X - sun_radius, get_world_sun.Y - sun_radius, sun_radius * 2F, sun_radius * 2F);
+            g_render.DrawEllipse(Pens.Orange, get_world_sun.X - gizmo_radius, get_world_sun.Y - gizmo_radius, gizmo_radius * 2F, gizmo_radius * 2F);
             g_render.DrawLine(Pens.Yellow, get_world_sun, center);
             var look = center.Minus(get_world_sun).norm();
             g_render.DrawLine(Pens.Yellow, center, center.PlusF(look.Rotate(-135F).x(10F)));
             g_render.DrawLine(Pens.Yellow, center, center.PlusF(look.Rotate(135F).x(10F)));
+
+            // MIRROR
+
+            var pt = get_world_mirror;
+            float x = pt.X, y = pt.Y;
+            g_render.DrawLine(Pens.Violet, x, y - gizmo_radius, x, y + gizmo_radius);
+            g_render.DrawLine(Pens.Violet, x - gizmo_radius, y, x + gizmo_radius, y);
         }
         void draw_shadows()
         {
