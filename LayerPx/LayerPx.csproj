@@ -77,8 +77,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="release\LayerPx.exe.config" />
-    <None Include="release\Tooling.dll.config" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -88,37 +86,6 @@
       <Project>{558899FF-01C9-480E-8837-DA2161694819}</Project>
       <Name>Tooling</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="release\ILGPU.dll" />
-    <Content Include="release\ILGPU.pdb" />
-    <Content Include="release\ILGPU.xml" />
-    <Content Include="release\LayerPx.exe" />
-    <Content Include="release\LayerPx.pdb" />
-    <Content Include="release\Microsoft.Bcl.AsyncInterfaces.dll" />
-    <Content Include="release\Microsoft.Bcl.AsyncInterfaces.xml" />
-    <Content Include="release\System.Buffers.dll" />
-    <Content Include="release\System.Buffers.xml" />
-    <Content Include="release\System.Collections.Immutable.dll" />
-    <Content Include="release\System.Collections.Immutable.xml" />
-    <Content Include="release\System.Memory.dll" />
-    <Content Include="release\System.Memory.xml" />
-    <Content Include="release\System.Numerics.Vectors.dll" />
-    <Content Include="release\System.Numerics.Vectors.xml" />
-    <Content Include="release\System.Reflection.Metadata.dll" />
-    <Content Include="release\System.Reflection.Metadata.xml" />
-    <Content Include="release\System.Runtime.CompilerServices.Unsafe.dll" />
-    <Content Include="release\System.Runtime.CompilerServices.Unsafe.xml" />
-    <Content Include="release\System.Text.Encodings.Web.dll" />
-    <Content Include="release\System.Text.Encodings.Web.xml" />
-    <Content Include="release\System.Text.Json.dll" />
-    <Content Include="release\System.Text.Json.xml" />
-    <Content Include="release\System.Threading.Tasks.Extensions.dll" />
-    <Content Include="release\System.Threading.Tasks.Extensions.xml" />
-    <Content Include="release\System.ValueTuple.dll" />
-    <Content Include="release\System.ValueTuple.xml" />
-    <Content Include="release\Tooling.dll" />
-    <Content Include="release\Tooling.pdb" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
