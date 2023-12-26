@@ -19,11 +19,8 @@ namespace LayerPx
 
         enum Tools
         {
-            PenCircle = 0,//C
-            PenSquare = 1,//P
-            Bucket,//B
-            Eraser,//E
-            EyeDrop//mouse middle (instant)
+            PenCircle = 0,
+            PenSquare = 1,
         }
         public enum ToolModes
         {
@@ -91,6 +88,9 @@ namespace LayerPx
         float imgh_scaled => (imgh * scale.Value);
         int W => Render.Width;
         int H => Render.Height;
+        int get_mirror_x(int x) => (int)(mirror_src.X + imgw / 2F + (mirror_src.X + imgw / 2F - x));
+        int get_mirror_y(int y) => (int)(mirror_src.Y + imgh / 2F + (mirror_src.Y + imgh / 2F - y));
+        Point get_mirror_pt(int x, int y) => new Point(get_mirror_x(x), get_mirror_y(y));
 
         public Form1()
         {
@@ -166,7 +166,7 @@ namespace LayerPx
         {
             Output = new Bitmap((int)imgw_scaled, (int)imgh_scaled);
             g = Graphics.FromImage(Output);
-            g.Clear(Color.FromArgb(12, 12, 16));
+            g.Clear(Color.Black);
             ResetDraw();
         }
         private void ResetGxRender()
@@ -230,10 +230,7 @@ namespace LayerPx
             if (IsKeyPressed(Key.H)) ShowSunAndMirror = !ShowSunAndMirror;
             if (IsKeyPressed(Key.J)) { ShowShadows = !ShowShadows; if (ShowShadows) refresh_shadows = true; }
 
-            if (IsKeyPressed(Key.C)) Tool = Tools.PenCircle;
-            if (IsKeyPressed(Key.P)) Tool = Tools.PenSquare;
-            if (IsKeyPressed(Key.B)) Tool = Tools.Bucket;
-            if (IsKeyPressed(Key.E)) Tool = Tools.Eraser;
+            if (IsKeyPressed(Key.P)) Tool = Tool == Tools.PenCircle ? Tools.PenSquare : Tools.PenCircle;
 
             if(IsKeyDown(Key.LeftCtrl))
             {
@@ -294,12 +291,12 @@ namespace LayerPx
                 if(mouseleft_released)
                     layer_at_first_press = data.PointedLayer(get_pos_ms());
                 mouseleft_released = false;
-                var m = get_pos_ms();
                 int v = MouseStates.ButtonDown == MouseButtons.Left ? pal_index_primary : 0;
-                RangeValue x, y;
                 if (MouseStates.OldPosition != Point.Empty && MouseStates.PositionChanged)
                 {
                     var old = get_pos_oldms();
+                    var m = get_pos_ms();
+                    RangeValue x, y;
                     for (float t = 0F; t <= 1F; t += 1F / MouseStates.LenghtDiff)
                     {
                         x = new RangeValue((int)Maths.Lerp(old.X, m.X, t), 0, DATA_WIDTH);
@@ -310,14 +307,14 @@ namespace LayerPx
                 else
                 {
                     var pos = get_pos_ms();
-                    UseTool(pos.X, pos.Y, v);
+                    UseTool(pos.X, pos.Y, v, IsKeyDown(Key.LeftShift));
                 }
             }
             KB.Update();
             MouseStates.Update();
             UIMgt.Update();
         }
-        void UseTool(int _x, int _y, int v)
+        void UseTool(int _x, int _y, int v, bool isBucket = false)
         {
             void use(int x, int y)
             {
@@ -329,46 +326,53 @@ namespace LayerPx
                         int direction = (Mode == ToolModes.Auto ? (IsKeyDown(Key.LeftCtrl) ? -1 : 1) : (Mode == ToolModes.Up ? 1 : -1)) * layer_gap;
                         holding_layer_target = data.calc_layer(direction, x, y).@new;
                     }
-                    switch (Tool)
+                    if (isBucket)
                     {
-                        default: break;
-                        case Tools.PenCircle: data.SetCircleWithLayer(holding_layer_target, x, y, v, pen_size); break;
-                        case Tools.PenSquare: data.SetSquareWithLayer(holding_layer_target, x, y, v, pen_size); break;
+                        data.FillWithLayer(holding_layer_target, x, y, v);
+                    }
+                    else
+                    {
+                        switch (Tool)
+                        {
+                            default: break;
+                            case Tools.PenCircle: data.SetCircleWithLayer(holding_layer_target, x, y, v, pen_size); break;
+                            case Tools.PenSquare: data.SetSquareWithLayer(holding_layer_target, x, y, v, pen_size); break;
+                        }
                     }
                 }
                 else
                 {
                     bool f = Mode != ToolModes.Normal;
-                    switch (Tool)
+
+                    if (isBucket)
                     {
-                        default: break;
-                        case Tools.PenCircle: data.SetCircleWithLayer(fixed_layer, x, y, v, pen_size, force: f); break;
-                        case Tools.PenSquare: data.SetSquareWithLayer(fixed_layer, x, y, v, pen_size, force: f); break;
+                        data.FillWithLayer(fixed_layer, x, y, v, force: f);
+                    }
+                    else
+                    {
+                        switch (Tool)
+                        {
+                            default: break;
+                            case Tools.PenCircle: data.SetCircleWithLayer(fixed_layer, x, y, v, pen_size, force: f); break;
+                            case Tools.PenSquare: data.SetSquareWithLayer(fixed_layer, x, y, v, pen_size, force: f); break;
+                        }
                     }
                 }
             }
 
-            Point center = Point.Empty, vec = Point.Empty;
-            if (mirror_mode != MirrorMode.None)
-            {
-                center = (imgw / 2F, imgh / 2F).P().ToPoint();
-                vec = mirror_src.PlusF(center).ToPoint();
-            }
             switch (mirror_mode)
             {
                 case MirrorMode.None: use(_x, _y); break;
                 case MirrorMode.X:
-                    var mirror_x = vec.X + (vec.X - _x);
                     use(_x, _y);
-                    use(mirror_x, _y);
+                    use(get_mirror_x(_x), _y);
                     break;
                 case MirrorMode.Y:
-                    var mirror_y = vec.Y + (vec.Y - _y);
                     use(_x, _y);
-                    use(_x, mirror_y);
+                    use(_x, get_mirror_y(_y));
                     break;
                 case MirrorMode.XY:
-                    var mirror_pt = vec.Plus(vec.Minus(_x, _y));
+                    var mirror_pt = get_mirror_pt(_x, _y);
                     use(_x, _y);
                     use(mirror_pt.X, _y);
                     use(_x, mirror_pt.Y);
@@ -457,11 +461,37 @@ namespace LayerPx
             g_render.DrawEllipse(Pens.Black, ms.X + lgh + 1, ms.Y + lgh, hlgh, hlgh);
 
             var pos = get_pos(Output);
-            var pointed = data.PointedData(get_pos_ms());
-            if(Tool == Tools.PenCircle)
-                g_render.DrawEllipse(Pens.Gray, pos.X + (pointed.x - pen_size / 2) * scale.Value, pos.Y + (pointed.y - pen_size / 2) * scale.Value, pen_size * scale.Value, pen_size * scale.Value);
-            else if (Tool == Tools.PenSquare)
-                g_render.DrawRectangle(Pens.Gray, pos.X + (pointed.x - pen_size / 2) * scale.Value, pos.Y + (pointed.y - pen_size / 2) * scale.Value, pen_size * scale.Value, pen_size * scale.Value);
+            var pointed = get_pos_ms();
+            int _x = pointed.X;
+            int _y = pointed.Y;
+
+            void draw_target(int x, int y)
+            {
+                if (Tool == Tools.PenCircle)
+                    g_render.DrawEllipse(Pens.Gray, pos.X + (x - pen_size / 2) * scale.Value, pos.Y + (y - pen_size / 2) * scale.Value, pen_size * scale.Value, pen_size * scale.Value);
+                else if (Tool == Tools.PenSquare)
+                    g_render.DrawRectangle(Pens.Gray, pos.X + (x - pen_size / 2) * scale.Value, pos.Y + (y - pen_size / 2) * scale.Value, pen_size * scale.Value, pen_size * scale.Value);
+            }
+
+            switch (mirror_mode)
+            {
+                case MirrorMode.None: draw_target(_x, _y); break;
+                case MirrorMode.X:
+                    draw_target(_x, _y);
+                    draw_target(get_mirror_x(_x), _y);
+                    break;
+                case MirrorMode.Y:
+                    draw_target(_x, _y);
+                    draw_target(_x, get_mirror_y(_y));
+                    break;
+                case MirrorMode.XY:
+                    var mirror_pt = get_mirror_pt(_x, _y);
+                    draw_target(_x, _y);
+                    draw_target(mirror_pt.X, _y);
+                    draw_target(_x, mirror_pt.Y);
+                    draw_target(mirror_pt.X, mirror_pt.Y);
+                    break;
+            }
         }
         void draw_modes()
         {
