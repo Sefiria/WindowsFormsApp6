@@ -262,6 +262,7 @@ namespace LayerPx
                     (UIMgt.UI.First(_ui => _ui is UIButton && _ui.Name == pal_index_primary.ToString()) as UIButton).BoundsColor = Color.White;
                     pal_index_primary = index;
                     (UIMgt.UI.First(_ui => _ui is UIButton && _ui.Name == pal_index_primary.ToString()) as UIButton).BoundsColor = Color.Cyan;
+                    fixed_layer = data.PointedLayer(get_pos_ms());
                 }
             }
 
