@@ -310,6 +310,10 @@ namespace LayerPx
                     UseTool(pos.X, pos.Y, v, IsKeyDown(Key.LeftShift));
                 }
             }
+
+            if (IsKeyPressed(Key.C) && IsKeyDown(Key.LeftCtrl))
+                ExportClipboard();
+
             KB.Update();
             MouseStates.Update();
             UIMgt.Update();
@@ -588,6 +592,14 @@ namespace LayerPx
         private void Render_MouseLeave(object sender, EventArgs e)
         {
             MouseStates.ButtonDown = MouseButtons.None;
+        }
+
+
+        // IMPORT / EXPORT
+
+        private void ExportClipboard()
+        {
+            Clipboard.SetImage(Output);
         }
     }
 }
