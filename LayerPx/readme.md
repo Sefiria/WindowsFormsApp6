@@ -1,14 +1,4 @@
-﻿
-            if(IsKeyDown(Key.LeftCtrl))
-            {
-                if (IsKeyPressed(Key.Left)) mirror_mode = (MirrorMode)Maths.Range(0, Enum.GetNames(typeof(MirrorMode)).Count() - 1, (int)mirror_mode - 1);
-                if (IsKeyPressed(Key.Right)) mirror_mode = (MirrorMode)Maths.Range(0, Enum.GetNames(typeof(MirrorMode)).Count() - 1, (int)mirror_mode + 1);
-            }
-            else
-            {
-                if (IsKeyPressed(Key.Left)) Mode = (ToolModes)Maths.Range(0, Enum.GetNames(typeof(ToolModes)).Count() - 1, (int)Mode - 1);
-                if (IsKeyPressed(Key.Right)) Mode = (ToolModes)Maths.Range(0, Enum.GetNames(typeof(ToolModes)).Count() - 1, (int)Mode + 1);
-            }
+﻿<br>
 
 LCTRL + LALT + LSHIFT + C : Clear<br>
 
