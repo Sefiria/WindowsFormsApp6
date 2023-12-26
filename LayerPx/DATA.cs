@@ -122,5 +122,12 @@ namespace LayerPx
             this[@new, x, y] = (byte)v;
             Form1.Instance.draw_refresh_queue.Enqueue((x, y).iP());
         }
+        public void Clear()
+        {
+            for (int L = 0; L < LAYERS; L++)
+                for (int X = 0; X < W; X++)
+                    for (int Y = 0; Y < H; Y++)
+                        Set(L, X, Y, 0);
+        }
     }
 }

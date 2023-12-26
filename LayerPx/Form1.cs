@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows.Forms;
 using Tooling;
 using Tooling.UI;
+using static LayerPx.Form1;
 using static Tooling.KB;
 
 namespace LayerPx
@@ -196,6 +197,12 @@ namespace LayerPx
             MouseStates.OldPosition = MouseStates.Position;
             MouseStates.Position = Render.PointToClient(MousePosition);
 
+            if (IsKeyDown(Key.LeftCtrl) && IsKeyDown(Key.LeftAlt) && IsKeyDown(Key.LeftShift) && IsKeyPressed(Key.C))
+            {
+                data.Clear();
+                ResetGx();
+            }
+
             if (IsKeyDown(Key.Z)) { Cam = Cam.Minus(0F, CAM_MOV_SPD * Amplitude); refresh_shadows = true; }
             if (IsKeyDown(Key.Q)) { Cam = Cam.Minus(CAM_MOV_SPD * Amplitude, 0F); refresh_shadows = true; }
             if (IsKeyDown(Key.S)) { Cam = Cam.PlusF(0F, CAM_MOV_SPD * Amplitude); refresh_shadows = true; }
@@ -272,6 +279,8 @@ namespace LayerPx
                 else
                 {
                     pen_size += (int)((MouseStates.Delta < 0 ? -1 : 1) * Amplitude);
+                    if (pen_size < 1) pen_size = 1;
+                    if (pen_size > Math.Min(DATA_WIDTH, DATA_HEIGHT) / 2) pen_size = Math.Min(DATA_WIDTH, DATA_HEIGHT) / 2;
                 }
             }
 
@@ -286,7 +295,6 @@ namespace LayerPx
                     layer_at_first_press = data.PointedLayer(get_pos_ms());
                 mouseleft_released = false;
                 var m = get_pos_ms();
-                Console.Write(m);
                 int v = MouseStates.ButtonDown == MouseButtons.Left ? pal_index_primary : 0;
                 RangeValue x, y;
                 if (MouseStates.OldPosition != Point.Empty && MouseStates.PositionChanged)
@@ -309,33 +317,65 @@ namespace LayerPx
             MouseStates.Update();
             UIMgt.Update();
         }
-        void UseTool(int x, int y, int v)
+        void UseTool(int _x, int _y, int v)
         {
-            if (!new List<ToolModes>() { ToolModes.Normal, ToolModes.Force }.Contains(Mode))
+            void use(int x, int y)
             {
-                if (holding_layer_released)
+                if (!new List<ToolModes>() { ToolModes.Normal, ToolModes.Force }.Contains(Mode))
                 {
-                    holding_layer_released = false;
-                    int direction = (Mode == ToolModes.Auto ? (IsKeyDown(Key.LeftCtrl) ? -1 : 1) : (Mode == ToolModes.Up ? 1 : -1)) * layer_gap;
-                    holding_layer_target = data.calc_layer(direction, x, y).@new;
+                    if (holding_layer_released)
+                    {
+                        holding_layer_released = false;
+                        int direction = (Mode == ToolModes.Auto ? (IsKeyDown(Key.LeftCtrl) ? -1 : 1) : (Mode == ToolModes.Up ? 1 : -1)) * layer_gap;
+                        holding_layer_target = data.calc_layer(direction, x, y).@new;
+                    }
+                    switch (Tool)
+                    {
+                        default: break;
+                        case Tools.PenCircle: data.SetCircleWithLayer(holding_layer_target, x, y, v, pen_size); break;
+                        case Tools.PenSquare: data.SetSquareWithLayer(holding_layer_target, x, y, v, pen_size); break;
+                    }
                 }
-                switch (Tool)
+                else
                 {
-                    default: break;
-                    case Tools.PenCircle: data.SetCircleWithLayer(holding_layer_target, x, y, v, pen_size); break;
-                    case Tools.PenSquare: data.SetSquareWithLayer(holding_layer_target, x, y, v, pen_size); break;
+                    bool f = Mode != ToolModes.Normal;
+                    switch (Tool)
+                    {
+                        default: break;
+                        case Tools.PenCircle: data.SetCircleWithLayer(fixed_layer, x, y, v, pen_size, force: f); break;
+                        case Tools.PenSquare: data.SetSquareWithLayer(fixed_layer, x, y, v, pen_size, force: f); break;
+                    }
                 }
             }
-            else
+
+            Point center = Point.Empty, vec = Point.Empty;
+            if (mirror_mode != MirrorMode.None)
             {
-                bool f = Mode != ToolModes.Normal;
-                switch (Tool)
-                {
-                    default: break;
-                    case Tools.PenCircle: data.SetCircleWithLayer(fixed_layer, x, y, v, pen_size, force: f); break;
-                    case Tools.PenSquare: data.SetSquareWithLayer(fixed_layer, x, y, v, pen_size, force: f); break;
-                }
+                center = (imgw / 2F, imgh / 2F).P().ToPoint();
+                vec = mirror_src.PlusF(center).ToPoint();
             }
+            switch (mirror_mode)
+            {
+                case MirrorMode.None: use(_x, _y); break;
+                case MirrorMode.X:
+                    var mirror_x = vec.X + (vec.X - _x);
+                    use(_x, _y);
+                    use(mirror_x, _y);
+                    break;
+                case MirrorMode.Y:
+                    var mirror_y = vec.Y + (vec.Y - _y);
+                    use(_x, _y);
+                    use(_x, mirror_y);
+                    break;
+                case MirrorMode.XY:
+                    var mirror_pt = vec.Plus(vec.Minus(_x, _y));
+                    use(_x, _y);
+                    use(mirror_pt.X, _y);
+                    use(_x, mirror_pt.Y);
+                    use(mirror_pt.X, mirror_pt.Y);
+                    break;
+            }
+
             refresh_shadows = true;
         }
 
