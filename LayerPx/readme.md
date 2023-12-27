@@ -35,10 +35,10 @@
 ## TOOLS
 
 - P : Switch between Square Pen & Circle Pen<br>
-- <i>(arrow)</i> Middle : Eyedrop Color Index & Fixed Layer<br>
-- [<b>LSHIFT for faster</b>] <i>(arrow)</i> Scroll Up / Down : Change Pen Size<br>
-- <i>(arrow)</i> Left : Draw<br>
-- <i>(arrow)</i> Right : Erase (set layer 0, all layers indexes 0)<br>
+- <i>(mouse)</i> Middle : Eyedrop Color Index & Fixed Layer<br>
+- [<b>LSHIFT for faster</b>] <i>(mouse)</i> Scroll Up / Down : Change Pen Size<br>
+- <i>(mouse)</i> Left : Draw<br>
+- <i>(mouse)</i> Right : Erase (set layer 0, all layers indexes 0)<br>
 
 ## DRAW & MIRROR MODES
 
