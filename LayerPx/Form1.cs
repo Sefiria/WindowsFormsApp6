@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Windows.Forms;
 using Tooling;
 using Tooling.UI;
@@ -44,23 +45,13 @@ namespace LayerPx
         Timer TimerDraw = new Timer() { Enabled = true, Interval = 10 };
 
         int imgw, imgh;
-        PointF Center = PointF.Empty;
-        PointF Cam = PointF.Empty;
-        PointF sun;
-        PointF mirror_src;
+        PointF Center = PointF.Empty, Cam = PointF.Empty, sun, mirror_src, begin_line = PointF.Empty;
         Tools Tool = Tools.PenSquare;
         MirrorMode mirror_mode = MirrorMode.None;
-        bool ShowGrid = false, ShowSunAndMirror = false, ShowShadows = true;
-        bool refresh_shadows = false;
+        bool ShowGrid = false, ShowSunAndMirror = false, ShowShadows = true, refresh_shadows = false, holding_layer_released = true, mouseleft_released = true;
         DATA data;
         Color[] pal = new Color[16];// 0 is transparent
-        int pal_index_primary = 1;
-        int pen_size = 1;
-        int holding_layer_target = DATA_LAYERS / 2;
-        bool holding_layer_released = true;
-        int fixed_layer = DATA_LAYERS / 2;
-        int layer_gap = 1;
-        bool mouseleft_released = true;
+        int pal_index_primary = 1, m_pen_size = 1, holding_layer_target = DATA_LAYERS / 2, fixed_layer = DATA_LAYERS / 2, layer_gap = 1;
 
         const int DATA_LAYERS = 8, DATA_WIDTH = 127, DATA_HEIGHT = 127;
         const float CAM_MOV_SPD = 3F, SUN_MOV_SPD = 2F;
@@ -91,6 +82,7 @@ namespace LayerPx
         int get_mirror_x(int x) => (int)(mirror_src.X + imgw / 2F + (mirror_src.X + imgw / 2F - x));
         int get_mirror_y(int y) => (int)(mirror_src.Y + imgh / 2F + (mirror_src.Y + imgh / 2F - y));
         Point get_mirror_pt(int x, int y) => new Point(get_mirror_x(x), get_mirror_y(y));
+        int pen_size => m_pen_size == 1 ? 1 : m_pen_size + m_pen_size % 2;
 
         public Form1()
         {
@@ -276,11 +268,16 @@ namespace LayerPx
                 }
                 else
                 {
-                    pen_size += (int)((MouseStates.Delta < 0 ? -1 : 1) * Amplitude);
-                    if (pen_size < 1) pen_size = 1;
-                    if (pen_size > Math.Min(DATA_WIDTH, DATA_HEIGHT) / 2) pen_size = Math.Min(DATA_WIDTH, DATA_HEIGHT) / 2;
+                    m_pen_size += (int)((MouseStates.Delta < 0 ? -1 : 1) * Amplitude);
+                    if (m_pen_size < 1) m_pen_size = 1;
+                    if (m_pen_size > Math.Min(DATA_WIDTH, DATA_HEIGHT) / 2) m_pen_size = Math.Min(DATA_WIDTH, DATA_HEIGHT) / 2;
                 }
             }
+
+            if (IsKeyPressed(Key.LeftAlt))
+                begin_line = get_pos_ms();
+            else if (!IsKeyDown(Key.LeftAlt))
+                begin_line = PointF.Empty;
 
             if (MouseStates.IsDown == false)
             {
@@ -289,14 +286,29 @@ namespace LayerPx
             }
             else if (MouseStates.ButtonDown != MouseButtons.Middle)
             {
-                if(mouseleft_released)
-                    layer_at_first_press = data.PointedLayer(get_pos_ms());
+                var ms = get_pos_ms();
+                if (mouseleft_released)
+                    layer_at_first_press = data.PointedLayer(ms);
                 mouseleft_released = false;
                 int v = MouseStates.ButtonDown == MouseButtons.Left ? pal_index_primary : 0;
+
+                if (begin_line != PointF.Empty)
+                {
+                    RangeValue x, y;
+                    float l = ms.Minus(begin_line).Length();
+                    for (float t = 0F; t <= 1F; t += 1F / l)
+                    {
+                        x = new RangeValue((int)Maths.Lerp(begin_line.X, ms.X, t), 0, DATA_WIDTH);
+                        y = new RangeValue((int)Maths.Lerp(begin_line.Y, ms.Y, t), 0, DATA_HEIGHT);
+                        UseTool(x.Value, y.Value, v);
+                    }
+                    begin_line = ms;
+                }
+
                 if (MouseStates.OldPosition != Point.Empty && MouseStates.PositionChanged)
                 {
                     var old = get_pos_oldms();
-                    var m = get_pos_ms();
+                    var m = ms;
                     RangeValue x, y;
                     for (float t = 0F; t <= 1F; t += 1F / MouseStates.LenghtDiff)
                     {
@@ -472,10 +484,29 @@ namespace LayerPx
 
             void draw_target(int x, int y)
             {
-                if (Tool == Tools.PenCircle)
-                    g_render.DrawEllipse(Pens.Gray, pos.X + (x - pen_size / 2) * scale.Value, pos.Y + (y - pen_size / 2) * scale.Value, pen_size * scale.Value, pen_size * scale.Value);
-                else if (Tool == Tools.PenSquare)
-                    g_render.DrawRectangle(Pens.Gray, pos.X + (x - pen_size / 2) * scale.Value, pos.Y + (y - pen_size / 2) * scale.Value, pen_size * scale.Value, pen_size * scale.Value);
+                void internal_draw(int __x, int __y)
+                {
+                    if (Tool == Tools.PenCircle)
+                        g_render.DrawEllipse(Pens.Gray, pos.X + (__x - (pen_size - 1) / 2) * scale.Value, pos.Y + (__y - (pen_size - 1) / 2) * scale.Value, pen_size * scale.Value, pen_size * scale.Value);
+                    else if (Tool == Tools.PenSquare)
+                        g_render.DrawRectangle(Pens.Gray, pos.X + (__x - (pen_size-1) / 2) * scale.Value, pos.Y + (__y - (pen_size - 1) / 2) * scale.Value, pen_size * scale.Value, pen_size * scale.Value);
+                }
+
+                if (begin_line != PointF.Empty)
+                {
+                    RangeValue i, j;
+                    float l = (_x, _y).P().Minus(begin_line).Length();
+                    for (float t = 0F; t <= 1F; t += 1F / l)
+                    {
+                        i = new RangeValue((int)Maths.Lerp(begin_line.X, _x, t), 0, DATA_WIDTH);
+                        j = new RangeValue((int)Maths.Lerp(begin_line.Y, _y, t), 0, DATA_HEIGHT);
+                        internal_draw(i.Value, j.Value);
+                    }
+                }
+                else
+                {
+                    internal_draw(_x, _y);
+                }
             }
 
             switch (mirror_mode)

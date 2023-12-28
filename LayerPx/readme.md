@@ -42,6 +42,8 @@
 - <i>(mouse)</i> Right : Erase (set layer 0, all layers indexes 0)<br>
 [<b>LSHIFT for bucket tool</b>]<br>
 - <i>(mouse)</i> Left : Draw / Modify layer<br>
+- <i>holding</i> LALT : Create a Line (<i>(mouse)</i> Left to draw it)
+- <i>holding</i> LALT & LCtrl : Create a Circle (<i>(mouse)</i> Left to draw it)
 
 ## DRAW & MIRROR MODES
 

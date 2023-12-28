@@ -30,6 +30,8 @@ namespace Tooling
         public static PointF x(this PointF pt, float n) => new PointF(pt.X * n, pt.Y * n);
         public static Point x(this int n, Point pt) => new Point(pt.X * n, pt.Y * n);
         public static Point x(this Point pt, int n) => new Point(pt.X * n, pt.Y * n);
+        public static Point x(this float n, Point pt) => new Point((int)(pt.X * n), (int)(pt.Y * n));
+        public static Point x(this Point pt, float n) => new Point((int)(pt.X * n), (int)(pt.Y * n));
         public static PointF Mod(this PointF A, int B) => new PointF(A.X % B, A.Y % B);
         public static PointF Mod(this PointF A, float B) => new PointF(A.X % B, A.Y % B);
 
