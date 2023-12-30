@@ -211,10 +211,10 @@ namespace LayerPx
                 }
                 else
                 {
-                    if (IsKeyDown(Key.Numpad8)) mirror_src = mirror_src.MinusF(0F, SUN_MOV_SPD * Amplitude);
-                    if (IsKeyDown(Key.Numpad4)) mirror_src = mirror_src.MinusF(SUN_MOV_SPD * Amplitude, 0F);
-                    if (IsKeyDown(Key.Numpad2)) mirror_src = mirror_src.PlusF(0F, SUN_MOV_SPD * Amplitude);
-                    if (IsKeyDown(Key.Numpad6)) mirror_src = mirror_src.PlusF(SUN_MOV_SPD * Amplitude, 0F);
+                    if (IsKeyDown(Key.Numpad8)) mirror_src = mirror_src.MinusF(0F, SUN_MOV_SPD * 0.2F * Amplitude);
+                    if (IsKeyDown(Key.Numpad4)) mirror_src = mirror_src.MinusF(SUN_MOV_SPD * 0.2F * Amplitude, 0F);
+                    if (IsKeyDown(Key.Numpad2)) mirror_src = mirror_src.PlusF(0F, SUN_MOV_SPD * 0.2F * Amplitude);
+                    if (IsKeyDown(Key.Numpad6)) mirror_src = mirror_src.PlusF(SUN_MOV_SPD * 0.2F * Amplitude, 0F);
                 }
             }
 
@@ -540,7 +540,7 @@ namespace LayerPx
                         }
                     }
                 }
-                internal_draw(_x, _y);
+                internal_draw((int)x, (int)y);
             }
 
             var mirror_pt = get_mirror_pt(_x, _y).ToPointF().PlusF(1,1);
