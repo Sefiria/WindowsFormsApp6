@@ -295,19 +295,19 @@ namespace LayerPx
                 if (begin_line != PointF.Empty)
                 {
                     RangeValue x, y;
-                    PointF lon = ms.Minus(begin_line), rotated_l;
+                    PointF lon = ms.Minus(begin_line), rotated_lon;
                     float l = lon.Length();
-                    if (IsKeyDown(Key.LeftCtrl))
+                    if (IsKeyDown(Key.LeftCtrl)) // draw circle
                     {
-                        for (float t = 0F; t <= 360F; t += 1F / l)
+                        for (float t = 0F; t <= 360F; t += 100F / l)
                         {
-                            rotated_l = Maths.Rotate(lon, t);
-                            x = new RangeValue((int)(begin_line.X + rotated_l.X / 2), 0, DATA_WIDTH);
-                            y = new RangeValue((int)(begin_line.Y + rotated_l.Y / 2), 0, DATA_HEIGHT);
-                            UseTool(x.Value, y.Value, v);
+                            rotated_lon = Maths.Rotate(lon, t);
+                            x = new RangeValue((int)(begin_line.X + rotated_lon.X / 2), 0, DATA_WIDTH);
+                            y = new RangeValue((int)(begin_line.Y + rotated_lon.Y / 2), 0, DATA_HEIGHT);
+                            UseTool((int)lon.X / 2 + x.Value, (int)lon.Y / 2 + y.Value, v);
                         }
                     }
-                    else
+                    else // draw line
                     {
                         for (float t = 0F; t <= 1F; t += 1F / l)
                         {
@@ -520,13 +520,24 @@ namespace LayerPx
                     }
                     else // circle
                     {
-                        g_render.DrawEllipse(Pens.Gray, pos.X + begin_line_x * scale.Value, pos.Y + begin_line_y * scale.Value, (x - begin_line_x) * scale.Value, (y - begin_line_y) * scale.Value);
-                        var pen = new Pen(Color.Gray);
-                        pen.DashStyle = System.Drawing.Drawing2D.DashStyle.Dash;
-                        pen.DashPattern = new float[] { 10F, 15F };
-                        PointF ptmin = new PointF(Math.Min(begin_line_x, x), Math.Min(begin_line_y, y));
-                        PointF ptmax = new PointF(Math.Max(begin_line_x, x), Math.Max(begin_line_y, y));
-                        g_render.DrawRectangle(pen, pos.X + ptmin.X * scale.Value, pos.Y + ptmin.Y * scale.Value, (ptmax.X - ptmin.X) * scale.Value, (ptmax.Y - ptmin.Y) * scale.Value);
+                        int __x, __y;
+                        PointF lon = (x, y).P().Minus(begin_line_x, begin_line_y), rotated_lon;
+                        float l = lon.Length();
+                        for (float t = 0F; t <= 360F; t += 100F / l)
+                        {
+                            rotated_lon = Maths.Rotate(lon, t);
+                            __x = (int)Maths.Range(0, DATA_WIDTH * scale.Value, (int)lon.X / 2 + (int)(begin_line_x + rotated_lon.X / 2));
+                            __y = (int)Maths.Range(0, DATA_HEIGHT * scale.Value, (int)lon.Y / 2 + (int)(begin_line_y + rotated_lon.Y / 2));
+                            if (pen_size == 1)
+                                g_render.DrawRectangle(Pens.Gray, pos.X + __x * scale.Value, pos.Y + __y * scale.Value, scale.Value, scale.Value);
+                            else
+                            {
+                                for (int j = -pen_size / 2; j < pen_size / 2; j++)
+                                    for (int i = -pen_size / 2; i < pen_size / 2; i++)
+                                        if (data.check_pass(__x - i, __y - j))
+                                            g_render.DrawRectangle(Pens.Gray, pos.X + (__x - i) * scale.Value, pos.Y + (__y - j) * scale.Value, scale.Value, scale.Value);
+                            }
+                        }
                     }
                 }
                 else

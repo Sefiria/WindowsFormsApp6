@@ -98,5 +98,9 @@ namespace Tooling
 
 
         public static int ToInt(this bool boolean) => boolean ? 1 : 0;
+        public static int Snap(this int number, float n) => (int)(number / n) * (int)n;
+        public static float SnapF(this int number, float n) => (int)(number / n) * n;
+        public static int Snap(this float number, float n) => (int)(number / n) * (int)n;
+        public static float SnapF(this float number, float n) => ((int)(number / n)) * n;
     }
 }
