@@ -69,6 +69,7 @@ namespace Tooling
             [System.Windows.Input.Key.LeftAlt] = true,
             [System.Windows.Input.Key.RightAlt] = true,
             [System.Windows.Input.Key.LeftShift] = true,
+            [System.Windows.Input.Key.RightShift] = true,
             [System.Windows.Input.Key.LeftCtrl] = true,
             [System.Windows.Input.Key.RightCtrl] = true,
             [System.Windows.Input.Key.Tab] = true,

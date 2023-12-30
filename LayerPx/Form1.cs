@@ -79,8 +79,8 @@ namespace LayerPx
         float imgh_scaled => (imgh * scale.Value);
         int W => Render.Width;
         int H => Render.Height;
-        int get_mirror_x(int x) => (int)(mirror_src.X + imgw / 2F + (mirror_src.X + imgw / 2F - x));
-        int get_mirror_y(int y) => (int)(mirror_src.Y + imgh / 2F + (mirror_src.Y + imgh / 2F - y));
+        int get_mirror_x(float x) => (int)(mirror_src.X + imgw / 2F + (mirror_src.X + imgw / 2F - x));
+        int get_mirror_y(float y) => (int)(mirror_src.Y + imgh / 2F + (mirror_src.Y + imgh / 2F - y));
         Point get_mirror_pt(int x, int y) => new Point(get_mirror_x(x), get_mirror_y(y));
         int pen_size => m_pen_size == 1 ? 1 : m_pen_size + m_pen_size % 2;
 
@@ -295,14 +295,27 @@ namespace LayerPx
                 if (begin_line != PointF.Empty)
                 {
                     RangeValue x, y;
-                    float l = ms.Minus(begin_line).Length();
-                    for (float t = 0F; t <= 1F; t += 1F / l)
+                    PointF lon = ms.Minus(begin_line), rotated_l;
+                    float l = lon.Length();
+                    if (IsKeyDown(Key.LeftCtrl))
                     {
-                        x = new RangeValue((int)Maths.Lerp(begin_line.X, ms.X, t), 0, DATA_WIDTH);
-                        y = new RangeValue((int)Maths.Lerp(begin_line.Y, ms.Y, t), 0, DATA_HEIGHT);
-                        UseTool(x.Value, y.Value, v);
+                        for (float t = 0F; t <= 360F; t += 1F / l)
+                        {
+                            rotated_l = Maths.Rotate(lon, t);
+                            x = new RangeValue((int)(begin_line.X + rotated_l.X / 2), 0, DATA_WIDTH);
+                            y = new RangeValue((int)(begin_line.Y + rotated_l.Y / 2), 0, DATA_HEIGHT);
+                            UseTool(x.Value, y.Value, v);
+                        }
                     }
-                    begin_line = ms;
+                    else
+                    {
+                        for (float t = 0F; t <= 1F; t += 1F / l)
+                        {
+                            x = new RangeValue((int)Maths.Lerp(begin_line.X, ms.X, t), 0, DATA_WIDTH);
+                            y = new RangeValue((int)Maths.Lerp(begin_line.Y, ms.Y, t), 0, DATA_HEIGHT);
+                            UseTool(x.Value, y.Value, v);
+                        }
+                    }
                 }
 
                 if (MouseStates.OldPosition != Point.Empty && MouseStates.PositionChanged)
@@ -482,7 +495,7 @@ namespace LayerPx
             int _x = pointed.X;
             int _y = pointed.Y;
 
-            void draw_target(int x, int y)
+            void draw_target(int x, int y, float begin_line_x=0, float begin_line_y = 0)
             {
                 void internal_draw(int __x, int __y)
                 {
@@ -492,15 +505,28 @@ namespace LayerPx
                         g_render.DrawRectangle(Pens.Gray, pos.X + (__x - (pen_size-1) / 2) * scale.Value, pos.Y + (__y - (pen_size - 1) / 2) * scale.Value, pen_size * scale.Value, pen_size * scale.Value);
                 }
 
-                if (begin_line != PointF.Empty)
+                if (begin_line != PointF.Empty) // draw a line / circle
                 {
-                    RangeValue i, j;
-                    float l = (_x, _y).P().Minus(begin_line).Length();
-                    for (float t = 0F; t <= 1F; t += 1F / l)
+                    if (IsKeyDown(Key.LeftCtrl) == false) // line
                     {
-                        i = new RangeValue((int)Maths.Lerp(begin_line.X, _x, t), 0, DATA_WIDTH);
-                        j = new RangeValue((int)Maths.Lerp(begin_line.Y, _y, t), 0, DATA_HEIGHT);
-                        internal_draw(i.Value, j.Value);
+                        RangeValue i, j;
+                        float l = (x, y).P().Minus(begin_line_x, begin_line_y).Length();
+                        for (float t = 0F; t <= 1F; t += 1F / l)
+                        {
+                            i = new RangeValue((int)Maths.Lerp(begin_line_x, x, t), 0, DATA_WIDTH);
+                            j = new RangeValue((int)Maths.Lerp(begin_line_y, y, t), 0, DATA_HEIGHT);
+                            internal_draw(i.Value, j.Value);
+                        }
+                    }
+                    else // circle
+                    {
+                        g_render.DrawEllipse(Pens.Gray, pos.X + begin_line_x * scale.Value, pos.Y + begin_line_y * scale.Value, (x - begin_line_x) * scale.Value, (y - begin_line_y) * scale.Value);
+                        var pen = new Pen(Color.Gray);
+                        pen.DashStyle = System.Drawing.Drawing2D.DashStyle.Dash;
+                        pen.DashPattern = new float[] { 10F, 15F };
+                        PointF ptmin = new PointF(Math.Min(begin_line_x, x), Math.Min(begin_line_y, y));
+                        PointF ptmax = new PointF(Math.Max(begin_line_x, x), Math.Max(begin_line_y, y));
+                        g_render.DrawRectangle(pen, pos.X + ptmin.X * scale.Value, pos.Y + ptmin.Y * scale.Value, (ptmax.X - ptmin.X) * scale.Value, (ptmax.Y - ptmin.Y) * scale.Value);
                     }
                 }
                 else
@@ -511,21 +537,47 @@ namespace LayerPx
 
             switch (mirror_mode)
             {
-                case MirrorMode.None: draw_target(_x, _y); break;
+                case MirrorMode.None: if (begin_line != PointF.Empty) draw_target(_x, _y, begin_line.X, begin_line.Y); else draw_target(_x, _y); break;
                 case MirrorMode.X:
-                    draw_target(_x, _y);
-                    draw_target(get_mirror_x(_x), _y);
+                    if (begin_line != PointF.Empty)
+                    {
+                        draw_target(_x, _y, begin_line.X, begin_line.Y);
+                        draw_target(get_mirror_x(_x), _y, get_mirror_x(begin_line.X), begin_line.Y);
+                    }
+                    else
+                    {
+                        draw_target(_x, _y);
+                        draw_target(get_mirror_x(_x), _y);
+                    }
                     break;
                 case MirrorMode.Y:
-                    draw_target(_x, _y);
-                    draw_target(_x, get_mirror_y(_y));
+                    if (begin_line != PointF.Empty)
+                    {
+                        draw_target(_x, _y, begin_line.X, begin_line.Y);
+                        draw_target(_x, get_mirror_y(_y), begin_line.X, get_mirror_y(begin_line.Y));
+                    }
+                    else
+                    {
+                        draw_target(_x, _y);
+                        draw_target(_x, get_mirror_y(_y));
+                    }
                     break;
                 case MirrorMode.XY:
                     var mirror_pt = get_mirror_pt(_x, _y);
-                    draw_target(_x, _y);
-                    draw_target(mirror_pt.X, _y);
-                    draw_target(_x, mirror_pt.Y);
-                    draw_target(mirror_pt.X, mirror_pt.Y);
+                    if (begin_line != PointF.Empty)
+                    {
+                        draw_target(_x, _y, begin_line.X, begin_line.Y);
+                        draw_target(get_mirror_x(_x), _y, get_mirror_x(begin_line.X), begin_line.Y);
+                        draw_target(_x, get_mirror_y(_y), begin_line.X, get_mirror_y(begin_line.Y));
+                        draw_target(get_mirror_x(_x), get_mirror_y(_y), get_mirror_x(begin_line.X), get_mirror_y(begin_line.Y));
+                    }
+                    else
+                    {
+                        draw_target(_x, _y);
+                        draw_target(mirror_pt.X, _y);
+                        draw_target(_x, mirror_pt.Y);
+                        draw_target(mirror_pt.X, mirror_pt.Y);
+                    }
                     break;
             }
         }
