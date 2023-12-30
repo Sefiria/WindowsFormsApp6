@@ -53,8 +53,8 @@ namespace LayerPx
                 return;
             }
 
-            for (int j= -size/2; j<size/2; j++)
-                for (int i = -size / 2; i < size / 2; i++)
+            for (int j= -size/2; j<=size/2; j++)
+                for (int i = -size / 2; i <= size / 2; i++)
                     if(check_pass(x - i, y - j))
                         set_single_bylayer(l, x-i, y-j, v, force);
         }
@@ -67,8 +67,8 @@ namespace LayerPx
             }
 
             int radius = diameter / 2;
-            for (int j = -radius; j < radius; j++)
-                for (int i = -radius; i < radius; i++)
+            for (int j = -radius; j <= radius; j++)
+                for (int i = -radius; i <= radius; i++)
                     if (check_pass(x - i, y - j) && Maths.Distance((i, j).P()) <= radius)
                         set_single_bylayer(l, x-i, y-j, v, force);
         }
@@ -134,8 +134,8 @@ namespace LayerPx
                 return;
             }
 
-            for (int j = -size / 2; j < size / 2; j++)
-                for (int i = -size / 2; i < size / 2; i++)
+            for (int j = -size / 2; j <= size / 2; j++)
+                for (int i = -size / 2; i <= size / 2; i++)
                     if (check_pass(x - i, y - j))
                         set_single_bydir(direction, x - i, y - j, v);
         }
@@ -148,8 +148,8 @@ namespace LayerPx
             }
 
             int radius = diameter / 2;
-            for (int j = -radius; j < radius; j++)
-                for (int i = -radius; i < radius; i++)
+            for (int j = -radius; j <= radius; j++)
+                for (int i = -radius; i <= radius; i++)
                     if (check_pass(x - i, y - j) && Maths.Distance((i, j).P()) <= radius)
                         set_single_bydir(direction, x - i, y - j, v);
         }

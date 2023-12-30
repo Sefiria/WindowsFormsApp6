@@ -13,10 +13,10 @@ namespace ConfigureRoute
         public static PointF Cam = PointF.Empty;
         public static float CamSpeed = 4F;
         public static PointF MS => MouseStates.Position;
-        public static PointF GetTargetPoint(vecf pt) => pt.pt.PlusF(Cam.Mod(Cube)).Snap(Cube).Minus(Cam.Mod(Cube));
-        public static PointF TargetPoint => MS.PlusF(Cam.Mod(Cube)).Snap(Cube).Minus(Cam.Mod(Cube));
-        public static PointF GetTargetCube(vecf pt) => pt.pt.PlusF(Cam.Mod(Cube)).Snap(Cube).Minus(Cam.Mod(Cube)).Minus(Cam).Div(Cube);
-        public static PointF TargetCube => MS.PlusF(Cam.Mod(Cube)).Snap(Cube).Minus(Cam.Mod(Cube)).Minus(Cam).Div(Cube);
+        public static PointF GetTargetPoint(vecf pt) => pt.pt.PlusF(Cam.Mod(Cube)).Snap(Cube).MinusF(Cam.Mod(Cube));
+        public static PointF TargetPoint => MS.PlusF(Cam.Mod(Cube)).Snap(Cube).MinusF(Cam.Mod(Cube));
+        public static PointF GetTargetCube(vecf pt) => pt.pt.PlusF(Cam.Mod(Cube)).Snap(Cube).MinusF(Cam.Mod(Cube)).MinusF(Cam).Div(Cube);
+        public static PointF TargetCube => MS.PlusF(Cam.Mod(Cube)).Snap(Cube).MinusF(Cam.Mod(Cube)).MinusF(Cam).Div(Cube);
         public static Font Font = new Font("Segoe UI", 12);
         public static Font SmallFont = new Font("Segoe UI", 8);
         public static int StackSize = 99;

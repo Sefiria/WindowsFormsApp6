@@ -27,7 +27,7 @@ namespace ConfigureRoute.Entities
         public int Visibility = 3; // Nombre de tiles que la car peut observer devant elle
         public RangeValueF Speed = new RangeValueF(0F, 1F, 1F);
         public DrivingStatus Status = DrivingStatus.Accelerate;
-        public override Rectangle Bounds => new Rectangle(Pos.Minus((W / 2, H / 2).P()).ToPoint(), ((float)Diagonal).iSz());
+        public override Rectangle Bounds => new Rectangle(Pos.MinusF((W / 2, H / 2).P()).ToPoint(), ((float)Diagonal).iSz());
         public Road RoadUnder() => Core.Map.FindRoad(Pos);
         public void PosAddLook()
         {
@@ -37,7 +37,7 @@ namespace ConfigureRoute.Entities
         public void PosRemoveLook()
         {
             var look = CalculateLook();
-            Pos = Pos.Minus(look.x(0.5F));
+            Pos = Pos.MinusF(look.x(0.5F));
         }
         public void PosAddLook(PointF look) => Pos = Pos.PlusF(look.x(Speed.Value));
         public void PosAddLook(PointF look, float speed) => Pos = Pos.PlusF(look.X * speed, look.Y * speed);
@@ -82,7 +82,7 @@ namespace ConfigureRoute.Entities
                         gtex.DrawRectangle(new Pen(Color.Red, 2F), 0, 0, sz, sz);
                     }
                 }
-                g.DrawImage(tex, Pos.Minus((W / 2, H / 2).P()).Minus(Core.Cam));
+                g.DrawImage(tex, Pos.MinusF((W / 2, H / 2).P()).MinusF(Core.Cam));
             }
         }
         public override void Update()

@@ -93,7 +93,7 @@ namespace WindowsFormsApp17
 
             int _x, _y, id;
             Bitmap tile;
-            PointF getDrawPoint(int x, int y) => Core.CenterPoint.PlusF(x * Core.TSZ, y * Core.TSZ).Minus(cam);
+            PointF getDrawPoint(int x, int y) => Core.CenterPoint.PlusF(x * Core.TSZ, y * Core.TSZ).MinusF(cam);
             for (int x = -hrtw - 1; x < hrtw + 3; x++)
             {
                 for (int y = -hrth - 1; y < hrth + 3; y++)

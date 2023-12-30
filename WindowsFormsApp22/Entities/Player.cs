@@ -30,7 +30,7 @@ namespace WindowsFormsApp22.Entities
 
         public override PointF CalculateLook()
         {
-            return MouseStates.Position.Minus(hw - cam_ofs.x, hh - cam_ofs.y).norm();
+            return MouseStates.Position.MinusF(hw - cam_ofs.x, hh - cam_ofs.y).norm();
         }
 
         public override void Update()

@@ -40,7 +40,7 @@ namespace KubeLayers
 
         public void Draw()
         {
-            core.g.DrawImage(Image, core.CenterPoint.PlusF(TilePos * tsz).Minus(core.Cam.Position));
+            core.g.DrawImage(Image, core.CenterPoint.PlusF(TilePos * tsz).MinusF(core.Cam.Position));
             Entity?.Draw();
         }
 

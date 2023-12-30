@@ -28,7 +28,7 @@ namespace KubeLayers
         }
         public virtual void Draw()
         {
-            core.g.DrawImage(Image, core.CenterPoint.PlusF(TileLocation * tsz).Minus(core.Cam.Position));
+            core.g.DrawImage(Image, core.CenterPoint.PlusF(TileLocation * tsz).MinusF(core.Cam.Position));
         }
 
         public virtual void Dispose()// for custom bitmaps

@@ -109,7 +109,7 @@ namespace ConfigureRoute.Entities
 				x_road = data.road.WorldX + Core.Cube / 2;
 				x_car = Pos.X;
 				gap = x_road - x_car;
-				if (gap < -gap_max) Pos = Pos.Minus(Speed.Value, 0F);
+				if (gap < -gap_max) Pos = Pos.MinusF(Speed.Value, 0F);
 				else if (gap > gap_max) Pos = Pos.PlusF(Speed.Value, 0F);
 			}
 			else
@@ -117,7 +117,7 @@ namespace ConfigureRoute.Entities
 				y_road = data.road.WorldY + Core.Cube / 2;
 				y_car = Pos.Y + Diagonal / 2F;
                 gap = y_road - y_car;
-				if (gap < -gap_max) Pos = Pos.Minus(0F, Speed.Value);
+				if (gap < -gap_max) Pos = Pos.MinusF(0F, Speed.Value);
 				else if (gap > gap_max) Pos = Pos.PlusF(0F, Speed.Value);
 			}
 		}

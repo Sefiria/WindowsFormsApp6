@@ -149,7 +149,7 @@ namespace ConfigureRoute
                     }
                     else if (Tool == RouteTools.Sign)
                     {
-                        pos = pos.Minus(Cube / 2F);
+                        pos = pos.MinusF(Cube / 2F);
                         tex = new Bitmap(Cube*2, Cube*2);
                         var pen = new Pen(Color.RoyalBlue, 2F);
                         using (Graphics gtex = Graphics.FromImage(tex))
@@ -314,8 +314,8 @@ namespace ConfigureRoute
             get
             {
                 var mc = MouseStates.Position.PlusF(Cam);
-                var road_top = Road.At(mc.Minus(0, Cube));
-                var road_left = Road.At(mc.Minus(Cube, 0));
+                var road_top = Road.At(mc.MinusF(0, Cube));
+                var road_left = Road.At(mc.MinusF(Cube, 0));
                 var road_under = Road.At(mc);
                 var road_bottom = Road.At(mc.PlusF(0, Cube));
                 var road_right = Road.At(mc.PlusF(Cube, 0));

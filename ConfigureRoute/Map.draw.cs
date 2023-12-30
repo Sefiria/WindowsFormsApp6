@@ -23,7 +23,7 @@ namespace ConfigureRoute
         }
         private void drawroad(Graphics g, Road t)
         {
-            var pt = (t.x * Core.Cube, t.y * Core.Cube).P().Minus(Core.Cam);
+            var pt = (t.x * Core.Cube, t.y * Core.Cube).P().MinusF(Core.Cam);
             g.FillRectangle(Brushes.Gray, pt.X, pt.Y, Core.Cube, Core.Cube);
             if(Core.AltMode)
             {
@@ -47,7 +47,7 @@ namespace ConfigureRoute
                     case int _ when v == Sign.CederLePassage:       g.DrawLine(new Pen(new HatchBrush(HatchStyle.DarkUpwardDiagonal, Color.WhiteSmoke, Color.Transparent), 4F), A, B); break;
                 }
             }
-            var pt = (s.x * Core.Cube, s.y * Core.Cube).P().Minus(Core.Cam);
+            var pt = (s.x * Core.Cube, s.y * Core.Cube).P().MinusF(Core.Cam);
             drawit(s.t, true, pt, (pt.X + Core.Cube, pt.Y).P());
             drawit(s.l, false, pt, (pt.X, pt.Y + Core.Cube).P());
         }

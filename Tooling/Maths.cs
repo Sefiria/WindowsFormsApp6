@@ -50,7 +50,7 @@ namespace Tooling
         public static float Distance(ICoords a, ICoords b) => Distance(a.X, a.Y, b.X, b.Y);
         public static float DistanceFromLine(PointF pt, float ax, float by, float c) => Abs(ax * pt.X + by * pt.Y + c) / Sqrt(Sq(ax) + Sq(by));
         public static float ScalarProduct(PointF AB, PointF AP) => AB.X * AP.X + AB.Y * AP.Y;
-        public static float ScalarProduct(PointF A, PointF B, PointF P) => ScalarProduct(B.Minus(A), P.Minus(A));
+        public static float ScalarProduct(PointF A, PointF B, PointF P) => ScalarProduct(B.MinusF(A), P.MinusF(A));
         public static float Abs(float K) => Sqrt(Sq(K));
         public static float Sign(float K) => (float)Math.Round(K / Abs(K));
         public static float Normalize(float K) => K / Abs(K);
@@ -145,8 +145,8 @@ namespace Tooling
             var A = segmentPointA;
             var B = segmentPointB;
             var P = pointAProjeter;
-            var AB = B.Minus(A);
-            var AP = P.Minus(A);
+            var AB = B.MinusF(A);
+            var AP = P.MinusF(A);
             // t = produit_scalaire( AP, AB ) / norme( AB )^2
             float scal = ScalarProduct(AB, AP) / Sq(AB.Length());
             // t = min( max( 0, t ), 1 )
@@ -379,7 +379,7 @@ namespace Tooling
         public static PointF ProjectionSurRectangle(Rectangle rect, PointF pt)
         {
             int rx = rect.X, ry = rect.Y, rw = rect.Width, rh = rect.Height;
-            var pt_norm = pt.Minus(rx + rw / 2F, ry + rh / 2F);
+            var pt_norm = pt.MinusF(rx + rw / 2F, ry + rh / 2F);
 
             if(Sq(pt.X) > Sq(pt.Y))
             {
@@ -400,7 +400,7 @@ namespace Tooling
         public static PointF ProjectionSurRectangleSimple(Rectangle rect, PointF pt)
         {
             float rx = rect.X, ry = rect.Y, rw = rect.Width, rh = rect.Height;
-            var pt_fromcenter = pt.Minus(rx + rw / 2F, ry + rh / 2F);
+            var pt_fromcenter = pt.MinusF(rx + rw / 2F, ry + rh / 2F);
 
             if (Sq(pt_fromcenter.X) > Sq(pt_fromcenter.Y))
                 return new PointF(rx + (pt_fromcenter.X < 0F ? 0F : rw), Range(ry, ry + rh, pt.Y));

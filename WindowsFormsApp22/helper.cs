@@ -10,6 +10,6 @@ namespace WindowsFormsApp22
 {
     public static class helper
     {
-        public static PointF LookToPlayer(this PointF from) => Core.Player.Pos.Minus(from).norm();
+        public static PointF LookToPlayer(this PointF from) => Core.Player.Pos.MinusF(from).norm();
     }
 }

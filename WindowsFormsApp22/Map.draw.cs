@@ -191,7 +191,7 @@ namespace WindowsFormsApp22
                         {
                             P = new PointF(x * cb, y * cb);
                             P_ = Maths.ProjectionSurSegment(A, B, P);
-                            PP_ = P_.Minus(P);
+                            PP_ = P_.MinusF(P);
                             var d = PP_.Length();
                             node_weight += 5000F * p.specialRaySize / d;
                         }
@@ -230,8 +230,8 @@ namespace WindowsFormsApp22
                     });
                     var matrix = new Matrix();
                     var d = Maths.Distance(Core.CenterPoint, e.DrawPoint);
-                    matrix.Rotate(e.DrawPoint.Minus(Core.CenterPoint).GetAngle() + 90, MatrixOrder.Prepend);
-                    var lk = e.DrawPoint.Minus(Core.CenterPoint).norm();
+                    matrix.Rotate(e.DrawPoint.MinusF(Core.CenterPoint).GetAngle() + 90, MatrixOrder.Prepend);
+                    var lk = e.DrawPoint.MinusF(Core.CenterPoint).norm();
                     var to = Maths.GetRayToolingLine(e.DrawPoint, lk, 10, 60, Core.RW - 10, Core.RH - 10);
                     matrix.Translate(to.X, to.Y, MatrixOrder.Append);
                     matrix.Scale(5F, 5F);

@@ -35,11 +35,11 @@ namespace WindowsFormsApp17
             jumping = j;
             //Console.WriteLine($"jumping: {jumping}  space_key: {KB.IsKeyDown(KB.Key.Space)}  on_ground: {Map.IsWorldBlock(X, Y + H + 1)}  under_jump_time_max: {jump_time < jump_time_max} (jump_time: {jump_time})");
 
-            if (q!=0) Pos = Pos.Minus(mv_speed, 0F);
+            if (q!=0) Pos = Pos.MinusF(mv_speed, 0F);
             if (d!=0) Pos = Pos.PlusF(mv_speed, 0F);
             //if (z != 0) Pos = Pos.Minus(0F, mv_speed);
             //if (s != 0) Pos = Pos.PlusF(0F, mv_speed);
-            if (j) { jump_time++; Pos = Pos.Minus(0, mv_speed * 2F); }
+            if (j) { jump_time++; Pos = Pos.MinusF(0, mv_speed * 2F); }
 
             Animate(q*-1+d);
 
@@ -51,7 +51,7 @@ namespace WindowsFormsApp17
                     jump_time = 0;
             }
             if (Map.IsWorldBlock(X, Y + H - 2))
-                Pos = Pos.Minus(0, mv_speed * 1.5F);
+                Pos = Pos.MinusF(0, mv_speed * 1.5F);
         }
 
         public override void Draw(Graphics g, PointF? position = null)

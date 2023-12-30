@@ -56,7 +56,7 @@ namespace WindowsFormsApp17
         public PointF DrawTile => Utils.DrawPoint(Pos.PlusF(W / 2, H / 2).Snap(Core.TSZ));
         //public Point DrawTile => DrawPoint.Snap(Core.TSZ);
         public virtual PointF CalculateLook() => Maths.AngleToPointF(Angle.Value).Round();
-        public List<PointF> Edges => new List<PointF>() { Pos.Minus(W/2, H/2), Pos.PlusF(W/2, -H/2), Pos.PlusF(-H/2, H/2), Pos.PlusF(W/2, H/2) };
+        public List<PointF> Edges => new List<PointF>() { Pos.MinusF(W/2, H/2), Pos.PlusF(W/2, -H/2), Pos.PlusF(-H/2, H/2), Pos.PlusF(W/2, H/2) };
         public bool IsVisible => Core.RenderBounds.Contains(DrawPoint.ToPoint());
 
         public Entity()

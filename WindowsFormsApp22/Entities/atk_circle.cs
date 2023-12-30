@@ -34,10 +34,10 @@ namespace WindowsFormsApp22.Entities
             if (Maths.Distance(Core.Player.Pos, Pos) > (Math.Max(W, H) + Math.Max(Core.Player.W, Core.Player.H)) / 2F + distance_to_player)
                 Pos = Pos.PlusF(look.x(IsVisible ? 0.5F : 2F));
             else
-                Pos = Pos.Minus(look.x(IsVisible ? 0.5F : 2F));
+                Pos = Pos.MinusF(look.x(IsVisible ? 0.5F : 2F));
             atick.Value += RandomThings.rnd(3F);
 
-            AtkEntities.ForEach(e => { if (Maths.Distance(e.Pos, Pos) <= (Math.Max(W, H) + Math.Max(e.W, e.H)) / 2F) Pos = Pos.Minus(e.Pos.Minus(Pos).norm()); });
+            AtkEntities.ForEach(e => { if (Maths.Distance(e.Pos, Pos) <= (Math.Max(W, H) + Math.Max(e.W, e.H)) / 2F) Pos = Pos.MinusF(e.Pos.MinusF(Pos).norm()); });
 
 
             if (IsVisible)

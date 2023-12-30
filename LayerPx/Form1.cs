@@ -61,8 +61,8 @@ namespace LayerPx
         PointF get_world_sun => get_pos(sun); 
         PointF get_world_mirror => get_pos(mirror_src); 
 
-        PointF get_pos(PointF pt) => Center.PlusF(pt.Minus(Cam).x(scale.Value));
-        PointF get_pos(Bitmap _img) => Center.Minus(imgw_scaled / 2, imgh_scaled / 2).Minus(Cam.x(scale.Value));
+        PointF get_pos(PointF pt) => Center.PlusF(pt.MinusF(Cam).x(scale.Value));
+        PointF get_pos(Bitmap _img) => Center.MinusF(imgw_scaled / 2, imgh_scaled / 2).MinusF(Cam.x(scale.Value));
         float get_pos_x(Bitmap _img) => Center.X - imgw_scaled / 2F - Cam.X * scale.Value;
         float get_pos_y(Bitmap _img) => Center.Y - imgh_scaled / 2F - Cam.Y * scale.Value;
         Point get_pos_ms(PointF pos)
@@ -79,8 +79,8 @@ namespace LayerPx
         float imgh_scaled => (imgh * scale.Value);
         int W => Render.Width;
         int H => Render.Height;
-        int get_mirror_x(float x) => (int)(mirror_src.X + imgw / 2F + (mirror_src.X + imgw / 2F - x));
-        int get_mirror_y(float y) => (int)(mirror_src.Y + imgh / 2F + (mirror_src.Y + imgh / 2F - y));
+        int get_mirror_x(float x) => (int)(mirror_src.X - 0.5F + imgw / 2F + (mirror_src.X - 0.5F + imgw / 2F - x));
+        int get_mirror_y(float y) => (int)(mirror_src.Y - 0.5F + imgh / 2F + (mirror_src.Y - 0.5F + imgh / 2F - y));
         Point get_mirror_pt(int x, int y) => new Point(get_mirror_x(x), get_mirror_y(y));
         int pen_size => m_pen_size == 1 ? 1 : m_pen_size + m_pen_size % 2;
 
@@ -195,8 +195,8 @@ namespace LayerPx
                 ResetGx();
             }
 
-            if (IsKeyDown(Key.Z)) { Cam = Cam.Minus(0F, CAM_MOV_SPD * Amplitude); refresh_shadows = true; }
-            if (IsKeyDown(Key.Q)) { Cam = Cam.Minus(CAM_MOV_SPD * Amplitude, 0F); refresh_shadows = true; }
+            if (IsKeyDown(Key.Z)) { Cam = Cam.MinusF(0F, CAM_MOV_SPD * Amplitude); refresh_shadows = true; }
+            if (IsKeyDown(Key.Q)) { Cam = Cam.MinusF(CAM_MOV_SPD * Amplitude, 0F); refresh_shadows = true; }
             if (IsKeyDown(Key.S)) { Cam = Cam.PlusF(0F, CAM_MOV_SPD * Amplitude); refresh_shadows = true; }
             if (IsKeyDown(Key.D)) { Cam = Cam.PlusF(CAM_MOV_SPD * Amplitude, 0F); refresh_shadows = true; }
 
@@ -204,15 +204,15 @@ namespace LayerPx
             {
                 if (IsKeyDown(Key.LeftCtrl))
                 {
-                    if (IsKeyDown(Key.Numpad8)) { sun = sun.Minus(0F, SUN_MOV_SPD * Amplitude); refresh_shadows = true; }
-                    if (IsKeyDown(Key.Numpad4)) { sun = sun.Minus(SUN_MOV_SPD * Amplitude, 0F); refresh_shadows = true; }
+                    if (IsKeyDown(Key.Numpad8)) { sun = sun.MinusF(0F, SUN_MOV_SPD * Amplitude); refresh_shadows = true; }
+                    if (IsKeyDown(Key.Numpad4)) { sun = sun.MinusF(SUN_MOV_SPD * Amplitude, 0F); refresh_shadows = true; }
                     if (IsKeyDown(Key.Numpad2)) { sun = sun.PlusF(0F, SUN_MOV_SPD * Amplitude); refresh_shadows = true; }
                     if (IsKeyDown(Key.Numpad6)) { sun = sun.PlusF(SUN_MOV_SPD * Amplitude, 0F); refresh_shadows = true; }
                 }
                 else
                 {
-                    if (IsKeyDown(Key.Numpad8)) mirror_src = mirror_src.Minus(0F, SUN_MOV_SPD * Amplitude);
-                    if (IsKeyDown(Key.Numpad4)) mirror_src = mirror_src.Minus(SUN_MOV_SPD * Amplitude, 0F);
+                    if (IsKeyDown(Key.Numpad8)) mirror_src = mirror_src.MinusF(0F, SUN_MOV_SPD * Amplitude);
+                    if (IsKeyDown(Key.Numpad4)) mirror_src = mirror_src.MinusF(SUN_MOV_SPD * Amplitude, 0F);
                     if (IsKeyDown(Key.Numpad2)) mirror_src = mirror_src.PlusF(0F, SUN_MOV_SPD * Amplitude);
                     if (IsKeyDown(Key.Numpad6)) mirror_src = mirror_src.PlusF(SUN_MOV_SPD * Amplitude, 0F);
                 }
@@ -295,7 +295,7 @@ namespace LayerPx
                 if (begin_line != PointF.Empty)
                 {
                     RangeValue x, y;
-                    PointF lon = ms.Minus(begin_line), rotated_lon;
+                    PointF lon = ms.MinusF(begin_line), rotated_lon;
                     float l = lon.Length();
                     if (IsKeyDown(Key.LeftCtrl)) // draw circle
                     {
@@ -495,7 +495,7 @@ namespace LayerPx
             int _x = pointed.X;
             int _y = pointed.Y;
 
-            void draw_target(int x, int y, float begin_line_x=0, float begin_line_y = 0)
+            void draw_target(float x, float y, float begin_line_x=0, float begin_line_y = 0)
             {
                 void internal_draw(int __x, int __y)
                 {
@@ -509,19 +509,19 @@ namespace LayerPx
                 {
                     if (IsKeyDown(Key.LeftCtrl) == false) // line
                     {
-                        RangeValue i, j;
-                        float l = (x, y).P().Minus(begin_line_x, begin_line_y).Length();
+                        int i, j;
+                        float l = (x, y).P().MinusF(begin_line_x, begin_line_y).Length();
                         for (float t = 0F; t <= 1F; t += 1F / l)
                         {
-                            i = new RangeValue((int)Maths.Lerp(begin_line_x, x, t), 0, DATA_WIDTH);
-                            j = new RangeValue((int)Maths.Lerp(begin_line_y, y, t), 0, DATA_HEIGHT);
-                            internal_draw(i.Value, j.Value);
+                            i = (int)Maths.Range(0, DATA_WIDTH, Maths.Lerp(begin_line_x, x, t));
+                            j = (int)Maths.Range(0, DATA_HEIGHT, Maths.Lerp(begin_line_y, y, t));
+                            internal_draw(i, j);
                         }
                     }
                     else // circle
                     {
                         int __x, __y;
-                        PointF lon = (x, y).P().Minus(begin_line_x, begin_line_y), rotated_lon;
+                        PointF lon = (x, y).P().MinusF(begin_line_x, begin_line_y), rotated_lon;
                         float l = lon.Length();
                         for (float t = 0F; t <= 360F; t += 100F / l)
                         {
@@ -532,20 +532,19 @@ namespace LayerPx
                                 g_render.DrawRectangle(Pens.Gray, pos.X + __x * scale.Value, pos.Y + __y * scale.Value, scale.Value, scale.Value);
                             else
                             {
-                                for (int j = -pen_size / 2; j < pen_size / 2; j++)
-                                    for (int i = -pen_size / 2; i < pen_size / 2; i++)
+                                for (int j = -pen_size / 2; j <= pen_size / 2; j++)
+                                    for (int i = -pen_size / 2; i <= pen_size / 2; i++)
                                         if (data.check_pass(__x - i, __y - j))
                                             g_render.DrawRectangle(Pens.Gray, pos.X + (__x - i) * scale.Value, pos.Y + (__y - j) * scale.Value, scale.Value, scale.Value);
                             }
                         }
                     }
                 }
-                else
-                {
-                    internal_draw(_x, _y);
-                }
+                internal_draw(_x, _y);
             }
 
+            var mirror_pt = get_mirror_pt(_x, _y).ToPointF().PlusF(1,1);
+            var mirror_bl = get_mirror_pt((int)begin_line.X, (int)begin_line.Y).ToPointF().PlusF(1, 1);
             switch (mirror_mode)
             {
                 case MirrorMode.None: if (begin_line != PointF.Empty) draw_target(_x, _y, begin_line.X, begin_line.Y); else draw_target(_x, _y); break;
@@ -553,34 +552,33 @@ namespace LayerPx
                     if (begin_line != PointF.Empty)
                     {
                         draw_target(_x, _y, begin_line.X, begin_line.Y);
-                        draw_target(get_mirror_x(_x), _y, get_mirror_x(begin_line.X), begin_line.Y);
+                        draw_target(mirror_pt.X, _y, mirror_bl.X, begin_line.Y);
                     }
                     else
                     {
                         draw_target(_x, _y);
-                        draw_target(get_mirror_x(_x), _y);
+                        draw_target(mirror_pt.X, _y);
                     }
                     break;
                 case MirrorMode.Y:
                     if (begin_line != PointF.Empty)
                     {
                         draw_target(_x, _y, begin_line.X, begin_line.Y);
-                        draw_target(_x, get_mirror_y(_y), begin_line.X, get_mirror_y(begin_line.Y));
+                        draw_target(_x, mirror_pt.Y, begin_line.X, mirror_bl.Y);
                     }
                     else
                     {
                         draw_target(_x, _y);
-                        draw_target(_x, get_mirror_y(_y));
+                        draw_target(_x, mirror_pt.Y);
                     }
                     break;
                 case MirrorMode.XY:
-                    var mirror_pt = get_mirror_pt(_x, _y);
                     if (begin_line != PointF.Empty)
                     {
                         draw_target(_x, _y, begin_line.X, begin_line.Y);
-                        draw_target(get_mirror_x(_x), _y, get_mirror_x(begin_line.X), begin_line.Y);
-                        draw_target(_x, get_mirror_y(_y), begin_line.X, get_mirror_y(begin_line.Y));
-                        draw_target(get_mirror_x(_x), get_mirror_y(_y), get_mirror_x(begin_line.X), get_mirror_y(begin_line.Y));
+                        draw_target(mirror_pt.X, _y, mirror_bl.X, begin_line.Y);
+                        draw_target(_x, mirror_pt.Y, begin_line.X, mirror_bl.Y);
+                        draw_target(mirror_pt.X, mirror_pt.Y, mirror_bl.X, mirror_bl.Y);
                     }
                     else
                     {
@@ -623,7 +621,7 @@ namespace LayerPx
             var center = get_pos(Output).PlusF(imgw_scaled / 2F, imgh_scaled / 2F);
             g_render.DrawEllipse(Pens.Orange, get_world_sun.X - gizmo_radius, get_world_sun.Y - gizmo_radius, gizmo_radius * 2F, gizmo_radius * 2F);
             g_render.DrawLine(Pens.Yellow, get_world_sun, center);
-            var look = center.Minus(get_world_sun).norm();
+            var look = center.MinusF(get_world_sun).norm();
             g_render.DrawLine(Pens.Yellow, center, center.PlusF(look.Rotate(-135F).x(10F)));
             g_render.DrawLine(Pens.Yellow, center, center.PlusF(look.Rotate(135F).x(10F)));
 
@@ -642,8 +640,8 @@ namespace LayerPx
             ResetDraw(nameof(draw_shadow));
             var sun_pos = get_world_sun;
             var center = get_pos(Output).PlusF(imgw_scaled / 2F, imgh_scaled / 2F);
-            var lenght = (center.Minus(sun_pos).Length() / (Maths.Diagonal(imgw_scaled, imgh_scaled) / 2F)) * 4F;
-            Point look_lenght = center.Minus(sun_pos).norm().x(lenght).ToPoint();
+            var lenght = (center.MinusF(sun_pos).Length() / (Maths.Diagonal(imgw_scaled, imgh_scaled) / 2F)) * 4F;
+            Point look_lenght = center.MinusF(sun_pos).norm().x(lenght).ToPoint();
             int i, j, _x, _y;
 
             for(int l=2; l<DATA_LAYERS+1; l++)

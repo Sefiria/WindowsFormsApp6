@@ -52,7 +52,7 @@ namespace WindowsFormsApp22.Entities
         public RectangleF BoundsF => new RectangleF(Pos.X, Pos.Y, W, H);
         public PointF Tile => Pos.DivF(Core.Cube);
         public virtual PointF CalculateLook() => Maths.AngleToPointF(Angle.Value).Round();
-        public List<PointF> Edges => new List<PointF>() { Pos.Minus(W/2, H/2), Pos.PlusF(W/2, -H/2), Pos.PlusF(-H/2, H/2), Pos.PlusF(W/2, H/2) };
+        public List<PointF> Edges => new List<PointF>() { Pos.MinusF(W/2, H/2), Pos.PlusF(W/2, -H/2), Pos.PlusF(-H/2, H/2), Pos.PlusF(W/2, H/2) };
         public bool IsVisible => Core.RenderBounds.Contains(DrawPoint.ToPoint());
 
         public Entity()

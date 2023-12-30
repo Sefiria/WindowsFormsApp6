@@ -9,7 +9,7 @@ namespace Tooling
         public static bool IsDown => ButtonDown != MouseButtons.None;
         public static bool IsUp => !IsDown;
         public static bool PositionChanged => Position != OldPosition;
-        public static float LenghtDiff => Position.Minus(OldPosition).Length();
+        public static float LenghtDiff => Position.MinusF(OldPosition).Length();
         public static PointF Position = PointF.Empty, OldPosition = PointF.Empty;
         public static int Delta = 0;
         public static void Update()

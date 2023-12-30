@@ -7,16 +7,26 @@ namespace Tooling
         #region Point, PointF
 
         public static PointF Add(this ref PointF pt, float x, float y) => pt = new PointF(pt.X + x, pt.Y + y);
-        public static PointF Minus(this PointF A, PointF B) => new PointF(A.X - B.X, A.Y - B.Y);
-        public static PointF Minus(this PointF A, vec B) => new PointF(A.X - B.x, A.Y - B.y);
-        public static PointF Minus(this PointF A, vecf B) => new PointF(A.X - B.x, A.Y - B.y);
-        public static PointF Minus(this PointF A, float x, float y) => new PointF(A.X - x, A.Y - y);
-        public static PointF Minus(this PointF A, float n) => new PointF(A.X - n, A.Y - n);
-        public static PointF Minus(this Point A, PointF B) => new PointF(A.X - B.X, A.Y - B.Y);
-        public static PointF Minus(this Point A, vec B) => new PointF(A.X - B.x, A.Y - B.y);
-        public static PointF Minus(this Point A, vecf B) => new PointF(A.X - B.x, A.Y - B.y);
-        public static PointF Minus(this Point A, float x, float y) => new PointF(A.X - x, A.Y -y);
-        public static PointF Minus(this Point A, float n) => new PointF(A.X - n, A.Y - n);
+        public static Point Minus(this PointF A, PointF B) => new Point((int)(A.X - B.X), (int)(A.Y - B.Y));
+        public static Point Minus(this PointF A, vec B) => new Point((int)(A.X - B.x), (int)(A.Y - B.y));
+        public static Point Minus(this PointF A, vecf B) => new Point((int)(A.X - B.x), (int)(A.Y - B.y));
+        public static Point Minus(this PointF A, float x, float y) => new Point((int)(A.X - x), (int)(A.Y - y));
+        public static Point Minus(this PointF A, float n) => new Point((int)(A.X - n), (int) (A.Y - n));
+        public static Point Minus(this Point A, PointF B) => new Point((int)(A.X - B.X), (int)(A.Y - B.Y));
+        public static Point Minus(this Point A, vec B) => new Point((int)(A.X - B.x), (int) (A.Y - B.y));
+        public static Point Minus(this Point A, vecf B) => new Point((int)(A.X - B.x), (int) (A.Y - B.y));
+        public static Point Minus(this Point A, float x, float y) => new Point((int)(A.X - x), (int) (A.Y - y));
+        public static Point Minus(this Point A, float n) => new Point((int)(A.X - n), (int) (A.Y - n));
+        public static PointF MinusF(this PointF A, PointF B) => new PointF(A.X - B.X, A.Y - B.Y);
+        public static PointF MinusF(this PointF A, vec B) => new PointF(A.X - B.x, A.Y - B.y);
+        public static PointF MinusF(this PointF A, vecf B) => new PointF(A.X - B.x, A.Y - B.y);
+        public static PointF MinusF(this PointF A, float x, float y) => new PointF(A.X - x, A.Y - y);
+        public static PointF MinusF(this PointF A, float n) => new PointF(A.X - n, A.Y - n);
+        public static PointF MinusF(this Point A, PointF B) => new PointF(A.X - B.X, A.Y - B.Y);
+        public static PointF MinusF(this Point A, vec B) => new PointF(A.X - B.x, A.Y - B.y);
+        public static PointF MinusF(this Point A, vecf B) => new PointF(A.X - B.x, A.Y - B.y);
+        public static PointF MinusF(this Point A, float x, float y) => new PointF(A.X - x, A.Y -y);
+        public static PointF MinusF(this Point A, float n) => new PointF(A.X - n, A.Y - n);
         public static Point Snap(this Point pt, int n) => pt.Div(n).x(n);
         public static PointF Snap(this PointF pt, int n) => pt.Div(n).x(n);
         public static Point Div(this Point pt, int n) => new Point(pt.X  / n, pt.Y  / n);
