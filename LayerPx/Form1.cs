@@ -59,7 +59,7 @@ namespace LayerPx
 
         RangeValueF scale = new RangeValueF(1F, 2F, 10F);
         PointF get_world_sun => get_pos(sun); 
-        PointF get_world_mirror => get_pos(mirror_src); 
+        PointF get_world_mirror => get_pos(mirror_src.ToPoint()); 
 
         PointF get_pos(PointF pt) => Center.PlusF(pt.MinusF(Cam).x(scale.Value));
         PointF get_pos(Bitmap _img) => Center.MinusF(imgw_scaled / 2, imgh_scaled / 2).MinusF(Cam.x(scale.Value));
@@ -82,7 +82,7 @@ namespace LayerPx
         int get_mirror_x(float x) => (int)(mirror_src.X - 0.5F + imgw / 2F + (mirror_src.X - 0.5F + imgw / 2F - x));
         int get_mirror_y(float y) => (int)(mirror_src.Y - 0.5F + imgh / 2F + (mirror_src.Y - 0.5F + imgh / 2F - y));
         Point get_mirror_pt(int x, int y) => new Point(get_mirror_x(x), get_mirror_y(y));
-        int pen_size => m_pen_size == 1 ? 1 : m_pen_size + m_pen_size % 2;
+        int pen_size => m_pen_size == 1 ? 1 : m_pen_size;
 
         public Form1()
         {
@@ -510,11 +510,11 @@ namespace LayerPx
                     if (IsKeyDown(Key.LeftCtrl) == false) // line
                     {
                         int i, j;
-                        float l = (x, y).P().MinusF(begin_line_x, begin_line_y).Length();
+                        float l = (int)(x, y).P().MinusF(begin_line_x, begin_line_y).Length();
                         for (float t = 0F; t <= 1F; t += 1F / l)
                         {
-                            i = (int)Maths.Range(0, DATA_WIDTH, Maths.Lerp(begin_line_x, x, t));
-                            j = (int)Maths.Range(0, DATA_HEIGHT, Maths.Lerp(begin_line_y, y, t));
+                            i = (int)Maths.Range(0, DATA_WIDTH, Maths.Lerp(x, begin_line_x, t));
+                            j = (int)Maths.Range(0, DATA_HEIGHT, Maths.Lerp(y, begin_line_y, t));
                             internal_draw(i, j);
                         }
                     }
@@ -543,8 +543,8 @@ namespace LayerPx
                 internal_draw((int)x, (int)y);
             }
 
-            var mirror_pt = get_mirror_pt(_x, _y).ToPointF().PlusF(1,1);
-            var mirror_bl = get_mirror_pt((int)begin_line.X, (int)begin_line.Y).ToPointF().PlusF(1, 1);
+            var mirror_pt = get_mirror_pt(_x, _y).ToPointF();
+            var mirror_bl = get_mirror_pt((int)begin_line.X, (int)begin_line.Y).ToPointF();
             switch (mirror_mode)
             {
                 case MirrorMode.None: if (begin_line != PointF.Empty) draw_target(_x, _y, begin_line.X, begin_line.Y); else draw_target(_x, _y); break;
@@ -628,7 +628,7 @@ namespace LayerPx
             // MIRROR
 
             var pt = get_world_mirror;
-            float x = pt.X, y = pt.Y;
+            float x = pt.X + scale.Value / 2F, y = pt.Y + scale.Value / 2F;
             g_render.DrawLine(Pens.Violet, x, y - gizmo_radius, x, y + gizmo_radius);
             g_render.DrawLine(Pens.Violet, x - gizmo_radius, y, x + gizmo_radius, y);
         }
