@@ -38,22 +38,31 @@ namespace LayerPx
             Y,
             XY,
         }
+        public enum TopLeftMenuType
+        {
+            Tileset = 0,
+            Pal,
+            None,
+        }
 
-        Bitmap img, Output;
-        Graphics g_render, g;
+        Bitmap img, Output, Tileset;
+        Graphics g_render, g, g_tileset;
         Timer TimerUpdate = new Timer() { Enabled = true, Interval = 10 };
         Timer TimerDraw = new Timer() { Enabled = true, Interval = 10 };
 
         int imgw, imgh;
-        PointF Center = PointF.Empty, Cam = PointF.Empty, sun, mirror_src, begin_line = PointF.Empty;
+        PointF Center = PointF.Empty, Cam = PointF.Empty, sun, mirror_src, begin_line = PointF.Empty, tileset_tile_index = Point.Empty;
         Tools Tool = Tools.PenSquare;
         MirrorMode mirror_mode = MirrorMode.None;
         bool ShowGrid = false, ShowSunAndMirror = false, ShowShadows = true, refresh_shadows = false, holding_layer_released = true, mouseleft_released = true;
+        bool draw_to_tileset = false;
         DATA data;
         Color[] pal = new Color[16];// 0 is transparent
         int pal_index_primary = 1, m_pen_size = 1, holding_layer_target = DATA_LAYERS / 2, fixed_layer = DATA_LAYERS / 2, layer_gap = 1;
+        float gridsz = 8;
+        TopLeftMenuType TopLeftMenuState = TopLeftMenuType.Pal;
 
-        const int DATA_LAYERS = 8, DATA_WIDTH = 127, DATA_HEIGHT = 127;
+        const int DATA_LAYERS = 8, DATA_WIDTH = 63, DATA_HEIGHT = 63;
         const float CAM_MOV_SPD = 3F, SUN_MOV_SPD = 2F;
         const float SCALE_GAP = 0.5F;
 
@@ -100,6 +109,9 @@ namespace LayerPx
             imgw = DATA_WIDTH + 1;
             imgh = DATA_HEIGHT + 1;
 
+            Tileset = new Bitmap(imgw * 4, imgh * 1);
+            g_tileset = Graphics.FromImage(Tileset);
+
             Center = new PointF(W / 2F, H / 2F);
 
             pal[0] = Color.Black;
@@ -130,6 +142,7 @@ namespace LayerPx
                     Position = (sz+(sz*(i%8)),sz+sz*(i/8)).Vf(),
                     Size = (sz, sz).Vf(),
                     OnClick = (ui) => {
+                        if (TopLeftMenuState != TopLeftMenuType.Pal) return;
                         var id = int.Parse(ui.Name);
                         if (MouseStates.ButtonDown == MouseButtons.Left)
                         {
@@ -200,7 +213,7 @@ namespace LayerPx
             if (IsKeyDown(Key.S)) { Cam = Cam.PlusF(0F, CAM_MOV_SPD * Amplitude); refresh_shadows = true; }
             if (IsKeyDown(Key.D)) { Cam = Cam.PlusF(CAM_MOV_SPD * Amplitude, 0F); refresh_shadows = true; }
 
-            if(ShowSunAndMirror)
+            if (ShowSunAndMirror)
             {
                 if (IsKeyDown(Key.LeftCtrl))
                 {
@@ -221,6 +234,7 @@ namespace LayerPx
             if (IsKeyPressed(Key.G)) ShowGrid = !ShowGrid;
             if (IsKeyPressed(Key.H)) ShowSunAndMirror = !ShowSunAndMirror;
             if (IsKeyPressed(Key.J)) { ShowShadows = !ShowShadows; if (ShowShadows) refresh_shadows = true; }
+            if (IsKeyPressed(Key.K)) { TopLeftMenuState++; if (TopLeftMenuState > TopLeftMenuType.None) TopLeftMenuState = 0; }
 
             if (IsKeyPressed(Key.P)) Tool = Tool == Tools.PenCircle ? Tools.PenSquare : Tools.PenCircle;
 
@@ -262,9 +276,17 @@ namespace LayerPx
             {
                 if (IsKeyDown(Key.LeftAlt))
                 {
-                    scale.Value += SCALE_GAP * (MouseStates.Delta < 0 ? -1F : 1F) * Amplitude;
-                    ResetGx();
-                    refresh_shadows = true;
+                    if (ShowGrid && IsKeyDown(Key.LeftShift))
+                    {
+                        gridsz += 0.1F * (MouseStates.Delta < 0 ? -1F : 1F) * Amplitude;
+                        if (gridsz < 1F) gridsz = 1F;
+                    }
+                    else
+                    {
+                        scale.Value += SCALE_GAP * (MouseStates.Delta < 0 ? -1F : 1F) * Amplitude;
+                        ResetGx();
+                        refresh_shadows = true;
+                    }
                 }
                 else
                 {
@@ -286,54 +308,64 @@ namespace LayerPx
             }
             else if (MouseStates.ButtonDown != MouseButtons.Middle)
             {
-                var ms = get_pos_ms();
-                if (mouseleft_released)
-                    layer_at_first_press = data.PointedLayer(ms);
-                mouseleft_released = false;
-                int v = MouseStates.ButtonDown == MouseButtons.Left ? pal_index_primary : 0;
-
-                if (begin_line != PointF.Empty)
+                if (MouseStates.ButtonDown == MouseButtons.Left && TopLeftMenuState == TopLeftMenuType.Tileset && new Rectangle((24, 24).iP(), Tileset.Size).Contains(MouseStates.Position.ToPoint()))
                 {
-                    RangeValue x, y;
-                    PointF lon = ms.MinusF(begin_line), rotated_lon;
-                    float l = lon.Length();
-                    if (IsKeyDown(Key.LeftCtrl)) // draw circle
-                    {
-                        for (float t = 0F; t <= 360F; t += 100F / l)
-                        {
-                            rotated_lon = Maths.Rotate(lon, t);
-                            x = new RangeValue((int)(begin_line.X + rotated_lon.X / 2), 0, DATA_WIDTH);
-                            y = new RangeValue((int)(begin_line.Y + rotated_lon.Y / 2), 0, DATA_HEIGHT);
-                            UseTool((int)lon.X / 2 + x.Value, (int)lon.Y / 2 + y.Value, v);
-                        }
-                    }
-                    else // draw line
-                    {
-                        for (float t = 0F; t <= 1F; t += 1F / l)
-                        {
-                            x = new RangeValue((int)Maths.Lerp(begin_line.X, ms.X, t), 0, DATA_WIDTH);
-                            y = new RangeValue((int)Maths.Lerp(begin_line.Y, ms.Y, t), 0, DATA_HEIGHT);
-                            UseTool(x.Value, y.Value, v);
-                        }
-                    }
-                }
-
-                if (MouseStates.OldPosition != Point.Empty && MouseStates.PositionChanged)
-                {
-                    var old = get_pos_oldms();
-                    var m = ms;
-                    RangeValue x, y;
-                    for (float t = 0F; t <= 1F; t += 1F / MouseStates.LenghtDiff)
-                    {
-                        x = new RangeValue((int)Maths.Lerp(old.X, m.X, t), 0, DATA_WIDTH);
-                        y = new RangeValue((int)Maths.Lerp(old.Y, m.Y, t), 0, DATA_HEIGHT);
-                        UseTool(x.Value, y.Value, v);
-                    }
+                    int x = (int)Maths.Range(0, Tileset.Width / imgw, (MouseStates.Position.X - 24) / imgw);
+                    int y = (int)Maths.Range(0, Tileset.Height / imgh, (MouseStates.Position.Y - 24) / imgh);
+                    tileset_tile_index = (x, y).iP();
+                    g.Clear()
                 }
                 else
                 {
-                    var pos = get_pos_ms();
-                    UseTool(pos.X, pos.Y, v, IsKeyDown(Key.LeftShift));
+                    var ms = get_pos_ms();
+                    if (mouseleft_released)
+                        layer_at_first_press = data.PointedLayer(ms);
+                    mouseleft_released = false;
+                    int v = MouseStates.ButtonDown == MouseButtons.Left ? pal_index_primary : 0;
+
+                    if (begin_line != PointF.Empty)
+                    {
+                        RangeValue x, y;
+                        PointF lon = ms.MinusF(begin_line), rotated_lon;
+                        float l = lon.Length();
+                        if (IsKeyDown(Key.LeftCtrl)) // draw circle
+                        {
+                            for (float t = 0F; t <= 360F; t += 100F / l)
+                            {
+                                rotated_lon = Maths.Rotate(lon, t);
+                                x = new RangeValue((int)(begin_line.X + rotated_lon.X / 2), 0, DATA_WIDTH);
+                                y = new RangeValue((int)(begin_line.Y + rotated_lon.Y / 2), 0, DATA_HEIGHT);
+                                UseTool((int)lon.X / 2 + x.Value, (int)lon.Y / 2 + y.Value, v);
+                            }
+                        }
+                        else // draw line
+                        {
+                            for (float t = 0F; t <= 1F; t += 1F / l)
+                            {
+                                x = new RangeValue((int)Maths.Lerp(begin_line.X, ms.X, t), 0, DATA_WIDTH);
+                                y = new RangeValue((int)Maths.Lerp(begin_line.Y, ms.Y, t), 0, DATA_HEIGHT);
+                                UseTool(x.Value, y.Value, v);
+                            }
+                        }
+                    }
+
+                    if (MouseStates.OldPosition != Point.Empty && MouseStates.PositionChanged)
+                    {
+                        var old = get_pos_oldms();
+                        var m = ms;
+                        RangeValue x, y;
+                        for (float t = 0F; t <= 1F; t += 1F / MouseStates.LenghtDiff)
+                        {
+                            x = new RangeValue((int)Maths.Lerp(old.X, m.X, t), 0, DATA_WIDTH);
+                            y = new RangeValue((int)Maths.Lerp(old.Y, m.Y, t), 0, DATA_HEIGHT);
+                            UseTool(x.Value, y.Value, v);
+                        }
+                    }
+                    else
+                    {
+                        var pos = get_pos_ms();
+                        UseTool(pos.X, pos.Y, v, IsKeyDown(Key.LeftShift));
+                    }
                 }
             }
 
@@ -437,7 +469,8 @@ namespace LayerPx
                         continue;
                     var dt = data.PointedData(x, y);
                     var brightness = dt.layer / (float)DATA_LAYERS;
-                    g.FillRectangle(new SolidBrush(pal[dt.index].WithBrightness(brightness)), x * scale.Value, y * scale.Value, scale.Value, scale.Value);
+                    var sc = draw_to_tileset ? 1F : scale.Value;
+                    (draw_to_tileset ?g_tileset:g).FillRectangle(new SolidBrush(pal[dt.index].WithBrightness(brightness)), x * sc + (draw_to_tileset ? imgw * tileset_tile_index.X : 0), y * sc + (draw_to_tileset ? imgh * tileset_tile_index.Y : 0), sc, sc);
                 }
             }
             if(sender != nameof(draw_shadow))
@@ -445,8 +478,8 @@ namespace LayerPx
         }
         void Draw()
         {
-            //Console.WriteLine($"{MouseStates.Position} - {pos}");
-            while(draw_refresh_queue.Count > 0)
+            bool queued = draw_refresh_queue.Count > 0;
+            while (draw_refresh_queue.Count > 0)
             {
                 Point pt = draw_refresh_queue.Dequeue();
                 int x = pt.X, y = pt.Y;
@@ -455,21 +488,26 @@ namespace LayerPx
                 var brightness = dt.layer / (float)DATA_LAYERS;
                 g.FillRectangle(new SolidBrush(pal[dt.index].WithBrightness(brightness)), x * scale.Value, y * scale.Value, scale.Value, scale.Value);
             }
+            if (queued)
+            {
+                draw_to_tileset = true;
+                ResetDraw();
+                draw_to_tileset = false;
+            }
         }
         void DrawUI()
         {
             draw_grid_and_img();
             draw_modes();
             draw_cursor();
-            UIMgt.Draw(g_render);
+            draw_topleftmenu();
         }
         void draw_grid_and_img()
         {
             var pos = get_pos(Output);
             if (ShowGrid)
             {
-                int img_sz = 8;
-                int sz = img_sz * (int)scale.Value;
+                int sz = (int)gridsz * (int)scale.Value;
                 for (int y = 0; y < imgw_scaled; y += sz)
                     g_render.DrawLine(Pens.DimGray, pos.X, pos.Y + y, pos.X + imgw_scaled, pos.Y + y);
                 for (int x = 0; x < imgh_scaled; x += sz)
@@ -664,7 +702,27 @@ namespace LayerPx
         }
         void draw_shadow(Color c, float b, int x, int y)
         {
-            g.FillRectangle(new SolidBrush(c.WithBrightness(b)), x * scale.Value, y * scale.Value, scale.Value, scale.Value);
+            var sc = draw_to_tileset ? 1F : scale.Value;
+            (draw_to_tileset ? g_tileset : g).FillRectangle(new SolidBrush(c.WithBrightness(b)), x * sc + (draw_to_tileset ? imgw * tileset_tile_index.X : 0), y * sc + (draw_to_tileset ? imgh * tileset_tile_index.Y : 0), sc, sc);
+        }
+        void draw_topleftmenu()
+        {
+            switch(TopLeftMenuState)
+            {
+                case TopLeftMenuType.Tileset: draw_tileset(); break;
+                case TopLeftMenuType.Pal: UIMgt.Draw(g_render); break;
+            }
+
+            void draw_tileset()
+            {
+                g_render.DrawImage(Tileset, 24, 24);
+                Pen pen = new Pen(Color.White);
+                pen.DashStyle = System.Drawing.Drawing2D.DashStyle.Dash;
+                float t = (DateTime.Now.Millisecond % 1000) / 1000F;
+                pen.DashPattern = new float[] { 0.01F + t * 10F, 0.01F + t * 10F, 10F - t * 10F, 10F - t * 10F };
+                g_render.FillRectangle(new SolidBrush(Color.FromArgb((byte)(50-t*50), Color.White)), 24 + imgw * tileset_tile_index.X, 24 + imgh * tileset_tile_index.Y, imgw, imgh);
+                g_render.DrawRectangle(pen, 24, 24, Tileset.Width, Tileset.Height);
+            }
         }
 
 
