@@ -40,6 +40,8 @@
             this.Render.Size = new System.Drawing.Size(540, 490);
             this.Render.TabIndex = 0;
             this.Render.TabStop = false;
+            this.Render.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Render_MouseDown);
+            this.Render.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Render_MouseMove);
             // 
             // Form1
             // 
@@ -48,6 +50,7 @@
             this.ClientSize = new System.Drawing.Size(540, 490);
             this.Controls.Add(this.Render);
             this.Name = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.Render)).EndInit();
             this.ResumeLayout(false);

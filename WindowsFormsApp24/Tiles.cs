@@ -42,8 +42,8 @@ namespace WindowsFormsApp24
         public (int layer, int x, int y, int index) PointedData(Point xy) => PointedData(xy.X, xy.Y);
         public int PointedLayer(int x, int y) => PointedData(x, y).layer;
         public int PointedLayer(Point xy) => PointedLayer(xy.X, xy.Y);
-        public int Pointedindex(int x, int y) => PointedData(x, y).index;
-        public int Pointedindex(Point xy) => Pointedindex(xy.X, xy.Y);
+        public int PointedIndex(int x, int y) => PointedData(x, y).index;
+        public int PointedIndex(Point xy) => PointedIndex(xy.X, xy.Y);
         public void Set(int l, int x, int y, int v) => this[l, x, y] = (byte)Maths.Range(0, byte.MaxValue, v);
     }
 }

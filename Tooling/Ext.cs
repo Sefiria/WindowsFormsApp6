@@ -74,6 +74,7 @@ namespace Tooling
 
         public static Point iP(this (int X, int Y) data) => new Point(data.X, data.Y); 
         public static PointF P(this (int X, int Y) data) => new PointF(data.X, data.Y); 
+        public static Point iP(this (float X, float Y) data) => new Point((int)data.X, (int)data.Y); 
         public static PointF P(this (float X, float Y) data) => new PointF(data.X, data.Y);
         public static PointF P(this float n) => new PointF(n, n);
         public static Point iP(this float n) => new Point((int)n, (int)n);

@@ -46,23 +46,50 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Events\Act.cs" />
+    <Compile Include="Cam.cs" />
+    <Compile Include="Character.cs" />
+    <Compile Include="Core.cs" />
+    <Compile Include="Enumerations.cs" />
+    <Compile Include="Events\WateringCan.cs" />
+    <Compile Include="Events\Shovel.cs" />
+    <Compile Include="Events\Command.cs" />
+    <Compile Include="Events\Crop.cs" />
+    <Compile Include="Events\OldCrop.cs" />
+    <Compile Include="Events\Event.cs" />
+    <Compile Include="Events\Bag.cs" />
+    <Compile Include="Events\Seed.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Fruit.cs" />
+    <Compile Include="Grass.cs" />
+    <Compile Include="Leaf.cs" />
+    <Compile Include="Map.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Root.cs" />
+    <Compile Include="Scenes\SceneBase.cs" />
+    <Compile Include="Scenes\SceneMain.cs" />
+    <Compile Include="Scenes\SceneTitle.cs" />
+    <Compile Include="Tiles.cs" />
+    <Compile Include="UIMouseAssist.cs" />
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -75,6 +102,24 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Tooling\Tooling.csproj">
+      <Project>{558899ff-01c9-480e-8837-da2161694819}</Project>
+      <Name>Tooling</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\mainchar.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tileset.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ImageHole.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\objects.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

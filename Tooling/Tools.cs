@@ -126,6 +126,17 @@ namespace Tooling
 
             return rotatedImage;
         }
+        public static Bitmap[,] Split2D(this Bitmap tex, int square_size)
+        {
+            int s = square_size;
+            int w = tex.Width, h = tex.Height;
+            int cw = w / s, ch = h / s;
+            var result = new Bitmap[cw, ch];
+            for (int i = 0; i < cw; i++)
+                for (int j = 0; j < ch; j++)
+                    result[i, j] = tex.Clone(new Rectangle(i*s, j*s, s, s), tex.PixelFormat);
+            return result;
+        }
         public static List<Bitmap> Split(this Bitmap tex, int cx = 0, int cy = 0, int x = 0, int y = 0)
         {
             int @case = 0;

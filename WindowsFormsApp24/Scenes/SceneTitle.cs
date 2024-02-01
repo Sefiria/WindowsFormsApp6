@@ -8,5 +8,14 @@ namespace WindowsFormsApp24.Scenes
 {
     internal class SceneTitle : SceneBase
     {
+        internal override void Draw()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal override void Update()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

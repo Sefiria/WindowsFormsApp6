@@ -8,7 +8,7 @@ namespace WindowsFormsApp24.Scenes
 {
     internal abstract class SceneBase
     {
-        public abstract void Update();
-        public abstract void Draw();
+        internal abstract void Update();
+        internal abstract void Draw();
     }
 }

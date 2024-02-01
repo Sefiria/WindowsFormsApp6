@@ -89,6 +89,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsFormsApp23", "Window
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LayerPx", "LayerPx\LayerPx.csproj", "{E067B322-0733-43C6-9F22-32CF0C842B38}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsFormsApp24", "WindowsFormsApp24\WindowsFormsApp24.csproj", "{EB2341B9-C808-4F13-867E-7B6C55EF78BB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -267,6 +269,10 @@ Global
 		{E067B322-0733-43C6-9F22-32CF0C842B38}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E067B322-0733-43C6-9F22-32CF0C842B38}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E067B322-0733-43C6-9F22-32CF0C842B38}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB2341B9-C808-4F13-867E-7B6C55EF78BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB2341B9-C808-4F13-867E-7B6C55EF78BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB2341B9-C808-4F13-867E-7B6C55EF78BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB2341B9-C808-4F13-867E-7B6C55EF78BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
