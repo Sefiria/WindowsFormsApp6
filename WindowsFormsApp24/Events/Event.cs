@@ -2,9 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 using Tooling;
 using WindowsFormsApp24.Properties;
 using static WindowsFormsApp24.Enumerations;
@@ -27,10 +29,11 @@ namespace WindowsFormsApp24.Events
         internal int W => Frames?.Length > 0 ? Frames[0].Width : Image?.Width ?? 0;
         internal int H => Frames?.Length > 0 ? Frames[0].Height : Image?.Height ?? 0;
         internal RectangleF RealTimeBounds => new RectangleF(X + Bounds.X - Core.Cam.X, Y + Bounds.Y - Core.Cam.Y, Bounds.Width, Bounds.Height);
+        internal RectangleF RealTimeDisplayArea => new RectangleF(X - Core.Cam.X, Y - H + Core.TileSize / 2 - Core.Cam.Y, W, H);
         internal bool IsOnScreen => Map.Current.IsEventOnScreen(this);
         internal bool Exists = true;
         internal string Filename = "";
-        internal Bitmap Image = null;
+        internal Bitmap Image = null, ShadowImage = null;
         internal Bitmap[] Frames;
         internal int Direction = 0, Frame = 0;
         internal bool IsMoving = false;
@@ -48,7 +51,7 @@ namespace WindowsFormsApp24.Events
 
         internal List<Command> Acts = new List<Command>();
         internal int ActIndex = 0;
-        internal bool ActsRepeat = false;
+        internal bool ActsRepeat = false, GenerateNew = true;
         internal Event AttachSource = null;
 
         private int frame_control = 0, frame_direction = 1;
@@ -196,6 +199,28 @@ namespace WindowsFormsApp24.Events
                 Core.Instance.g.DrawImage(img, Position.PlusF(TextureOffset).Minus(Cam.Position));
         }
         internal virtual void DrawExtraInfos(){}
+        internal virtual void DrawShadow(bool generateNew = false)
+        {
+            var a = Map.Current.SunTicks / 32F * 360F - 90F;
+            if (GenerateNew || generateNew)
+            {
+                GenerateNew = false;
+                var img = new Bitmap(Frames != null ? Frames[Direction * 3 + 1 + Frame] : Image);
+                if (img == null) return;
+                ShadowImage = new Bitmap(W, H*2);
+                img = img.GetAdjusted(0F);
+                using (Graphics g = Graphics.FromImage(ShadowImage))
+                    g.DrawImage(img, Point.Empty);
+                img = new Bitmap(ShadowImage);
+                ShadowImage = new Bitmap(W*2, H*2);
+                using (Graphics g = Graphics.FromImage(ShadowImage))
+                    g.DrawImage(img, W/2F,0F);
+                ShadowImage = ShadowImage.Rotated(a);// TODO TRANSPARENT SHADOW
+            }
+            var arad = a.ToRadians();
+            var turnpos = ((float)Math.Cos(arad), (float)Math.Sin(arad)).P();
+            Core.Instance.g.DrawImage(ShadowImage, RealTimeDisplayArea.Location.PlusF(TextureOffset).MinusF(W/2F,0F).MinusF(turnpos));
+        }
         internal Bitmap BottomPartOf(Bitmap img) => img.Clone(new Rectangle(0, img.Height - Core.TileSize / 2, img.Width, Core.TileSize / 2), img.PixelFormat);
         internal Bitmap TopPartOf(Bitmap img) => img.Height - Core.TileSize / 2 <= 0 ? null : img.Clone(new Rectangle(0, 0, img.Width, img.Height - Core.TileSize / 2), img.PixelFormat);
 
@@ -214,7 +239,7 @@ namespace WindowsFormsApp24.Events
             var events = new List<Event>(Map.Current.Events)
                                 .Where(ev => ev.Guid != Core.MainCharacter.HandObject)
                                 .Where(ev => exceptions == null ? true : !exceptions.Contains(ev))
-                                .Where(ev => ev.RealTimeBounds.X > caller.RealTimeBounds.X - 64 && ev.RealTimeBounds.X < caller.RealTimeBounds.X + 64 && ev.RealTimeBounds.Y > caller.RealTimeBounds.Y - 64 && ev.RealTimeBounds.Y < caller.RealTimeBounds.Y + 64)
+                                .Where(ev => ev.RealTimeBounds.X + ev.RealTimeBounds.Width > caller.RealTimeBounds.X - 64 && ev.RealTimeBounds.X < caller.RealTimeBounds.X + caller.RealTimeBounds.Width + 64 && ev.RealTimeBounds.Y + ev.RealTimeBounds.Height > caller.RealTimeBounds.Y - 64 && ev.RealTimeBounds.Y < caller.RealTimeBounds.Y + caller.RealTimeBounds.Height + 64)
                                 .ToList();
 
             if (onlyFirstContact)

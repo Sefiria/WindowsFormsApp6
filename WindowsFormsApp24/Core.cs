@@ -59,6 +59,7 @@ namespace WindowsFormsApp24
                 // Miscs
                 [NamedObjects.Bag]                    = Textures[1, 14],
                 [NamedObjects.EventContainer]  = Resources.EventContainer,
+                [NamedObjects.ClosetContainer]  = Resources.closet,
             };
         }
         internal void ResetGraphics()

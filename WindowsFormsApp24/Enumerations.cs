@@ -35,12 +35,13 @@ namespace WindowsFormsApp24
         }
         internal enum NamedObjects
         {
+            Undefined = 0,
             // plants
-            Carrot=0, Onion, Potatoe, Healherb, Salad, Pepper, Tomatoe,
+            Carrot, Onion, Potatoe, Healherb, Salad, Pepper, Tomatoe,
             // tools
             Shovel, WateringCan,
             // Miscs
-            Bag, EventContainer
+            Bag, EventContainer, ClosetContainer
         }
         internal enum WatercanStats
         {

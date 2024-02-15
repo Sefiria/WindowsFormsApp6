@@ -34,14 +34,17 @@ namespace WindowsFormsApp24
         internal void DoOnScreenTiles(Action<int, int> func)
         {
             var ts = Core.TileSize;
-            var rect = new RectangleF(Core.Cam.Position, new SizeF(Core.Instance.RenderImage.Size));
-            for(int x= (int)Core.Cam.X / ts; x - Core.Cam.X / ts < Core.Instance.RenderImage.Size.Width / ts; x++)
-                for(int y= (int)Core.Cam.Y / ts; y - Core.Cam.Y / ts < Core.Instance.RenderImage.Size.Height / ts; y++)
+            var rect = new Rectangle(Core.Cam.Position, Core.Instance.RenderImage.Size);
+            for(int x= rect.X / ts; x - rect.X / ts < rect.Width / ts; x++)
+                for(int y= rect.Y / ts; y - rect.Y / ts < rect.Height / ts; y++)
                     func(x, y);
         }
         internal DrawingPart DrawingPart;
         internal Queue<(int layer, int x, int y)> TilesToRefresh = new Queue<(int layer, int x, int y)>();
         internal bool complete_refresh = true;
+        internal int SunOldTicks = -1;
+        internal float SunTicks = 0F, SunTickRate = 0.001F;
+        internal bool SunMoved => SunOldTicks != SunTicks;
 
         internal Guid AddEvent(Event ev) { Events.Add(ev); return Events.Last().Guid; }
         internal static Guid AddEventToCurrent(Event ev) { Current.Events.Add(ev); return Current.Events.Last().Guid; }
@@ -79,7 +82,14 @@ namespace WindowsFormsApp24
                     Events.Remove(ev);
                 ev.Update();
             }
+
             Core.Instance.Ticks++;
+
+            if (SunOldTicks != (int)SunTicks)
+                SunOldTicks = (int)SunTicks;
+            SunTicks += SunTickRate;
+            while (SunTicks >= 32F) SunTicks -= 32F;
+            while (SunTicks < 0F) SunTicks += 32F;
 
             UIMouseAssist.Update();
         }
@@ -138,17 +148,36 @@ namespace WindowsFormsApp24
 
             var onscreenevents = GetOnScreenEvents();
             var listZ = onscreenevents.Select(ev => ev.Z).Distinct().OrderBy(z => z).ToList();
-            for(int i=0;i<listZ.Count; i++)
+            if (listZ.Count == 0)
             {
+                scene.MainCharacter.DrawShadow(SunMoved);
                 UIMouseAssist.Draw();
                 DrawingPart = DrawingPart.Bottom;
-                onscreenevents.Where(ev => ev.Z == listZ[i]).ToList().ForEach(ev => ev.Draw());
-                if(scene.MainCharacter.Z == listZ[i])
-                    scene.MainCharacter.Draw();
+                scene.MainCharacter.Draw();
                 DrawingPart = DrawingPart.Top;
-                onscreenevents.Where(ev => ev.Z == listZ[i]).ToList().ForEach(ev => ev.Draw());
-                if (scene.MainCharacter.Z == listZ[i])
-                    scene.MainCharacter.Draw();
+                scene.MainCharacter.Draw();
+            }
+            else
+            {
+                for (int i = 0; i < listZ.Count; i++)
+                {
+                    onscreenevents.Where(ev => ev.Z == listZ[i]).ToList().ForEach(ev => ev.DrawShadow(SunMoved));
+                    if (scene.MainCharacter.Z == listZ[i])
+                        scene.MainCharacter.DrawShadow(SunMoved);
+                }
+
+                for (int i = 0; i < listZ.Count; i++)
+                {
+                    UIMouseAssist.Draw();
+                    DrawingPart = DrawingPart.Bottom;
+                    onscreenevents.Where(ev => ev.Z == listZ[i]).ToList().ForEach(ev => ev.Draw());
+                    if (scene.MainCharacter.Z == listZ[i])
+                        scene.MainCharacter.Draw();
+                    DrawingPart = DrawingPart.Top;
+                    if (scene.MainCharacter.Z == listZ[i])
+                        scene.MainCharacter.Draw();
+                    onscreenevents.Where(ev => ev.Z == listZ[i]).ToList().ForEach(ev => ev.Draw());
+                }
             }
 
             //onscreenevents.ForEach(ev => Core.Instance.gUI.DrawRectangle(new Pen(Color.Red, 4F), ev.RealTimeBounds.ToIntRect()));//debug

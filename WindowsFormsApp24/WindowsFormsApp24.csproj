@@ -51,6 +51,7 @@
     <Compile Include="Character.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="Enumerations.cs" />
+    <Compile Include="Events\ClosetContainer.cs" />
     <Compile Include="Events\EventContainer.cs" />
     <Compile Include="Events\WateringCan.cs" />
     <Compile Include="Events\Shovel.cs" />
@@ -125,6 +126,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\EventContainer.png" />
+    <None Include="Resources\closet.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

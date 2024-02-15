@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using Tooling;
@@ -22,8 +23,11 @@ namespace WindowsFormsApp24
             var ms = MouseStates.Position.DivF(Core.Cam.Zoom);
             var p = Core.MainCharacter;
             bool evIsHand = p.HandObject.IsDefined();
-            Event ev = Map.Current.Events.OrderByDescending(e => e.Z).FirstOrDefault(e => e.RealTimeBounds.Contains(ms));
-            if(ev != null)
+            Event ev = Map.Current.Events.Reverse<Event>().OrderByDescending(e => e.Z).FirstOrDefault(e => e.RealTimeDisplayArea.Contains(ms));
+            if(evIsHand)
+                while (ev?.AttachSource != null)
+                    ev = ev.AttachSource;
+            if (ev != null)
                 ev.MouseHover = true;
             if (evIsHand && !(ev is EventContainer))
                 ev = Map.Current.Events.First(e => e.Guid == p.HandObject);
@@ -72,7 +76,7 @@ namespace WindowsFormsApp24
                 var tile = Maths.Lerp(p.Position, ms, t).Snap(ts).PlusF(ts / 2F, ts / 2F).MinusF(cam.Position);
                 if (!Path.Contains(tile))
                 {
-                    if(Path.Count > 1 && Maths.Distance(Path[Path.Count-2], tile) < ts * 1.5F)
+                    if (Path.Count > 1 && Maths.Distance(Path[Path.Count - 2], tile) < ts * 1.5F)
                         Path.Remove(Path.Last());
                     Path.Add(tile);
                 }
@@ -81,10 +85,22 @@ namespace WindowsFormsApp24
             }
             PathTargetTile = ms.Div(ts);
 
-            if (Path.Count > 1)
+            if (Maths.Distance(p.Position.Div(ts), PathTargetTile) <= max_distance)
             {
                 g.FillRectangle(new SolidBrush(Color.FromArgb(111, 100, 200, 255)), PathTargetTile.X * ts - cam.X, PathTargetTile.Y * ts - cam.Y, Core.TileSize, Core.TileSize);
-                g.DrawLines(pen, Path.ToArray());
+                if (Path.Count > 1)
+                    g.DrawLines(pen, Path.ToArray());
+            }
+            else
+            {
+                for (int x = p.TileX - max_distance; x < p.TileX + max_distance; x++)
+                {
+                    for (int y = p.TileY - max_distance; y < p.TileY + max_distance; y++)
+                    {
+                        if (Maths.Distance(p.Position.Div(ts), (x,y).P()) <= max_distance)
+                            g.FillRectangle(new SolidBrush(Color.FromArgb(50, 100, 200, 255)), x * ts - cam.X, y * ts - cam.Y, Core.TileSize, Core.TileSize);
+                    }
+                }
             }
         }
     }

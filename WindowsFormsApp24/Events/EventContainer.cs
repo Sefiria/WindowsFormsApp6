@@ -13,19 +13,24 @@ namespace WindowsFormsApp24.Events
 {
     internal class EventContainer : Event
     {
-        internal NamedObjects NamedObject = NamedObjects.EventContainer;
+        internal NamedObjects NamedObject;
         internal int StackSizeX, StackSizeY;
         internal int StackSize => StackSizeX * StackSizeY;
         internal List<Guid> Stack = new List<Guid>();
         internal Point PrevPosition = Point.Empty;
         internal bool HasToResetStackPositions = false;
+        internal bool StackIsFull => Stack.Count == StackSize;
+        internal bool StackIsNotFull => !StackIsFull;
 
-        internal EventContainer(int stacksize_x, int stacksize_y, int x, int y, int z) : base(x, y, z)
+        internal EventContainer(int stacksize_x, int stacksize_y, int x, int y, int z, NamedObjects namedObject = NamedObjects.EventContainer) : base(x, y, z)
         {
+            NamedObject = namedObject;
             Initialize(stacksize_x, stacksize_y);
         }
-        internal EventContainer(int stacksize_x, int stacksize_y, float x, float y, float z) : base(x, y, z)
+        internal EventContainer(int stacksize_x, int stacksize_y, float x, float y, float z, NamedObjects namedObject = NamedObjects.EventContainer) : base(x, y, z)
         {
+            if (NamedObject == NamedObjects.Undefined)
+                NamedObject = NamedObjects.EventContainer;
             Initialize(stacksize_x, stacksize_y);
         }
 
@@ -35,8 +40,7 @@ namespace WindowsFormsApp24.Events
             StackSizeX = stacksize_x;
             StackSizeY = stacksize_y;
             var img = Core.NamedTextures[NamedObject];
-            TextureOffset.Y = 4F;
-            Bounds = new RectangleF(0, -img.Height / 3 - TextureOffset.Y, img.Width, img.Height);
+            Bounds = new RectangleF(0, 0, img.Width, img.Height / 3);
             Image = Core.NamedTextures[NamedObject];
             Image.MakeTransparent(Color.White);
         }
@@ -51,7 +55,7 @@ namespace WindowsFormsApp24.Events
             p.HandObject = Guid.Empty;
             var hw = W / ((StackSizeX + 2) * (float)ev.W) * ev.W - 2;
             var hh = H / ((StackSizeY + 2) * (float)ev.H) * ev.H - Core.TileSize - 2;
-            ev.X = X + hw + ((Stack.Count-1) % StackSizeX) * (W / ((StackSizeX + 2) * (float)ev.W)) * ev.W;
+            ev.X = X + hw + ((Stack.Count-1) % StackSizeX) * (W / ((StackSizeX + 2) * (float)ev.W)) * ev.W - ev.W / 4F;
             ev.Y = Y + hh + ((Stack.Count - 1) / StackSizeX) * (H / ((StackSizeY + 2) * (float)ev.H)) * ev.H;
             ev.Z = Z + 1;
             ev.AttachTo(this);
@@ -59,13 +63,14 @@ namespace WindowsFormsApp24.Events
         internal override void DetachChild(Event child)
         {
             Stack.Remove(child.Guid);
+            child.Z--;
             HasToResetStackPositions = true;
         }
 
         internal override void Update()
         {
             MouseHover = false;
-            Highlight = Character.MainHandObjectDefined;
+            Highlight = Character.MainHandObjectDefined && StackIsNotFull;
             if (Position == PrevPosition && !HasToResetStackPositions)
                 return;
             PrevPosition = Position;
@@ -75,7 +80,7 @@ namespace WindowsFormsApp24.Events
             foreach (Guid guid in stack)
             {
                 i++;
-                ev = Map.Current.Events.FirstOrDefault(e => e.Guid == guid);
+                ev = Map.GetEvent(guid);
                 if (ev == null)
                 {
                     Stack.Remove(guid);
@@ -83,7 +88,7 @@ namespace WindowsFormsApp24.Events
                 }
                 hw = W / ((sx + 2) * ev.W) * ev.W - 2;
                 hh = H / ((sy + 2) * ev.H) * ev.H - Core.TileSize - 2;
-                ev.X = X + hw + (i%sx) * (W / ((sx+2) * ev.W)) * ev.W;
+                ev.X = X + hw + (i%sx) * (W / ((sx+2) * ev.W)) * ev.W - ev.W / 4F;
                 ev.Y = Y + hh + (int)(i / sx) * (H / ((sy + 2) * ev.H)) * ev.H;
                 ev.Z = Z + 1;
             }

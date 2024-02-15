@@ -55,10 +55,11 @@ namespace WindowsFormsApp24
             var watercan = new WateringCan(3F, 0, 2, 0);
             watercan.Volume = watercan.Stats[WatercanStats.MaxVolume];
             scene.Map.AddEvent(watercan);
-            scene.Map.AddEvent(new SmallContainer(4, 3, 0));
-            scene.Map.AddEvent(new MediumContainer(4, 5, 0));
-            scene.Map.AddEvent(new BigContainer(4, 7, 0));
-            
+            scene.Map.AddEvent(new ClosetContainer(4, 3, 0));
+            //scene.Map.AddEvent(new SmallContainer(4, 3, 0));
+            //scene.Map.AddEvent(new MediumContainer(4, 5, 0));
+            //scene.Map.AddEvent(new BigContainer(4, 7, 0));
+
             // DEBUG FILL CONTAINERS
             //for (int i = 0; i < SmallContainer.SmallContainerStackSizeX * SmallContainer.SmallContainerStackSizeY; i++)
             //{
@@ -74,6 +75,11 @@ namespace WindowsFormsApp24
             //{
             //    Core.MainCharacter.HandObject = scene.Map.AddEvent(new Seed(NamedObjects.Carrot, 5000, 0, 0));
             //    Map.GetEvent(typeof(BigContainer)).PrimaryAction();
+            //}
+            //for (int i = 0; i < ClosetContainer.ClosetStackSizeX * ClosetContainer.ClosetStackSizeY; i++)
+            //{
+            //    Core.MainCharacter.HandObject = scene.Map.AddEvent(new Seed(NamedObjects.Carrot, 5000, 0, 0));
+            //    Map.GetEvent(typeof(ClosetContainer)).PrimaryAction();
             //}
         }
         private void Render_MouseMove(object sender, MouseEventArgs e)

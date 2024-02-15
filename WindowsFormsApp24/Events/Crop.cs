@@ -10,7 +10,15 @@ namespace WindowsFormsApp24.Events
 {
     internal class Crop : Event
     {
+        internal Crop(NamedObjects namedObject, int x, int y) : base(Core.NamedTextures[namedObject], true, x, y)
+        {
+            Initialize(namedObject);
+        }
         internal Crop(NamedObjects namedObject, float x, float y) : base(Core.NamedTextures[namedObject], true, x, y)
+        {
+            Initialize(namedObject);
+        }
+        internal void Initialize(NamedObjects namedObject)
         {
             Object = namedObject;
             start_grow_tick = Core.Instance.Ticks;
