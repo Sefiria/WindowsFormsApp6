@@ -1,9 +1,12 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Tooling
 {
-    public class MouseStates
+    public class MouseStatesV1
     {
         public static MouseButtons ButtonDown = MouseButtons.None;
         public static bool IsDown => ButtonDown != MouseButtons.None;

@@ -78,7 +78,7 @@ namespace ConfigureRoute.Entities
                     using (Graphics gtex = Graphics.FromImage(tex))
                     {
                         int sz = Diagonal;
-                        gtex.FillRectangle(new SolidBrush(Color.FromArgb(Bounds.Contains(MouseStates.Position.PlusF(Core.Cam).ToPoint()) ? 200 : 50, Color.Red)), 0, 0, sz, sz);
+                        gtex.FillRectangle(new SolidBrush(Color.FromArgb(Bounds.Contains(MouseStatesV1.Position.PlusF(Core.Cam).ToPoint()) ? 200 : 50, Color.Red)), 0, 0, sz, sz);
                         gtex.DrawRectangle(new Pen(Color.Red, 2F), 0, 0, sz, sz);
                     }
                 }

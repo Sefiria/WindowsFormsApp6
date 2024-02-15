@@ -41,7 +41,7 @@ namespace WindowsFormsApp17
 
         void Update(object sender, EventArgs e)
         {
-            MouseStates.Position = Render.PointToClient(MousePosition).MinusF((Core.mw - Core.TSZ * 1F, (float)Core.mh).P());
+            MouseStatesV1.Position = Render.PointToClient(MousePosition).MinusF((Core.mw - Core.TSZ * 1F, (float)Core.mh).P());
 
             Data.Instance.map.FluidUpdate();
 

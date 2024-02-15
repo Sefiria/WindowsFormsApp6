@@ -1,15 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Tooling;
 using WindowsFormsApp24.Events;
 using WindowsFormsApp24.Properties;
+using WindowsFormsApp24.Scenes;
 using static WindowsFormsApp24.Enumerations;
 
 namespace WindowsFormsApp24
@@ -26,6 +20,7 @@ namespace WindowsFormsApp24
             Core.Instance.Render = Render;
 
             KB.Init();
+            MouseStates.Initialize();
 
             TempFirstInit();
         }
@@ -37,11 +32,12 @@ namespace WindowsFormsApp24
             Core.Instance.CurrentScene.Update();
 
             MouseStates.Update();
-            MouseStates.ButtonDown = MouseButtons.None;
 
-            Core.Instance.ResetGraphics();
+            if (WindowState != FormWindowState.Minimized)
+                Core.Instance.ResetGraphics();
             Core.Instance.CurrentScene.Draw();
-            Core.Instance.WriteGraphics();
+            if (WindowState != FormWindowState.Minimized)
+                Core.Instance.WriteGraphics();
         }
 
 
@@ -53,18 +49,45 @@ namespace WindowsFormsApp24
             scene.Maps.Add(new Map(16, 16, Resources.tileset));
             scene.CurrentMapID = 0;
             // Events
-            scene.MainCharacter = new Character(Resources.mainchar, 5, 5);
-            scene.Map.Events.Add(new Bag(NamedObjects.Carrot, 500, 1, 2, 2));
-            scene.Map.Events.Add(new Shovel(1, 2));
-            scene.Map.Events.Add(new WateringCan(3F, 0, 2) { Volume=3F });
-        }
-        private void Render_MouseDown(object sender, MouseEventArgs e)
-        {
-            MouseStates.ButtonDown = e.Button;
+            scene.MainCharacter = new Character(Resources.mainchar, 5, 5, 0);
+            scene.Map.AddEvent(new Bag(NamedObjects.Carrot, 10000, 99, 2, 2, 0));
+            scene.Map.AddEvent(new Shovel(1, 2, 0));
+            var watercan = new WateringCan(3F, 0, 2, 0);
+            watercan.Volume = watercan.Stats[WatercanStats.MaxVolume];
+            scene.Map.AddEvent(watercan);
+            scene.Map.AddEvent(new SmallContainer(4, 3, 0));
+            scene.Map.AddEvent(new MediumContainer(4, 5, 0));
+            scene.Map.AddEvent(new BigContainer(4, 7, 0));
+            
+            // DEBUG FILL CONTAINERS
+            //for (int i = 0; i < SmallContainer.SmallContainerStackSizeX * SmallContainer.SmallContainerStackSizeY; i++)
+            //{
+            //    Core.MainCharacter.HandObject = scene.Map.AddEvent(new Seed(NamedObjects.Carrot, 5000, 0, 0));
+            //    Map.GetEvent(typeof(SmallContainer)).PrimaryAction();
+            //}
+            //for (int i = 0; i < MediumContainer.MediumContainerStackSizeX * MediumContainer.MediumContainerStackSizeY; i++)
+            //{
+            //    Core.MainCharacter.HandObject = scene.Map.AddEvent(new Seed(NamedObjects.Carrot, 5000, 0, 0));
+            //    Map.GetEvent(typeof(MediumContainer)).PrimaryAction();
+            //}
+            //for (int i = 0; i < BigContainer.BigContainerStackSizeX * BigContainer.BigContainerStackSizeY; i++)
+            //{
+            //    Core.MainCharacter.HandObject = scene.Map.AddEvent(new Seed(NamedObjects.Carrot, 5000, 0, 0));
+            //    Map.GetEvent(typeof(BigContainer)).PrimaryAction();
+            //}
         }
         private void Render_MouseMove(object sender, MouseEventArgs e)
         {
+            MouseStates.OldPosition = MouseStates.Position;
             MouseStates.Position = e.Location;
+        }
+        private void Render_MouseDown(object sender, MouseEventArgs e)
+        {
+            MouseStates.ButtonsDown[e.Button] = true;
+        }
+        private void Render_MouseUp(object sender, MouseEventArgs e)
+        {
+            MouseStates.ButtonsDown[e.Button] = false;
         }
     }
 }

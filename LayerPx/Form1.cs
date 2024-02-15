@@ -81,8 +81,8 @@ namespace LayerPx
             var y = new RangeValue((int)((pos.Y - o.Y) / scale.Value), 0, DATA_HEIGHT).Value;
             return new Point(x, y);
         }
-        Point get_pos_ms() => get_pos_ms(MouseStates.Position);
-        Point get_pos_oldms() => get_pos_ms(MouseStates.OldPosition);
+        Point get_pos_ms() => get_pos_ms(MouseStatesV1.Position);
+        Point get_pos_oldms() => get_pos_ms(MouseStatesV1.OldPosition);
         float Amplitude => IsKeyDown(Key.LeftShift) ? 5F : 1F;
         float imgw_scaled => (imgw * scale.Value);
         float imgh_scaled => (imgh * scale.Value);
@@ -144,13 +144,13 @@ namespace LayerPx
                     OnClick = (ui) => {
                         if (TopLeftMenuState != TopLeftMenuType.Pal) return;
                         var id = int.Parse(ui.Name);
-                        if (MouseStates.ButtonDown == MouseButtons.Left)
+                        if (MouseStatesV1.ButtonDown == MouseButtons.Left)
                         {
                             (UIMgt.UI.First(_ui => _ui is UIButton && _ui.Name == pal_index_primary.ToString()) as UIButton).BoundsColor = Color.White;
                             pal_index_primary = id;
                             (UIMgt.UI.First(_ui => _ui is UIButton && _ui.Name == pal_index_primary.ToString()) as UIButton).BoundsColor = Color.Cyan;
                         }
-                        else if (MouseStates.ButtonDown == MouseButtons.Right)
+                        else if (MouseStatesV1.ButtonDown == MouseButtons.Right)
                         {
                             if (def_pal_col(id))
                                 (ui as UIButton).Tex = Tooling.Tools.CreateRectBitmap(sz, pal[id]);
@@ -199,8 +199,8 @@ namespace LayerPx
 
         private void GlobalUpdate(object sender, EventArgs e)
         {
-            MouseStates.OldPosition = MouseStates.Position;
-            MouseStates.Position = Render.PointToClient(MousePosition);
+            MouseStatesV1.OldPosition = MouseStatesV1.Position;
+            MouseStatesV1.Position = Render.PointToClient(MousePosition);
 
             if (IsKeyDown(Key.LeftCtrl) && IsKeyDown(Key.LeftAlt) && IsKeyDown(Key.LeftShift) && IsKeyPressed(Key.C))
             {
@@ -260,7 +260,7 @@ namespace LayerPx
                 if (IsKeyPressed(Key.Down)) fixed_layer = (int)Maths.Range(0, DATA_LAYERS, fixed_layer - layer_gap);
             }
 
-            if (MouseStates.ButtonDown == MouseButtons.Middle)
+            if (MouseStatesV1.ButtonDown == MouseButtons.Middle)
             {
                 int index = data.Pointedindex(get_pos_ms());
                 if (index > 0)
@@ -272,25 +272,25 @@ namespace LayerPx
                 }
             }
 
-            if (MouseStates.Delta != 0)
+            if (MouseStatesV1.Delta != 0)
             {
                 if (IsKeyDown(Key.LeftAlt))
                 {
                     if (ShowGrid && IsKeyDown(Key.LeftShift))
                     {
-                        gridsz += 0.1F * (MouseStates.Delta < 0 ? -1F : 1F) * Amplitude;
+                        gridsz += 0.1F * (MouseStatesV1.Delta < 0 ? -1F : 1F) * Amplitude;
                         if (gridsz < 1F) gridsz = 1F;
                     }
                     else
                     {
-                        scale.Value += SCALE_GAP * (MouseStates.Delta < 0 ? -1F : 1F) * Amplitude;
+                        scale.Value += SCALE_GAP * (MouseStatesV1.Delta < 0 ? -1F : 1F) * Amplitude;
                         ResetGx();
                         refresh_shadows = true;
                     }
                 }
                 else
                 {
-                    m_pen_size += (int)((MouseStates.Delta < 0 ? -1 : 1) * Amplitude);
+                    m_pen_size += (int)((MouseStatesV1.Delta < 0 ? -1 : 1) * Amplitude);
                     if (m_pen_size < 1) m_pen_size = 1;
                     if (m_pen_size > Math.Min(DATA_WIDTH, DATA_HEIGHT) / 2) m_pen_size = Math.Min(DATA_WIDTH, DATA_HEIGHT) / 2;
                 }
@@ -301,17 +301,17 @@ namespace LayerPx
             else if (!IsKeyDown(Key.LeftAlt))
                 begin_line = PointF.Empty;
 
-            if (MouseStates.IsDown == false)
+            if (MouseStatesV1.IsDown == false)
             {
                 mouseleft_released = true;
                 holding_layer_released = true;
             }
-            else if (MouseStates.ButtonDown != MouseButtons.Middle)
+            else if (MouseStatesV1.ButtonDown != MouseButtons.Middle)
             {
-                if (MouseStates.ButtonDown == MouseButtons.Left && TopLeftMenuState == TopLeftMenuType.Tileset && new Rectangle((24, 24).iP(), Tileset.Size).Contains(MouseStates.Position.ToPoint()))
+                if (MouseStatesV1.ButtonDown == MouseButtons.Left && TopLeftMenuState == TopLeftMenuType.Tileset && new Rectangle((24, 24).iP(), Tileset.Size).Contains(MouseStatesV1.Position.ToPoint()))
                 {
-                    int x = (int)Maths.Range(0, Tileset.Width / imgw, (MouseStates.Position.X - 24) / imgw);
-                    int y = (int)Maths.Range(0, Tileset.Height / imgh, (MouseStates.Position.Y - 24) / imgh);
+                    int x = (int)Maths.Range(0, Tileset.Width / imgw, (MouseStatesV1.Position.X - 24) / imgw);
+                    int y = (int)Maths.Range(0, Tileset.Height / imgh, (MouseStatesV1.Position.Y - 24) / imgh);
                     tileset_tile_index = (x, y).iP();
                     g.Clear()
                 }
@@ -321,7 +321,7 @@ namespace LayerPx
                     if (mouseleft_released)
                         layer_at_first_press = data.PointedLayer(ms);
                     mouseleft_released = false;
-                    int v = MouseStates.ButtonDown == MouseButtons.Left ? pal_index_primary : 0;
+                    int v = MouseStatesV1.ButtonDown == MouseButtons.Left ? pal_index_primary : 0;
 
                     if (begin_line != PointF.Empty)
                     {
@@ -349,12 +349,12 @@ namespace LayerPx
                         }
                     }
 
-                    if (MouseStates.OldPosition != Point.Empty && MouseStates.PositionChanged)
+                    if (MouseStatesV1.OldPosition != Point.Empty && MouseStatesV1.PositionChanged)
                     {
                         var old = get_pos_oldms();
                         var m = ms;
                         RangeValue x, y;
-                        for (float t = 0F; t <= 1F; t += 1F / MouseStates.LenghtDiff)
+                        for (float t = 0F; t <= 1F; t += 1F / MouseStatesV1.LenghtDiff)
                         {
                             x = new RangeValue((int)Maths.Lerp(old.X, m.X, t), 0, DATA_WIDTH);
                             y = new RangeValue((int)Maths.Lerp(old.Y, m.Y, t), 0, DATA_HEIGHT);
@@ -373,7 +373,7 @@ namespace LayerPx
                 ExportClipboard();
 
             KB.Update();
-            MouseStates.Update();
+            MouseStatesV1.Update();
             UIMgt.Update();
         }
         void UseTool(int _x, int _y, int v, bool isBucket = false)
@@ -517,7 +517,7 @@ namespace LayerPx
         }
         void draw_cursor()
         {
-            var ms = MouseStates.Position;
+            var ms = MouseStatesV1.Position;
             int lgh = 16;
             int hlgh = lgh / 2;
             g_render.DrawLine(Pens.White, ms.X, ms.Y, ms.X + lgh, ms.Y + lgh);
@@ -730,19 +730,19 @@ namespace LayerPx
 
         private void Render_MouseWheel(object sender, MouseEventArgs e)
         {
-            MouseStates.Delta = e.Delta;
+            MouseStatesV1.Delta = e.Delta;
         }
         private void Render_MouseDown(object sender, MouseEventArgs e)
         {
-            MouseStates.ButtonDown = e.Button;
+            MouseStatesV1.ButtonDown = e.Button;
         }
         private void Render_MouseUp(object sender, MouseEventArgs e)
         {
-            MouseStates.ButtonDown = MouseButtons.None;
+            MouseStatesV1.ButtonDown = MouseButtons.None;
         }
         private void Render_MouseLeave(object sender, EventArgs e)
         {
-            MouseStates.ButtonDown = MouseButtons.None;
+            MouseStatesV1.ButtonDown = MouseButtons.None;
         }
 
 

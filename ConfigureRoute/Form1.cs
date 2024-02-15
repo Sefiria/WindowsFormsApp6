@@ -42,7 +42,7 @@ namespace ConfigureRoute
             MgControls();
 
             //UIMgt.MouseDown();
-            if (MouseStates.IsDown) MouseClick();
+            if (MouseStatesV1.IsDown) MouseClick();
 
             //if (KB.IsKeyPressed(KB.Key.E))
             //    Core.Inventory.Toggle();
@@ -132,9 +132,9 @@ namespace ConfigureRoute
                         tex = new Bitmap(Cube, Cube);
                         using (Graphics gtex = Graphics.FromImage(tex))
                         {
-                            if (MouseStates.IsDown)
+                            if (MouseStatesV1.IsDown)
                             {
-                                switch (MouseStates.ButtonDown)
+                                switch (MouseStatesV1.ButtonDown)
                                 {
                                     case MouseButtons.Left: gtex.Clear(Color.FromArgb(150, Color.White)); break;
                                     case MouseButtons.Right: gtex.Clear(Color.FromArgb(50, Color.Blue)); break;
@@ -188,7 +188,7 @@ namespace ConfigureRoute
 
         private void Render_MouseDown(object sender, MouseEventArgs e)
         {
-            MouseStates.ButtonDown = e.Button;
+            MouseStatesV1.ButtonDown = e.Button;
             //UIMgt.MouseDown();
             FirstClickHoldNotOnUI = UIMgt.CurrentClicked == null;
             if (Tool != RouteTools.Sign)
@@ -207,7 +207,7 @@ namespace ConfigureRoute
                     if (SignDirection == 3) pt.X++;
                     int direction = SignDirection == 2 ? 0 : (SignDirection == 3 ? 1 : SignDirection);
                     var sign = Core.Map.Signs.FirstOrDefault(s => s.x == pt.X && s.y == pt.Y);
-                    if (MouseStates.ButtonDown == MouseButtons.Left)
+                    if (MouseStatesV1.ButtonDown == MouseButtons.Left)
                     {
                         if (sign == null)
                         {
@@ -219,7 +219,7 @@ namespace ConfigureRoute
                         if(sign.t == 0 && sign.l == 0)
                             Core.Map.Signs.Remove(sign);
                     }
-                    else if (MouseStates.ButtonDown == MouseButtons.Right)
+                    else if (MouseStatesV1.ButtonDown == MouseButtons.Right)
                     {
                         if (sign != null) Core.Map.Signs.Remove(sign);
                     }
@@ -232,15 +232,15 @@ namespace ConfigureRoute
         }
         private void Render_MouseUp(object sender, MouseEventArgs e)
         {
-            MouseStates.ButtonDown = MouseButtons.None;
+            MouseStatesV1.ButtonDown = MouseButtons.None;
         }
         private void Render_MouseLeave(object sender, EventArgs e)
         {
-            MouseStates.ButtonDown = MouseButtons.None;
+            MouseStatesV1.ButtonDown = MouseButtons.None;
         }
         private void Render_MouseMove(object sender, MouseEventArgs e)
         {
-            MouseStates.Position = PointToClient(MousePosition);
+            MouseStatesV1.Position = PointToClient(MousePosition);
         }
 
         private void LoadUI()
@@ -276,7 +276,7 @@ namespace ConfigureRoute
         {
             if (!DeleteEntitiesMode)
             {
-                if (MouseStates.ButtonDown == MouseButtons.Left || MouseStates.ButtonDown == MouseButtons.Right)
+                if (MouseStatesV1.ButtonDown == MouseButtons.Left || MouseStatesV1.ButtonDown == MouseButtons.Right)
                 {
                     if (FirstClickHoldNotOnUI && UIMgt.CurrentClicked == null)
                     {
@@ -284,12 +284,12 @@ namespace ConfigureRoute
                         {
                             var pt = TargetPoint.PlusF(Cam).Div(Cube);
                             var road = Core.Map.Roads.FirstOrDefault(r => r.x == pt.X && r.y == pt.Y);
-                            if (MouseStates.ButtonDown == MouseButtons.Left)
+                            if (MouseStatesV1.ButtonDown == MouseButtons.Left)
                             {
                                 if (road == null) Core.Map.Roads.Add(new Obj.Road { x = pt.X, y = pt.Y, z = Direction });
                                 else road.z = Direction;
                             }
-                            else if (MouseStates.ButtonDown == MouseButtons.Right)
+                            else if (MouseStatesV1.ButtonDown == MouseButtons.Right)
                             {
                                 if (road != null) Core.Map.Roads.Remove(road);
                             }
@@ -305,7 +305,7 @@ namespace ConfigureRoute
 
         private void RemoveEntityUnderMouse()
         {
-            Entity clicked_entity = Core.Map.Entities.FirstOrDefault(e => e.Bounds.Contains(MouseStates.Position.PlusF(Cam).ToPoint()));
+            Entity clicked_entity = Core.Map.Entities.FirstOrDefault(e => e.Bounds.Contains(MouseStatesV1.Position.PlusF(Cam).ToPoint()));
             if (clicked_entity != null)
                 clicked_entity.Exist = false;
         }
@@ -313,7 +313,7 @@ namespace ConfigureRoute
         {
             get
             {
-                var mc = MouseStates.Position.PlusF(Cam);
+                var mc = MouseStatesV1.Position.PlusF(Cam);
                 var road_top = Road.At(mc.MinusF(0, Cube));
                 var road_left = Road.At(mc.MinusF(Cube, 0));
                 var road_under = Road.At(mc);

@@ -19,7 +19,7 @@ namespace WindowsFormsApp24.Events
         internal void Initialize()
         {
             Image = new Bitmap(Core.TileSize * 3, Core.TileSize * 3);
-            Offset = (-Core.TileSize, -Core.TileSize*2).P();
+            TextureOffset = (-Core.TileSize, -Core.TileSize*2).P();
             g = Graphics.FromImage(Image);
             start_grow_tick = (long)RandomThings.rnd(10, 100);
         }

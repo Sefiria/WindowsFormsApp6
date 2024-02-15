@@ -32,7 +32,7 @@ namespace WindowsFormsApp17
                 return;
             }
 
-            if (MouseStates.ButtonDown == MouseButtons.Left)
+            if (MouseStatesV1.ButtonDown == MouseButtons.Left)
                 //AddStructure(e);
                 AddWater(e);
             else if (e.Button == MouseButtons.Right)

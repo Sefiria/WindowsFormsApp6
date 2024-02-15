@@ -40,7 +40,11 @@ namespace WindowsFormsApp24
             // tools
             Shovel, WateringCan,
             // Miscs
-            Bag,
+            Bag, EventContainer
+        }
+        internal enum WatercanStats
+        {
+            MaxVolume=0, FlowRate, FlowLoss, EvaporationRate, Spread,
         }
     }
 }

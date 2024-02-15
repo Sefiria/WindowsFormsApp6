@@ -10,7 +10,8 @@ namespace WindowsFormsApp24.Events
 {
     internal class Shovel : Event
     {
-        internal Shovel(float x, float y) : base(Core.NamedTextures[NamedObjects.Shovel], true, x, y){}
+        internal Shovel(int x, int y, int z) : base(Core.NamedTextures[NamedObjects.Shovel], true, x, y, z){}
+        internal Shovel(float x, float y, float z) : base(Core.NamedTextures[NamedObjects.Shovel], true, x, y, z){}
 
         internal override void SecondaryAction()
         {
@@ -18,15 +19,15 @@ namespace WindowsFormsApp24.Events
         }
         internal override void PrimaryAction()
         {
-            if (Core.CurrentMainScene.MainCharacter.HandObject != ID)
+            if (Core.CurrentMainScene.MainCharacter.HandObject != Guid)
                 return;
             int x = (int)((float)Data["X"]) / Core.TileSize;
             int y = (int)((float)Data["Y"]) / Core.TileSize;
             var tiledata = Map.Current.Tiles.PointedData(x, y);
-            var index = tiledata.index;
+            var index = tiledata.tile?.TilesetIndex;
             var layer = tiledata.layer;
-            if (index == 0 && Map.Current.Events.FirstOrDefault(ev => ev.TileX != x && ev.TileY != y) != null)
-                Map.Current.Tiles.Set(layer+1, x, y, 1);
+            if ((index == null || index == 0) && Map.Current.Events.FirstOrDefault(ev => ev.TileX != x && ev.TileY != y) != null)
+                Map.Current.Tiles.SetTilesetIndex(layer+1, x, y, 1, new Tile(1, layer + 1, x, y));
         }
     }
 }

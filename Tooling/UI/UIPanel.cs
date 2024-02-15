@@ -10,7 +10,7 @@ namespace Tooling.UI
 
         public override void Click()
         {
-            Content.Where(ui => ui.Bounds.Contains(MouseStates.Position)).ToList().ForEach(ui => ui.Click());
+            Content.Where(ui => ui.Bounds.Contains(MouseStatesV1.Position)).ToList().ForEach(ui => ui.Click());
         }
 
         public override void Draw(Graphics g)

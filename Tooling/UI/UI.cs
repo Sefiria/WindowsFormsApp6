@@ -32,7 +32,7 @@ namespace Tooling.UI
 
         public virtual void Update()
         {
-            if (Bounds.Contains(MouseStates.Position)) UIMgt.CurrentHover = this;
+            if (Bounds.Contains(MouseStatesV1.Position)) UIMgt.CurrentHover = this;
         }
         public virtual void Draw(Graphics g) { }
         public virtual void Click() { UIMgt.CurrentClicked = this; }

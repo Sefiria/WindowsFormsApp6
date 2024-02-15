@@ -51,6 +51,7 @@
     <Compile Include="Character.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="Enumerations.cs" />
+    <Compile Include="Events\EventContainer.cs" />
     <Compile Include="Events\WateringCan.cs" />
     <Compile Include="Events\Shovel.cs" />
     <Compile Include="Events\Command.cs" />
@@ -80,7 +81,8 @@
     <Compile Include="Scenes\SceneBase.cs" />
     <Compile Include="Scenes\SceneMain.cs" />
     <Compile Include="Scenes\SceneTitle.cs" />
-    <Compile Include="Tiles.cs" />
+    <Compile Include="Tile.cs" />
+    <Compile Include="TileArray.cs" />
     <Compile Include="UIMouseAssist.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
@@ -120,6 +122,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\objects.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\EventContainer.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

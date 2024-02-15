@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using Tooling;
 
@@ -63,5 +64,48 @@ namespace Tooling
             }
             return output;
         }
+
+        public static Font SmallFont = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Pixel);
+        public static Font MediumFont = new Font("Segoe UI", 16F, FontStyle.Regular, GraphicsUnit.Pixel);
+        public static Font BigFont = new Font("Segoe UI", 24F, FontStyle.Regular, GraphicsUnit.Pixel);
+        public static Font SmallFontItalic = new Font("Segoe UI", 10F, FontStyle.Italic, GraphicsUnit.Pixel);
+        public static Font MediumFontItalic = new Font("Segoe UI", 16F, FontStyle.Regular, GraphicsUnit.Pixel);
+        public static Font BigFontItalic = new Font("Segoe UI", 24F, FontStyle.Regular, GraphicsUnit.Pixel);
+        public static Font SmallFontBold = new Font("Segoe UI", 10F, FontStyle.Bold, GraphicsUnit.Pixel);
+        public static Font MediumFontBold = new Font("Segoe UI", 16F, FontStyle.Bold, GraphicsUnit.Pixel);
+        public static Font BigFontBold = new Font("Segoe UI", 24F, FontStyle.Bold, GraphicsUnit.Pixel);
+
+        public static GraphicsPath CreateRoundedRect(Rectangle bounds, int radius)
+        {
+            int diameter = radius * 2;
+            Size size = new Size(diameter, diameter);
+            Rectangle arc = new Rectangle(bounds.Location, size);
+            GraphicsPath path = new GraphicsPath();
+
+            if (radius == 0)
+            {
+                path.AddRectangle(bounds);
+                return path;
+            }
+
+            // top left arc  
+            path.AddArc(arc, 180, 90);
+
+            // top right arc  
+            arc.X = bounds.Right - diameter;
+            path.AddArc(arc, 270, 90);
+
+            // bottom right arc  
+            arc.Y = bounds.Bottom - diameter;
+            path.AddArc(arc, 0, 90);
+
+            // bottom left arc 
+            arc.X = bounds.Left;
+            path.AddArc(arc, 90, 90);
+
+            path.CloseFigure();
+            return path;
+        }
+        public static GraphicsPath CreateRoundedRect(float x, float y, float w, float h, int radius) => CreateRoundedRect(new Rectangle((int)x, (int)y, (int)w, (int)h), radius);
     }
 }

@@ -21,7 +21,7 @@ namespace Tooling.UI
             CurrentHover = null;
             UI.ForEach(ui => ui.Update());
 
-            if (MouseStates.IsDown)
+            if (MouseStatesV1.IsDown)
                 UI.Where(ui => ui.IsHover).ToList().ForEach(ui => ui.Click());
         }
 

@@ -12,7 +12,7 @@ namespace ConfigureRoute
         public const int Cube = 24;
         public static PointF Cam = PointF.Empty;
         public static float CamSpeed = 4F;
-        public static PointF MS => MouseStates.Position;
+        public static PointF MS => MouseStatesV1.Position;
         public static PointF GetTargetPoint(vecf pt) => pt.pt.PlusF(Cam.Mod(Cube)).Snap(Cube).MinusF(Cam.Mod(Cube));
         public static PointF TargetPoint => MS.PlusF(Cam.Mod(Cube)).Snap(Cube).MinusF(Cam.Mod(Cube));
         public static PointF GetTargetCube(vecf pt) => pt.pt.PlusF(Cam.Mod(Cube)).Snap(Cube).MinusF(Cam.Mod(Cube)).MinusF(Cam).Div(Cube);

@@ -30,7 +30,7 @@ namespace Tooling.UI
         {
             var pos = GetGlobalPosition();
             var bc = SleepTransparent && !IsHover ? Color.FromArgb(128, BackgroundColor) : BackgroundColor;
-            Brush brush = new SolidBrush(Bounds.Contains(MouseStates.Position) ? bc.Mod(20 * (MouseStates.IsDown ? -1 : 1)) : bc);
+            Brush brush = new SolidBrush(Bounds.Contains(MouseStatesV1.Position) ? bc.Mod(20 * (MouseStatesV1.IsDown ? -1 : 1)) : bc);
             g.FillRectangle(brush, Bounds);
             if(Tex != null) g.DrawImage(SleepTransparent && !IsHover ? Tex.WithOpacity(128) : Tex, pos.x + TexPos.X, pos.y + TexPos.Y);
             g.DrawRectangle(new Pen(BoundsColor, IsHover ? 2F : 1F), Bounds.ToIntRect());

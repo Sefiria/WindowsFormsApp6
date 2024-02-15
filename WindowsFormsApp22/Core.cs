@@ -14,7 +14,7 @@ namespace WindowsFormsApp22
         public static Player Player;
         public static vecf cam_ofs = vecf.Zero;
         public static PointF Cam => Player?.Pos.PlusF(cam_ofs) ?? Point.Empty;
-        public static PointF MS => MouseStates.Position;
+        public static PointF MS => MouseStatesV1.Position;
         public static PointF GetTargetPoint(vecf pt) => pt.pt.PlusF(Cam.Mod(Cube)).Snap(Cube).MinusF(Cam.Mod(Cube));
         public static PointF TargetPoint => MS.PlusF(Cam.Mod(Cube)).Snap(Cube).MinusF(Cam.Mod(Cube));
         public static PointF GetTargetCube(vecf pt) => pt.pt.PlusF(Cam.Mod(Cube)).Snap(Cube).MinusF(Cam.Mod(Cube)).MinusF(Cam).Div(Cube);

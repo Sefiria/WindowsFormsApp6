@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 
 namespace Tooling
 {
@@ -113,5 +114,13 @@ namespace Tooling
         public static float SnapF(this int number, float n) => (int)(number / n) * n;
         public static int Snap(this float number, float n) => (int)(number / n) * (int)n;
         public static float SnapF(this float number, float n) => ((int)(number / n)) * n;
+
+        public static (int x, int y) ToTupleInt(this Point pt) => (pt.X, pt.Y);
+        public static (int x, int y) ToTupleInt(this PointF pt) => ((int)pt.X, (int)pt.Y);
+        public static (float x, float y) ToTupleFloat(this Point pt) => (pt.X, pt.Y);
+        public static (float x, float y) ToTupleFloat(this PointF pt) => (pt.X, pt.Y);
+
+        public static bool IsDefined(this Guid guid) => guid != Guid.Empty;
+        public static bool IsNotDefined(this Guid guid) => !guid.IsDefined();
     }
 }

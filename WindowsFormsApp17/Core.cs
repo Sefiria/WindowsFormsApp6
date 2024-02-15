@@ -17,7 +17,7 @@ namespace WindowsFormsApp17
         public static int mh => (rh - h) / 2;
         public static Graphics render_g, g;
         public static Random RND = new Random((int)DateTime.UtcNow.Ticks);
-        public static PointF MouseLocation => MouseStates.Position;
+        public static PointF MouseLocation => MouseStatesV1.Position;
         public static vecf MouseVec => MouseLocation.vecf();
         public static vecf MouseTile => MouseVec.tile(TSZ);
         public static vecf MouseSnap => MouseVec.snap(TSZ);

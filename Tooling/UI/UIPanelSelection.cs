@@ -12,7 +12,7 @@ namespace Tooling.UI
         public override void Click()
         {
             UI clicked;
-            if ((clicked = Content.FirstOrDefault(ui => ui.Bounds.Contains(MouseStates.Position))) != null)
+            if ((clicked = Content.FirstOrDefault(ui => ui.Bounds.Contains(MouseStatesV1.Position))) != null)
             {
                 SelectedId = Content.IndexOf(clicked);
                 clicked.Click();

@@ -11,7 +11,10 @@ namespace WindowsFormsApp24.Events
 {
     internal class Seed : Event
     {
-        internal Seed(NamedObjects obj, long grow_ticks, float x, float y) : base(x, y)
+        internal Seed(NamedObjects obj, long grow_ticks, int x, int y) : base(x, y) { Initialize(obj, grow_ticks); }
+        internal Seed(NamedObjects obj, long grow_ticks, float x, float y) : base(0,0) { X = x; Y = y; Initialize(obj, grow_ticks); }
+
+        internal void Initialize(NamedObjects obj, long grow_ticks)
         {
             var img = Core.NamedTextures[obj];
             Name = Enum.GetName(typeof(NamedObjects), obj) + "-seed";
@@ -19,6 +22,7 @@ namespace WindowsFormsApp24.Events
             int sz = (int)(w * 0.8F);
             var min = new Bitmap(img, sz, sz);
             var tex = new Bitmap(w, w);
+            Bounds = new RectangleF(0, 0, w, w);
             using (Graphics g = Graphics.FromImage(tex))
             {
                 g.FillEllipse(Brushes.Maroon, 0, 0, w, w);

@@ -57,7 +57,7 @@ namespace WindowsFormsApp22
 
         private void Update(object _, EventArgs e)
         {
-            MouseStates.Position = Render.PointToClient(MousePosition);
+            MouseStatesV1.Position = Render.PointToClient(MousePosition);
 
             MgControls();
 
@@ -68,7 +68,7 @@ namespace WindowsFormsApp22
             UIMgt.Update();
 
             KB.Update();
-            MouseStates.ButtonDown = MouseButtons.None;
+            MouseStatesV1.ButtonDown = MouseButtons.None;
         }
 
         private void MgControls()
@@ -98,7 +98,7 @@ namespace WindowsFormsApp22
 
         private void Render_MouseDown(object sender, MouseEventArgs e)
         {
-            MouseStates.ButtonDown = e.Button;
+            MouseStatesV1.ButtonDown = e.Button;
         }
     }
 }

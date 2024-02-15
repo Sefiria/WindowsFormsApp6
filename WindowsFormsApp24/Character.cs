@@ -11,16 +11,24 @@ namespace WindowsFormsApp24
     internal class Character : Event
     {
         internal float LookX, LookY;
-        internal int HandObject = -1;//Map.Events index
+        internal Guid HandObject = Guid.Empty;
+        internal bool HandObjectDefined => HandObject.IsDefined();
+        internal Event HandEvent => Map.GetEvent(HandObject);
 
-        public Character(string filename, float x, float y) : base(filename, x, y){ Initialize(); }
-        public Character(Bitmap image, float x, float y) : base(image, x, y){ Initialize(); }
+        internal static Guid MainHandObject => Core.MainCharacter.HandObject;
+        internal static bool MainHandObjectDefined => MainHandObject.IsDefined();
+        internal static Event MainHandEvent => Map.GetEvent(MainHandObject);
+
+        public Character(string filename, int x, int y, int z) : base(filename, x, y, z){ Initialize(); }
+        public Character(string filename, float x, float y, float z) : base(filename, x, y, z){ Initialize(); }
+        public Character(Bitmap image, int x, int y, int z) : base(image, x, y, z){ Initialize(); }
+        public Character(Bitmap image, float x, float y, float z) : base(image, x, y, z){ Initialize(); }
 
         internal void Initialize()
         {
-            Offset = (- Core.TileSize / 2F-5F, -5F).P();
-            OffsetTexture.X = -Core.TileSize / 2 - 5;
-            OffsetTexture.Y = - 5;
+            TextureOffset.X = -Core.TileSize / 2F - 5F;
+            TextureOffset.Y = -5F;
+            Bounds = new RectangleF(TextureOffset.X+8, TextureOffset.Y, Core.TileSize, Core.TileSize / 2F);
         }
         internal override void Update()
         {
@@ -29,8 +37,6 @@ namespace WindowsFormsApp24
         }
         private void update_controls()
         {
-            if (HandObject > -1) Map.Current.Events[HandObject].Layer = EvLayer.Below;
-
             bool up = Core.GetInput(InputNames.Up);
             bool left = Core.GetInput(InputNames.Left);
             bool down = Core.GetInput(InputNames.Down);
@@ -79,11 +85,12 @@ namespace WindowsFormsApp24
                 if (LookY < 0 && DoesntCollides(0, -MoveSpeed)) Y -= MoveSpeed;
             }
 
-            if (HandObject > -1)
+            if(IsMoving) Map.Current.complete_refresh = true;
+
+            if (HandObjectDefined)
             {
                 var ts = Core.TileSize;
-                var hand = Map.Current.Events[HandObject];
-                hand.Layer = EvLayer.Above;
+                var hand = HandEvent;
                 int w = hand.W;
                 int hw = w / 2;
                 int h = hand.H;
@@ -95,7 +102,7 @@ namespace WindowsFormsApp24
                     case 2: hand.X = X - hw + ts * 0.7F; hand.Y = Y - hh + h * 0.25F; break;// →
                     case 3: hand.X = X - hw; hand.Y = Y - hh - h / 2; hand.Layer = EvLayer.Below; break;// ↑
                 }
-                Map.Current.Events[HandObject] = hand;
+                Map.SetEvent(HandObject, hand);
             }
         }
     }

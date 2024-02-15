@@ -42,6 +42,7 @@
             this.Render.TabStop = false;
             this.Render.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Render_MouseDown);
             this.Render.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Render_MouseMove);
+            this.Render.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Render_MouseUp);
             // 
             // Form1
             // 

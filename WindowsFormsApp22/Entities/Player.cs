@@ -30,7 +30,7 @@ namespace WindowsFormsApp22.Entities
 
         public override PointF CalculateLook()
         {
-            return MouseStates.Position.MinusF(hw - cam_ofs.x, hh - cam_ofs.y).norm();
+            return MouseStatesV1.Position.MinusF(hw - cam_ofs.x, hh - cam_ofs.y).norm();
         }
 
         public override void Update()
@@ -70,7 +70,7 @@ namespace WindowsFormsApp22.Entities
 
             if (cooldownA == 0)
             {
-                if (MouseStates.ButtonDown == MouseButtons.Left)
+                if (MouseStatesV1.ButtonDown == MouseButtons.Left)
                 {
                     var bullet = new Behaviored("player_bullet", Color.Red, X, Y, 4, 4, Behaviored.Default_AddLook(CalculateLook(), 5F));
                     bullet.Parent = Core.Map.obj_colliders;
@@ -82,7 +82,7 @@ namespace WindowsFormsApp22.Entities
 
             if (cooldownB == 0)
             {
-                if (MouseStates.ButtonDown == MouseButtons.Right)
+                if (MouseStatesV1.ButtonDown == MouseButtons.Right)
                 {
                     IsUsingSpecial = true;
                     specialAngle = CalculateLook().GetAngle();

@@ -36,7 +36,7 @@ namespace WindowsFormsApp17
 
         private void Update(object _, EventArgs e)
         {
-            MouseStates.Position = Render.PointToClient(MousePosition);
+            MouseStatesV1.Position = Render.PointToClient(MousePosition);
 
             //new List<Structure>(Data.Instance.Structures.Values).ForEach(s => s.Update());
             //new List<Item>(Data.Instance.Items).ForEach(o => o.Update());
@@ -141,7 +141,7 @@ namespace WindowsFormsApp17
 
         private void Render_MouseDown(object sender, MouseEventArgs e)
         {
-            MouseStates.ButtonDown = e.Button;
+            MouseStatesV1.ButtonDown = e.Button;
             Core.MouseHolding = true;
             Render_MouseMove(null, e);
         }

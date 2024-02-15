@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using Tooling;
+using WindowsFormsApp24.Events;
 using WindowsFormsApp24.Properties;
 using WindowsFormsApp24.Scenes;
 using static WindowsFormsApp24.Enumerations;
@@ -58,23 +58,28 @@ namespace WindowsFormsApp24
 
                 // Miscs
                 [NamedObjects.Bag]                    = Textures[1, 14],
+                [NamedObjects.EventContainer]  = Resources.EventContainer,
             };
         }
         internal void ResetGraphics()
         {
             RenderImage = new Bitmap(Render.Width, Render.Height);
             g = Graphics.FromImage(RenderImage);
+
+            ImageUI = new Bitmap(Render.Width, Render.Height);
+            gUI = Graphics.FromImage(ImageUI);
         }
         internal void WriteGraphics()
         {
-            Render.Image = RenderImage;
+            g.DrawImage(ImageUI, 0, 0);
+            Render.Image = RenderImage.Resize((int)(Cam.Zoom * RenderImage.Width), (int)(Cam.Zoom * RenderImage.Height));
         }
 
         internal SceneBase CurrentScene = new SceneMain();// debug temp set
         internal static SceneMain CurrentMainScene => Instance.CurrentScene as SceneMain;
         internal static Character MainCharacter => CurrentMainScene.MainCharacter;
-        internal Bitmap RenderImage;
-        internal Graphics g;
+        internal Bitmap RenderImage, ImageUI;
+        internal Graphics g, gUI;
         private long m_Ticks = 0;
         internal long Ticks
         {
@@ -93,11 +98,11 @@ namespace WindowsFormsApp24
         internal static bool GetInput(InputNames input, bool pressedInsteadDown = false)
         {
             int v = Instance.KeysBinding[input];
-            if (v == MouseLeft) return MouseStates.ButtonDown == MouseButtons.Left;
-            if (v == MouseRight) return MouseStates.ButtonDown == MouseButtons.Right;
-            if (v == MouseMiddle) return MouseStates.ButtonDown == MouseButtons.Middle;
-            if (v == MouseButton1) return MouseStates.ButtonDown == MouseButtons.XButton1;
-            if (v == MouseButton2) return MouseStates.ButtonDown == MouseButtons.XButton2;
+            if (v == MouseLeft) return MouseStates.IsButtonDown(MouseButtons.Left, pressedInsteadDown);
+            if (v == MouseRight) return MouseStates.IsButtonDown(MouseButtons.Right, pressedInsteadDown);
+            if (v == MouseMiddle) return MouseStates.IsButtonDown(MouseButtons.Middle, pressedInsteadDown);
+            if (v == MouseButton1) return MouseStates.IsButtonDown(MouseButtons.XButton1, pressedInsteadDown);
+            if (v == MouseButton2) return MouseStates.IsButtonDown(MouseButtons.XButton2, pressedInsteadDown);
             return pressedInsteadDown ? KB.IsKeyPressed((KB.Key)v) : KB.IsKeyDown((KB.Key)v);
         }
     }
