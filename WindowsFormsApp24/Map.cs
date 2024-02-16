@@ -43,7 +43,7 @@ namespace WindowsFormsApp24
         internal Queue<(int layer, int x, int y)> TilesToRefresh = new Queue<(int layer, int x, int y)>();
         internal bool complete_refresh = true;
         internal int SunOldTicks = -1;
-        internal float SunTicks = 0F, SunTickRate = 0.001F;
+        internal float SunTicks = 0F, SunTickRate = 0.002F;
         internal bool SunMoved => SunOldTicks != SunTicks;
 
         internal Guid AddEvent(Event ev) { Events.Add(ev); return Events.Last().Guid; }
@@ -182,6 +182,9 @@ namespace WindowsFormsApp24
 
             //onscreenevents.ForEach(ev => Core.Instance.gUI.DrawRectangle(new Pen(Color.Red, 4F), ev.RealTimeBounds.ToIntRect()));//debug
             //Core.Instance.gUI.DrawRectangle(new Pen(Color.Red, 4F), scene.MainCharacter.RealTimeBounds.ToIntRect());//debug
+
+            var a = (0.85F - Maths.Abs(Maths.Abs(180F - (Map.Current.SunTicks / 32F * 360F)) / 90F - 1F)) * 0.5F;
+            Core.Instance.g.DrawImage(new Bitmap(Core.Instance.RenderImage.Width, Core.Instance.RenderImage.Height).CreateRectangle(Color.DarkBlue, a), Point.Empty);
         }
 
         public bool IsCrop(int tile_x, int tile_y) => Tiles.PointedTile(tile_x, tile_y)?.TilesetIndex == 1;

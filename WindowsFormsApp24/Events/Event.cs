@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Tooling;
 using WindowsFormsApp24.Properties;
+using static System.Net.Mime.MediaTypeNames;
 using static WindowsFormsApp24.Enumerations;
 
 namespace WindowsFormsApp24.Events
@@ -26,6 +27,7 @@ namespace WindowsFormsApp24.Events
         internal Point TilePosition => (TileX, TileY).iP();
         internal RectangleF Bounds;
         internal PointF TextureOffset = PointF.Empty;
+        internal PointF ShadowOffset = PointF.Empty;
         internal int W => Frames?.Length > 0 ? Frames[0].Width : Image?.Width ?? 0;
         internal int H => Frames?.Length > 0 ? Frames[0].Height : Image?.Height ?? 0;
         internal RectangleF RealTimeBounds => new RectangleF(X + Bounds.X - Core.Cam.X, Y + Bounds.Y - Core.Cam.Y, Bounds.Width, Bounds.Height);
@@ -193,7 +195,7 @@ namespace WindowsFormsApp24.Events
             if (img == null)
                 return;
             if((MouseHover || Highlight) && Core.MainCharacter.HandObject != Guid) img = img.GetAdjusted(brightness:1F + 0.2F * ((Core.Instance.Ticks + 15) % 30) / 30F - 0.2F * (Core.Instance.Ticks % 30) / 30F);
-            if(map.DrawingPart == DrawingPart.Top)
+            if (map.DrawingPart == DrawingPart.Top)
                 Core.Instance.g.DrawImage(img, Position.PlusF(TextureOffset).Minus(0, img.Height).Minus(Cam.Position));
             else
                 Core.Instance.g.DrawImage(img, Position.PlusF(TextureOffset).Minus(Cam.Position));
@@ -201,25 +203,36 @@ namespace WindowsFormsApp24.Events
         internal virtual void DrawExtraInfos(){}
         internal virtual void DrawShadow(bool generateNew = false)
         {
-            var a = Map.Current.SunTicks / 32F * 360F - 90F;
+            var a = Map.Current.SunTicks / 32F * 360F;
+            var ts = Core.TileSize;
             if (GenerateNew || generateNew)
             {
                 GenerateNew = false;
                 var img = new Bitmap(Frames != null ? Frames[Direction * 3 + 1 + Frame] : Image);
                 if (img == null) return;
-                ShadowImage = new Bitmap(W, H*2);
-                img = img.GetAdjusted(0F);
-                using (Graphics g = Graphics.FromImage(ShadowImage))
-                    g.DrawImage(img, Point.Empty);
-                img = new Bitmap(ShadowImage);
                 ShadowImage = new Bitmap(W*2, H*2);
                 using (Graphics g = Graphics.FromImage(ShadowImage))
-                    g.DrawImage(img, W/2F,0F);
-                ShadowImage = ShadowImage.Rotated(a);// TODO TRANSPARENT SHADOW
+                {
+                    var pts = new List<PointF>
+                    {
+                        (0,-1).P().Rotate(a), (0.8F, -1F).P().Rotate(a),(0.8F, 0F).P(),(0, 0).P(),
+                    };
+                    for (int i = 0; i < pts.Count; i++)
+                        pts[i] = (W*0.75F, H/1F).P().PlusF(pts[i].x((W, H/2).P()));
+                    pts[0] = (pts[0].X, pts[1].Y).P();
+                    if (a >= 90F && a < 270F)
+                    {
+                        var pt = pts[0];
+                        pts[0] = pts[1];
+                        pts[1] = pt;
+                    }
+                    g.FillPath(Brushes.Black, new GraphicsPath(pts.ToArray(), new byte[] { 0, 1, 1, 1 } ));
+                    ShadowImage = ShadowImage.WithOpacity(Maths.Abs(Maths.Abs(180F-a)/90F-1F));
+                }
+                //using (Graphics g = Graphics.FromImage(ShadowImage))
+                //    g.DrawRectangle(Pens.Red, 0, 0, ShadowImage.Width-1, ShadowImage.Height-1);
             }
-            var arad = a.ToRadians();
-            var turnpos = ((float)Math.Cos(arad), (float)Math.Sin(arad)).P();
-            Core.Instance.g.DrawImage(ShadowImage, RealTimeDisplayArea.Location.PlusF(TextureOffset).MinusF(W/2F,0F).MinusF(turnpos));
+            Core.Instance.g.DrawImage(ShadowImage, Position.MinusF(Core.Cam.Position).MinusF(ShadowImage.Width/2F, ShadowImage.Height/2F).PlusF(ShadowOffset).PlusF(W/4F, ts/2F));
         }
         internal Bitmap BottomPartOf(Bitmap img) => img.Clone(new Rectangle(0, img.Height - Core.TileSize / 2, img.Width, Core.TileSize / 2), img.PixelFormat);
         internal Bitmap TopPartOf(Bitmap img) => img.Height - Core.TileSize / 2 <= 0 ? null : img.Clone(new Rectangle(0, 0, img.Width, img.Height - Core.TileSize / 2), img.PixelFormat);

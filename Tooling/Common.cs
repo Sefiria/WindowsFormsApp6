@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.Linq;
+using System.Windows.Forms;
 using Tooling;
 
 namespace Tooling
@@ -107,5 +109,52 @@ namespace Tooling
             return path;
         }
         public static GraphicsPath CreateRoundedRect(float x, float y, float w, float h, int radius) => CreateRoundedRect(new Rectangle((int)x, (int)y, (int)w, (int)h), radius);
+        /// <summary>  
+        /// Method for changing the opacity of an image  
+        /// </summary>  
+        /// <param name="image">image to set opacity on</param>  
+        /// <param name="opacity">percentage of opacity</param>  
+        /// <returns></returns>  
+        public static Image WithOpacity(this Image image, float opacity)
+        {
+            try
+            {
+                //create a Bitmap the size of the image provided  
+                Bitmap bmp = new Bitmap(image.Width, image.Height);
+
+                //create a graphics object from the image  
+                using (Graphics gfx = Graphics.FromImage(bmp))
+                {
+
+                    //create a color matrix object  
+                    ColorMatrix matrix = new ColorMatrix();
+
+                    //set the opacity  
+                    matrix.Matrix33 = opacity;
+
+                    //create image attributes  
+                    ImageAttributes attributes = new ImageAttributes();
+
+                    //set the color(opacity) of the image  
+                    attributes.SetColorMatrix(matrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+
+                    //now draw the image  
+                    gfx.DrawImage(image, new Rectangle(0, 0, bmp.Width, bmp.Height), 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, attributes);
+                }
+                return bmp;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                return null;
+            }
+        }
+        public static Bitmap CreateRectangle(this Bitmap b, Color c, byte alpha = 255) => CreateRectangle(b,c,alpha/255F);
+        public static Bitmap CreateRectangle(this Bitmap b, Color c, float alpha = 1F)
+        {
+            using (Graphics g = Graphics.FromImage(b))
+                g.Clear(c);
+            return b.WithOpacity(alpha);
+        }
     }
 }

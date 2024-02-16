@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
 using Tooling;
 using WindowsFormsApp24.Events;
@@ -49,7 +50,7 @@ namespace WindowsFormsApp24
             scene.Maps.Add(new Map(16, 16, Resources.tileset));
             scene.CurrentMapID = 0;
             // Events
-            scene.MainCharacter = new Character(Resources.mainchar, 5, 5, 0);
+            scene.MainCharacter = new Character(Resources.mainchar, 5, 5, 0) { ShadowOffset = new PointF(-16, -6) };
             scene.Map.AddEvent(new Bag(NamedObjects.Carrot, 10000, 99, 2, 2, 0));
             scene.Map.AddEvent(new Shovel(1, 2, 0));
             var watercan = new WateringCan(3F, 0, 2, 0);
