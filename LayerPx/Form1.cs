@@ -313,7 +313,7 @@ namespace LayerPx
                     int x = (int)Maths.Range(0, Tileset.Width / imgw, (MouseStatesV1.Position.X - 24) / imgw);
                     int y = (int)Maths.Range(0, Tileset.Height / imgh, (MouseStatesV1.Position.Y - 24) / imgh);
                     tileset_tile_index = (x, y).iP();
-                    g.Clear()
+                    g.Clear(Color.White);
                 }
                 else
                 {

@@ -86,7 +86,7 @@ namespace WindowsFormsApp17
             {
                 //Console.WriteLine($"Add water [{x},{y}]");
                 Data.Instance.map.fluids[x, y].type = 0;
-                Data.Instance.map.fluids[x, y].quantity = 1F;
+                Data.Instance.map.fluids[x, y].quantity += 2F;
             }
         }
         public void Update()

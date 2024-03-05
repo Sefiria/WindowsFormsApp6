@@ -197,11 +197,11 @@ namespace WindowsFormsApp17
                     if (fluids[x, y].quantity == 0F)
                         continue;
 
-                    bool bottom = y < h - 1 && tiles[x, y + 1] == 0 && fluids[x, y + 1].quantity < 1F;
+                    bool bottom =  y < h - 1 && tiles[x, y + 1] == 0 && fluids[x, y + 1].quantity < 1F;
                     bool left = x > 0 && tiles[x - 1, y] == 0 && fluids[x - 1, y].quantity < 1F;
                     bool right = x < w-1 && tiles[x + 1, y] == 0 && fluids[x + 1, y].quantity < 1F;
                     bool top = y > 0 && tiles[x, y - 1] == 0 && fluids[x, y].quantity > 1F && fluids[x, y - 1].quantity < 1F;
-                    float d, d2, q, spd = 0.1F;
+                    float d, d2, q, spd = 0.2F;
 
                     void move(int ofst_x, int ofst_y, float _d)
                     {

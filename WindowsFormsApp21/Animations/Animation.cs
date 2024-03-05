@@ -24,11 +24,11 @@ namespace WindowsFormsApp21.Animations
         {
             Name = "";
         }
-        public Animation Load(string animationName)
+        public static Animation Load(string animationName)
         {
             return Templates.FirstOrDefault(x => x.Name == animationName);
         }
 
-        public static Animation Idle = new Animation() { Name = "Idle",  }
+        public static Animation Idle = new Animation() { Name = "Idle" };
     }
 }

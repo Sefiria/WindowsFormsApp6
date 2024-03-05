@@ -45,6 +45,8 @@ namespace WindowsFormsApp17
                 Render_MouseMove(null, LastMouseEventArgs);
 
             user.Update();
+            //Data.Instance.map.set(20, 20, 0);
+            //Data.Instance.map.fluids[20, 20].quantity = 10F;
             Data.Instance.map.FluidUpdate();
 
             KB.Update();

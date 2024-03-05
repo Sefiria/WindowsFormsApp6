@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 public class PNG
 {
-    private const string key = "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";
+    private const string key = "key";
     private const string url = "https://api.openai.com/v1/chat/completions";
     private List<dynamic> messages = null;
 

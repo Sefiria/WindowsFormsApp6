@@ -17,7 +17,7 @@ namespace WindowsFormsApp17
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            if(Keyboard.IsKeyDown(Key.LeftAlt))
+            if(!Keyboard.IsKeyDown(Key.LeftAlt))
             {
                 var set = new FormConfig();
                 Application.Run(set);
