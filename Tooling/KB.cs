@@ -16,7 +16,7 @@ namespace Tooling
             Right,
             Z,Q,S,D,
             A, E, R, C, B, G, P, H, J, K, L, M, N, O,
-            Num1, Num2,Num3,Num4,Num5,Num6,Num7,Num8,Num9, Num0, CharDegree, CharPlus,
+            Num1, Num2,Num3,Num4,Num5,Num6,Num7,Num8,Num9, Num0, CharDegree, CharPlus, Add, Substract,
             Numpad1, Numpad2, Numpad3, Numpad4, Numpad5, Numpad6, Numpad7, Numpad8, Numpad9, Numpad0,
             LeftAlt, RightAlt, LeftShift, RightShift, LeftCtrl, RightCtrl,
             Tab, Supr,
@@ -61,6 +61,8 @@ namespace Tooling
             [System.Windows.Input.Key.D0] = true,
             [System.Windows.Input.Key.Oem4] = true,
             [System.Windows.Input.Key.OemPlus] = true,
+            [System.Windows.Input.Key.Add] = true,
+            [System.Windows.Input.Key.Subtract] = true,
             [System.Windows.Input.Key.NumPad1] = true,
             [System.Windows.Input.Key.NumPad2] = true,
             [System.Windows.Input.Key.NumPad3] = true,
@@ -120,6 +122,8 @@ namespace Tooling
             System.Windows.Input.Key.D0,
             System.Windows.Input.Key.Oem4,
             System.Windows.Input.Key.OemPlus,
+            System.Windows.Input.Key.Add,
+            System.Windows.Input.Key.Subtract,
             System.Windows.Input.Key.NumPad1,
             System.Windows.Input.Key.NumPad2,
             System.Windows.Input.Key.NumPad3,
@@ -146,5 +150,7 @@ namespace Tooling
         public static bool IsKeyPressed(Key k) => Keyboard.IsKeyDown(AvailableKeys[(int)k]) && Released[AvailableKeys[(int)k]];
         public static bool IsKeyUp(Key k) => !IsKeyDown(k);
         public static bool LeftShift => Keyboard.IsKeyDown(System.Windows.Input.Key.LeftShift);
+        public static bool LeftCtrl => Keyboard.IsKeyDown(System.Windows.Input.Key.LeftCtrl);
+        public static bool LeftAlt => Keyboard.IsKeyDown(System.Windows.Input.Key.LeftAlt);
     }
 }

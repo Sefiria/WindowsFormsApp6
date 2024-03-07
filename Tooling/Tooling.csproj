@@ -98,6 +98,7 @@
     <Compile Include="ColorExt.cs" />
     <Compile Include="Common.cs" />
     <Compile Include="Core.cs" />
+    <Compile Include="DATA.cs" />
     <Compile Include="Enumerations.cs" />
     <Compile Include="Ext.cs" />
     <Compile Include="GPU.cs" />
@@ -127,6 +128,7 @@
     <Compile Include="ValueNoise.cs" />
     <Compile Include="vec.cs" />
     <Compile Include="vecf.cs" />
+    <Compile Include="VoxParser.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -149,6 +151,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Voxels.Core\Voxels.Core.csproj">
+      <Project>{5F012250-CA19-4C6A-A3A0-7144DAE5E8AE}</Project>
+      <Name>Voxels.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

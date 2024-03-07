@@ -369,8 +369,19 @@ namespace LayerPx
                 }
             }
 
-            if (IsKeyPressed(Key.C) && IsKeyDown(Key.LeftCtrl))
-                ExportClipboard();
+            if (LeftCtrl)
+            {
+                if (IsKeyPressed(Key.C))
+                    ExportClipboard();
+                else if (IsKeyPressed(Key.L))
+                {
+                    var voxels = VoxParser.LoadVox("test_output.vox");
+                    data = voxels.ToDATA();
+                    pal = voxels.Colors.ToDrawingPalette();
+                }
+                else if (IsKeyPressed(Key.S))
+                    VoxParser.SaveVox(data.ToVox(pal.ToConformPalette()), "test_output.vox");
+            }
 
             KB.Update();
             MouseStatesV1.Update();
@@ -390,15 +401,15 @@ namespace LayerPx
                     }
                     if (isBucket)
                     {
-                        data.FillWithLayer(holding_layer_target, x, y, v);
+                        data.FillWithLayer(holding_layer_target, x, y, v, layer_at_first_press, ref draw_refresh_queue);
                     }
                     else
                     {
                         switch (Tool)
                         {
                             default: break;
-                            case Tools.PenCircle: data.SetCircleWithLayer(holding_layer_target, x, y, v, pen_size); break;
-                            case Tools.PenSquare: data.SetSquareWithLayer(holding_layer_target, x, y, v, pen_size); break;
+                            case Tools.PenCircle: data.SetCircleWithLayer(holding_layer_target, x, y, v, pen_size, layer_at_first_press, ref draw_refresh_queue); break;
+                            case Tools.PenSquare: data.SetSquareWithLayer(holding_layer_target, x, y, v, pen_size, layer_at_first_press, ref draw_refresh_queue); break;
                         }
                     }
                 }
@@ -408,15 +419,15 @@ namespace LayerPx
 
                     if (isBucket)
                     {
-                        data.FillWithLayer(fixed_layer, x, y, v, force: f);
+                        data.FillWithLayer(fixed_layer, x, y, v, layer_at_first_press, ref draw_refresh_queue, force: f);
                     }
                     else
                     {
                         switch (Tool)
                         {
                             default: break;
-                            case Tools.PenCircle: data.SetCircleWithLayer(fixed_layer, x, y, v, pen_size, force: f); break;
-                            case Tools.PenSquare: data.SetSquareWithLayer(fixed_layer, x, y, v, pen_size, force: f); break;
+                            case Tools.PenCircle: data.SetCircleWithLayer(fixed_layer, x, y, v, pen_size, layer_at_first_press, ref draw_refresh_queue, force: f); break;
+                            case Tools.PenSquare: data.SetSquareWithLayer(fixed_layer, x, y, v, pen_size, layer_at_first_press, ref draw_refresh_queue, force: f); break;
                         }
                     }
                 }
