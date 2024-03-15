@@ -106,6 +106,7 @@
     <Compile Include="ICoords.cs" />
     <Compile Include="INoise.cs" />
     <Compile Include="KB.cs" />
+    <Compile Include="Line.cs" />
     <Compile Include="LoopValue.cs" />
     <Compile Include="Maths.cs" />
     <Compile Include="MouseStatesV2.cs" />

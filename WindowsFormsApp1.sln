@@ -95,6 +95,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsFormsApp25_vx", "Win
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Voxels.Core", "Voxels.Core\Voxels.Core.csproj", "{5F012250-CA19-4C6A-A3A0-7144DAE5E8AE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsFormsApp26", "WindowsFormsApp26\WindowsFormsApp26.csproj", "{EA92BF19-ABA7-4EA1-869B-EBE402923CD0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToolingGranularity", "ToolingGranularity\ToolingGranularity.csproj", "{D61888EB-1F85-4D1F-99CC-AF4F2197D169}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -285,6 +289,14 @@ Global
 		{5F012250-CA19-4C6A-A3A0-7144DAE5E8AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F012250-CA19-4C6A-A3A0-7144DAE5E8AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5F012250-CA19-4C6A-A3A0-7144DAE5E8AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA92BF19-ABA7-4EA1-869B-EBE402923CD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA92BF19-ABA7-4EA1-869B-EBE402923CD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA92BF19-ABA7-4EA1-869B-EBE402923CD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA92BF19-ABA7-4EA1-869B-EBE402923CD0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D61888EB-1F85-4D1F-99CC-AF4F2197D169}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D61888EB-1F85-4D1F-99CC-AF4F2197D169}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D61888EB-1F85-4D1F-99CC-AF4F2197D169}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D61888EB-1F85-4D1F-99CC-AF4F2197D169}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

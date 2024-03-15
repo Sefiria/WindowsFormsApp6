@@ -1,5 +1,9 @@
-﻿using System;
+﻿using ILGPU.Runtime;
+using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace Tooling
 {
@@ -65,7 +69,7 @@ namespace Tooling
         public static PointF PlusF(this PointF pt, float n) => new PointF(n + pt.X, n + pt.Y);
         public static PointF PlusF(this int n, Point pt) => new PointF(n + pt.X, n + pt.Y);
         public static PointF PlusF(this PointF pt, float x, float y) => new PointF(pt.X + x, pt.Y + y);
-
+        
         public static Point Plus(this PointF a, PointF b) => a.PlusF(b).ToPoint();
         public static Point Plus(this PointF a, Point b) => a.PlusF(b).ToPoint();
         public static Point Plus(this Point a, PointF b) => a.PlusF(b).ToPoint();
@@ -126,5 +130,66 @@ namespace Tooling
 
         public static bool IsDefined(this Guid guid) => guid != Guid.Empty;
         public static bool IsNotDefined(this Guid guid) => !guid.IsDefined();
+
+        public static RectangleF ToF(this Rectangle rect) => new RectangleF(rect.Location, rect.Size);
+        public static RectangleF WithOffset(this RectangleF rect, PointF offset)
+        {
+            RectangleF newRect = new RectangleF(rect.Location, rect.Size);
+            newRect.Offset(offset);
+            return newRect;
+        }
+        public static Rectangle WithOffset(this Rectangle rect, PointF offset) => rect.ToF().WithOffset(offset).ToIntRect();
+        public static int GetEdgesAlignBitWise() => (int)(ContentAlignment.TopCenter | ContentAlignment.BottomCenter | ContentAlignment.MiddleLeft | ContentAlignment.MiddleRight);
+        public static List<ContentAlignment> GetEdgesAlign() => new List<ContentAlignment> { ContentAlignment.TopCenter, ContentAlignment.BottomCenter, ContentAlignment.MiddleLeft, ContentAlignment.MiddleRight };
+        public static Line GetEdge(this Rectangle box, ContentAlignment @where)
+        {
+            switch(@where)
+            {
+                default: throw new ArgumentException($"ContentAlignment not expected, got value '{(int)@where}' where it expects [TopCenter (2), BottomCenter (512), MiddleLeft (16), MiddleRight (64)]");
+                case ContentAlignment.TopCenter: return new Line(new Point(box.Left, box.Top), new Point(box.Right, box.Top));
+                case ContentAlignment.MiddleRight: return new Line(new Point(box.Right, box.Top), new Point(box.Right, box.Bottom));
+                case ContentAlignment.BottomCenter: return new Line(new Point(box.Left, box.Bottom), new Point(box.Right, box.Bottom));
+                case ContentAlignment.MiddleLeft: return new Line(new Point(box.Left, box.Top), new Point(box.Left, box.Bottom));
+            }
+        }
+        public static LineF GetEdge(this RectangleF box, ContentAlignment @where)
+        {
+            switch (@where)
+            {
+                default: throw new ArgumentException($"ContentAlignment not expected, got value '{(int)@where}' where it expects [TopCenter (2), BottomCenter (512), MiddleLeft (16), MiddleRight (64)]");
+                case ContentAlignment.TopCenter: return new LineF(new PointF(box.Left, box.Top), new PointF(box.Right, box.Top));
+                case ContentAlignment.MiddleRight: return new LineF(new PointF(box.Right, box.Top), new PointF(box.Right, box.Bottom));
+                case ContentAlignment.BottomCenter: return new LineF(new PointF(box.Left, box.Bottom), new PointF(box.Right, box.Bottom));
+                case ContentAlignment.MiddleLeft: return new LineF(new PointF(box.Left, box.Top), new PointF(box.Left, box.Bottom));
+            }
+        }
+        public static List<Line> GetEdges(this Rectangle box) => GetEdgesAlign().Select(align => box.GetEdge(align)).ToList();
+        public static List<LineF> GetEdges(this RectangleF box) => GetEdgesAlign().Select(align => box.GetEdge(align)).ToList();
+        public static int GetCornersAlignBitWise() => (int)(ContentAlignment.TopLeft | ContentAlignment.TopRight | ContentAlignment.BottomLeft | ContentAlignment.BottomRight);
+        public static List<ContentAlignment> GetCornersAlign() => new List<ContentAlignment> { ContentAlignment.TopLeft, ContentAlignment.TopRight, ContentAlignment.BottomLeft, ContentAlignment.BottomRight };
+        public static Point GetCorner(this Rectangle box, ContentAlignment @where)
+        {
+            switch (@where)
+            {
+                default: throw new ArgumentException($"ContentAlignment not expected, got value '{(int)@where}' where it expects [TopLeft (!), TopRight ($), BottomLeft (256), BottomRight (1024)]");
+                case ContentAlignment.TopLeft: return box.Location;
+                case ContentAlignment.TopRight: return box.Location.Plus(new Point(box.Width, 0));
+                case ContentAlignment.BottomLeft: return box.Location.Plus(new Point(0, box.Height));
+                case ContentAlignment.BottomRight: return box.Location.Plus(new Point(box.Width, box.Height));
+            }
+        }
+        public static PointF GetCorner(this RectangleF box, ContentAlignment @where)
+        {
+            switch (@where)
+            {
+                default: throw new ArgumentException($"ContentAlignment not expected, got value '{(int)@where}' where it expects [TopLeft (!), TopRight ($), BottomLeft (256), BottomRight (1024)]");
+                case ContentAlignment.TopLeft: return box.Location;
+                case ContentAlignment.TopRight: return box.Location.Plus(new PointF(box.Width, 0f));
+                case ContentAlignment.BottomLeft: return box.Location.Plus(new PointF(0f, box.Height));
+                case ContentAlignment.BottomRight: return box.Location.Plus(new PointF(box.Width, box.Height));
+            }
+        }
+        public static List<Point> GetCorners(this Rectangle box) => GetCornersAlign().Select(align => box.GetCorner(align)).ToList();
+        public static List<PointF> GetCorners(this RectangleF box) => GetCornersAlign().Select(align => box.GetCorner(align)).ToList();
     }
 }
