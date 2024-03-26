@@ -13,6 +13,7 @@ namespace WindowsFormsApp26
     {
         static Core m_Instance = null;
         public static Core Instance => m_Instance ?? (m_Instance = new Core());
+        public static bool DEBUG = false;
 
         public static List<Entity> CurrentEntities => Instance.CurrentScene.Entities;
 
@@ -56,6 +57,7 @@ namespace WindowsFormsApp26
         {
             ResetGraphics();
             CurrentScene?.Draw(g);
+            CurrentScene?.DrawForeground(g);
             g.DrawImage(UIImage, 0f, 0f);
             Canvas.Image = RenderImage;
         }

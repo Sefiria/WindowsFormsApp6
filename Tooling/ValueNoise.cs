@@ -154,6 +154,33 @@ namespace Tooling
 
         private float LERP(float t, float a, float b) { return a + t * (b - a); }
 
+
+        public static void NormalizeArray(ref float[,] arr, int w, int h)
+        {
+            float min = float.PositiveInfinity;
+            float max = float.NegativeInfinity;
+
+            for (int y = 0; y < h; y++)
+            {
+                for (int x = 0; x < w; x++)
+                {
+
+                    float v = arr[x, y];
+                    if (v < min) min = v;
+                    if (v > max) max = v;
+                }
+            }
+
+            for (int y = 0; y < h; y++)
+            {
+                for (int x = 0; x < w; x++)
+                {
+                    float v = arr[x, y];
+                    arr[x, y] = (v - min) / (max - min);
+                }
+            }
+
+        }
     }
 
 }

@@ -27,6 +27,9 @@ namespace WindowsFormsApp26
         {
             g.Clear(BGColor);
         }
+        public virtual void DrawForeground(Graphics g)
+        {
+        }
 
 
         public void Collide(ref List<Entity> Entities)

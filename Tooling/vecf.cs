@@ -12,11 +12,12 @@ namespace Tooling
     {
         public float x { get; set; }
         public float y { get; set; }
+        public byte UserData { get; set; } = 0;
         public vecf() { x = y = 0F; }
         public vecf(vecf v) { x = v.x; y = v.y; }
         public vecf(int x, int y) { this.x = x; this.y = y; }
-        public vecf(float x, float y) { this.x = x; this.y = y; }
-        [JsonIgnore] public vec i => new vec((int)x, (int)y);
+        public vecf(float x, float y, byte usrdt = 0) { this.x = x; this.y = y; UserData = usrdt; }
+        [JsonIgnore] public vec i => new vec(x, y);
         [JsonIgnore] public Point ipt => new Point((int)x, (int)y);
         [JsonIgnore] public PointF pt => new PointF(x, y);
         [JsonIgnore] public Size isz => new Size((int)x, (int)y);
@@ -55,6 +56,7 @@ namespace Tooling
         public static vecf operator *(vecf a, vecf b) => new vecf((a?.x * b?.x).Value, (a?.y * b?.y).Value);
         public static vecf operator *(vecf a, int b) => new vecf((a?.x * b).Value, (a?.y * b).Value);
         public static vecf operator *(vecf a, float b) => new vecf((a?.x * b).Value, (a?.y * b).Value);
+        public static vecf operator /(vecf a, vec b) => new vecf((a?.x / b?.x).Value, (a?.y / b?.y).Value);
         public static vecf operator /(vecf a, vecf b) => new vecf((a?.x / b?.x).Value, (a?.y / b?.y).Value);
         public static vecf operator /(vecf a, int b) => b == 0 ? a : new vecf((a?.x / b).Value, (a?.y / b).Value);
         public static vecf operator /(vecf a, float b) => Math.Round(b, 4) == 0F ? a : new vecf((a?.x / b).Value, (a?.y / b).Value);

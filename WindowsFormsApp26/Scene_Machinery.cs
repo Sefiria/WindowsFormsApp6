@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Tooling;
 using WindowsFormsApp26.Entities.Structures;
+using WindowsFormsApp26.Properties;
 
 namespace WindowsFormsApp26
 {
@@ -17,7 +18,7 @@ namespace WindowsFormsApp26
         public override void Initialize()
         {
             BGColor = Color.FromArgb(172, 167, 226);
-            var transformator = new Transformator(((Point)Core.Instance.Canvas.Size).Minus((Point)Transformator.Size).Div(2));
+            var transformator = new Transformator(((Point)Core.Instance.Canvas.Size).Minus((Point)Resources.Transformator.Size).Div(2));
             var drawerInput = new DrawerInput(transformator.Position.MinusF(-32f, 128f), new Size(64, 64));
         }
 
@@ -34,6 +35,11 @@ namespace WindowsFormsApp26
             base.Draw(g);
             var entities = new List<Entity>(Entities);
             entities.ForEach(e => { if (e.Exists) e.Draw(g); });
+        }
+        public override void DrawForeground(Graphics g)
+        {
+            base.DrawForeground(g);
+            new List<Entity>(Entities).ForEach(e => { if (e.Exists) e.DrawForeground(g); });
         }
     }
 }

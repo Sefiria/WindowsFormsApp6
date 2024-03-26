@@ -152,5 +152,9 @@ namespace Tooling
         public static bool LeftShift => Keyboard.IsKeyDown(System.Windows.Input.Key.LeftShift);
         public static bool LeftCtrl => Keyboard.IsKeyDown(System.Windows.Input.Key.LeftCtrl);
         public static bool LeftAlt => Keyboard.IsKeyDown(System.Windows.Input.Key.LeftAlt);
+        public static (bool z, bool q, bool s, bool d) ZQSD()
+        {
+            return (IsKeyDown(Key.Z), IsKeyDown(Key.Q), IsKeyDown(Key.S), IsKeyDown(Key.D));
+        }
     }
 }

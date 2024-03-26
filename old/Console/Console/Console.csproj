@@ -1,0 +1,110 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{DD1C3532-ABF3-4AA2-8292-9B1B46964339}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Console</RootNamespace>
+    <AssemblyName>Console</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>7.3</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <LangVersion>7.3</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Battle\BattleRender.cs" />
+    <Compile Include="Battle\BattleUpdate.cs" />
+    <Compile Include="Battle\BattleInfo.cs" />
+    <Compile Include="Core\Blocks\BlockBase.cs" />
+    <Compile Include="Core\Blocks\Axe.cs" />
+    <Compile Include="Core\Blocks\MatterDrop.cs" />
+    <Compile Include="Core\Blocks\DarkPlant.cs" />
+    <Compile Include="Core\Blocks\MatterBowl.cs" />
+    <Compile Include="Core\Blocks\RedPlant.cs" />
+    <Compile Include="Core\Blocks\GreenPlant.cs" />
+    <Compile Include="Core\Blocks\MatterPlant.cs" />
+    <Compile Include="Core\Blocks\GrayPlant.cs" />
+    <Compile Include="Core\Blocks\OilBowl.cs" />
+    <Compile Include="Core\Blocks\WaterBowl.cs" />
+    <Compile Include="Core\Blocks\ChestAxe.cs" />
+    <Compile Include="Core\Blocks\Furnace.cs" />
+    <Compile Include="Core\Blocks\CrackedTree.cs" />
+    <Compile Include="Core\Blocks\Charcoal.cs" />
+    <Compile Include="Core\Blocks\Bowl.cs" />
+    <Compile Include="Core\Blocks\Seed.cs" />
+    <Compile Include="Core\Blocks\BluePlant.cs" />
+    <Compile Include="Core\Blocks\Wood.cs" />
+    <Compile Include="Core\Blocks\Tree.cs" />
+    <Compile Include="Core\Blocks\Key.cs" />
+    <Compile Include="Core\Blocks\ChestKey.cs" />
+    <Compile Include="Core\Blocks\Door.cs" />
+    <Compile Include="Core\Blocks\Wall.cs" />
+    <Compile Include="Core\Blocks\Floor.cs" />
+    <Compile Include="Core\Blocks\IBlock.cs" />
+    <Compile Include="Core\ChangeConsoleFont.cs" />
+    <Compile Include="Core\Data.cs" />
+    <Compile Include="Core\HelpBlock.cs" />
+    <Compile Include="Core\Map.cs" />
+    <Compile Include="Core\Monsters\Monster.cs" />
+    <Compile Include="Core\Monsters\IBattler.cs" />
+    <Compile Include="Core\Monsters\Attacker.cs" />
+    <Compile Include="Core\Monsters\MonsterTest.cs" />
+    <Compile Include="Core\native\ConsoleMethods.cs" />
+    <Compile Include="Core\native\DisableConsoleQuickEdit.cs" />
+    <Compile Include="Core\native\InputsSimulation.cs" />
+    <Compile Include="Core\native\NativeGetConsoleSelectionInfo.cs" />
+    <Compile Include="Core\Skills\ItemEffects.cs" />
+    <Compile Include="Core\Skills\SpecialEffects.cs" />
+    <Compile Include="Core\Skills\MagicEffects.cs" />
+    <Compile Include="Core\Skills\Skills.cs" />
+    <Compile Include="Core\Vec.cs" />
+    <Compile Include="Core\Room.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

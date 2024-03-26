@@ -99,6 +99,7 @@
     <Compile Include="Common.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="DATA.cs" />
+    <Compile Include="DynamicArray.cs" />
     <Compile Include="Enumerations.cs" />
     <Compile Include="Ext.cs" />
     <Compile Include="GPU.cs" />

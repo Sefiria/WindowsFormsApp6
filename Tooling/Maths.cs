@@ -239,6 +239,7 @@ namespace Tooling
             var product = Vector.CrossProduct(vs, vo);
             return product >= 0F;
         }
+        public static vecf Round(this vecf v, int digits) => ((float)Math.Round(v.x, digits), (float)Math.Round(v.y, digits)).Vf();
         public static PointF Round(this PointF pt) => new PointF((float)Math.Round(pt.X), (float)Math.Round(pt.Y));
         public static Point Round(this Point pt) => new Point((int)Math.Round((double)pt.X), (int)Math.Round((double)pt.Y));
         public static float Round(this float f, int digits) => (float)Math.Round(f, digits);

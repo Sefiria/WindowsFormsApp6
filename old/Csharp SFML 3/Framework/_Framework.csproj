@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5DA7AC46-92E1-4630-8F28-1F26012CF433}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Framework</RootNamespace>
+    <AssemblyName>Framework</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <LangVersion>7.3</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <LangVersion>7.3</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="sfmlnet-graphics-2">
+      <HintPath>..\..\SFML - Copy5\Csharp SFML\Csharp SFML\bin\Includes\sfmlnet-graphics-2.dll</HintPath>
+    </Reference>
+    <Reference Include="sfmlnet-system-2">
+      <HintPath>..\..\SFML - Copy5\Csharp SFML\Csharp SFML\bin\Includes\sfmlnet-system-2.dll</HintPath>
+    </Reference>
+    <Reference Include="sfmlnet-window-2, Version=2.2.0.0, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BehaviorScript.cs" />
+    <Compile Include="ComboBoxIconed.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Entities\AbstractObject\AbstractObject.cs" />
+    <Compile Include="Entities\Entity\Material\Background\Background.cs" />
+    <Compile Include="Entities\AbstractObject\CraftAttribute.cs" />
+    <Compile Include="Entities\AbstractObject\CraftProperty.cs" />
+    <Compile Include="Entities\Entity\Entity.cs" />
+    <Compile Include="Entities\Entity\Equipment\Craftable.cs" />
+    <Compile Include="Entities\Entity\Equipment\Equipment.cs" />
+    <Compile Include="Entities\Entity\Material\Block\VolatileBlock.cs" />
+    <Compile Include="Entities\Entity\Material\Block\Block.cs" />
+    <Compile Include="Entities\Entity\Material\Bullet\Bullet.cs" />
+    <Compile Include="Entities\Entity\Material\Collectible\Collectible.cs" />
+    <Compile Include="Entities\Entity\Material\Collectible\CraftItem.cs" />
+    <Compile Include="Entities\Entity\Material\Door\Door.cs" />
+    <Compile Include="Entities\Entity\Material\Material.cs" />
+    <Compile Include="Entities\Entity\Organic\Organic.cs" />
+    <Compile Include="Entities\Entity\Organic\Playable\Playable.cs" />
+    <Compile Include="Entities\Entity\Organic\Playable\Player.cs" />
+    <Compile Include="Entities\Entity\Organic\UnPlayable\Buildable\Behavior.cs" />
+    <Compile Include="Entities\Entity\Organic\UnPlayable\Buildable\Boss.cs" />
+    <Compile Include="Entities\Entity\Organic\UnPlayable\Buildable\Buildable.cs" />
+    <Compile Include="Entities\Entity\Organic\UnPlayable\Buildable\Part.cs" />
+    <Compile Include="Entities\Entity\Organic\UnPlayable\Buildable\SpecialMob.cs" />
+    <Compile Include="Entities\Entity\Organic\UnPlayable\UnBuildable\Mob.cs" />
+    <Compile Include="Entities\Entity\Organic\UnPlayable\UnBuildable\UnBuildable.cs" />
+    <Compile Include="Entities\Entity\Organic\UnPlayable\UnPlayable.cs" />
+    <Compile Include="EntityProperties.cs" />
+    <Compile Include="GlobalVariables.cs" />
+    <Compile Include="IDManager.cs" />
+    <Compile Include="Level.cs" />
+    <Compile Include="Maths.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RichTextBoxExtended.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="RichTextBoxExtended.Designer.cs">
+      <DependentUpon>RichTextBoxExtended.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SpriteManager.cs" />
+    <Compile Include="Tools.cs" />
+    <Compile Include="Warp.cs" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Fill112.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Fill1121.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\GUI.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\zelecx\zelecx.csproj">
+      <Project>{231CFA37-EE3A-4F97-B715-9E72AE9F910C}</Project>
+      <Name>zelecx</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+</Project>

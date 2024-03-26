@@ -94,9 +94,17 @@ namespace Tooling
         public static SizeF Sz(this float n) => new SizeF(n, n);
         public static Size iSz(this float n) => new Size((int)n, (int)n);
         public static vec V(this (int X, int Y) data) => new vec(data.X, data.Y);
+        public static vec V(this (int X, int Y, byte UserData) data) => new vec(data.X, data.Y, data.UserData);
+        public static vec V(this (int X, int Y, int byteUserData) data) => new vec(data.X, data.Y, (byte)data.byteUserData);
         public static vec V(this (float X, float Y) data) => new vec(data.X, data.Y);
+        public static vec V(this (float X, float Y, byte UserData) data) => new vec(data.X, data.Y, data.UserData);
+        public static vec V(this (float X, float Y, int byteUserData) data) => new vec(data.X, data.Y, (byte)data.byteUserData);
         public static vecf Vf(this (int X, int Y) data) => new vecf(data.X, data.Y);
+        public static vecf Vf(this (int X, int Y, byte UserData) data) => new vecf(data.X, data.Y, data.UserData);
+        public static vecf Vf(this (int X, int Y, int byteUserData) data) => new vecf(data.X, data.Y, (byte)data.byteUserData);
         public static vecf Vf(this (float X, float Y) data) => new vecf(data.X, data.Y);
+        public static vecf Vf(this (float X, float Y, byte UserData) data) => new vecf(data.X, data.Y, data.UserData);
+        public static vecf Vf(this (float X, float Y, int byteUserData) data) => new vecf(data.X, data.Y, (byte)data.byteUserData);
         public static vecf Vf(this SizeF size) => new vecf(size.Width, size.Height);
         public static vecf Vf(this Size size) => new vecf(size.Width, size.Height);
         public static vec V(this SizeF size) => new vec(size.Width, size.Height);
@@ -191,5 +199,9 @@ namespace Tooling
         }
         public static List<Point> GetCorners(this Rectangle box) => GetCornersAlign().Select(align => box.GetCorner(align)).ToList();
         public static List<PointF> GetCorners(this RectangleF box) => GetCornersAlign().Select(align => box.GetCorner(align)).ToList();
+        /// <summary>
+        /// Return the byte-cutted integer [0-255] of an integer
+        /// </summary>
+        public static int ByteCut(this int i) => Math.Min(byte.MaxValue, Math.Max(byte.MinValue, i));
     }
 }
