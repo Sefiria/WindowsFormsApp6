@@ -45,8 +45,12 @@ namespace console_v2
             TheGuy = new Guy();
 
             // temp debug
-            for(int i=0;i<99;i++)
-                TheGuy.Inventory.Items.Add(new Item(string.Concat(Enumerable.Repeat((char) RandomThings.rnd(48, 122), 10)), RandomThings.rnd(1, 99)));
+            for (int i = 0; i < 99; i++)
+            {
+                var item = new Item(string.Concat(Enumerable.Repeat((char)RandomThings.rnd(48, 122), 10)), RandomThings.rnd(1, 99));
+                if (i % 2 == 0) item.IsMenuConsommable = false;
+                TheGuy.Inventory.Items.Add(item);
+            }
         }
         public void ResetGraphics()
         {
