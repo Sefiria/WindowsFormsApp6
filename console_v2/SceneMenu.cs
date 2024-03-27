@@ -163,6 +163,8 @@ namespace console_v2
                     {
                         if (dropdownitem.Key.Contains(ms))
                         {
+                            if (dropdownitem.Value == null)
+                                return;
                             dropdownitem.Value();
                             break;
                         }
@@ -278,7 +280,7 @@ namespace console_v2
                         j++;
                     }
                     foreach(var submenuitem in list_submenuitems)
-                        draw(submenuitem.Key, submenuitem.Value);
+                        draw(submenuitem.Key, submenuitem.Key == "Consume" && !item.IsMenuConsommable ? null : submenuitem.Value);
                 }
                 i++;
             }
