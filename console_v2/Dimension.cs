@@ -32,10 +32,15 @@ namespace console_v2
 
         public void Update()
         {
+            Chunks.Keys.ToArray().ToList().ForEach(c => Chunks[c].Update());
             if (Core.Instance.TheGuy.HasMoved)
             {
                 UpdateMoveCreateChunks();
             }
+        }
+        public void TickSecond()
+        {
+            Chunks.Keys.ToArray().ToList().ForEach(c => Chunks[c].TickSecond());
         }
 
         private void CreateChunks()

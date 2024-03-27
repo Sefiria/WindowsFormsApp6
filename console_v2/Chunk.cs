@@ -44,6 +44,7 @@ namespace console_v2
 
         public vec Index;
         public Dictionary<vec, Tile> Tiles = new Dictionary<vec, Tile>();
+        public List<Entity> Entities = new List<Entity>();
         public Chunk(vec index)
         {
             Index = index;
@@ -51,16 +52,25 @@ namespace console_v2
 
         public void Update()
         {
+            var entities = new List<Entity>(Entities);
+            entities.ForEach(e => { if (e.Exists == false) Entities.Remove(e); else e.Update(); });
+        }
+
+        public void TickSecond()
+        {
+            Entities.ForEach(e => { if (e.Exists == false) Entities.Remove(e); else e.TickSecond(); });
         }
 
         public void Draw(Graphics g)
         {
-            //Tiles.Keys.ToList().ForEach(tileCoord => Tiles[tileCoord].Draw(g));
             string result = "";
             for (int y = 0; y < ChunkSize.y; y++)
                 for (int x = 0; x < ChunkSize.x; x++)
                     result += (char)DB.Resources[(int)Tiles[(x, y).V()].Sol];
-            GraphicsManager.DrawString(g, result, Brushes.DimGray, vec.Zero/*.Plus((0-Core.Instance.Cam).pt)*/);
+            GraphicsManager.DrawString(g, result, Brushes.DimGray, vec.Zero);
+
+            var entities = new List<Entity>(Entities);
+            entities.ForEach(e => { if (e.Exists) e.Draw(g); });
         }
 
 

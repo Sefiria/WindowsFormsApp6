@@ -24,31 +24,34 @@ namespace console_v2
         //CharColor
         public SolidBrush CharBrush = new SolidBrush(Color.White);
 
+        public Statistics Stats = null;
+        public Inventory Inventory = null;
+
         public Entity()
         {
-            Initialize();
         }
-        public Entity(vecf position)
+        public Entity(vecf position, bool addToCurrentChunkEntities = true)
         {
             Position = position;
-            Initialize();
+            Initialize(addToCurrentChunkEntities);
         }
-        private void Initialize()
+        private void Initialize(bool addToCurrentChunkEntities = true)
         {
-            Core.Instance.CurrentScene.Entities.Add(this);
+            if(addToCurrentChunkEntities)
+                Core.CurrentEntities.Add(this);
         }
 
         public virtual void Update()
         {
         }
-        //public virtual void Draw(Graphics g)
-        //{
-        //    var u = Core.CurrentEntities.FirstOrDefault(e => e.ID == ID);
-        //    g.DrawImage(Image, Position);
-        //}
+
         public virtual void Draw(Graphics g)
         {
-            g.DrawString(string.Concat((char)CharToDisplay), GraphicsManager.Font, CharBrush, Position.pt);
+            GraphicsManager.DrawString(g, string.Concat((char)CharToDisplay), CharBrush, Position);
         }
+
+        public virtual void TickSecond() {}
+
+        public virtual void Action(Entity triggerer) { }
     }
 }

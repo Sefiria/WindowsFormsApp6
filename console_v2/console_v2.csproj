@@ -61,14 +61,18 @@
     </Compile>
     <Compile Include="GraphicsManager.cs" />
     <Compile Include="Guy.cs" />
+    <Compile Include="HealthEffect.cs" />
     <Compile Include="Inventory.cs" />
     <Compile Include="Item.cs" />
+    <Compile Include="Lootable.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResourcesManager.cs" />
+    <Compile Include="res\entities\EntityTree.cs" />
     <Compile Include="SceneMenu.cs" />
     <Compile Include="Scene.cs" />
     <Compile Include="SceneAdventure.cs" />
+    <Compile Include="Statistics.cs" />
     <Compile Include="Tile.cs" />
     <Compile Include="Tool.cs" />
     <Compile Include="World.cs" />

@@ -29,11 +29,14 @@ namespace console_v2
         {
             base.Update();
 
-            var entities = new List<Entity>(Entities);
-            entities.ForEach(e => { if (e.Exists == false) Entities.Remove(e); else e.Update(); });
             World.Update();
 
             if (KB.IsKeyPressed(KB.Key.Escape)) Core.Instance.SwitchScene(Core.Scenes.Menu);
+        }
+
+        public override void TickSecond()
+        {
+            World.TickSecond();
         }
 
         public override void Draw(Graphics g)
@@ -41,8 +44,6 @@ namespace console_v2
             base.Draw(g);
 
             World.Draw(g);
-            var entities = new List<Entity>(Entities);
-            entities.ForEach(e => { if (e.Exists) e.Draw(g); });
 
             Core.Instance.gui.DrawRectangle(new Pen(Color.FromArgb(100, 100, 0)), new Rectangle(DrawingRect.Location, (Size)((Point)DrawingRect.Size).Minus(1)));
         }

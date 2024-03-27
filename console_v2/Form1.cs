@@ -9,6 +9,7 @@ namespace console_v2
     public partial class Form1 : Form
     {
         Timer TimerUpdate = new Timer() { Enabled = true, Interval = 10 };
+        Timer TimerTickSecond = new Timer() { Enabled = true, Interval = 1000 };
         Timer TimerDraw = new Timer() { Enabled = true, Interval = 10 };
 
         public Form1()
@@ -19,6 +20,7 @@ namespace console_v2
             Core.Instance.InitializeCore(ref Render);
             Core.Instance.InitializeScenes();
             TimerUpdate.Tick += Update;
+            TimerTickSecond.Tick += TickSecond;
             TimerDraw.Tick += Draw;
         }
 
@@ -28,6 +30,11 @@ namespace console_v2
 
             KB.Update();
             MouseStates.Update();
+        }
+
+        private void TickSecond(object sender, EventArgs e)
+        {
+            Core.Instance.TickSecond();
         }
 
         private void Draw(object sender, EventArgs e)

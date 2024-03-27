@@ -100,7 +100,7 @@ namespace console_v2
             {
                 var ms = MouseStates.Position.ToPoint();
                 var clicked = Buttons.FirstOrDefault(bt => bt.Bounds.Contains(ms));
-                if (clicked != null) selectedButton = clicked;
+                if (clicked != null) { SubMenu_Items_selected_i = -1; selectedButton = clicked; }
             }
 
             switch(selectedButton.Text)
@@ -200,6 +200,49 @@ namespace console_v2
         }
         private void SubMenu_Tools_Update()
         {
+            var ms = MouseStates.Position.ToPoint();
+            if (MouseStates.IsButtonPressed(MouseButtons.Left) && SubMenu_Items_selected_i != -1)
+            {
+                if (SubMenu_Items_selected_i != -1)
+                {
+                    foreach (var dropdownitem in SubMenu_Items_dropdownitems)
+                    {
+                        if (dropdownitem.Key.Contains(ms))
+                        {
+                            if (dropdownitem.Value == null)
+                                return;
+                            dropdownitem.Value();
+                            break;
+                        }
+                    }
+                }
+                SubMenu_Items_selected_i = -1;
+            }
+            if (MouseStates.IsButtonPressed(MouseButtons.Right))
+            {
+                if (SubMenu_Items_selected_i == -1)
+                {
+                    var guy = Core.Instance.TheGuy;
+                    var tools = guy.Inventory.Tools;
+                    int x, y, w = 240, h = 25, i = 0;
+                    foreach (var tool in tools)
+                    {
+                        x = i / (mainrect.Height / h) * (w + 10);
+                        if (x >= mainrect.Width) break;
+                        y = (i - x / w * (mainrect.Height / h)) * h;
+                        if (new Rectangle(x, y, 240, 20).Contains(ms))
+                        {
+                            SubMenu_Items_selected_i = i;
+                            break;
+                        }
+                        i++;
+                    }
+                }
+                else
+                {
+                    SubMenu_Items_selected_i = -1;
+                }
+            }
         }
         private void SubMenu_Skills_Update()
         {
@@ -220,12 +263,24 @@ namespace console_v2
         {
             var tg = Core.Instance.TheGuy;
             var font = GraphicsManager.Font;
-            Rectangle rect_guy = new Rectangle(mainrect.X + 20, mainrect.Y + 20, mainrect.Width - 40, 150);
+            var statfont = new Font("Segoe UI", 12);
+            Rectangle rect, rect_guy = new Rectangle(mainrect.X + 20, mainrect.Y + 20, mainrect.Width - 40, 150);
+            int x, y, w = 170, h = 25, i = 0, max_h = rect_guy.Height - 20;
 
+            void draw_stat(KeyValuePair<Statistics.Stat, int> stat)
+            {
+                x = i / (max_h / h) * (w + 10);
+                y = (i - x / w * (max_h / h)) * h;
+                rect = new Rectangle(rect_guy.X + 120 + x, rect_guy.Y + 10 + y, 240, h);
+                g.DrawString($"{Enum.GetName(typeof(Statistics.Stat), stat.Key), -5}", statfont, Brushes.White, rect);
+                g.DrawString($"{stat.Value,10}", statfont, Brushes.White, rect.WithOffset((80, 0).P()));
+                i++;
+            }
             void draw(Guy guy)
             {
                 g.FillRectangle(makeReversebrush(rect_guy), rect_guy);
                 g.DrawString(string.Concat((char)guy.CharToDisplay), font, guy.CharBrush, rect_guy.Location.Plus(50, rect_guy.Height / 2 - (int)GraphicsManager.CharSize.Height / 2));
+                guy.Stats.List.ForEach(draw_stat);
             }
 
             draw(tg);
@@ -256,7 +311,7 @@ namespace console_v2
                     void actions_remove_if_zero() { if (guy.Inventory.Items[guy.Inventory.Items.IndexOf(item)].Count == 0) actions_remove(); }
                     void actions_remove_one() { guy.Inventory.Items[guy.Inventory.Items.IndexOf(item)].Count--; actions_remove_if_zero(); }
                     Action Remove = () => actions_remove();
-                    Action Consume = () => actions_remove_one();
+                    Action Consume = () => { item.Consume(); actions_remove_if_zero(); };
                     Action Drop1 = () => actions_remove_one();
                     Action DropAll = () => actions_remove();
                     var list_submenuitems = new Dictionary<string, Action> {
@@ -287,6 +342,48 @@ namespace console_v2
         }
         private void SubMenu_Tools_Draw(Graphics g)
         {
+            var gui = Core.Instance.gui;
+            var guy = Core.Instance.TheGuy;
+            var tools = new List<Tool>(guy.Inventory.Tools);
+            var font = new Font("Segoe UI", 14f);
+            int x, y, w = 240, h = 25, i = 0;
+            var ms = MouseStates.Position.ToPoint();
+            bool hover;
+            Rectangle rect;
+            foreach (var tool in tools)
+            {
+                x = i / (mainrect.Height / h) * (w + 10);
+                if (x >= mainrect.Width) break;
+                y = (i - x / w * (mainrect.Height / h)) * h;
+                rect = new Rectangle(x, y, 240, h);
+                hover = i == SubMenu_Items_selected_i || (SubMenu_Items_selected_i == -1 && rect.Contains(ms));
+                g.DrawString(tool.Name, font, hover ? Brushes.White : Brushes.Gray, new Rectangle(x, y, 140, 20));
+                g.DrawString($"{tool.Count,14}", font, hover ? Brushes.White : Brushes.Gray, new Rectangle(x + 150, y, 100, 20));
+                if (i == SubMenu_Items_selected_i)
+                {
+                    int j = 0;
+                    Action Use = () => tool.Use(guy);
+                    var list_submenuitems = new Dictionary<string, Action>
+                    {
+                        ["Use"] = Use,
+                    };
+                    var list_sz = list_submenuitems.Select(k => TextRenderer.MeasureText(k.Key, font));
+                    int max_sz_w = list_sz.Max(sz => sz.Width);
+                    int max_sz_h = list_sz.Max(sz => sz.Height);
+                    void draw(string txt, Action action)
+                    {
+                        var r = new Rectangle(rect.X + 10, rect.Y + 10 + max_sz_h * j, max_sz_w, max_sz_h);
+                        Brush brush = r.Contains(ms) ? Brushes.White : Brushes.Gray;
+                        gui.FillRectangle(makebrush(r), r);
+                        gui.DrawString(txt, font, brush, r);
+                        SubMenu_Items_dropdownitems[r] = action;
+                        j++;
+                    }
+                    foreach (var submenuitem in list_submenuitems)
+                        draw(submenuitem.Key, submenuitem.Value);
+                }
+                i++;
+            }
         }
         private void SubMenu_Skills_Draw(Graphics g)
         {

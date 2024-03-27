@@ -19,15 +19,26 @@ namespace console_v2
         public vec PreviousPosition = vec.Zero;
         public bool HasMoved => Position.i != PreviousPosition;
         public vec Direction => Position.i - PreviousPosition;
+        public vec DirectionPointed = vec.Zero;
 
-        public Inventory Inventory;
 
-
-        public Guy()
+        public Guy() : base(vecf.Zero)
         {
             CharToDisplay = 'ῗ';
             Position = Chunk.ChunkSize.f  / 2f;
             Offset = (4f, 4f).Vf();
+            Stats = new Statistics(new Dictionary<Statistics.Stat, int>
+            {
+                [Statistics.Stat.HPMax] = 200,
+                [Statistics.Stat.HP] = 200,
+                [Statistics.Stat.MPMax] = 50,
+                [Statistics.Stat.MP] = 50,
+                [Statistics.Stat.STR] = 50,
+                [Statistics.Stat.INT] = 75,
+                [Statistics.Stat.DEF] = 0,
+                [Statistics.Stat.MPDEF] = 0,
+                [Statistics.Stat.MOVSPD] = 50,
+            });
             Inventory = new Inventory();
         }
 
@@ -36,6 +47,9 @@ namespace console_v2
             base.Update();
 
             ManageMovement();
+
+            if(KB.IsKeyPressed(KB.Key.Space))
+                Core.GetEntityAt(Position.i + DirectionPointed)?.Action(this);
         }
 
         private void ManageMovement()
@@ -62,10 +76,11 @@ namespace console_v2
                     CurChunk = nxt_chunk;
                 }
             }
-            if (z) { var p = (0f, -mv_speed).Vf(); TryMove(p); }
-            if (q) { var p = (-mv_speed, 0f).Vf(); TryMove(p); }
-            if (s) { var p = (0f, mv_speed).Vf(); TryMove(p); }
-            if (d) { var p = (mv_speed, 0f).Vf(); TryMove(p); }
+            var mvspd = mv_speed + Stats._Get(Statistics.Stat.MOVSPD) * 0.001f;
+            if (z) { var p = (0f, -mvspd).Vf(); TryMove(p); DirectionPointed = (0, -1).V(); }
+            if (q) { var p = (-mvspd, 0f).Vf(); TryMove(p); DirectionPointed = (-1, 0).V(); }
+            if (s) { var p = (0f, mvspd).Vf(); TryMove(p); DirectionPointed = (0, 1).V(); }
+            if (d) { var p = (mvspd, 0f).Vf(); TryMove(p); DirectionPointed = (1, 0).V(); }
 
             BoundThis(ref Position, ref CurChunk);
         }
@@ -77,6 +92,11 @@ namespace console_v2
             //    GraphicsManager.DrawString(g, string.Concat((char)CharToDisplay), x == Chunk.ChunkSize.x-1 ? Brushes.Yellow : CharBrush, (x,7).Vf().i.f * GraphicsManager.CharSize.Vf());
             //GraphicsManager.DrawString(g, "ꬾ║¶₼Ƥ₶Шﷺﷺ#", Brushes.Yellow, SceneAdventure.DrawingRect.Location.vecf() + (0,8).Vf().i.f * GraphicsManager.CharSize.Vf());
             //GraphicsManager.DrawString(g, "##########", Brushes.Yellow, SceneAdventure.DrawingRect.Location.vecf() + (0,9).Vf().i.f * GraphicsManager.CharSize.Vf());
+        }
+
+        public override void TickSecond()
+        {
+            Stats.TickSecond();
         }
     }
 }

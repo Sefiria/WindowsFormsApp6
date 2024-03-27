@@ -103,6 +103,8 @@
     <Compile Include="Enumerations.cs" />
     <Compile Include="Ext.cs" />
     <Compile Include="GPU.cs" />
+    <Compile Include="IDBItem.cs" />
+    <Compile Include="IName.cs" />
     <Compile Include="ISized.cs" />
     <Compile Include="ICoords.cs" />
     <Compile Include="INoise.cs" />

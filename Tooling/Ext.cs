@@ -16,12 +16,12 @@ namespace Tooling
         public static Point Minus(this PointF A, vec B) => new Point((int)(A.X - B.x), (int)(A.Y - B.y));
         public static Point Minus(this PointF A, vecf B) => new Point((int)(A.X - B.x), (int)(A.Y - B.y));
         public static Point Minus(this PointF A, float x, float y) => new Point((int)(A.X - x), (int)(A.Y - y));
-        public static Point Minus(this PointF A, float n) => new Point((int)(A.X - n), (int) (A.Y - n));
+        public static Point Minus(this PointF A, float n) => new Point((int)(A.X - n), (int)(A.Y - n));
         public static Point Minus(this Point A, PointF B) => new Point((int)(A.X - B.X), (int)(A.Y - B.Y));
-        public static Point Minus(this Point A, vec B) => new Point((int)(A.X - B.x), (int) (A.Y - B.y));
-        public static Point Minus(this Point A, vecf B) => new Point((int)(A.X - B.x), (int) (A.Y - B.y));
-        public static Point Minus(this Point A, float x, float y) => new Point((int)(A.X - x), (int) (A.Y - y));
-        public static Point Minus(this Point A, float n) => new Point((int)(A.X - n), (int) (A.Y - n));
+        public static Point Minus(this Point A, vec B) => new Point((int)(A.X - B.x), (int)(A.Y - B.y));
+        public static Point Minus(this Point A, vecf B) => new Point((int)(A.X - B.x), (int)(A.Y - B.y));
+        public static Point Minus(this Point A, float x, float y) => new Point((int)(A.X - x), (int)(A.Y - y));
+        public static Point Minus(this Point A, float n) => new Point((int)(A.X - n), (int)(A.Y - n));
         public static PointF MinusF(this PointF A, PointF B) => new PointF(A.X - B.X, A.Y - B.Y);
         public static PointF MinusF(this PointF A, vec B) => new PointF(A.X - B.x, A.Y - B.y);
         public static PointF MinusF(this PointF A, vecf B) => new PointF(A.X - B.x, A.Y - B.y);
@@ -30,12 +30,12 @@ namespace Tooling
         public static PointF MinusF(this Point A, PointF B) => new PointF(A.X - B.X, A.Y - B.Y);
         public static PointF MinusF(this Point A, vec B) => new PointF(A.X - B.x, A.Y - B.y);
         public static PointF MinusF(this Point A, vecf B) => new PointF(A.X - B.x, A.Y - B.y);
-        public static PointF MinusF(this Point A, float x, float y) => new PointF(A.X - x, A.Y -y);
+        public static PointF MinusF(this Point A, float x, float y) => new PointF(A.X - x, A.Y - y);
         public static PointF MinusF(this Point A, float n) => new PointF(A.X - n, A.Y - n);
         public static Point Snap(this Point pt, int n) => pt.Div(n).x(n);
         public static PointF Snap(this PointF pt, int n) => pt.Div(n).x(n);
-        public static Point Div(this Point pt, int n) => new Point(pt.X  / n, pt.Y  / n);
-        public static Point Div(this PointF pt, int n) => new Point((int)pt.X  / n, (int)pt.Y  / n);
+        public static Point Div(this Point pt, int n) => new Point(pt.X / n, pt.Y / n);
+        public static Point Div(this PointF pt, int n) => new Point((int)pt.X / n, (int)pt.Y / n);
         public static PointF DivF(this Point pt, int n) => new Point(pt.X / n, pt.Y / n);
         public static PointF DivF(this Point pt, float n) => new Point((int)(pt.X / n), (int)(pt.Y / n));
         public static PointF DivF(this PointF pt, int n) => new PointF(pt.X / n, pt.Y / n);
@@ -69,7 +69,7 @@ namespace Tooling
         public static PointF PlusF(this PointF pt, float n) => new PointF(n + pt.X, n + pt.Y);
         public static PointF PlusF(this int n, Point pt) => new PointF(n + pt.X, n + pt.Y);
         public static PointF PlusF(this PointF pt, float x, float y) => new PointF(pt.X + x, pt.Y + y);
-        
+
         public static Point Plus(this PointF a, PointF b) => a.PlusF(b).ToPoint();
         public static Point Plus(this PointF a, Point b) => a.PlusF(b).ToPoint();
         public static Point Plus(this Point a, PointF b) => a.PlusF(b).ToPoint();
@@ -81,9 +81,9 @@ namespace Tooling
         #endregion
 
 
-        public static Point iP(this (int X, int Y) data) => new Point(data.X, data.Y); 
-        public static PointF P(this (int X, int Y) data) => new PointF(data.X, data.Y); 
-        public static Point iP(this (float X, float Y) data) => new Point((int)data.X, (int)data.Y); 
+        public static Point iP(this (int X, int Y) data) => new Point(data.X, data.Y);
+        public static PointF P(this (int X, int Y) data) => new PointF(data.X, data.Y);
+        public static Point iP(this (float X, float Y) data) => new Point((int)data.X, (int)data.Y);
         public static PointF P(this (float X, float Y) data) => new PointF(data.X, data.Y);
         public static PointF P(this float n) => new PointF(n, n);
         public static Point iP(this float n) => new Point((int)n, (int)n);
@@ -151,7 +151,7 @@ namespace Tooling
         public static List<ContentAlignment> GetEdgesAlign() => new List<ContentAlignment> { ContentAlignment.TopCenter, ContentAlignment.BottomCenter, ContentAlignment.MiddleLeft, ContentAlignment.MiddleRight };
         public static Line GetEdge(this Rectangle box, ContentAlignment @where)
         {
-            switch(@where)
+            switch (@where)
             {
                 default: throw new ArgumentException($"ContentAlignment not expected, got value '{(int)@where}' where it expects [TopCenter (2), BottomCenter (512), MiddleLeft (16), MiddleRight (64)]");
                 case ContentAlignment.TopCenter: return new Line(new Point(box.Left, box.Top), new Point(box.Right, box.Top));
@@ -203,5 +203,10 @@ namespace Tooling
         /// Return the byte-cutted integer [0-255] of an integer
         /// </summary>
         public static int ByteCut(this int i) => Math.Min(byte.MaxValue, Math.Max(byte.MinValue, i));
+
+        public static Dictionary<T, U> ToDict<T, U>(this U value) where T : Enum where U : struct => Enum.GetValues(typeof(T)).Cast<T>().ToDictionary(s => s, s => value);
+        public static bool ContainsName<T>(this List<T> list, string name) where T : class, IName => list?.FirstOrDefault(item => item.Name.CompareTo(name) == 0) != null;
+        public static bool ContainsItem<T>(this List<T> list, int dbref) where T : class, IDBItem => list?.FirstOrDefault(item => item.DBItem == dbref) != null;
+
     }
 }

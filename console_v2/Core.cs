@@ -1,4 +1,5 @@
-﻿using System;
+﻿using console_v2.res.entities;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -15,7 +16,11 @@ namespace console_v2
         public static Core Instance => m_Instance ?? (m_Instance = new Core());
         public static bool DEBUG = false;
 
-        public static List<Entity> CurrentEntities => Instance.CurrentScene.Entities;
+        public static List<Entity> CurrentEntities => (Instance.CurrentScene as SceneAdventure).World.CurrentDimension.Chunks[Instance.TheGuy?.CurChunk ?? vec.Zero].Entities;
+        public static void AddEntity(Entity e) => (Instance.CurrentScene as SceneAdventure).World.CurrentDimension.Chunks[Instance.TheGuy?.CurChunk ?? vec.Zero].Entities.Add(e);
+        public static void AddEntity(Entity e, vec chunk) => (Instance.CurrentScene as SceneAdventure).World.CurrentDimension.Chunks[chunk].Entities.Add(e);
+        public static void AddEntity(Entity e, vec dimension, vec chunk) => (Instance.CurrentScene as SceneAdventure).World.Dimensions[dimension].Chunks[chunk].Entities.Add(e);
+        public static Entity GetEntityAt(vec tile) => CurrentEntities?.FirstOrDefault(e => e.Position.ToTile() == tile);
 
         public SceneAdventure SceneAdventure;
         public Scene CurrentScene;
@@ -39,18 +44,14 @@ namespace console_v2
         }
         public void InitializeScenes()
         {
+            ResetGraphics();
+
             SceneAdventure = new SceneAdventure();
             CurrentScene = SceneAdventure;
             SceneAdventure.Initialize();
             TheGuy = new Guy();
-
-            // temp debug
-            for (int i = 0; i < 99; i++)
-            {
-                var item = new Item(string.Concat(Enumerable.Repeat((char)RandomThings.rnd(48, 122), 10)), RandomThings.rnd(1, 99));
-                if (i % 2 == 0) item.IsMenuConsommable = false;
-                TheGuy.Inventory.Items.Add(item);
-            }
+            new Lootable((5, 5).V(), true, (int)Outils.Hache);
+            new EntityTree((8, 5).V());
         }
         public void ResetGraphics()
         {
@@ -81,6 +82,12 @@ namespace console_v2
         {
             CurrentScene?.Update();
         }
+
+        public void TickSecond()
+        {
+            CurrentScene?.TickSecond();
+        }
+
 
         public void Draw()
         {
