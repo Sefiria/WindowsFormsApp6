@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Tooling;
 
 namespace console_v2
 {
@@ -48,8 +47,7 @@ namespace console_v2
 
         public static Dictionary<int, int> Resources = new Dictionary<int, int>
         {
-
-            [(int)Sols.Pierre] = 'ʭ',
+            [(int)Sols.Pierre] = short.MaxValue + 0,//'ʭ',
             [(int)Sols.Terre] = '░',
             [(int)Sols.Herbe] = '▒',
             [(int)Sols.Pave] = 'Ш',
@@ -74,7 +72,7 @@ namespace console_v2
         public static Dictionary<int, Color> ResColor = new Dictionary<int, Color>
         {
             [(int)Sols.Pierre] = Color.DimGray,
-            [(int)Sols.Terre] = Color.Brown,
+            [(int)Sols.Terre] = Color.Sienna,//Color.Tan for sand
             [(int)Sols.Herbe] = Color.DarkGreen,
             [(int)Sols.Pave] = Color.Beige,
 
@@ -83,11 +81,53 @@ namespace console_v2
         };
         public static Dictionary<GenerationMode, Color> ChunkLayerColor = new Dictionary<GenerationMode, Color>
         {
-            [GenerationMode.Mine] = Color.FromArgb(40,40,40),
+            [GenerationMode.Mine] = Color.FromArgb(80,80,80),
             [GenerationMode.Rocailleux] = Color.DimGray,
             [GenerationMode.Plaine] = Color.Green,
             [GenerationMode.Foret] = Color.DarkGreen,
         };
+        public static Dictionary<int, Bitmap> ResourcesSpecials;
+
+        static DB()
+        {
+            int w = (int)GraphicsManager.CharSize.Width, h = (int)GraphicsManager.CharSize.Height;
+
+            Bitmap create(string strpixels, int color)
+            {
+                List<vec> pixels = new List<vec>();
+                var lines = string.Concat(strpixels.Skip(2).Take(strpixels.Length - 4)).Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+                int y = 0;
+                for (int _y = 0; _y < lines.Length; _y++, y++)
+                {
+                    if (lines[_y].StartsWith("@"))
+                    {
+                        y += int.Parse(string.Concat(lines[_y].Skip(1))) - 1;
+                        continue;
+                    }
+                    for (int x = 0; x < lines[_y].Length; x++)
+                    {
+                        if (lines[_y][x] != ' ')
+                            pixels.Add((x, y).V());
+                    }
+                }
+                Bitmap result = new Bitmap(w, y);
+                using (var g = Graphics.FromImage(result))
+                    pixels.ForEach(px => g.DrawRectangle(new Pen(Color.FromArgb(color)), px.x, px.y, 1, 1));
+                return result.Resize(w, h);
+            }
+
+            ResourcesSpecials = new Dictionary<int, Bitmap>();
+            ResourcesSpecials[(int)Sols.Pierre] = create($@"
+@8
+       •         •
+@8
+          •         •
+@8
+  •         •
+@8
+     •         •
+", Color.DimGray.ToArgb());
+        }
     }
 }
 

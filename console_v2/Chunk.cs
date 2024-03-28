@@ -62,11 +62,26 @@ namespace console_v2
 
         public void Draw(Graphics g)
         {
+            List<(vecf vf, int res)> specials = new List<(vecf vf, int res)>();
             string result = "";
             for (int y = 0; y < ChunkSize.y; y++)
+            {
                 for (int x = 0; x < ChunkSize.x; x++)
-                    result += (char)DB.Resources[(int)Tiles[(x, y).V()].Sol];
+                {
+                    var res = (int)Tiles[(x, y).V()].Sol;
+                    var c = DB.Resources[res];
+                    if(c >= short.MaxValue)
+                    {
+                        vecf _vf = ((int)(x * GraphicsManager.CharSize.Width), (int)(y * GraphicsManager.CharSize.Height)).Vf();
+                        specials.Add((_vf, res));
+                        result += ' ';
+                    }
+                    else
+                        result += (char)c;
+                }
+            }
             GraphicsManager.DrawString(g, result, Brushes.DimGray, vec.Zero);
+            specials.ForEach(spe => g.DrawImage(DB.ResourcesSpecials[spe.res], SceneAdventure.DrawingRect.Location.Plus(spe.vf.pt.MinusF(5, 0))));
 
             var entities = new List<Entity>(Entities);
             entities.ForEach(e => { if (e.Exists) e.Draw(g); });

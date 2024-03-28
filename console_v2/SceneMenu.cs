@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Tooling;
 
@@ -71,18 +72,19 @@ namespace console_v2
                     selectedButton = bt;
                 return bt;
             }
-            for (int y = 0; y < 7; y++)
+            for (int y = 0; y < 8; y++)
             {
                 rect = new Rectangle(menurect.X + (int)(menurect.Width * 0.1), menurect.Y + menuButtonSize.Height / 2 + y * (int)(menuButtonSize.Height * 1.5), menuButtonSize.Width, menuButtonSize.Height);
                 switch (y)
                 {
                     case 0: Buttons.Add(create_button("State", true)); break;
-                    case 1: Buttons.Add(create_button("Items")); break;
-                    case 2: Buttons.Add(create_button("Tools")); break;
-                    case 3: Buttons.Add(create_button("Skills")); break;
-                    case 4: Buttons.Add(create_button("Equip")); break;
-                    case 5: Buttons.Add(create_button("Options")); break;
-                    case 6: Buttons.Add(create_button("Save")); break;
+                    case 1: Buttons.Add(create_button("Map")); break;
+                    case 2: Buttons.Add(create_button("Items")); break;
+                    case 3: Buttons.Add(create_button("Tools")); break;
+                    case 4: Buttons.Add(create_button("Skills")); break;
+                    case 5: Buttons.Add(create_button("Equip")); break;
+                    case 6: Buttons.Add(create_button("Options")); break;
+                    case 7: Buttons.Add(create_button("Save")); break;
                 }
             }
         }
@@ -105,6 +107,7 @@ namespace console_v2
             switch(selectedButton.Text)
             {
                 case "State":  SubMenu_State_Update(); break;
+                case "Map": SubMenu_Map_Update(); break;
                 case "Items": SubMenu_Items_Update(); break;
                 case "Tools": SubMenu_Tools_Update(); break;
                 case "Skills": SubMenu_Skills_Update(); break;
@@ -128,6 +131,7 @@ namespace console_v2
             switch (selectedButton.Text)
             {
                 case "State": SubMenu_State_Draw(g); break;
+                case "Map": SubMenu_Map_Draw(g); break;
                 case "Items": SubMenu_Items_Draw(g); break;
                 case "Tools": SubMenu_Tools_Draw(g); break;
                 case "Skills": SubMenu_Skills_Draw(g); break;
@@ -145,11 +149,20 @@ namespace console_v2
         #region Sub Menus Vars
         int SubMenu_Items_selected_i = -1;
         Dictionary<Rectangle, Action> SubMenu_Items_dropdownitems = new Dictionary<Rectangle, Action>();
+        int SubMenu_Map_mode = 0;
         #endregion
 
         #region Sub Menus Update
         private void SubMenu_State_Update()
         {
+        }
+        private void SubMenu_Map_Update()
+        {
+            if (KB.IsKeyPressed(KB.Key.Space))
+            {
+                SubMenu_Map_mode++;
+                while (SubMenu_Map_mode > 1) { SubMenu_Map_mode -= 2; }
+            }
         }
         private void SubMenu_Items_Update()
         {
@@ -283,6 +296,83 @@ namespace console_v2
             }
 
             draw(tg);
+        }
+        private void SubMenu_Map_Draw(Graphics g)
+        {
+            // mode
+            var _rect = new Rectangle(mainrect.X + 50, mainrect.Y + 50, 100, 25);
+            g.FillRectangle(Brushes.DimGray, _rect);
+            switch(SubMenu_Map_mode)
+            {
+                case 0: _rect = new Rectangle(mainrect.X + 50, mainrect.Y + 50, 40, 25); break;
+                case 1: _rect = new Rectangle(mainrect.X + 110, mainrect.Y + 50, 40, 25); break;
+                default: throw new Exception("SceneMenu.cs/SubMenu_Map_Draw: not set");
+            }
+            g.FillRectangle(Brushes.Gray, _rect);
+            var _font = new Font("Segoe UI", 10);
+            g.DrawString("Layers", _font, SubMenu_Map_mode == 0 ? Brushes.White : Brushes.Gray, mainrect.X + 20, mainrect.Y + 30);
+            g.DrawString("Tiles", _font, SubMenu_Map_mode == 1 ? Brushes.White : Brushes.Gray, mainrect.X + 140, mainrect.Y + 30);
+            g.DrawString("[Space]", _font, KB.IsKeyDown(KB.Key.Space) ? Brushes.White : Brushes.Gray, mainrect.X + 80, mainrect.Y + 85);
+            // ----
+
+            var sz = mainrect.Size;
+            var tg = Core.Instance.TheGuy;
+            var world = Core.Instance.SceneAdventure.World;
+            Rectangle rect;
+            vec c = tg.CurChunk;
+            var chunks = world.Dimensions[tg.CurDimension].Chunks.ToList();
+            var szmini = 30;
+            var g_x = mainrect.X + mainrect.Width / 2 - szmini / 2 * (c.x);
+            var g_y = mainrect.Y + mainrect.Height / 2 - szmini / 2 * (c.y);
+            Bitmap _img = new Bitmap(Chunk.ChunkSize.x, Chunk.ChunkSize.y);
+            Graphics _g = Graphics.FromImage(_img);
+
+            void draw_entities(KeyValuePair<vec, Chunk> chunk)
+            {
+                var entities = new List<Entity>(chunk.Value.Entities).Except(tg);
+                foreach (var e in chunk.Value.Entities)
+                    g.DrawRectangle(Pens.White, rect.X + e.TileX, rect.Y + e.TileY, 1, 1);
+                if (chunk.Key == tg.CurChunk)
+                {
+                    g.DrawRectangle(new Pen(Color.FromArgb(150, Core.Instance.Ticks % 20 < 10 ? Color.Cyan : Color.Orange)), rect.X + tg.X - 1, rect.Y + tg.Y - 1, 3, 3);
+                    g.DrawRectangle(Pens.White, rect.X + tg.X, rect.Y + tg.Y, 1, 1);
+                    g.DrawRectangle(Pens.LightGray, rect);
+                }
+            }
+            void draw_minichunk_mode_0(KeyValuePair<vec, Chunk> chunk)
+            {
+                rect = new Rectangle(g_x + szmini * chunk.Key.x, g_y + szmini * chunk.Key.y, szmini - 1, szmini - 1);
+                g.FillRectangle(new SolidBrush(DB.ChunkLayerColor[chunk.Value.Layer]), g_x + szmini * chunk.Key.x, g_y + szmini * chunk.Key.y, szmini, szmini);
+                draw_entities(chunk);
+            }
+            void draw_minichunk_mode_1(KeyValuePair<vec, Chunk> chunk)
+            {
+                _g.Clear(Color.Transparent);
+                for (int i = 0; i < Chunk.ChunkSize.x; i++)
+                {
+                    for (int j = 0; j < Chunk.ChunkSize.y; j++)
+                    {
+                        var tile = chunk.Value.Tiles[(i, j).V()];
+                        var color = DB.ResColor[tile.Sol != 0 ? (int)tile.Sol : (int)tile.Mur];
+                        _g.DrawRectangle(new Pen(color), i, j, 1, 1);
+                    }
+                }
+                g.DrawImage(_img.Resize(szmini), g_x + szmini * chunk.Key.x, g_y + szmini * chunk.Key.y);
+                rect = new Rectangle(g_x + szmini * chunk.Key.x, g_y + szmini * chunk.Key.y, szmini - 1, szmini - 1);
+                draw_entities(chunk);
+            }
+
+            chunks.ForEach(chunk =>
+            {
+                switch(SubMenu_Map_mode)
+                {
+                    case 0: draw_minichunk_mode_0(chunk); break;
+                    case 1: draw_minichunk_mode_1(chunk); break;
+                }
+            });
+
+            _g.Dispose();
+            _img.Dispose();
         }
         private void SubMenu_Items_Draw(Graphics g)
         {
