@@ -13,6 +13,8 @@ namespace console_v2
         public vecf Offset = vecf.Zero;
         public float X { get => Position.x; set => Position.x = value; }
         public float Y { get => Position.y; set => Position.y = value; }
+        public float TileX => (int)(X / GraphicsManager.CharSize.Width);
+        public float TileY => (int)(Y / GraphicsManager.CharSize.Height);
         public Bitmap Image = null;
         public int CharToDisplay = 'X';
         public Color m_CharColor = Color.White;

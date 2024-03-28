@@ -42,6 +42,11 @@ namespace console_v2.res.entities
             {
                 new Lootable(Position.ToTile(), true, new Item("Buche", Objets.Buche, 1) { IsConsommable = false });
                 Exists = false;
+                ParticlesManager.Generate(Position + GraphicsManager.CharSize.Vf() / 2f, 5f, 10f, Color.White, 10, 100);
+            }
+            else
+            {
+                ParticlesManager.Generate(Position + GraphicsManager.CharSize.Vf() / 2f, 2f, 3f, Color.White, 3, 100);
             }
         }
     }

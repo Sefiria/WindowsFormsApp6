@@ -12,11 +12,6 @@ namespace console_v2
 {
     public class Chunk
     {
-        public enum GenerationMode
-        {
-            Mine=0, Rocailleux, Plaine, Foret
-        }
-
         public static vec ChunkSize = (24, 16).V();
         public static Dictionary<GenerationMode, Dictionary<float, Sols>> LayeredGrounds = new Dictionary<GenerationMode, Dictionary<float, Sols>>
         {
@@ -46,6 +41,9 @@ namespace console_v2
         public vec Index;
         public Dictionary<vec, Tile> Tiles = new Dictionary<vec, Tile>();
         public List<Entity> Entities = new List<Entity>();
+        public bool AlreadyVisited = false;
+        public GenerationMode Layer;
+
         public Chunk(vec index)
         {
             Index = index;
@@ -79,6 +77,7 @@ namespace console_v2
         {
             Chunk chunk = new Chunk(chunk_index);
 
+            chunk.Layer = mode;
             int w = ChunkSize.x;
             int h = ChunkSize.y;
             int SEED = (int)DateTime.UtcNow.Ticks;

@@ -45,7 +45,7 @@ namespace console_v2
                     Items[id].Count += item.Count;
                 else
                     Items.Add(item);
-                NotificationsManager.AddNotification(NotificationsManager.NotificationTypes.SideLeft, $"{item.Name} x {item.Count}", DB.Colors[typeof(Objets)]);
+                NotificationsManager.AddNotification(NotificationsManager.NotificationTypes.SideLeft, $"+ {item.Name} x {item.Count}", DB.Colors[typeof(Objets)]);
             }
         }
         public void Add(params Tool[] tools)
@@ -57,7 +57,7 @@ namespace console_v2
                     Tools[id].Count += tool.Count;
                 else
                     Tools.Add(tool);
-                NotificationsManager.AddNotification(NotificationsManager.NotificationTypes.SideLeft, $"{tool.Name} x {tool.Count}", DB.Colors[typeof(Outils)]);
+                NotificationsManager.AddNotification(NotificationsManager.NotificationTypes.SideLeft, $" +{tool.Name} x {tool.Count}", DB.Colors[typeof(Outils)]);
             }
         }
         public void Add(params int[] dbrefs)
@@ -119,7 +119,7 @@ namespace console_v2
                 foreach (var item in refs)
                 {
                     string item_name = Items[Items.IndexOf(Items.First(i => i.DBItem == item.dbref))].Name;
-                    NotificationsManager.AddNotification(NotificationsManager.NotificationTypes.SideLeft, $"{item_name} x {item.count}", DB.Colors[typeof(Objets)]);
+                    NotificationsManager.AddNotification(NotificationsManager.NotificationTypes.SideLeft, $"+ {item_name} x {item.count}", DB.Colors[typeof(Objets)]);
                 }
             }
         }
@@ -130,7 +130,7 @@ namespace console_v2
                 foreach (var tool in refs)
                 {
                     string tool_name = Tools[Tools.IndexOf(Tools.First(i => i.DBItem == tool.dbref))].Name;
-                    NotificationsManager.AddNotification(NotificationsManager.NotificationTypes.SideLeft, $"{tool_name} x {tool.count}", DB.Colors[typeof(Outils)]);
+                    NotificationsManager.AddNotification(NotificationsManager.NotificationTypes.SideLeft, $"+ {tool_name} x {tool.count}", DB.Colors[typeof(Outils)]);
                 }
             }
         }

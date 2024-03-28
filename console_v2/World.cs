@@ -13,9 +13,15 @@ namespace console_v2
         public Dictionary<vec, Dimension> Dimensions = new Dictionary<vec, Dimension>();
         public vec CurrentDimensionCoord = vec.Zero;
         public Dimension CurrentDimension => Dimensions[CurrentDimensionCoord];
-        public Chunk GetChunk(vec dimention_coord, vec tile_coord) => Dimensions[dimention_coord].Chunks.FirstOrDefault(x => x.Value.Tiles.Any(t => t.Key == tile_coord)).Value;
+        public Chunk GetChunk(vec dimention_coord, vec chunk_coord)
+        {
+            if (Dimensions[dimention_coord].Chunks.ContainsKey(chunk_coord))
+                return Dimensions[dimention_coord].Chunks[chunk_coord];
+            return null;
+        }
+        public Chunk GetChunkByTile(vec dimention_coord, vec tile_coord) => Dimensions[dimention_coord].Chunks.FirstOrDefault(x => x.Value.Tiles.Any(t => t.Key == tile_coord)).Value;
         public Chunk GetChunk(vec chunk) => CurrentDimension.Chunks[chunk];
-        public Tile GetTile(vec tile_coords) => GetChunk(CurrentDimensionCoord, tile_coords)?.Tiles.FirstOrDefault(t => t.Value.Index == tile_coords).Value;
+        public Tile GetTile(vec tile_coords) => GetChunkByTile(CurrentDimensionCoord, tile_coords)?.Tiles.FirstOrDefault(t => t.Value.Index == tile_coords).Value;
         public KeyValuePair<vec, Chunk> GetCurrentDimensionChunk(vec tile_coord) => CurrentDimension.Chunks.FirstOrDefault(c => c.Value.Tiles.ContainsKey(tile_coord));
         public World()
         {
@@ -35,6 +41,7 @@ namespace console_v2
         {
             var tg = Core.Instance.TheGuy;
             Dimensions[tg.CurDimension].Chunks[tg.CurChunk].Draw(Core.Instance.g);
+            MinimapManager.Draw(Core.Instance.gui);
         }
         public bool IsBlocking(Tile tile) => ((int)tile.Sol).IsBlockingType();
         public bool IsBlocking(vec tile_coord) => ((int?)Tile.GetFromWorldLocation(tile_coord)?.Sol)?.IsBlockingType() ?? true;

@@ -12,7 +12,12 @@ namespace console_v2
     public enum Outils { Hache = 200, Pioche = 210, Faux = 220 }
     public enum Objets { Buche = 500, Planche = 505 }
     public enum Consommables { Fraises = 1000 }
-    public enum ____ {  }
+
+
+    public enum GenerationMode
+    {
+        Mine = 0, Rocailleux, Plaine, Foret
+    }
 
     public static class DB
     {
@@ -65,6 +70,23 @@ namespace console_v2
         {
             [typeof(Objets)] = Color.Yellow,
             [typeof(Outils)] = Color.Cyan,
+        };
+        public static Dictionary<int, Color> ResColor = new Dictionary<int, Color>
+        {
+            [(int)Sols.Pierre] = Color.DimGray,
+            [(int)Sols.Terre] = Color.Brown,
+            [(int)Sols.Herbe] = Color.DarkGreen,
+            [(int)Sols.Pave] = Color.Beige,
+
+            [(int)Murs.Pierre] = Color.Gray,
+            [(int)Murs.PierreFissuree] = Color.Gray,
+        };
+        public static Dictionary<GenerationMode, Color> ChunkLayerColor = new Dictionary<GenerationMode, Color>
+        {
+            [GenerationMode.Mine] = Color.FromArgb(40,40,40),
+            [GenerationMode.Rocailleux] = Color.DimGray,
+            [GenerationMode.Plaine] = Color.Green,
+            [GenerationMode.Foret] = Color.DarkGreen,
         };
     }
 }

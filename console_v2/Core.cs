@@ -29,6 +29,7 @@ namespace console_v2
         public Graphics g, gui;
         public PictureBox Canvas;
         public Guy TheGuy;
+        public long Ticks;
 
         public int ScreenWidth => Canvas.Width;
         public int ScreenHeight => Canvas.Height;
@@ -46,6 +47,7 @@ namespace console_v2
         {
             ResetGraphics();
 
+            Ticks = 0;
             SceneAdventure = new SceneAdventure();
             CurrentScene = SceneAdventure;
             SceneAdventure.Initialize();
@@ -80,6 +82,8 @@ namespace console_v2
         public void Update()
         {
             CurrentScene?.Update();
+            ParticlesManager.Update();
+            Ticks++;
         }
 
         public void TickSecond()
@@ -92,6 +96,7 @@ namespace console_v2
         {
             ResetGraphics();
             CurrentScene?.Draw(g);
+            ParticlesManager.Draw(g);
             g.DrawImage(UIImage, 0f, 0f);
             Canvas.Image = RenderImage;
         }

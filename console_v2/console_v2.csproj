@@ -65,7 +65,10 @@
     <Compile Include="Inventory.cs" />
     <Compile Include="Item.cs" />
     <Compile Include="Lootable.cs" />
+    <Compile Include="MinimapManager.cs" />
     <Compile Include="NotificationsManager.cs" />
+    <Compile Include="Particle.cs" />
+    <Compile Include="ParticlesManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResourcesManager.cs" />

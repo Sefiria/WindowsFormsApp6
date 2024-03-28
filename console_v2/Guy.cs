@@ -15,7 +15,7 @@ namespace console_v2
         private World ThisWorld = (Core.Instance.CurrentScene as SceneAdventure).World;
 
         public vec CurDimension = vec.Zero, CurChunk = vec.Zero;
-        public float mv_speed = 0.05f;
+        public float mv_speed = 0.07f;
         public vec PreviousPosition = vec.Zero;
         public bool HasMoved => Position.i != PreviousPosition;
         public vec Direction => Position.i - PreviousPosition;
@@ -79,6 +79,7 @@ namespace console_v2
                         ThisWorld.GetChunk(nxt_chunk).Entities.Add(this);
                     }
                     CurChunk = nxt_chunk;
+                    ThisWorld.GetChunk(CurChunk).AlreadyVisited = true;
                 }
             }
             var mvspd = mv_speed + Stats._Get(Statistics.Stat.MOVSPD) * 0.001f;
