@@ -51,7 +51,6 @@ namespace console_v2
             SceneAdventure.Initialize();
             TheGuy = new Guy();
             new Lootable((5, 5).V(), true, (int)Outils.Hache);
-            new EntityTree((8, 5).V());
         }
         public void ResetGraphics()
         {

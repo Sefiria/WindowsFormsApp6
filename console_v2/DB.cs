@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -59,6 +60,11 @@ namespace console_v2
             [(int)Objets.Planche] = '║',
 
             [(int)Consommables.Fraises] = 'ꬾ',
+        };
+        public static Dictionary<Type, Color> Colors = new Dictionary<Type, Color>
+        {
+            [typeof(Objets)] = Color.Yellow,
+            [typeof(Outils)] = Color.Cyan,
         };
     }
 }

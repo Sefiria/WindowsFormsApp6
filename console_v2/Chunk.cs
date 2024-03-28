@@ -1,4 +1,5 @@
-﻿using System;
+﻿using console_v2.res.entities;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
 using System.Drawing;
@@ -58,7 +59,7 @@ namespace console_v2
 
         public void TickSecond()
         {
-            Entities.ForEach(e => { if (e.Exists == false) Entities.Remove(e); else e.TickSecond(); });
+            new List<Entity>(Entities).ForEach(e => { if (e.Exists == false) Entities.Remove(e); else e.TickSecond(); });
         }
 
         public void Draw(Graphics g)
@@ -109,7 +110,24 @@ namespace console_v2
                 }
             }
 
+            GenerateEntities(mode, chunk);
+
             return chunk;
+        }
+
+        private static void GenerateEntities(GenerationMode mode, Chunk chunk)
+        {
+            vec v;
+
+            // Generate Trees
+
+            var treesCount = RandomThings.rnd(Maths.Sq((int)mode) * 5);
+            for (int i = 0; i < treesCount; i++)
+            {
+                do { v = (RandomThings.rnd(ChunkSize.x), RandomThings.rnd(ChunkSize.y)).V();}
+                while (chunk.Entities.At(v) != null);
+                chunk.Entities.Add(new EntityTree(v, false));
+            }
         }
 
         private static Sols GetLayeredGrounds(GenerationMode mode, float layer)

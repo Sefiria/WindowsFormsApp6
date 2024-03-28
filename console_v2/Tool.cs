@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Tooling;
 
 namespace console_v2
@@ -19,6 +21,13 @@ namespace console_v2
 
         public Tool()
         {
+        }
+        public Tool(Tool copy)
+        {
+            Name = copy.Name;
+            Duration = copy.Duration;
+            DBRef = copy.DBRef;
+            Count = copy.Count;
         }
         public Tool(string name, Outils dbref)
         {

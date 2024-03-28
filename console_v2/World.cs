@@ -14,6 +14,7 @@ namespace console_v2
         public vec CurrentDimensionCoord = vec.Zero;
         public Dimension CurrentDimension => Dimensions[CurrentDimensionCoord];
         public Chunk GetChunk(vec dimention_coord, vec tile_coord) => Dimensions[dimention_coord].Chunks.FirstOrDefault(x => x.Value.Tiles.Any(t => t.Key == tile_coord)).Value;
+        public Chunk GetChunk(vec chunk) => CurrentDimension.Chunks[chunk];
         public Tile GetTile(vec tile_coords) => GetChunk(CurrentDimensionCoord, tile_coords)?.Tiles.FirstOrDefault(t => t.Value.Index == tile_coords).Value;
         public KeyValuePair<vec, Chunk> GetCurrentDimensionChunk(vec tile_coord) => CurrentDimension.Chunks.FirstOrDefault(c => c.Value.Tiles.ContainsKey(tile_coord));
         public World()

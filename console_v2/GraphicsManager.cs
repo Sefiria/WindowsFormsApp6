@@ -55,23 +55,5 @@ namespace console_v2
                 g.DrawString("" + text[i], Font, brush, SceneAdventure.DrawingRect.Location.Plus((v + vf).pt.MinusF(5, 0)));
             }
         }
-        //public static void DrawTile(Graphics g, Tile tile, vec coordinates)
-        //{
-        //    var sol = (int)tile.Sol;
-        //    var mur = (int)tile.Mur;
-        //    var ents = tile.Entities;
-        //    if(sol != 0) DrawRes(g, ResourcesManager.Instance.Ressources[sol], coordinates);
-        //    if(mur != 0) DrawRes(g, ResourcesManager.Instance.Ressources[mur], coordinates);
-        //    ents.ToList().ForEach(e => DrawRes(g, ResourcesManager.Instance.Ressources[e], coordinates));
-        //}
-        //public static void DrawRes(Graphics g, vec[] metacoords, vec coordinates)
-        //{
-        //    var scale = Core.Instance.GlobalScale;
-        //    var coords = ((coordinates - Core.Instance.Cam) * scale).pt;
-        //    var w = ConsoleCharSize.Width;
-        //    var h = ConsoleCharSize.Height;
-        //    foreach (var v in metacoords)
-        //        g.FillRectangle(PaletteBrushes[v.UserData], coords.X * w + v.x * scale, coords.Y * h + v.y * scale, scale, scale);
-        //}
     }
 }

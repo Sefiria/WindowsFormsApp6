@@ -37,7 +37,10 @@ namespace console_v2
         }
         void Initialize()
         {
-            CharToDisplay = '▄';
+            if(Content.Count == 1 && Items.Count == 0 && Tools.Count == 0) CharToDisplay = DB.Resources[Content[0]];
+            else if (Content.Count == 0 && Items.Count == 1 && Tools.Count == 0) CharToDisplay = DB.Resources[Items[0].DBItem];
+            else if (Content.Count == 0 && Items.Count == 0 && Tools.Count == 1) CharToDisplay = DB.Resources[Tools[0].DBItem];
+            else CharToDisplay = '▄';
         }
 
         public override void Update()

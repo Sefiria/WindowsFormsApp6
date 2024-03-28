@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Tooling;
 
 namespace console_v2
@@ -19,6 +21,12 @@ namespace console_v2
 
         public Item()
         {
+        }
+        public Item(Item copy)
+        {
+            Name = copy.Name;
+            DBRef = copy.DBRef;
+            Count = copy.Count;
         }
         public Item(string name, Objets dbref, int count = 1)
         {

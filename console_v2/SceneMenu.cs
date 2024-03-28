@@ -30,7 +30,7 @@ namespace console_v2
 
         public List<EvtRect> Buttons = new List<EvtRect>();
 
-        static Color buttonStartColor, buttonEndColor;
+        static Color buttonStartColor = Color.FromArgb(0, 0, 50), buttonEndColor = Color.FromArgb(0, 0, 100);
 
         int w;
         int h;
@@ -53,15 +53,14 @@ namespace console_v2
         public override void Initialize()
         {
             Buttons.Clear();
-            w = Core.Instance.ScreenWidth;
-            h = Core.Instance.ScreenHeight;
-            buttonStartColor = Color.FromArgb(20, 20, 100);
-            buttonEndColor = Color.FromArgb(0, 0, 40);
+            var m = 50;
+            w = Core.Instance.ScreenWidth - m * 2;
+            h = Core.Instance.ScreenHeight - m * 2;
             buttonsColor = Color.FromArgb((buttonStartColor.R * 3).ByteCut(), (buttonStartColor.G * 3).ByteCut(), (buttonStartColor.B * 3).ByteCut());
-            fullrect = new Rectangle(0, 0, w, h);
-            menurect = new Rectangle(w - 300, 0, 300, h);
-            mainrect = new Rectangle(0, 0, menurect.X, h);
-            gilsrect = new Rectangle(w - 200, h - 50, 200, 50);
+            fullrect = new Rectangle(m, m, w, h);
+            menurect = new Rectangle(fullrect.X + fullrect.Width - 300, fullrect.Y, 300, fullrect.Height);
+            mainrect = new Rectangle(fullrect.X, fullrect.Y, menurect.X - fullrect.X, fullrect.Height);
+            gilsrect = new Rectangle(fullrect.X + fullrect.Width - 200, fullrect.Y + fullrect.Height - 50, 200, 50);
             menuButtonSize = new Size((int)(menurect.Width * 0.8), 40);
 
             Rectangle rect;
@@ -74,7 +73,7 @@ namespace console_v2
             }
             for (int y = 0; y < 7; y++)
             {
-                rect = new Rectangle(menurect.X + (int)(menurect.Width * 0.1), menuButtonSize.Height / 2 + y * (int)(menuButtonSize.Height * 1.5), menuButtonSize.Width, menuButtonSize.Height);
+                rect = new Rectangle(menurect.X + (int)(menurect.Width * 0.1), menurect.Y + menuButtonSize.Height / 2 + y * (int)(menuButtonSize.Height * 1.5), menuButtonSize.Width, menuButtonSize.Height);
                 switch (y)
                 {
                     case 0: Buttons.Add(create_button("State", true)); break;
@@ -184,7 +183,7 @@ namespace console_v2
                         x = i / (mainrect.Height / h) * (w + 10);
                         if (x >= mainrect.Width) break;
                         y = (i - x / w * (mainrect.Height / h)) * h;
-                        if (new Rectangle(x, y, 240, 20).Contains(ms))
+                        if (new Rectangle(mainrect.X + x, mainrect.Y + y, 240, 20).Contains(ms))
                         {
                             SubMenu_Items_selected_i = i;
                             break;
@@ -230,7 +229,7 @@ namespace console_v2
                         x = i / (mainrect.Height / h) * (w + 10);
                         if (x >= mainrect.Width) break;
                         y = (i - x / w * (mainrect.Height / h)) * h;
-                        if (new Rectangle(x, y, 240, 20).Contains(ms))
+                        if (new Rectangle(mainrect.X + x, mainrect.Y + y, 240, 20).Contains(ms))
                         {
                             SubMenu_Items_selected_i = i;
                             break;
@@ -300,20 +299,22 @@ namespace console_v2
                 x = i / (mainrect.Height / h) * (w + 10);
                 if (x >= mainrect.Width) break;
                 y = (i - x / w * (mainrect.Height / h)) * h;
-                rect = new Rectangle(x, y, 240, h);
+                rect = new Rectangle(mainrect.X + x, mainrect.Y + y, 240, h);
                 hover = i == SubMenu_Items_selected_i || (SubMenu_Items_selected_i == -1 && rect.Contains(ms));
-                g.DrawString(item.Name, font, hover ? Brushes.White : Brushes.Gray, new Rectangle(x, y, 140, 20));
-                g.DrawString($"{item.Count,14}", font, hover ? Brushes.White : Brushes.Gray, new Rectangle(x+150, y, 100, 20));
+                g.DrawString(item.Name, font, hover ? Brushes.White : Brushes.Gray, new Rectangle(mainrect.X + x, mainrect.Y + y, 140, 20));
+                g.DrawString($"{item.Count,14}", font, hover ? Brushes.White : Brushes.Gray, new Rectangle(mainrect.X + x + 150, mainrect.Y + y, 100, 20));
                 if(i == SubMenu_Items_selected_i)
                 {
                     int j = 0;
                     void actions_remove() { guy.Inventory.Items.RemoveAt(guy.Inventory.Items.IndexOf(item)); }
                     void actions_remove_if_zero() { if (guy.Inventory.Items[guy.Inventory.Items.IndexOf(item)].Count == 0) actions_remove(); }
                     void actions_remove_one() { guy.Inventory.Items[guy.Inventory.Items.IndexOf(item)].Count--; actions_remove_if_zero(); }
+                    void actions_drop_one() { Core.Instance.SceneAdventure.World.GetChunk(guy.CurChunk).Entities.Add(new Lootable(guy.Position.i + guy.DirectionPointed, false, new Item(item) { Count=1 })); actions_remove_one(); }
+                    void actions_drop_all() { Core.Instance.SceneAdventure.World.GetChunk(guy.CurChunk).Entities.Add(new Lootable(guy.Position.i + guy.DirectionPointed, false, new Item(item))); actions_remove(); }
                     Action Remove = () => actions_remove();
                     Action Consume = () => { item.Consume(); actions_remove_if_zero(); };
-                    Action Drop1 = () => actions_remove_one();
-                    Action DropAll = () => actions_remove();
+                    Action Drop1 = () => actions_drop_one();
+                    Action DropAll = () => actions_drop_all();
                     var list_submenuitems = new Dictionary<string, Action> {
                         ["Consume"] = Consume,
                         ["Drop 1"] = Drop1,
@@ -325,9 +326,9 @@ namespace console_v2
                     int max_sz_h = list_sz.Max(sz => sz.Height);
                     void draw(string txt, Action action)
                     {
-                        var r = new Rectangle(rect.X + 10, rect.Y + 10 + max_sz_h * j, max_sz_w, max_sz_h);
+                        var r = new Rectangle(rect.X + 40, rect.Y + 10 + max_sz_h * j, max_sz_w, max_sz_h);
                         Brush brush = Brushes.Gray;
-                        if (txt == "Consume" && !item.IsMenuConsommable) brush = new SolidBrush(Color.FromArgb(80, 80, 80));
+                        if (txt == "Consume" && (!item.IsConsommable || !item.IsMenuConsommable)) brush = new SolidBrush(Color.FromArgb(80, 80, 80));
                         else brush = r.Contains(ms) ? Brushes.White : Brushes.Gray;
                         gui.FillRectangle(makebrush(r), r);
                         gui.DrawString(txt, font, brush, r);
@@ -335,7 +336,7 @@ namespace console_v2
                         j++;
                     }
                     foreach(var submenuitem in list_submenuitems)
-                        draw(submenuitem.Key, submenuitem.Key == "Consume" && !item.IsMenuConsommable ? null : submenuitem.Value);
+                        draw(submenuitem.Key, submenuitem.Key == "Consume" && (!item.IsConsommable || !item.IsMenuConsommable) ? null : submenuitem.Value);
                 }
                 i++;
             }
@@ -355,10 +356,10 @@ namespace console_v2
                 x = i / (mainrect.Height / h) * (w + 10);
                 if (x >= mainrect.Width) break;
                 y = (i - x / w * (mainrect.Height / h)) * h;
-                rect = new Rectangle(x, y, 240, h);
+                rect = new Rectangle(mainrect.X + x, mainrect.Y + y, 240, h);
                 hover = i == SubMenu_Items_selected_i || (SubMenu_Items_selected_i == -1 && rect.Contains(ms));
-                g.DrawString(tool.Name, font, hover ? Brushes.White : Brushes.Gray, new Rectangle(x, y, 140, 20));
-                g.DrawString($"{tool.Count,14}", font, hover ? Brushes.White : Brushes.Gray, new Rectangle(x + 150, y, 100, 20));
+                g.DrawString(tool.Name, font, hover ? Brushes.White : Brushes.Gray, new Rectangle(mainrect.X + x, mainrect.Y + y, 140, 20));
+                g.DrawString($"{tool.Count,14}", font, hover ? Brushes.White : Brushes.Gray, new Rectangle(mainrect.X + x + 150, mainrect.Y + y, 100, 20));
                 if (i == SubMenu_Items_selected_i)
                 {
                     int j = 0;
@@ -372,7 +373,7 @@ namespace console_v2
                     int max_sz_h = list_sz.Max(sz => sz.Height);
                     void draw(string txt, Action action)
                     {
-                        var r = new Rectangle(rect.X + 10, rect.Y + 10 + max_sz_h * j, max_sz_w, max_sz_h);
+                        var r = new Rectangle(rect.X + 40, rect.Y + 10 + max_sz_h * j, max_sz_w, max_sz_h);
                         Brush brush = r.Contains(ms) ? Brushes.White : Brushes.Gray;
                         gui.FillRectangle(makebrush(r), r);
                         gui.DrawString(txt, font, brush, r);

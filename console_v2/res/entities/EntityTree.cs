@@ -10,7 +10,8 @@ namespace console_v2.res.entities
 {
     internal class EntityTree : Entity
     {
-        public EntityTree(vec tile) : base(tile.ToWorld())
+        public EntityTree() : base() { }
+        public EntityTree(vec tile, bool addToCurrentChunkEntities = true) : base(tile.ToWorld(), addToCurrentChunkEntities)
         {
             CharToDisplay = 'ῼ';
             Stats = new Statistics(new Dictionary<Statistics.Stat, int> { [Statistics.Stat.HPMax] = 10, [Statistics.Stat.HP] = 10 });
@@ -39,7 +40,7 @@ namespace console_v2.res.entities
             Stats._Substract(Statistics.Stat.HP, str);
             if (Stats._Get(Statistics.Stat.HP) <= 0)
             {
-                new Lootable(Position.i, true, new Item("Buche", Objets.Buche, 1));
+                new Lootable(Position.ToTile(), true, new Item("Buche", Objets.Buche, 1) { IsConsommable = false });
                 Exists = false;
             }
         }

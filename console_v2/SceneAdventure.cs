@@ -30,6 +30,7 @@ namespace console_v2
             base.Update();
 
             World.Update();
+            NotificationsManager.Update();
 
             if (KB.IsKeyPressed(KB.Key.Escape)) Core.Instance.SwitchScene(Core.Scenes.Menu);
         }
@@ -44,6 +45,7 @@ namespace console_v2
             base.Draw(g);
 
             World.Draw(g);
+            NotificationsManager.Draw(Core.Instance.gui);
 
             Core.Instance.gui.DrawRectangle(new Pen(Color.FromArgb(100, 100, 0)), new Rectangle(DrawingRect.Location, (Size)((Point)DrawingRect.Size).Minus(1)));
         }

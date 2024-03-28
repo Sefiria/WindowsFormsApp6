@@ -39,7 +39,7 @@ namespace console_v2
                 [Statistics.Stat.MPDEF] = 0,
                 [Statistics.Stat.MOVSPD] = 50,
             });
-            Inventory = new Inventory();
+            Inventory = new Inventory(this);
         }
 
         public override void Update()
@@ -73,6 +73,11 @@ namespace console_v2
                 if (nxt_pos.i == Position.i || ThisWorld.IsntBlocking(CurDimension, nxt_chunk, nxt_pos.i))
                 {
                     Position = nxt_pos;
+                    if (CurChunk != nxt_chunk)
+                    {
+                        ThisWorld.GetChunk(CurChunk).Entities.Remove(this);
+                        ThisWorld.GetChunk(nxt_chunk).Entities.Add(this);
+                    }
                     CurChunk = nxt_chunk;
                 }
             }
@@ -88,10 +93,6 @@ namespace console_v2
         public override void Draw(Graphics g)
         {
             GraphicsManager.DrawString(g, string.Concat((char)CharToDisplay), CharBrush, Position.i.f * GraphicsManager.CharSize.Vf() + Offset);
-            //for(int x=0;x<Chunk.ChunkSize.x;x++)
-            //    GraphicsManager.DrawString(g, string.Concat((char)CharToDisplay), x == Chunk.ChunkSize.x-1 ? Brushes.Yellow : CharBrush, (x,7).Vf().i.f * GraphicsManager.CharSize.Vf());
-            //GraphicsManager.DrawString(g, "ꬾ║¶₼Ƥ₶Шﷺﷺ#", Brushes.Yellow, SceneAdventure.DrawingRect.Location.vecf() + (0,8).Vf().i.f * GraphicsManager.CharSize.Vf());
-            //GraphicsManager.DrawString(g, "##########", Brushes.Yellow, SceneAdventure.DrawingRect.Location.vecf() + (0,9).Vf().i.f * GraphicsManager.CharSize.Vf());
         }
 
         public override void TickSecond()
