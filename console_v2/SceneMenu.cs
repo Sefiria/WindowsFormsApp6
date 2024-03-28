@@ -363,10 +363,21 @@ namespace console_v2
                 if (i == SubMenu_Items_selected_i)
                 {
                     int j = 0;
+                    void actions_remove() { guy.Inventory.Tools.RemoveAt(guy.Inventory.Tools.IndexOf(tool)); }
+                    void actions_remove_if_zero() { if (guy.Inventory.Tools[guy.Inventory.Tools.IndexOf(tool)].Count == 0) actions_remove(); }
+                    void actions_remove_one() { guy.Inventory.Tools[guy.Inventory.Tools.IndexOf(tool)].Count--; actions_remove_if_zero(); }
+                    void actions_drop_one() { Core.Instance.SceneAdventure.World.GetChunk(guy.CurChunk).Entities.Add(new Lootable(guy.Position.i + guy.DirectionPointed, false, new Tool(tool) { Count = 1 })); actions_remove_one(); }
+                    void actions_drop_all() { Core.Instance.SceneAdventure.World.GetChunk(guy.CurChunk).Entities.Add(new Lootable(guy.Position.i + guy.DirectionPointed, false, new Tool(tool))); actions_remove(); }
+                    Action Remove = () => actions_remove();
                     Action Use = () => tool.Use(guy);
+                    Action Drop1 = () => actions_drop_one();
+                    Action DropAll = () => actions_drop_all();
                     var list_submenuitems = new Dictionary<string, Action>
                     {
                         ["Use"] = Use,
+                        ["Drop 1"] = Drop1,
+                        ["Drop All"] = DropAll,
+                        ["Remove"] = Remove,
                     };
                     var list_sz = list_submenuitems.Select(k => TextRenderer.MeasureText(k.Key, font));
                     int max_sz_w = list_sz.Max(sz => sz.Width);
