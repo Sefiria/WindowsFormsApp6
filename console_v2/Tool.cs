@@ -48,6 +48,7 @@ namespace console_v2
 
         private void UseShovel(Entity triggerer)
         {
+            // TODO -> TO TEST
             var tile = triggerer.Position.ToTile();
             var chunk = Core.Instance.SceneAdventure.World.GetCurrentDimensionChunk(tile).Value;
             if(chunk.Tiles[tile].Sol == Sols.Herbe)
