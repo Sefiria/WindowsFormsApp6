@@ -14,18 +14,20 @@ namespace console_v2
     {
         private World ThisWorld = (Core.Instance.CurrentScene as SceneAdventure).World;
 
+        public vecf TilePositionF;
+        public new vecf Position => TilePositionF.i.ToWorld();
         public vec CurDimension = vec.Zero, CurChunk = vec.Zero;
         public float mv_speed = 0.07f;
         public vec PreviousPosition = vec.Zero;
-        public bool HasMoved => Position.i != PreviousPosition;
-        public vec Direction => Position.i - PreviousPosition;
+        public bool HasMoved => TilePositionF.i != PreviousPosition;
+        public vec Direction => TilePositionF.i - PreviousPosition;
         public vec DirectionPointed = vec.Zero;
 
 
         public Guy() : base(vecf.Zero)
         {
             CharToDisplay = 'ῗ';
-            Position = Chunk.ChunkSize.f  / 2f;
+            TilePositionF = Chunk.ChunkSize.f  / 2f;
             Offset = (4f, 4f).Vf();
             Stats = new Statistics(new Dictionary<Statistics.Stat, int>
             {
@@ -49,12 +51,12 @@ namespace console_v2
             ManageMovement();
 
             if(KB.IsKeyPressed(KB.Key.Space))
-                Core.GetEntityAt(Position.i + DirectionPointed)?.Action(this);
+                Core.GetEntityAt(TilePositionF.i + DirectionPointed)?.Action(this);
         }
 
         private void ManageMovement()
         {
-            PreviousPosition = Position.i;
+            PreviousPosition = TilePositionF.i;
 
             void BoundThis(ref vecf pos, ref vec chunk)
             {
@@ -67,12 +69,12 @@ namespace console_v2
             var (z, q, s, d) = KB.ZQSD();
             void TryMove(vecf p)
             {
-                vecf nxt_pos = Maths.Round(Position + p, 4);
+                vecf nxt_pos = Maths.Round(TilePositionF + p, 4);
                 vec nxt_chunk = new vec(CurChunk);
                 BoundThis(ref nxt_pos, ref nxt_chunk);
-                if (nxt_pos.i == Position.i || ThisWorld.IsntBlocking(CurDimension, nxt_chunk, nxt_pos.i))
+                if (nxt_pos.i == TilePositionF.i || ThisWorld.IsntBlocking(CurDimension, nxt_chunk, nxt_pos.i))
                 {
-                    Position = nxt_pos;
+                    TilePositionF = nxt_pos;
                     if (CurChunk != nxt_chunk)
                     {
                         ThisWorld.GetChunk(CurChunk).Entities.Remove(this);
@@ -88,12 +90,12 @@ namespace console_v2
             if (s) { var p = (0f, mvspd).Vf(); TryMove(p); DirectionPointed = (0, 1).V(); }
             if (d) { var p = (mvspd, 0f).Vf(); TryMove(p); DirectionPointed = (1, 0).V(); }
 
-            BoundThis(ref Position, ref CurChunk);
+            BoundThis(ref TilePositionF, ref CurChunk);
         }
 
         public override void Draw(Graphics g)
         {
-            GraphicsManager.DrawString(g, string.Concat((char)CharToDisplay), CharBrush, Position.i.f * GraphicsManager.CharSize.Vf() + Offset);
+            GraphicsManager.DrawString(g, string.Concat((char)CharToDisplay), CharBrush, TilePositionF.i.f * GraphicsManager.CharSize.Vf() + Offset);
         }
 
         public override void TickSecond()

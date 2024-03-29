@@ -24,8 +24,8 @@ namespace console_v2
 
         public static void Generate(vecf position, float size_around, float force, Color color, int count_around, int duration_around)
         {
-            int rnd = RandomThings.rnd(count_around / 4, count_around / 2);
-            int count = RandomThings.rnd(count_around - rnd, count_around + rnd);
+            int rnd = count_around == 1 ? 0 : RandomThings.rnd(count_around / 4, count_around / 2);
+            int count = count_around == 1 ? 1 : RandomThings.rnd(count_around - rnd, count_around + rnd);
             float rndf = RandomThings.rnd(size_around / 4, size_around / 2);
             float size = RandomThings.rnd(size_around - rndf, size_around + rndf);
             rnd = RandomThings.rnd(duration_around / 4, duration_around / 2);

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using console_v2.res.DBResSpeDef;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -8,10 +9,10 @@ namespace console_v2
 {
     public enum Sols { Vide = 0, Pierre = 10, Terre = 15, Herbe = 20, Pave = 30 }
     public enum Murs { Vide = 0, Pierre = 100, PierreFissuree = 110 }
-    public enum Outils { Hache = 200, Pioche = 210, Faux = 220 }
-    public enum Objets { Buche = 500, Planche = 505 }
+    public enum Outils { Hache = 200, Pioche = 210, Faux = 220, Pelle = 230 }
+    public enum Objets { Buche = 500, Planche = 505, FibreDePlante = 510, Boue, EssenceViolys = 600, EssenceRougeo, EssenceJaunade, EssenceVerdacier, EssenceNoiranite, EssenceBlanchaine }
     public enum Consommables { Fraises = 1000 }
-
+    public enum Plantes { Violys = 2000, Rougeo, Jaunade, Verdacier, Noiranite, Blanchaine }
 
     public enum GenerationMode
     {
@@ -45,6 +46,11 @@ namespace console_v2
         public static bool IsBlockingType(this int value) => value == -1 ? true : /*value.Is<Sols>() || */value.Is<Murs>();
         public static bool IsntBlockingType(this int value) => !IsBlockingType(value);
 
+        public static List<Sols> HarvestableGrounds = new List<Sols>
+        {
+            Sols.Terre, Sols.Herbe, 
+        };
+
         public static Dictionary<int, int> Resources = new Dictionary<int, int>
         {
             [(int)Sols.Pierre] = short.MaxValue + 0,//'ʭ',
@@ -58,11 +64,15 @@ namespace console_v2
             [(int)Outils.Hache] = 'Ƥ',
             [(int)Outils.Pioche] = '₼',
             [(int)Outils.Faux] = 'ﻞ',
+            [(int)Outils.Pelle] = 'д',
 
             [(int)Objets.Buche] = '¶',
             [(int)Objets.Planche] = '║',
+            [(int)Objets.FibreDePlante] = 'ˠ',
+            [(int)Objets.Boue] = '░',
 
             [(int)Consommables.Fraises] = 'ꬾ',
+
         };
         public static Dictionary<Type, Color> Colors = new Dictionary<Type, Color>
         {
@@ -117,17 +127,13 @@ namespace console_v2
             }
 
             ResourcesSpecials = new Dictionary<int, Bitmap>();
-            ResourcesSpecials[(int)Sols.Pierre] = create($@"
-@8
-       •         •
-@8
-          •         •
-@8
-  •         •
-@8
-     •         •
-", Color.DimGray.ToArgb());
+            ResourcesSpecials[(int)Sols.Pierre] = create(DBSpe_Stone.String, Color.DimGray.ToArgb());
+            ResourcesSpecials[(int)Plantes.Violys] = ResourcesSpecials[(int)Objets.EssenceViolys] = create(DBSpe_Violys.String, Color.White.ToArgb());
+            ResourcesSpecials[(int)Plantes.Rougeo] = ResourcesSpecials[(int)Objets.EssenceRougeo] = create(DBSpe_Rougeo.String, Color.White.ToArgb());
+            ResourcesSpecials[(int)Plantes.Jaunade] = ResourcesSpecials[(int)Objets.EssenceJaunade] = create(DBSpe_Jaunade.String, Color.White.ToArgb());
+            ResourcesSpecials[(int)Plantes.Verdacier] = ResourcesSpecials[(int)Objets.EssenceVerdacier] = create(DBSpe_Verdacier.String, Color.White.ToArgb());
+            ResourcesSpecials[(int)Plantes.Noiranite] = ResourcesSpecials[(int)Objets.EssenceNoiranite] = create(DBSpe_Noiranite.String, Color.White.ToArgb());
+            ResourcesSpecials[(int)Plantes.Blanchaine] = ResourcesSpecials[(int)Objets.EssenceBlanchaine] = create(DBSpe_Blanchaine.String, Color.White.ToArgb());
         }
     }
 }
-

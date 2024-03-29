@@ -14,7 +14,7 @@ namespace console_v2.res.entities
         public EntityTree(vec tile, bool addToCurrentChunkEntities = true) : base(tile.ToWorld(), addToCurrentChunkEntities)
         {
             CharToDisplay = 'ῼ';
-            Stats = new Statistics(new Dictionary<Statistics.Stat, int> { [Statistics.Stat.HPMax] = 10, [Statistics.Stat.HP] = 10 });
+            Stats = new Statistics(new Dictionary<Statistics.Stat, int> { [Statistics.Stat.HPMax] = 30, [Statistics.Stat.HP] = 30 });
         }
 
         public override void Update()
@@ -32,11 +32,7 @@ namespace console_v2.res.entities
             if (!Exists) return;
 
             var axes = triggerer.Inventory.Tools.Where(tool => tool.DBRef == Outils.Hache);
-
-            if (axes.Count() == 0)
-                return;
-
-            var str = axes.Max(tool => tool.STR);
+            var str = axes.Count() == 0 ? 1 : axes.Max(axe => axe.STR);
             Stats._Substract(Statistics.Stat.HP, str);
             if (Stats._Get(Statistics.Stat.HP) <= 0)
             {
@@ -46,7 +42,7 @@ namespace console_v2.res.entities
             }
             else
             {
-                ParticlesManager.Generate(Position + GraphicsManager.CharSize.Vf() / 2f, 2f, 3f, Color.White, 3, 100);
+                ParticlesManager.Generate(Position + GraphicsManager.CharSize.Vf() / 2f, 2f, 3f, Color.White, str, 100);
             }
         }
     }

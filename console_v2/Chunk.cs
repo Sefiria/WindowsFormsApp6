@@ -142,6 +142,19 @@ namespace console_v2
                 while (chunk.Entities.At(v) != null);
                 chunk.Entities.Add(new EntityTree(v, false));
             }
+
+            // Generate Plants
+
+            var available_harvestableGrounds = chunk.Tiles.Where(tile => chunk.Entities.At(tile.Key) == null && DB.HarvestableGrounds.Contains(tile.Value.Sol)).Select(tile => tile.Key).ToList();
+            var plantsCount = RandomThings.rnd(Math.Min(2 * (int)mode, available_harvestableGrounds.Count / 4));
+            for (int i = 0; i < plantsCount; i++)
+            {
+                var rnd_id = RandomThings.rnd(available_harvestableGrounds.Count);
+                var names = Enum.GetNames(typeof(Plantes));
+                var plant = (Plantes)Enum.Parse(typeof(Plantes), names[RandomThings.rnd(names.Length)]);
+                chunk.Entities.Add(new EntityPlant(available_harvestableGrounds.ElementAt(rnd_id), plant, false));
+                available_harvestableGrounds.RemoveAt(rnd_id);
+            }
         }
 
         private static Sols GetLayeredGrounds(GenerationMode mode, float layer)

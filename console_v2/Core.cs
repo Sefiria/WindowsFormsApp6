@@ -52,7 +52,11 @@ namespace console_v2
             CurrentScene = SceneAdventure;
             SceneAdventure.Initialize();
             TheGuy = new Guy();
-            new Lootable((5, 5).V(), true, (int)Outils.Hache);
+            TheGuy.Inventory.Add(
+                new Tool("Hache en Bois", Outils.Hache, 3),
+                new Tool("Faux en Bois", Outils.Faux, 1),
+                new Tool("Pelle en Bois", Outils.Pelle, 1)
+                );
         }
         public void ResetGraphics()
         {

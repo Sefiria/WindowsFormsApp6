@@ -13,8 +13,19 @@ namespace console_v2
         List<int> Content = new List<int>();
         List<Item> Items = new List<Item>();
         List<Tool> Tools = new List<Tool>();
+        int DBResSpe = -1;
 
         public Lootable() : base() { }
+        public Lootable(vec tile, bool addToCurrentChunkEntities = true, params Objets[] content) : base(tile.ToWorld(), addToCurrentChunkEntities)
+        {
+            Content.AddRange(content.Select(c => (int)c));
+            Initialize();
+        }
+        public Lootable(vec tile, bool addToCurrentChunkEntities = true, params Outils[] content) : base(tile.ToWorld(), addToCurrentChunkEntities)
+        {
+            Content.AddRange(content.Select(c => (int)c));
+            Initialize();
+        }
         public Lootable(vec tile, bool addToCurrentChunkEntities = true, params int[] content) : base(tile.ToWorld(), addToCurrentChunkEntities)
         {
             Content.AddRange(content);
@@ -37,10 +48,19 @@ namespace console_v2
         }
         void Initialize()
         {
-            if(Content.Count == 1 && Items.Count == 0 && Tools.Count == 0) CharToDisplay = DB.Resources[Content[0]];
-            else if (Content.Count == 0 && Items.Count == 1 && Tools.Count == 0) CharToDisplay = DB.Resources[Items[0].DBItem];
-            else if (Content.Count == 0 && Items.Count == 0 && Tools.Count == 1) CharToDisplay = DB.Resources[Tools[0].DBItem];
-            else CharToDisplay = '▄';
+            CharToDisplay = 0;
+            void set(int dbref)
+            {
+                if (DB.Resources.ContainsKey(dbref))
+                    CharToDisplay = DB.Resources[dbref];
+                else if (DB.ResourcesSpecials.ContainsKey(dbref))
+                    DBResSpe = dbref;
+            }
+            if (Content.Count == 1 && Items.Count == 0 && Tools.Count == 0) set(Content[0]);
+            else if (Content.Count == 0 && Items.Count == 1 && Tools.Count == 0) set(Items[0].DBItem);
+            else if (Content.Count == 0 && Items.Count == 0 && Tools.Count == 1) set(Tools[0].DBItem);
+            if (CharToDisplay == 0 && DBResSpe == -1)
+                CharToDisplay = '▄';
         }
 
         public override void Update()
@@ -50,7 +70,10 @@ namespace console_v2
 
         public override void Draw(Graphics g)
         {
-            base.Draw(g);
+            if(DBResSpe > -1)
+                g.DrawImage(DB.ResourcesSpecials[DBResSpe], SceneAdventure.DrawingRect.Location.Plus(Position.pt));
+            else
+                base.Draw(g);
         }
 
         public override void Action(Entity triggerer)

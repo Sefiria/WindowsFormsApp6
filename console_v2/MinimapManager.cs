@@ -52,8 +52,8 @@ namespace console_v2
                         g.DrawRectangle(Pens.White, rect.X + e.TileX, rect.Y + e.TileY, 1, 1);
                     if (x == 0 & y == 0)
                     {
-                        g.DrawRectangle(new Pen(Color.FromArgb(150, Core.Instance.Ticks % 20 < 10 ? Color.Cyan : Color.Orange)), rect.X + tg.X - 1, rect.Y + tg.Y - 1, 3, 3);
-                        g.DrawRectangle(Pens.White, rect.X + tg.X, rect.Y + tg.Y, 1, 1);
+                        g.FillRectangle(new SolidBrush(Color.FromArgb(150, Core.Instance.Ticks % 20 < 10 ? Color.Yellow : Color.Red)), rect.X + tg.TilePositionF.x - 1, rect.Y + tg.TilePositionF.y - 1, 3, 3);
+                        //g.DrawRectangle(Pens.White, rect.X + tg.TilePositionF.x, rect.Y + tg.TilePositionF.y, 1, 1);
                         g.DrawRectangle(Pens.LightGray, rect);
                     }
                 }

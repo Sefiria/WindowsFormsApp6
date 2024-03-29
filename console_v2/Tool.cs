@@ -15,7 +15,7 @@ namespace console_v2
         public Outils DBRef;
         public float Duration;
         public int Count;
-        public int STR = 1;
+        public int STR;
 
         public int DBItem => (int)DBRef;
 
@@ -29,16 +29,37 @@ namespace console_v2
             DBRef = copy.DBRef;
             Count = copy.Count;
         }
-        public Tool(string name, Outils dbref)
+        public Tool(string name, Outils dbref, int STR = 1)
         {
             Name = name;
             Duration = 1f;
             DBRef = dbref;
+            this.STR = STR;
             Count = 1;
         }
 
         public void Use(Entity triggerer)
         {
+            switch(DBRef)
+            {
+                case Outils.Pelle: UseShovel(triggerer); break;
+            }
+        }
+
+        private void UseShovel(Entity triggerer)
+        {
+            var tile = triggerer.Position.ToTile();
+            var chunk = Core.Instance.SceneAdventure.World.GetCurrentDimensionChunk(tile).Value;
+            if(chunk.Tiles[tile].Sol == Sols.Herbe)
+            {
+                triggerer.Inventory.Add(new Item("Fibre De Plante", Objets.FibreDePlante, RandomThings.rnd(5)));
+                chunk.Tiles[tile].Sol = Sols.Terre;
+            }
+            else if (chunk.Tiles[tile].Sol == Sols.Terre)
+            {
+                triggerer.Inventory.Add(new Item("Boue", Objets.Boue));
+                chunk.Tiles[tile].Sol = Sols.Pierre;
+            }
         }
     }
 }
