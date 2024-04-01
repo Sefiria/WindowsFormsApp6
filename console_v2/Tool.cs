@@ -50,7 +50,7 @@ namespace console_v2
         {
             // TODO -> TO TEST
             var tile = triggerer.Position.ToTile();
-            var chunk = Core.Instance.SceneAdventure.World.GetCurrentDimensionChunk(tile).Value;
+            var chunk = Core.Instance.SceneAdventure.World.GetChunk();
             if(chunk.Tiles[tile].Sol == Sols.Herbe)
             {
                 triggerer.Inventory.Add(new Item("Fibre De Plante", Objets.FibreDePlante, RandomThings.rnd(5)));

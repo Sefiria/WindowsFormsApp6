@@ -399,8 +399,8 @@ namespace console_v2
                     void actions_remove() { guy.Inventory.Items.RemoveAt(guy.Inventory.Items.IndexOf(item)); }
                     void actions_remove_if_zero() { if (guy.Inventory.Items[guy.Inventory.Items.IndexOf(item)].Count == 0) actions_remove(); }
                     void actions_remove_one() { guy.Inventory.Items[guy.Inventory.Items.IndexOf(item)].Count--; actions_remove_if_zero(); }
-                    void actions_drop_one() { NotificationsManager.AddNotification(NotificationsManager.NotificationTypes.SideLeft, $"- {item.Name} x 1", Color.Red); Core.Instance.SceneAdventure.World.GetChunk(guy.CurChunk).Entities.Add(new Lootable(guy.Position.i + guy.DirectionPointed, false, new Item(item) { Count=1 })); actions_remove_one(); }
-                    void actions_drop_all() { NotificationsManager.AddNotification(NotificationsManager.NotificationTypes.SideLeft, $"- {item.Name} x {item.Count}", Color.Red); Core.Instance.SceneAdventure.World.GetChunk(guy.CurChunk).Entities.Add(new Lootable(guy.Position.i + guy.DirectionPointed, false, new Item(item))); actions_remove(); }
+                    void actions_drop_one() { NotificationsManager.AddNotification(NotificationsManager.NotificationTypes.SideLeft, $"- {item.Name} x 1", Color.Red); Core.Instance.SceneAdventure.World.GetChunk(guy.CurChunk).Entities.Add(new Lootable(guy.TilePositionF.i + guy.DirectionPointed, false, new Item(item) { Count=1 })); actions_remove_one(); }
+                    void actions_drop_all() { NotificationsManager.AddNotification(NotificationsManager.NotificationTypes.SideLeft, $"- {item.Name} x {item.Count}", Color.Red); Core.Instance.SceneAdventure.World.GetChunk(guy.CurChunk).Entities.Add(new Lootable(guy.TilePositionF.i + guy.DirectionPointed, false, new Item(item))); actions_remove(); }
                     Action Remove = () => { NotificationsManager.AddNotification(NotificationsManager.NotificationTypes.SideLeft, $"- {item.Name} x {item.Count}", Color.Red); actions_remove(); };
                     Action Consume = () => { item.Consume(); actions_remove_if_zero(); };
                     Action Drop1 = () => actions_drop_one();
@@ -456,8 +456,8 @@ namespace console_v2
                     void actions_remove() { guy.Inventory.Tools.RemoveAt(guy.Inventory.Tools.IndexOf(tool)); }
                     void actions_remove_if_zero() { if (guy.Inventory.Tools[guy.Inventory.Tools.IndexOf(tool)].Count == 0) actions_remove(); }
                     void actions_remove_one() { guy.Inventory.Tools[guy.Inventory.Tools.IndexOf(tool)].Count--; actions_remove_if_zero(); }
-                    void actions_drop_one() { NotificationsManager.AddNotification(NotificationsManager.NotificationTypes.SideLeft, $"- {tool.Name} x 1", Color.Red); Core.Instance.SceneAdventure.World.GetChunk(guy.CurChunk).Entities.Add(new Lootable(guy.Position.i + guy.DirectionPointed, false, new Tool(tool) { Count = 1 })); actions_remove_one(); }
-                    void actions_drop_all() { NotificationsManager.AddNotification(NotificationsManager.NotificationTypes.SideLeft, $"- {tool.Name} x {tool.Count}", Color.Red); Core.Instance.SceneAdventure.World.GetChunk(guy.CurChunk).Entities.Add(new Lootable(guy.Position.i + guy.DirectionPointed, false, new Tool(tool))); actions_remove(); }
+                    void actions_drop_one() { NotificationsManager.AddNotification(NotificationsManager.NotificationTypes.SideLeft, $"- {tool.Name} x 1", Color.Red); Core.Instance.SceneAdventure.World.GetChunk(guy.CurChunk).Entities.Add(new Lootable(guy.TilePositionF.i + guy.DirectionPointed, false, new Tool(tool) { Count = 1 })); actions_remove_one(); }
+                    void actions_drop_all() { NotificationsManager.AddNotification(NotificationsManager.NotificationTypes.SideLeft, $"- {tool.Name} x {tool.Count}", Color.Red); Core.Instance.SceneAdventure.World.GetChunk(guy.CurChunk).Entities.Add(new Lootable(guy.TilePositionF.i + guy.DirectionPointed, false, new Tool(tool))); actions_remove(); }
                     Action Remove = () => { NotificationsManager.AddNotification(NotificationsManager.NotificationTypes.SideLeft, $"- {tool.Name} x {tool.Count}", Color.Red); actions_remove(); };
                     Action Use = () => tool.Use(guy);
                     Action Drop1 = () => actions_drop_one();

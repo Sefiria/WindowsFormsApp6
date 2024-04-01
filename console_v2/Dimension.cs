@@ -23,6 +23,8 @@ namespace console_v2
                 { (-1,  1).V(), (0,  1).V(), (1,  1).V() }
         };
 
+        public Chunk this[vec chunk] => Chunks[chunk];
+
         public Dimension(vec index)
         {
             Index = index;

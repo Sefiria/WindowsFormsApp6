@@ -15,7 +15,6 @@ namespace console_v2
         private World ThisWorld = (Core.Instance.CurrentScene as SceneAdventure).World;
 
         public vecf TilePositionF;
-        public new vecf Position => TilePositionF.i.ToWorld();
         public vec CurDimension = vec.Zero, CurChunk = vec.Zero;
         public float mv_speed = 0.07f;
         public vec PreviousPosition = vec.Zero;
@@ -52,6 +51,8 @@ namespace console_v2
 
             if(KB.IsKeyPressed(KB.Key.Space))
                 Core.GetEntityAt(TilePositionF.i + DirectionPointed)?.Action(this);
+
+            Position = TilePositionF.i.ToWorld();
         }
 
         private void ManageMovement()
@@ -77,8 +78,8 @@ namespace console_v2
                     TilePositionF = nxt_pos;
                     if (CurChunk != nxt_chunk)
                     {
-                        ThisWorld.GetChunk(CurChunk).Entities.Remove(this);
-                        ThisWorld.GetChunk(nxt_chunk).Entities.Add(this);
+                        ThisWorld.Dimensions[CurDimension][CurChunk].Entities.Remove(this);
+                        ThisWorld.Dimensions[CurDimension][nxt_chunk].Entities.Add(this);
                     }
                     CurChunk = nxt_chunk;
                     ThisWorld.GetChunk(CurChunk).AlreadyVisited = true;

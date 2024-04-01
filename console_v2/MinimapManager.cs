@@ -38,7 +38,7 @@ namespace console_v2
                 int _x = range + x;
                 int _y = range + y;
                 vec chunk_vec = chunks[_x, _y];
-                Chunk chunk = world.GetChunk(tg.CurDimension, chunk_vec);
+                Chunk chunk = world.GetChunk( chunk_vec);
                 //if (chunk == null) return;
                 //for (int i = 0; i < Chunk.ChunkSize.x; i++)
                 //    for (int j = 0; j < Chunk.ChunkSize.y; j++)
@@ -48,7 +48,7 @@ namespace console_v2
                     rect = new Rectangle(szmini * _x, szmini* _y, szmini -1, szmini - 1);
                     g.FillRectangle(new SolidBrush(DB.ChunkLayerColor[chunk.Layer]), szmini * _x, szmini * _y, szmini, szmini);
                     var entities = new List<Entity>(chunk.Entities).Except(tg);
-                    foreach (var e in chunk.Entities)
+                    foreach (var e in entities)
                         g.DrawRectangle(Pens.White, rect.X + e.TileX, rect.Y + e.TileY, 1, 1);
                     if (x == 0 & y == 0)
                     {

@@ -11,18 +11,26 @@ namespace console_v2
     public class World
     {
         public Dictionary<vec, Dimension> Dimensions = new Dictionary<vec, Dimension>();
-        public vec CurrentDimensionCoord = vec.Zero;
+        public vec CurrentDimensionCoord => Core.Instance.TheGuy?.CurDimension ?? vec.Zero;
+        public vec CurrentChunkCoord => Core.Instance.TheGuy?.CurChunk ?? vec.Zero;
         public Dimension CurrentDimension => Dimensions[CurrentDimensionCoord];
-        public Chunk GetChunk(vec dimention_coord, vec chunk_coord)
+        public Dimension GetDimension(vec dimension_coord)
         {
-            if (Dimensions[dimention_coord].Chunks.ContainsKey(chunk_coord))
-                return Dimensions[dimention_coord].Chunks[chunk_coord];
+            if (Dimensions.ContainsKey(dimension_coord))
+                return Dimensions[dimension_coord];
             return null;
         }
-        public Chunk GetChunkByTile(vec dimention_coord, vec tile_coord) => Dimensions[dimention_coord].Chunks.FirstOrDefault(x => x.Value.Tiles.Any(t => t.Key == tile_coord)).Value;
-        public Chunk GetChunk(vec chunk) => CurrentDimension.Chunks[chunk];
-        public Tile GetTile(vec tile_coords) => GetChunkByTile(CurrentDimensionCoord, tile_coords)?.Tiles.FirstOrDefault(t => t.Value.Index == tile_coords).Value;
-        public KeyValuePair<vec, Chunk> GetCurrentDimensionChunk(vec tile_coord) => CurrentDimension.Chunks.FirstOrDefault(c => c.Value.Tiles.ContainsKey(tile_coord));
+        public Chunk GetChunk(vec dimension_coord, vec chunk_coord)
+        {
+            var dimension = GetDimension(dimension_coord);
+            if (dimension.Chunks.ContainsKey(chunk_coord))
+                return dimension.Chunks[chunk_coord];
+            return null;
+        }
+        public Dimension GetDimension() => Dimensions[CurrentDimensionCoord];
+        public Chunk GetChunk(vec chunk_coord) => GetChunk(CurrentDimensionCoord, chunk_coord);
+        public Chunk GetChunk() => GetChunk(CurrentChunkCoord);
+        public Tile GetTile(vec tile_coords) => GetChunk()?.Tiles.FirstOrDefault(t => t.Value.Index == tile_coords).Value;
         public World()
         {
         }
