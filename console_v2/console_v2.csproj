@@ -62,8 +62,10 @@
     <Compile Include="GraphicsManager.cs" />
     <Compile Include="Guy.cs" />
     <Compile Include="HealthEffect.cs" />
+    <Compile Include="IItem.cs" />
     <Compile Include="Inventory.cs" />
     <Compile Include="Item.cs" />
+    <Compile Include="ITool.cs" />
     <Compile Include="Lootable.cs" />
     <Compile Include="MinimapManager.cs" />
     <Compile Include="NotificationsManager.cs" />
@@ -84,6 +86,7 @@
     <Compile Include="SceneMenu.cs" />
     <Compile Include="Scene.cs" />
     <Compile Include="SceneAdventure.cs" />
+    <Compile Include="Shortcut.cs" />
     <Compile Include="Statistics.cs" />
     <Compile Include="Tile.cs" />
     <Compile Include="Tool.cs" />

@@ -16,7 +16,7 @@ namespace console_v2
         public virtual void Update() { }
         public virtual void TickSecond() { }
 
-        public virtual void Draw(Graphics g)
+        public virtual void Draw(Graphics g, Graphics gui)
         {
             g.Clear(BGColor);
         }

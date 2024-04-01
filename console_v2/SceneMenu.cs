@@ -117,7 +117,7 @@ namespace console_v2
             }
         }
 
-        public override void Draw(Graphics g)
+        public override void Draw(Graphics g, Graphics gui)
         {
             g.FillRectangle(makebrush(mainrect), mainrect);
             g.FillRectangle(makebrush(menurect), menurect);
@@ -132,8 +132,8 @@ namespace console_v2
             {
                 case "State": SubMenu_State_Draw(g); break;
                 case "Map": SubMenu_Map_Draw(g); break;
-                case "Items": SubMenu_Items_Draw(g); break;
-                case "Tools": SubMenu_Tools_Draw(g); break;
+                case "Items": SubMenu_Items_Draw(g, gui); break;
+                case "Tools": SubMenu_Tools_Draw(g, gui); break;
                 case "Skills": SubMenu_Skills_Draw(g); break;
                 case "Equip": SubMenu_Equip_Draw(g); break;
                 case "Options": SubMenu_Options_Draw(g); break;
@@ -374,9 +374,8 @@ namespace console_v2
             _g.Dispose();
             _img.Dispose();
         }
-        private void SubMenu_Items_Draw(Graphics g)
+        private void SubMenu_Items_Draw(Graphics g, Graphics gui)
         {
-            var gui = Core.Instance.gui;
             var guy = Core.Instance.TheGuy;
             var items = new List<Item>(guy.Inventory.Items);
             var font = new Font("Segoe UI", 14f);
@@ -431,9 +430,8 @@ namespace console_v2
                 i++;
             }
         }
-        private void SubMenu_Tools_Draw(Graphics g)
+        private void SubMenu_Tools_Draw(Graphics g, Graphics gui)
         {
-            var gui = Core.Instance.gui;
             var guy = Core.Instance.TheGuy;
             var tools = new List<Tool>(guy.Inventory.Tools);
             var font = new Font("Segoe UI", 14f);

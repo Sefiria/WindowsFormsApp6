@@ -9,8 +9,9 @@ using Tooling;
 
 namespace console_v2
 {
-    public class Tool : IName, IDBItem
+    public class Tool : ITool, IName, IDBItem, IUniqueRef
     {
+        public Guid UniqueId => Guid.NewGuid();
         public string Name { get; set; } = "Unnamed_Tool";
         public Outils DBRef;
         public float Duration;
@@ -48,7 +49,6 @@ namespace console_v2
 
         private void UseShovel(Entity triggerer)
         {
-            // TODO -> TO TEST
             var tile = triggerer.Position.ToTile();
             var chunk = Core.Instance.SceneAdventure.World.GetChunk();
             if(chunk.Tiles[tile].Sol == Sols.Herbe)

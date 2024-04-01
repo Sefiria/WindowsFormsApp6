@@ -45,11 +45,11 @@ namespace console_v2
             Dimensions.Keys.ToArray().ToList().ForEach(d => Dimensions[d].TickSecond());
         }
 
-        public void Draw(Graphics g)
+        public void Draw(Graphics g, Graphics gui)
         {
             var tg = Core.Instance.TheGuy;
             Dimensions[tg.CurDimension].Chunks[tg.CurChunk].Draw(Core.Instance.g);
-            MinimapManager.Draw(Core.Instance.gui);
+            MinimapManager.Draw(gui);
         }
         public bool IsBlocking(Tile tile) => ((int)tile.Sol).IsBlockingType();
         public bool IsBlocking(vec tile_coord) => ((int?)Tile.GetFromWorldLocation(tile_coord)?.Sol)?.IsBlockingType() ?? true;

@@ -30,6 +30,7 @@ namespace console_v2
         public PictureBox Canvas;
         public Guy TheGuy;
         public long Ticks;
+        public List<Shortcut> Shortcuts;
 
         public int ScreenWidth => Canvas.Width;
         public int ScreenHeight => Canvas.Height;
@@ -52,11 +53,18 @@ namespace console_v2
             CurrentScene = SceneAdventure;
             SceneAdventure.Initialize();
             TheGuy = new Guy();
+            var wooden_axe = new Tool("Hache en Bois", Outils.Hache, 3);
+            var wooden_scythe = new Tool("Faux en Bois", Outils.Faux, 1);
+            var wooden_shovel = new Tool("Pelle en Bois", Outils.Pelle, 1);
             TheGuy.Inventory.Add(
-                new Tool("Hache en Bois", Outils.Hache, 3),
-                new Tool("Faux en Bois", Outils.Faux, 1),
-                new Tool("Pelle en Bois", Outils.Pelle, 1)
+                wooden_axe,
+                wooden_scythe,
+                wooden_shovel
                 );
+            Shortcuts = new List<Shortcut>
+            {
+                new Shortcut(0, KB.Key.C, wooden_shovel),
+            };
         }
         public void ResetGraphics()
         {
@@ -99,7 +107,7 @@ namespace console_v2
         public void Draw()
         {
             ResetGraphics();
-            CurrentScene?.Draw(g);
+            CurrentScene?.Draw(g, gui);
             ParticlesManager.Draw(g);
             g.DrawImage(UIImage, 0f, 0f);
             Canvas.Image = RenderImage;

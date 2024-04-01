@@ -103,6 +103,7 @@
     <Compile Include="Enumerations.cs" />
     <Compile Include="Ext.cs" />
     <Compile Include="GPU.cs" />
+    <Compile Include="IUniqueRef.cs" />
     <Compile Include="IDBItem.cs" />
     <Compile Include="IName.cs" />
     <Compile Include="ISized.cs" />
