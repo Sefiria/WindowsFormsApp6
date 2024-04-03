@@ -58,7 +58,7 @@ namespace console_v2
                     if (!Chunks.ContainsKey(v))
                     {
                         var gen = (GEN_NOISE.Sample2D(v.x / 40f, v.y / 40f) + 1f) / 2f;
-                        Chunks[v] = Generate((GenerationMode)(Enum.GetNames(typeof(GenerationMode)).Length * gen), v);
+                        Chunks[v] = Generate((GenerationMode)((Enum.GetNames(typeof(GenerationMode)).Length - 1) * gen), v);
                     }
                 }
             }

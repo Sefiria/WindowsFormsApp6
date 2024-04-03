@@ -72,10 +72,11 @@ namespace console_v2
 
             [(int)Outils.Hache] = 'Ƥ',
             [(int)Outils.Pioche] = '₼',
-            [(int)Outils.Faux] = 'ﻞ',
+            [(int)Outils.Faux] = 'Ҁ',
             [(int)Outils.Pelle] = 'д',
 
             [(int)Objets.Buche] = '¶',
+            [(int)Objets.BoisDeChauffe] = '═',
             [(int)Objets.Planche] = '║',
             [(int)Objets.FibreDePlante] = 'ˠ',
             [(int)Objets.Boue] = '░',

@@ -37,7 +37,7 @@ namespace console_v2
 
             update_shortcuts();
 
-            if (KB.IsKeyPressed(KB.Key.Tab)) Core.Instance.SwitchScene(Core.Scenes.Craft, 2);
+            if (KB.IsKeyPressed(KB.Key.Tab)) Core.Instance.SwitchScene(Core.Scenes.Craft, 3);
             if (KB.IsKeyPressed(KB.Key.Escape)) Core.Instance.SwitchScene(Core.Scenes.Menu);
         }
 

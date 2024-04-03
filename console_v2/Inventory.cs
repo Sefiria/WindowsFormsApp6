@@ -108,8 +108,44 @@ namespace console_v2
         {
             foreach (int dbref in dbrefs)
             {
-                if (dbref.Is<Objets>()) Contains((Objets)dbref);
-                else if (dbref.Is<Outils>()) Contains((Outils)dbref);
+                if (dbref.Is<Objets>())
+                {
+                    var item = Items.FirstOrDefault(it => (int)it.DBRef == dbref);
+                    if(item != null)
+                        Items.Remove(item);
+                }
+                else if (dbref.Is<Outils>())
+                {
+                    var tool = Tools.FirstOrDefault(t => (int)t.DBRef == dbref);
+                    if (tool != null)
+                        Tools.Remove(tool);
+                }
+            }
+        }
+        public void RemoveSingle(params int[] dbrefs)
+        {
+            foreach (int dbref in dbrefs)
+            {
+                if (dbref.Is<Objets>())
+                {
+                    var item = Items.FirstOrDefault(it => (int)it.DBRef == dbref);
+                    if (item != null)
+                    {
+                        Items[Items.IndexOf(item)].Count--;
+                        if(Items[Items.IndexOf(item)].Count == 0)
+                            Items.Remove(item);
+                    }
+                }
+                else if (dbref.Is<Outils>())
+                {
+                    var tool = Tools.FirstOrDefault(t => (int)t.DBRef == dbref);
+                    if (tool != null)
+                    {
+                        Tools[Tools.IndexOf(tool)].Count--;
+                        if (Tools[Tools.IndexOf(tool)].Count == 0)
+                            Tools.Remove(tool);
+                    }
+                }
             }
         }
 

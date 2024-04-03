@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Tooling;
+using static console_v2.TheRecipes;
 
 namespace console_v2
 {
@@ -38,30 +40,105 @@ namespace console_v2
                 this.Name = Name;
                 this.Mode = Mode;
             }
-            public int SatisfiedCountBy(RecipeObj[,] slots)
+            public bool SatisfiedBy(RecipeObj[,] slots)
             {
                 switch(Mode)
                 {
                     default:
-                    case RecipeMode.Chaos: return SatisfiedCountBy_Chaos(slots);
-                    case RecipeMode.ToolsOnTop: return SatisfiedCountBy_ToolsOnTop(slots);
-                    case RecipeMode.Static: return SatisfiedCountBy_Static(slots);
+                    case RecipeMode.Chaos: return SatisfiedBy_Chaos(slots);
+                    case RecipeMode.ToolsOnTop: return SatisfiedBy_ToolsOnTop(slots);
+                    case RecipeMode.Static: return SatisfiedBy_Static(slots);
                 }
             }
+            /*
             private int SatisfiedCountBy_Chaos(RecipeObj[,] slots)
             {
                 var listA = _2DToList(Needs);
                 var listB = _2DToList(slots);
-                return listA.Count(a => listB.Where(b => b.DBRef == a.DBRef).Any());
+                int count = 0;
+                RecipeObj match;
+                while (true)
+                {
+                    for (int a = 0; a < listA.Count; a++)
+                    {
+                        match = listB.FirstOrDefault(slot => slot?.Count > 0 && slot?.DBRef == listA[a]?.DBRef);
+                        if (match == null)
+                            return count;
+                        if (listB[listB.IndexOf(match)].DBRef.Isnt<Outils>())
+                            listB[listB.IndexOf(match)].Count--;
+                    }
+                    count++;
+                }
+            }
+            */
+            private bool SatisfiedBy_Chaos(RecipeObj[,] slots)
+            {
+                var listA = _2DToList(Needs);
+                var listB = _2DToList(slots);
+                RecipeObj match;
+                if (listB.Where(b => b != null).Any(b => !listA.Select(a => a?.DBRef).Contains(b?.DBRef)))
+                    return false;
+                for (int a = 0; a < listA.Count; a++)
+                {
+                    match = listB.FirstOrDefault(slot => slot?.Count >= listA[a]?.Count && slot?.DBRef == listA[a]?.DBRef);
+                    if (match == null)
+                        return false;
+                    if (listB[listB.IndexOf(match)].DBRef.Isnt<Outils>())
+                        listB[listB.IndexOf(match)].Count--;
+                }
+                return true;
+            }
+            private bool SatisfiedBy_ToolsOnTop(RecipeObj[,] slots)
+            {
+                var listA = _2DToList(Needs);
+                var listB = _2DToList(slots);
+                RecipeObj match;
+                int layer, layer_tool = 0, layer_item = int.MaxValue;
+                for (int a = 0; a < listA.Count; a++)
+                {
+                    match = listB.FirstOrDefault(slot => slot?.Count >= listA[a]?.Count && slot?.DBRef == listA[a]?.DBRef);
+                    if (match == null)
+                        return false;
+                    layer = -1;
+                    for (int i = 0; i < slots.GetLength(0) && layer == -1; i++)
+                        for (int j = 0; j < slots.GetLength(1) && layer == -1; j++)
+                            if (slots[i, j]?.DBRef == match.DBRef)
+                                layer = j;
+                    if (layer == -1)
+                        return false;
+                    if (listB[listB.IndexOf(match)].DBRef.Isnt<Outils>())
+                    {
+                        listB[listB.IndexOf(match)].Count--;
+                        if (layer < layer_item)
+                            layer_item = layer;
+                    }
+                    else
+                    {
+                        if (layer > layer_tool)
+                            layer_tool = layer;
+                    }
+                }
 
+                return layer_tool < layer_item;
             }
-            private int SatisfiedCountBy_ToolsOnTop(RecipeObj[,] slots)
+            private bool SatisfiedBy_Static(RecipeObj[,] slots)
             {
-                return 0;
-            }
-            private int SatisfiedCountBy_Static(RecipeObj[,] slots)
-            {
-                return 0;
+                var listA = _2DToList(Needs);
+                var listB = _2DToList(slots);
+                RecipeObj match;
+                for (int a = 0; a < listA.Count; a++)
+                {
+                    if (listA[a] == null)
+                        continue;
+                    match = listB.FirstOrDefault(slot => slot?.Count >= listA[a]?.Count && slot?.DBRef == listA[a]?.DBRef);
+                    if (match == null)
+                        return false;
+                    for (int i = 0; i < slots.GetLength(0) && i < Needs.GetLength(0); i++)
+                        for (int j = 0; j < slots.GetLength(1) && j < Needs.GetLength(1); j++)
+                            if (slots[i, j]?.DBRef != Needs[i, j]?.DBRef || Needs[i, j]?.DBRef != slots[i, j]?.DBRef || slots[i, j]?.Count < Needs[i, j]?.Count)
+                                return false;
+                }
+                return true;
             }
 
             static List<RecipeObj> _2DToList(RecipeObj[,] array)
@@ -81,11 +158,39 @@ namespace console_v2
         }
         public class RecipeFactory
         {
+            public RecipeFactory()
+            {
+            }
+            static RecipeFactory()
+            {
+                Recipes = new List<Recipe>();
+                RecipeObj[,] needs;
+                List<RecipeObj> results;
+                Recipe recipe;
+
+                needs = new RecipeObj[,] { { new RecipeObj((int)Outils.Hache, 1), new RecipeObj((int)Objets.Buche, 1) } };
+                results = new List<RecipeObj> { new RecipeObj((int)Objets.BoisDeChauffe, 1), new RecipeObj((int)Objets.EssenceBlanchaine, 2) };
+                recipe = Create("Bois de chauffe", RecipeMode.Chaos, needs, results);
+                Recipes.Add(recipe);
+
+                needs = new RecipeObj[,] { { new RecipeObj((int)Outils.Faux, 1), new RecipeObj((int)Objets.Buche, 1) } };
+                results = new List<RecipeObj> { new RecipeObj((int)Objets.BoisDeChauffe, 1) };
+                recipe = Create("Test ToolsOnTop", RecipeMode.ToolsOnTop, needs, results);
+                Recipes.Add(recipe);
+
+                needs = new RecipeObj[,] {
+                    { null, new RecipeObj((int)Objets.Buche, 1), null },
+                    { null, new RecipeObj((int)Outils.Pelle, 1), null }
+                };
+                results = new List<RecipeObj> { new RecipeObj((int)Objets.BoisDeChauffe, 1) };
+                recipe = Create("Test Static", RecipeMode.Static, needs, results);
+                Recipes.Add(recipe);
+            }
             public static Recipe Create(string name, RecipeMode mode, RecipeObj[,] needs, List<RecipeObj> results)
             {
-                RecipeObj[,] inter = new RecipeObj[needs.GetLength(0), needs.GetLength(1)];
-                for (int y = 0; y < needs.GetLength(1); y++)
-                    for (int x = 0; x < needs.GetLength(0); x++)
+                RecipeObj[,] inter = new RecipeObj[needs.GetLength(1), needs.GetLength(0)];
+                for (int y = 0; y < needs.GetLength(0); y++)
+                    for (int x = 0; x < needs.GetLength(1); x++)
                         inter[x, y] = needs[y, x];
                 needs = inter;
 
@@ -100,45 +205,21 @@ namespace console_v2
 
             private static Recipe CreateChaos(string name, RecipeObj[,] needs, List<RecipeObj> results)
             {
-                Recipe recipe = new Recipe(name, RecipeMode.Chaos);
+                Recipe recipe = new Recipe(name, RecipeMode.Chaos) { Needs = needs, Results = results };
                 return recipe;
             }
             private static Recipe CreateToolsOnTop(string name, RecipeObj[,] needs, List<RecipeObj> results)
             {
-                Recipe recipe = new Recipe(name, RecipeMode.ToolsOnTop);
+                Recipe recipe = new Recipe(name, RecipeMode.ToolsOnTop) { Needs = needs, Results = results};
                 return recipe;
             }
             private static Recipe CreateStatic(string name, RecipeObj[,] needs, List<RecipeObj> results)
             {
-                Recipe recipe = new Recipe(name, RecipeMode.Static);
+                Recipe recipe = new Recipe(name, RecipeMode.Static) { Needs = needs, Results = results };
                 return recipe;
             }
         }
 
-        public static List<Recipe> Recipes = new List<Recipe>
-        {
-            RecipeFactory.Create("Bois de chauffe", RecipeMode.ToolsOnTop, new RecipeObj[,]
-            {
-                { new RecipeObj((int)Outils.Hache, 1), new RecipeObj((int)Objets.Buche, 1) }
-            }, new List<RecipeObj>
-            {
-                new RecipeObj((int)Objets.BoisDeChauffe, 1)
-            }),
-            RecipeFactory.Create("Test Chaos", RecipeMode.Chaos, new RecipeObj[,]
-            {
-                { new RecipeObj((int)Outils.Faux, 1), new RecipeObj((int)Objets.Buche, 1) }
-            }, new List<RecipeObj>
-            {
-                new RecipeObj((int)Objets.BoisDeChauffe, 1)
-            }),
-            RecipeFactory.Create("Test Static", RecipeMode.Static, new RecipeObj[,]
-            {
-                { null, new RecipeObj((int)Objets.Buche, 1), null },
-                { null, new RecipeObj((int)Outils.Pelle, 1), null }
-            }, new List<RecipeObj>
-            {
-                new RecipeObj((int)Objets.BoisDeChauffe, 1)
-            }),
-        };
+        public static List<Recipe> Recipes;
     }
 }

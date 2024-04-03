@@ -1,14 +1,11 @@
 ﻿using System;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.Remoting;
 using System.Windows.Forms;
-using System.Xml.Linq;
 using Tooling;
 using static console_v2.SceneCraft;
+using static console_v2.TheRecipes;
 
 namespace console_v2
 {
@@ -121,9 +118,12 @@ namespace console_v2
         }
         public class SlotResult : Slot
         {
-            public override Rectangle Bounds => new Rectangle(mainrect.X + mainrect.Width / 2 - SlotsResult.Count * (sz + slot_margin) / 2 + x * (sz + slot_margin), 20, sz, sz);
-            public SlotResult(TheRecipes.RecipeObj result) : base()
+            public override Rectangle Bounds => new Rectangle(mainrect.X + mainrect.Width / 2 - SlotsResult.Count * (sz + slot_margin) / 2 + x * (sz + slot_margin), mainrect.Y + mainrect.Height / 2 + CraftSize * (sz + slot_margin) / 2 + 50, sz, sz);
+            public RecipeObj[,] Needs;
+            public Recipe Recipe;
+            public SlotResult(RecipeObj[,] needs, RecipeObj result) : base()
             {
+                Needs = needs;
                 DBRef = result.DBRef;
                 Count = result.Count;
                 Name = DB.DefineName(DBRef);
@@ -169,10 +169,22 @@ namespace console_v2
             brushMid = new SolidBrush(colorMid);
             brushLight = new SolidBrush(colorLight);
             hint_z_s = byte.MaxValue;
+
+            new RecipeFactory(); // dummy instantiation for trigger static ctor
+
+            ResetListAndSlots();
+        }
+
+        private void ResetListAndSlots(bool keepSlotsIfPossible = false)
+        {
             var inv = Core.Instance.TheGuy.Inventory;
             var items = inv.Items.Select(it => it.UniqueId);
             var tools = inv.Tools.Select(t => t.UniqueId);
             objs = tools.Concat(items).ToList();
+            List<Slot> prevSlots = null;
+
+            if(keepSlotsIfPossible)
+                prevSlots = new List<Slot>(Slots);
 
             Slots.Clear();
             for (int y = 0; y < CraftSize; y++)
@@ -190,7 +202,32 @@ namespace console_v2
                 return new ListItem(objs.IndexOf(obj)) { Name = name, DBRef = dbref, CharToDisplay = CharToDisplay, DBResSpe = DBResSpe, Count = count, content = content };
             }).ToList();
 
+            if(keepSlotsIfPossible)
+            {
+                foreach (var prevSlot in prevSlots)
+                {
+                    if (prevSlot.content == Guid.Empty)
+                        continue;
+                    var item = listItems.FirstOrDefault(it => it.content == prevSlot.content);
+                    if (item != null)
+                    {
+                        int id = Slots.IndexOf(Slots.First(slot => slot.x == prevSlot.x && slot.y == prevSlot.y));
+                        int count = Math.Min(prevSlot.Count, item.Count);
+                        if (count == 0)
+                            continue;
+                        Slots[id].Index = prevSlot.Index;
+                        Slots[id].Name = prevSlot.Name;
+                        Slots[id].DBRef = prevSlot.DBRef;
+                        Slots[id].content = prevSlot.content;
+                        Slots[id].Count = count;
+                        Slots[id].CharToDisplay = prevSlot.CharToDisplay;
+                        Slots[id].DBResSpe = prevSlot.DBResSpe;
+                        listItems[listItems.IndexOf(item)].Count -= count;
+                    }
+                }
+            }
         }
+
         public override void Update()
         {
             if (KB.IsKeyPressed(KB.Key.Tab) || KB.IsKeyPressed(KB.Key.Escape))
@@ -289,20 +326,9 @@ namespace console_v2
                                             slot.Count += SelectedTempItem.Count;
                                             SelectedTempItem = null;
                                         }
-                                        else// slot different than selection
-                                        {
-                                            ListItem inter = slot.Clone();
-                                            setslot(SelectedTempItem.Count);
-                                            SelectedTempItem.Index = inter.Index;
-                                            SelectedTempItem.Name = inter.Name;
-                                            SelectedTempItem.content = inter.content;
-                                            SelectedTempItem.Count = inter.Count;
-                                            SelectedTempItem.CharToDisplay = inter.CharToDisplay;
-                                            SelectedTempItem.DBResSpe = inter.DBResSpe;
-                                        }
                                     }
                                 }
-                                else if (bt_right)// right click
+                                else if (bt_right)// slot different than selection & right click
                                 {
                                     if (slot.content == Guid.Empty)// slot empty
                                         setslot(1);
@@ -313,6 +339,18 @@ namespace console_v2
                                         SelectedTempItem = null;
                                 }
                             }
+                            else if (bt_left)// left click
+                            {
+                                ListItem inter = slot.Clone();
+                                setslot(SelectedTempItem.Count);
+                                SelectedTempItem.Index = inter.Index;
+                                SelectedTempItem.Name = inter.Name;
+                                SelectedTempItem.content = inter.content;
+                                SelectedTempItem.Count = inter.Count;
+                                SelectedTempItem.CharToDisplay = inter.CharToDisplay;
+                                SelectedTempItem.DBResSpe = inter.DBResSpe; 
+
+                            }
                         }
                     }
                 }
@@ -320,25 +358,49 @@ namespace console_v2
             #endregion
 
             CheckRecipes();
+
+            if(bt_left && SlotsResult.Any(slot => slot.Bounds.Contains(msbase)))
+            {
+                var inv = Core.Instance.TheGuy.Inventory;
+                var needs = SlotsResult.First().Needs;
+                foreach (var need in needs)
+                {
+                    if (need.DBRef.Is<Outils>())
+                    {
+                        // TODO : give damages to the tool (ATM tool usePoint not implemented)
+                        continue;// don't remove tools but give them damage
+                    }
+                    for (int i = 0; i < need.Count; i++)
+                        inv.RemoveSingle(need.DBRef);
+                }
+                foreach (var result in SlotsResult)
+                    for(int i=0; i<result.Count; i++)
+                        inv.Add(result.DBRef);
+                ResetListAndSlots(true);
+            }
         }
 
         private void CheckRecipes()
         {
             SlotsResult.Clear();
-            var slots = new TheRecipes.RecipeObj[CraftSize, CraftSize];
+            var slots = new RecipeObj[CraftSize, CraftSize];
             Slot _Slot;
             for (int y = 0; y < CraftSize; y++)
             {
                 for (int x = 0; x < CraftSize; x++)
                 {
                     _Slot = Slots[y * CraftSize + x];
-                    slots[x, y] = new TheRecipes.RecipeObj(_Slot.DBRef, _Slot.Count);
+                    slots[x, y] = _Slot.content == Guid.Empty ? null : new RecipeObj(listItems.First(it => it.content == _Slot.content).DBRef, _Slot.Count);
                 }
             }
-            int count = 0;
-            TheRecipes.Recipe recipe = TheRecipes.Recipes.FirstOrDefault(r => { count = r.SatisfiedCountBy(slots); return count > 0; });
-            foreach(var result in recipe.Results)
-                SlotsResult.Add(new SlotResult(result));
+            if (Recipes != null)
+            {
+                Recipe recipe = Recipes.FirstOrDefault(r => r.SatisfiedBy(slots));
+                int x = 0;
+                if (recipe != null)
+                    foreach (var result in recipe.Results)
+                        SlotsResult.Add(new SlotResult(recipe.Needs, result) { x = x++ });
+            }
         }
 
         public override void Draw(Graphics g, Graphics gui)
@@ -353,7 +415,6 @@ namespace console_v2
             Bitmap listBitmap = new Bitmap(listrect.Width, listrect.Height);
             Graphics listgui = Graphics.FromImage(listBitmap);
             var inv = Core.Instance.TheGuy.Inventory;
-            int y;
             Font font = new Font("Segoe UI", 14f);
             var sz = TextRenderer.MeasureText("A", font);
             int w = sz.Width;
