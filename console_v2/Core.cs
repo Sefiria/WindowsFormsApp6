@@ -61,6 +61,8 @@ namespace console_v2
                 wooden_scythe,
                 wooden_shovel
                 );
+            for (int i = 0; i < 99; i++)
+                TheGuy.Inventory.Add(new Item(string.Concat(Enumerable.Repeat((char)RandomThings.rnd(30, 90), 4)), Objets.Boue, 1));
             Shortcuts = new List<Shortcut>
             {
                 new Shortcut(0, KB.Key.C, wooden_shovel),
@@ -113,14 +115,15 @@ namespace console_v2
             Canvas.Image = RenderImage;
         }
 
-        public enum Scenes { Adventure, Menu }
-        internal void SwitchScene(Scenes scene)
+        public enum Scenes { Adventure, Menu, Craft }
+        internal void SwitchScene(Scenes scene, params object[] args)
         {
             switch(scene)
             {
                 default:return;
                 case Scenes.Adventure: CurrentScene = SceneAdventure; break;
                 case Scenes.Menu: CurrentScene = new SceneMenu(); break;
+                case Scenes.Craft: CurrentScene = new SceneCraft((int)args[0]); break;
             }
         }
     }

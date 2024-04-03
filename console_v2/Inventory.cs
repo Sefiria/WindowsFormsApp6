@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.Remoting;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Tooling;
@@ -133,6 +134,44 @@ namespace console_v2
                     NotificationsManager.AddNotification(NotificationsManager.NotificationTypes.SideLeft, $"+ {tool_name} x {tool.count}", DB.Colors[typeof(Outils)]);
                 }
             }
+        }
+
+        public (string name, int dbref) GetObjectInfosByUniqueId(Guid id)
+        {
+            int dbref = -1;
+            string name = "";
+            Item item = null;
+            Tool tool = Tools.FirstOrDefault(t => t.UniqueId == id);
+            if (tool != null)
+            {
+                dbref = (int)tool.DBRef;
+                name = tool.Name;
+            }
+            else
+            {
+                item = Items.FirstOrDefault(it => it.UniqueId == id);
+                if (item != null)
+                {
+                    dbref = (int)item.DBRef;
+                    name = item.Name;
+                }
+            }
+            return (name, dbref);
+        }
+        public int GetDBRefByUniqueId(Guid id)
+        {
+            int dbref = -1;
+            Item item = null;
+            Tool tool = Tools.FirstOrDefault(t => t.UniqueId == id);
+            if (tool != null)
+                dbref = (int)tool.DBRef;
+            else
+            {
+                item = Items.FirstOrDefault(it => it.UniqueId == id);
+                if (item != null)
+                    dbref = (int)item.DBRef;
+            }
+            return dbref;
         }
     }
 }

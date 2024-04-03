@@ -83,6 +83,7 @@
     <Compile Include="res\DBResSpeDef\DBSpe_Stone.cs" />
     <Compile Include="res\entities\EntityPlant.cs" />
     <Compile Include="res\entities\EntityTree.cs" />
+    <Compile Include="SceneCraft.cs" />
     <Compile Include="SceneMenu.cs" />
     <Compile Include="Scene.cs" />
     <Compile Include="SceneAdventure.cs" />

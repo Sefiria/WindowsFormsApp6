@@ -11,7 +11,7 @@ namespace console_v2
 {
     public class Tool : ITool, IName, IDBItem, IUniqueRef
     {
-        public Guid UniqueId => Guid.NewGuid();
+        public Guid UniqueId { get; set; } = Guid.NewGuid();
         public string Name { get; set; } = "Unnamed_Tool";
         public Outils DBRef;
         public float Duration;
@@ -53,12 +53,16 @@ namespace console_v2
             var chunk = Core.Instance.SceneAdventure.World.GetChunk();
             if(chunk.Tiles[tile].Sol == Sols.Herbe)
             {
-                triggerer.Inventory.Add(new Item("Fibre De Plante", Objets.FibreDePlante, RandomThings.rnd(5)));
+                var n = RandomThings.rnd(3);
+                if (n > 0)
+                    triggerer.Inventory.Add(new Item("Fibre De Plante", Objets.FibreDePlante, n));
                 chunk.Tiles[tile].Sol = Sols.Terre;
             }
             else if (chunk.Tiles[tile].Sol == Sols.Terre)
             {
-                triggerer.Inventory.Add(new Item("Boue", Objets.Boue));
+                var n = RandomThings.rnd(2);
+                if (n > 0)
+                    triggerer.Inventory.Add(new Item("Boue", Objets.Boue, n));
                 chunk.Tiles[tile].Sol = Sols.Pierre;
             }
         }

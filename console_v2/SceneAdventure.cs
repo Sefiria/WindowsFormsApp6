@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Media;
 using System.Runtime.Remoting;
+using System.Security.Cryptography;
 using Tooling;
 
 namespace console_v2
@@ -36,6 +37,7 @@ namespace console_v2
 
             update_shortcuts();
 
+            if (KB.IsKeyPressed(KB.Key.Tab)) Core.Instance.SwitchScene(Core.Scenes.Craft, 2);
             if (KB.IsKeyPressed(KB.Key.Escape)) Core.Instance.SwitchScene(Core.Scenes.Menu);
         }
 
@@ -60,7 +62,7 @@ namespace console_v2
         {
             Core.Instance.Shortcuts.ForEach(s =>
             {
-                if (KB.IsKeyPressed(s.Key))
+                if (s.IsPressed())
                 {
                     (s.Ref as IItem)?.Consume();
                     (s.Ref as ITool)?.Use(Core.Instance.TheGuy);
@@ -74,19 +76,18 @@ namespace console_v2
             float total_sz = shortcuts.Count * GraphicsManager.CharSize.Width + 20;
             float _x = DrawingRect.X + DrawingRect.Width / 2 - total_sz / 2;
             SolidBrush brush = new SolidBrush(Color.FromArgb(100, Color.Gray));
-            for(int i = 0; i < shortcuts.Count; i++)
+
+            for (int i = 0; i < shortcuts.Count; i++)
             {
                 int x = (int)(_x + i * sz);
-                gui.FillRectangle(brush, , 50, sz, GraphicsManager.CharSize.Height + 10);
+                gui.FillRectangle(brush, x, 50, sz, GraphicsManager.CharSize.Height + 10);
 
-                int r = shortcuts[i].Ref.UniqueId;// TODO if item or tool, retrieve dbref
-                // TODO char or bitmap ?
-                if (DB.Resources.ContainsKey(dbref))
-                    CharToDisplay = DB.Resources[dbref];
-                else if (DB.ResourcesSpecials.ContainsKey(dbref))
-                    DBResSpe = dbref;
-                // TODO draw char or bitmap (res or spe)
-                gui.DrawString(DB. )
+                var dbref = Core.Instance.TheGuy.Inventory.GetDBRefByUniqueId(shortcuts[i].Ref.UniqueId);
+                (int CharToDisplay, Bitmap DBResSpe) = DB.RetrieveDBResOrSpe(dbref);
+                if(CharToDisplay > -1)
+                    gui.DrawString(string.Concat((char)CharToDisplay), GraphicsManager.Font, shortcuts[i].IsDown() ? Brushes.White : Brushes.Gray, x + 10, 50);
+                else
+                    gui.DrawImage(DBResSpe, x + 10, 50);
             }
         }
     }

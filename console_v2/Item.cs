@@ -11,7 +11,7 @@ namespace console_v2
 {
     public class Item : IItem, IName, IDBItem, IUniqueRef
     {
-        public Guid UniqueId => Guid.NewGuid();
+        public Guid UniqueId { get; set; } = Guid.NewGuid();
         public string Name { get; set; } = "Unnamed_Item";
         public Objets DBRef;
         public bool IsConsommable = true;

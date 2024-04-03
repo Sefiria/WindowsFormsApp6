@@ -21,5 +21,7 @@ namespace console_v2
             Key = key;
             Ref = @ref;
         }
+        public bool IsPressed() => KB.IsKeyPressed(Key);
+        public bool IsDown() => KB.IsKeyDown(Key);
     }
 }

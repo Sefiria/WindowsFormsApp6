@@ -8,6 +8,6 @@ namespace Tooling
 {
     public interface IUniqueRef
     {
-        Guid UniqueId { get; }
+        Guid UniqueId { get; set; }
     }
 }

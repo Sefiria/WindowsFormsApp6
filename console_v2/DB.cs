@@ -98,6 +98,17 @@ namespace console_v2
         };
         public static Dictionary<int, Bitmap> ResourcesSpecials;
 
+        public static  (int CharToDisplay, Bitmap DBResSpe) RetrieveDBResOrSpe(int _dbref)
+        {
+            int _CharToDisplay = -1;
+            Bitmap _DBResSpe = null;
+            if (Resources.ContainsKey(_dbref))
+                _CharToDisplay = Resources[_dbref];
+            else if (ResourcesSpecials.ContainsKey(_dbref))
+                _DBResSpe = ResourcesSpecials[_dbref];
+            return (_CharToDisplay, _DBResSpe);
+        }
+
         static DB()
         {
             int w = (int)GraphicsManager.CharSize.Width, h = (int)GraphicsManager.CharSize.Height;

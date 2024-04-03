@@ -31,7 +31,8 @@ namespace console_v2
 
         public List<EvtRect> Buttons = new List<EvtRect>();
 
-        static Color buttonStartColor = Color.FromArgb(0, 0, 50), buttonEndColor = Color.FromArgb(0, 0, 100);
+        static Color menuStartColor = Color.FromArgb(0, 0, 50), menuEndColor = Color.FromArgb(0, 0, 100);
+        static Color buttonStartColor = Color.FromArgb(0, 50, 0), buttonEndColor = Color.FromArgb(0, 100, 0);
 
         int w;
         int h;
@@ -43,8 +44,9 @@ namespace console_v2
         Color buttonsColor;
         EvtRect selectedButton;
 
-        static Brush makebrush(Rectangle _rect) => new LinearGradientBrush(_rect.Location.PlusF((0, _rect.Height).P()), _rect.Location.PlusF((_rect.Width, 0).P()), buttonStartColor, buttonEndColor);
-        static Brush makeReversebrush(Rectangle _rect) => new LinearGradientBrush(_rect.Location.PlusF((0, _rect.Height).P()), _rect.Location.PlusF((_rect.Width, 0).P()), buttonEndColor, buttonStartColor);
+        static Brush makebrush(Rectangle _rect) => new LinearGradientBrush(_rect.Location.PlusF((0, _rect.Height).P()), _rect.Location.PlusF((_rect.Width, 0).P()), menuStartColor, menuEndColor);
+        static Brush makebuttonbrush(Rectangle _rect) => new LinearGradientBrush(_rect.Location.PlusF((0, _rect.Height).P()), _rect.Location.PlusF((_rect.Width, 0).P()), buttonStartColor, buttonEndColor);
+        static Brush makeReversebrush(Rectangle _rect) => new LinearGradientBrush(_rect.Location.PlusF((0, _rect.Height).P()), _rect.Location.PlusF((_rect.Width, 0).P()), menuEndColor, menuStartColor);
 
         public SceneMenu()
         {
