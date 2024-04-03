@@ -173,5 +173,64 @@ namespace console_v2
             }
             return dbref;
         }
+        public string GetNameByUniqueId(Guid id)
+        {
+            string name = null;
+            Item item = null;
+            Tool tool = Tools.FirstOrDefault(t => t.UniqueId == id);
+            if (tool != null)
+                name = tool.Name;
+            else
+            {
+                item = Items.FirstOrDefault(it => it.UniqueId == id);
+                if (item != null)
+                    name = item.Name;
+            }
+            return name;
+        }
+        public int GetCountByUniqueId(Guid id)
+        {
+            int count = 0;
+            Item item = null;
+            Tool tool = Tools.FirstOrDefault(t => t.UniqueId == id);
+            if (tool != null)
+                count = tool.Count;
+            else
+            {
+                item = Items.FirstOrDefault(it => it.UniqueId == id);
+                if (item != null)
+                    count = item.Count;
+            }
+            return count;
+        }
+
+        internal (string name, int dbref, int count, Guid content) GetFullInfosByUniqueId(Guid id)
+        {
+            int dbref = -1;
+            string name = "";
+            int count = 0;
+            Guid content = Guid.Empty;
+            Item item = null;
+            Tool tool = Tools.FirstOrDefault(t => t.UniqueId == id);
+            if (tool != null)
+            {
+                dbref = (int)tool.DBRef;
+                name = tool.Name;
+                count = tool.Count;
+                content = tool.UniqueId;
+            }
+            else
+            {
+                item = Items.FirstOrDefault(it => it.UniqueId == id);
+                if (item != null)
+                {
+                    dbref = (int)item.DBRef;
+                    name = item.Name;
+                    count = item.Count;
+                    content = item.UniqueId;
+                }
+            }
+            return (name, dbref, count, content);
+        }
     }
 }

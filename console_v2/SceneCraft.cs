@@ -3,7 +3,10 @@ using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.Remoting;
 using System.Windows.Forms;
+using System.Xml.Linq;
 using Tooling;
 using static console_v2.SceneCraft;
 
@@ -13,12 +16,19 @@ namespace console_v2
     {
         public class ListItem
         {
-            public int Index;
+            public static Font font = new Font("Segoe UI", 14f);
+            public static Font MiniFont = new Font("Segoe UI", 10f);
             public static int sz = 50;
+
+            public int Index;
             public int x, y;
             public vec vec { get => (x, y).V(); set { x = value.x; y = value.y; } }
             public Guid content = Guid.Empty;
-            public int Count = 0;
+            public string Name;
+            public string DisplayName => $"{Name} ( {Count} )";
+            public int DBRef, CharToDisplay = -1, Count = 0;
+            public Bitmap DBResSpe = null;
+            public virtual Rectangle Bounds => new Rectangle(20, (int)(20 + (Index - scroll) * (TextRenderer.MeasureText("A", font).Height * 1.5f)), TextRenderer.MeasureText("A", font).Width * 2 + TextRenderer.MeasureText(DisplayName, font).Width, TextRenderer.MeasureText("A", font).Height);
             public ListItem() { }
             public ListItem(int index)
             {
@@ -29,36 +39,62 @@ namespace console_v2
                 this.x = x;
                 this.y = y;
             }
+            public ListItem(ListItem copy)
+            {
+                Index = copy.Index;
+                x = copy.x;
+                y = copy.y;
+                vec = copy.vec;
+                content = copy.content;
+                Name = copy.Name;
+                DBRef = copy.DBRef;
+                CharToDisplay = copy.CharToDisplay;
+                Count = copy.Count;
+                DBResSpe = copy.DBResSpe;
+            }
             public virtual void Draw(Graphics g)
             {
-                var inv = Core.Instance.TheGuy.Inventory;
-                string name;
-                int dbref, CharToDisplay, y;
-                Bitmap DBResSpe;
-                Font font = new Font("Segoe UI", 14f);
+                if (Count > 0)
+                    DrawBoundsRelief(g, Bounds, 4f, 4, 4, Bounds.Contains(MouseStates.Position.ToPoint().Minus(listrect.Location)) ? ((SelectedTempItem?.Index ?? -1) == Index ? brushLight : null) : brushDark);
+                int i = Index - (int)scroll;
+                if (i < 0f || i >= objs.Count) return;
+                DrawItemContent(g, Point.Empty);
+            }
+            public void DrawItemContent(Graphics g, Point offset)
+            {
+                var pos = offset != Point.Empty ? offset : Bounds.Location;
                 var sz = TextRenderer.MeasureText("A", font);
                 int w = sz.Width;
                 int h = sz.Height;
+                int y = (int)(20 + (Index - scroll) * (h * 1.5f));
 
-                int i = Index - (int)scroll;
-                if (i < 0f || i >= objs.Count) return;
-                (name, dbref) = inv.GetObjectInfosByUniqueId(objs[i]);
-                if (dbref == -1)
-                    return;
-                (CharToDisplay, DBResSpe) = DB.RetrieveDBResOrSpe(dbref);
-                if (CharToDisplay == -1 && DBResSpe == null)
-                    return;
-                y = (int)(20 + (Index - scroll) * (h * 1.5f));// TODO    Index - scroll    adjust
                 if (CharToDisplay > -1)
-                    g.DrawString(string.Concat((char)CharToDisplay), font, Brushes.White, 20, y);
+                    g.DrawString(string.Concat((char)CharToDisplay), font, Brushes.White, pos);
                 else
-                    g.DrawImage(DBResSpe, 20, y);
-                g.DrawString(name, font, Brushes.White, 20 + w * 3, y);
+                    g.DrawImage(DBResSpe, pos);
+                if(offset != Point.Empty)
+                    g.DrawString(DisplayName, font, Count > 0 ? Brushes.White : Brushes.Gray, w * 2 + offset.X, offset.Y);
+                else
+                    g.DrawString(DisplayName, font, Count > 0 ? Brushes.White : Brushes.Gray, 20 + w * 2, y);
             }
+
+            public static void DrawBoundsRelief(Graphics g, Rectangle r, float w, int inflate = 0, int offset = 0, Brush brush = null)
+            {
+                if(inflate >0) r.Inflate(inflate, inflate);
+                if(offset > 0) r.Offset(offset, offset);
+                g.FillRectangle(brush ?? brushMid, r);
+                Pen p = new Pen(colorDark.Mod(30, 25, 20), w - 1);
+                g.DrawLine(p, r.Left, r.Top, r.Right - w, r.Top);
+                g.DrawLine(p, r.Left, r.Top, r.Left, r.Bottom - w);
+                p = new Pen(colorDark.Mod(0, -10, -15), w - 1);
+                g.DrawLine(p, r.Right - w, r.Bottom - w, r.Left, r.Bottom - w);
+                g.DrawLine(p, r.Right - w, r.Bottom - w, r.Right - w, r.Top);
+            }
+            public ListItem Clone() => new ListItem(this);
         }
         public class Slot : ListItem
         {
-            public Rectangle Bounds => new Rectangle((mainrect.Location.vecf().i + mainrect.Size.V() / 2 - CraftSize * (sz + slot_margin) / 2 + vec * (sz + slot_margin)).ipt, new Size(sz, sz));
+            public override Rectangle Bounds => new Rectangle((mainrect.Location.vecf().i + mainrect.Size.V() / 2 - CraftSize * (sz + slot_margin) / 2 + vec * (sz + slot_margin)).ipt, new Size(sz, sz));
             public Slot() : base()
             {
             }
@@ -67,20 +103,36 @@ namespace console_v2
             }
             public override void Draw(Graphics gui)
             {
-                var r = Bounds;
-                gui.FillRectangle(brushMid, r);
-                r.Inflate(2, 2);
-                float w = 4f;
-                Pen p = new Pen(colorDark.Mod(30, 25, 20), w-1);
-                gui.DrawLine(p, r.Left, r.Top, r.Right-w, r.Top);
-                gui.DrawLine(p, r.Left, r.Top, r.Left, r.Bottom-w);
-                p = new Pen(colorDark.Mod(0, -10, -15), w-1);
-                gui.DrawLine(p, r.Right-w, r.Bottom-w, r.Left, r.Bottom-w);
-                gui.DrawLine(p, r.Right-w, r.Bottom-w, r.Right-w, r.Top);   
+                var bounds = Bounds;
+
+                if((SelectedTempItem?.Index ?? -1) > -1 && bounds.Contains(MouseStates.Position.ToPoint()))
+                    DrawBoundsRelief(gui, bounds, 4f, 2, brush:brushLight);
+                else
+                    DrawBoundsRelief(gui, bounds, 4f, 2);
+
+                if (CharToDisplay > -1)
+                    gui.DrawString(string.Concat((char)CharToDisplay), font, Brushes.White, bounds.Location);
+                else if(DBResSpe != null)
+                    gui.DrawImage(DBResSpe, bounds.Location);
+
+                if (Count > 0)
+                    gui.DrawString(Count.ToString(), MiniFont, Brushes.White, bounds.Location.Plus((Point)TextRenderer.MeasureText("A", font)));
+            }
+        }
+        public class SlotResult : Slot
+        {
+            public override Rectangle Bounds => new Rectangle(mainrect.X + mainrect.Width / 2 - SlotsResult.Count * (sz + slot_margin) / 2 + x * (sz + slot_margin), 20, sz, sz);
+            public SlotResult(TheRecipes.RecipeObj result) : base()
+            {
+                DBRef = result.DBRef;
+                Count = result.Count;
+                Name = DB.DefineName(DBRef);
+                (CharToDisplay, DBResSpe) = DB.RetrieveDBResOrSpe(DBRef);
             }
         }
 
         public List<Slot> Slots = new List<Slot>();
+        public static List<SlotResult> SlotsResult = new List<SlotResult>();
 
         int w;
         int h;
@@ -93,10 +145,12 @@ namespace console_v2
         public static Color colorLight = Color.FromArgb(80, 50, 30);
         public static SolidBrush brushDark, brushMid, brushLight;
         public static int hint_z_s;
+        public static Point ItemListSelectedPoint;
 
         public static float scroll = 0f;
         private static List<Guid> objs;
         private static List<ListItem> listItems;
+        private static ListItem SelectedTempItem = null;
 
         public SceneCraft(int size)
         {
@@ -129,7 +183,13 @@ namespace console_v2
                 }
             }
 
-            listItems = objs.Select(obj => new ListItem(objs.IndexOf(obj))).ToList();
+            listItems = objs.Select(obj =>
+            {
+                (string name, int dbref, int count, Guid content) = inv.GetFullInfosByUniqueId(obj);
+                (int CharToDisplay, Bitmap DBResSpe) = DB.RetrieveDBResOrSpe(dbref);
+                return new ListItem(objs.IndexOf(obj)) { Name = name, DBRef = dbref, CharToDisplay = CharToDisplay, DBResSpe = DBResSpe, Count = count, content = content };
+            }).ToList();
+
         }
         public override void Update()
         {
@@ -143,12 +203,142 @@ namespace console_v2
             if (KB.IsKeyDown(KB.Key.S)) scroll += 0.2f;
             scroll = Math.Max(0, Math.Min(objs.Count - 1, scroll));
 
-            //if (MouseStates.ButtonsDown[MouseButtons.Left])
-            //{
-            //    var ms = MouseStates.Position.ToPoint();
-            //    var clicked = Slots.FirstOrDefault(bt => bt.Bounds.Contains(ms));
-            //    if (clicked != null) { SubMenu_Items_selected_i = -1; selectedButton = clicked; }
-            //}
+            var msbase = MouseStates.Position.ToPoint();
+            var ms = msbase.Minus(listrect.Location);
+            var bt_left = MouseStates.IsButtonPressed(MouseButtons.Left);
+            var bt_right = MouseStates.IsButtonPressed(MouseButtons.Right);
+
+            # region mainalgo
+            if (bt_left || bt_right)// left / right click
+            {
+                if (bt_left && SelectedTempItem == null)// left click & no selection
+                {
+                    var item = listItems.FirstOrDefault(it => it.Bounds.Contains(ms));
+                    if (item != null && item.Count > 0)// click on item in list
+                    {
+                        ItemListSelectedPoint = ms.Minus(item.Bounds.Location);
+                        SelectedTempItem = item.Clone();
+                        listItems[item.Index].Count = 0;
+                    }
+                    else if(item == null)// no item clicked
+                    {
+                        var slot = Slots.FirstOrDefault(s => s.Bounds.Contains(msbase));
+                        if(slot != null && slot.content != Guid.Empty)// slot clicked (take full slot content)
+                        {
+                            ListItem inter = slot.Clone();
+                            SelectedTempItem = new ListItem();
+                            SelectedTempItem.Index = inter.Index;
+                            SelectedTempItem.Name = inter.Name;
+                            SelectedTempItem.content = inter.content;
+                            SelectedTempItem.Count = inter.Count;
+                            SelectedTempItem.CharToDisplay = inter.CharToDisplay;
+                            SelectedTempItem.DBResSpe = inter.DBResSpe;
+                            slot.Index = -1;
+                            slot.content = Guid.Empty;
+                            slot.Count = 0;
+                            slot.CharToDisplay = -1;
+                            slot.DBResSpe = null;
+                        }
+                    }
+                }
+                else// no left click OR already selection
+                {
+                    if (listrect.Contains(ms) && SelectedTempItem != null)// list rectangle contains mouse & already selection
+                    {
+                        if (bt_left)// left click
+                        {
+                            listItems[SelectedTempItem.Index].Count += SelectedTempItem.Count;
+                            SelectedTempItem = null;
+                        }
+                        else if (bt_right)// right click
+                        {
+                            listItems[SelectedTempItem.Index].Count++;
+                            SelectedTempItem.Count--;
+                            if(SelectedTempItem.Count == 0)
+                                SelectedTempItem = null;
+                        }
+                    }
+                    else if(mainrect.Contains(ms))// main rectangle contains mouse
+                    {
+                        var slot = Slots.FirstOrDefault(s => s.Bounds.Contains(msbase));
+                        if (slot != null)// slot hover
+                        {
+                            void setslot(int count)
+                            {
+                                slot.Index = SelectedTempItem.Index;
+                                slot.Name = SelectedTempItem.Name;
+                                slot.content = SelectedTempItem.content;
+                                slot.Count = count;
+                                slot.CharToDisplay = SelectedTempItem.CharToDisplay;
+                                slot.DBResSpe = SelectedTempItem.DBResSpe;
+                            }
+
+                            if (SelectedTempItem != null && (slot.content == Guid.Empty || (SelectedTempItem?.Index ?? -1) == slot.Index))// already selection & ( slot same as selection OR slot empty )
+                            {
+                                if (bt_left)// left click
+                                {
+                                    if (slot.content == Guid.Empty)// slot empty
+                                    {
+                                        setslot(SelectedTempItem.Count);
+                                        SelectedTempItem = null;
+                                    }
+                                    else// slot not empty
+                                    {
+                                        if (SelectedTempItem.Index == slot.Index)// slot same as selection
+                                        {
+                                            slot.Count += SelectedTempItem.Count;
+                                            SelectedTempItem = null;
+                                        }
+                                        else// slot different than selection
+                                        {
+                                            ListItem inter = slot.Clone();
+                                            setslot(SelectedTempItem.Count);
+                                            SelectedTempItem.Index = inter.Index;
+                                            SelectedTempItem.Name = inter.Name;
+                                            SelectedTempItem.content = inter.content;
+                                            SelectedTempItem.Count = inter.Count;
+                                            SelectedTempItem.CharToDisplay = inter.CharToDisplay;
+                                            SelectedTempItem.DBResSpe = inter.DBResSpe;
+                                        }
+                                    }
+                                }
+                                else if (bt_right)// right click
+                                {
+                                    if (slot.content == Guid.Empty)// slot empty
+                                        setslot(1);
+                                    else// slot not empty
+                                        slot.Count++;
+                                    SelectedTempItem.Count--;
+                                    if (SelectedTempItem.Count == 0)
+                                        SelectedTempItem = null;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            #endregion
+
+            CheckRecipes();
+        }
+
+        private void CheckRecipes()
+        {
+            SlotsResult.Clear();
+            var slots = new TheRecipes.RecipeObj[CraftSize, CraftSize];
+            Slot _Slot;
+            for (int y = 0; y < CraftSize; y++)
+            {
+                for (int x = 0; x < CraftSize; x++)
+                {
+                    _Slot = Slots[y * CraftSize + x];
+                    slots[x, y] = new TheRecipes.RecipeObj(_Slot.DBRef, _Slot.Count);
+                }
+            }
+            int count = 0;
+            TheRecipes.Recipe recipe = TheRecipes.Recipes.FirstOrDefault(r => { count = r.SatisfiedCountBy(slots); return count > 0; });
+            foreach(var result in recipe.Results)
+                SlotsResult.Add(new SlotResult(result));
         }
 
         public override void Draw(Graphics g, Graphics gui)
@@ -182,140 +372,17 @@ namespace console_v2
                 hint_z_s -= 3;
             }
             gui.DrawImage(listBitmap, listrect.Location);
+
+            if (SelectedTempItem  != null)
+            {
+                var item = SelectedTempItem;
+                var rect = item.Bounds;
+                rect = new Rectangle(MouseStates.Position.ToPoint().Minus(ItemListSelectedPoint), rect.Size);
+                ListItem.DrawBoundsRelief(gui, rect, 4f, 4, 4, brushLight);
+                item.DrawItemContent(gui, rect.Location);
+            }
+
+            SlotsResult.ForEach(slot => slot.Draw(gui));
         }
-
-        //private void SubMenu_Map_Draw(Graphics g)
-        //{
-        //    // mode
-        //    var _rect = new Rectangle(listrect.X + 50, listrect.Y + 50, 100, 25);
-        //    g.FillRectangle(Brushes.DimGray, _rect);
-        //    switch(SubMenu_Map_mode)
-        //    {
-        //        case 0: _rect = new Rectangle(listrect.X + 50, listrect.Y + 50, 40, 25); break;
-        //        case 1: _rect = new Rectangle(listrect.X + 110, listrect.Y + 50, 40, 25); break;
-        //        default: throw new Exception("SceneMenu.cs/SubMenu_Map_Draw: not set");
-        //    }
-        //    g.FillRectangle(Brushes.Gray, _rect);
-        //    var _font = new Font("Segoe UI", 10);
-        //    g.DrawString("Layers", _font, SubMenu_Map_mode == 0 ? Brushes.White : Brushes.Gray, listrect.X + 20, listrect.Y + 30);
-        //    g.DrawString("Tiles", _font, SubMenu_Map_mode == 1 ? Brushes.White : Brushes.Gray, listrect.X + 140, listrect.Y + 30);
-        //    g.DrawString("[Space]", _font, KB.IsKeyDown(KB.Key.Space) ? Brushes.White : Brushes.Gray, listrect.X + 80, listrect.Y + 85);
-        //    // ----
-
-        //    var sz = listrect.Size;
-        //    var tg = Core.Instance.TheGuy;
-        //    var world = Core.Instance.SceneAdventure.World;
-        //    Rectangle rect;
-        //    vec c = tg.CurChunk;
-        //    var chunks = world.Dimensions[tg.CurDimension].Chunks.ToList();
-        //    var szmini = 30;
-        //    var g_x = listrect.X + listrect.Width / 2 - szmini / 2 * (c.x);
-        //    var g_y = listrect.Y + listrect.Height / 2 - szmini / 2 * (c.y);
-        //    Bitmap _img = new Bitmap(Chunk.ChunkSize.x, Chunk.ChunkSize.y);
-        //    Graphics _g = Graphics.FromImage(_img);
-
-        //    void draw_entities(KeyValuePair<vec, Chunk> chunk)
-        //    {
-        //        var entities = new List<Entity>(chunk.Value.Entities).Except(tg);
-        //        foreach (var e in chunk.Value.Entities)
-        //            g.DrawRectangle(Pens.White, rect.X + e.TileX, rect.Y + e.TileY, 1, 1);
-        //        if (chunk.Key == tg.CurChunk)
-        //        {
-        //            g.DrawRectangle(new Pen(Color.FromArgb(150, Core.Instance.Ticks % 20 < 10 ? Color.Cyan : Color.Orange)), rect.X + tg.X - 1, rect.Y + tg.Y - 1, 3, 3);
-        //            g.DrawRectangle(Pens.White, rect.X + tg.X, rect.Y + tg.Y, 1, 1);
-        //            g.DrawRectangle(Pens.LightGray, rect);
-        //        }
-        //    }
-        //    void draw_minichunk_mode_0(KeyValuePair<vec, Chunk> chunk)
-        //    {
-        //        rect = new Rectangle(g_x + szmini * chunk.Key.x, g_y + szmini * chunk.Key.y, szmini - 1, szmini - 1);
-        //        g.FillRectangle(new SolidBrush(DB.ChunkLayerColor[chunk.Value.Layer]), g_x + szmini * chunk.Key.x, g_y + szmini * chunk.Key.y, szmini, szmini);
-        //        draw_entities(chunk);
-        //    }
-        //    void draw_minichunk_mode_1(KeyValuePair<vec, Chunk> chunk)
-        //    {
-        //        _g.Clear(Color.Transparent);
-        //        for (int i = 0; i < Chunk.ChunkSize.x; i++)
-        //        {
-        //            for (int j = 0; j < Chunk.ChunkSize.y; j++)
-        //            {
-        //                var tile = chunk.Value.Tiles[(i, j).V()];
-        //                var color = DB.ResColor[tile.Sol != 0 ? (int)tile.Sol : (int)tile.Mur];
-        //                _g.DrawRectangle(new Pen(color), i, j, 1, 1);
-        //            }
-        //        }
-        //        g.DrawImage(_img.Resize(szmini), g_x + szmini * chunk.Key.x, g_y + szmini * chunk.Key.y);
-        //        rect = new Rectangle(g_x + szmini * chunk.Key.x, g_y + szmini * chunk.Key.y, szmini - 1, szmini - 1);
-        //        draw_entities(chunk);
-        //    }
-
-        //    chunks.ForEach(chunk =>
-        //    {
-        //        switch(SubMenu_Map_mode)
-        //        {
-        //            case 0: draw_minichunk_mode_0(chunk); break;
-        //            case 1: draw_minichunk_mode_1(chunk); break;
-        //        }
-        //    });
-
-        //    _g.Dispose();
-        //    _img.Dispose();
-        //}
-        //private void SubMenu_Items_Draw(Graphics g, Graphics gui)
-        //{
-        //    var guy = Core.Instance.TheGuy;
-        //    var items = new List<Item>(guy.Inventory.Items);
-        //    var font = new Font("Segoe UI", 14f);
-        //    int x, y, w = 240, h = 25, i = 0;
-        //    var ms = MouseStates.Position.ToPoint();
-        //    bool hover;
-        //    Rectangle rect;
-        //    foreach (var item in items)
-        //    {
-        //        x = i / (listrect.Height / h) * (w + 10);
-        //        if (x >= listrect.Width) break;
-        //        y = (i - x / w * (listrect.Height / h)) * h;
-        //        rect = new Rectangle(listrect.X + x, listrect.Y + y, 240, h);
-        //        hover = i == SubMenu_Items_selected_i || (SubMenu_Items_selected_i == -1 && rect.Contains(ms));
-        //        g.DrawString(item.Name, font, hover ? Brushes.White : Brushes.Gray, new Rectangle(listrect.X + x, listrect.Y + y, 140, 20));
-        //        g.DrawString($"{item.Count,14}", font, hover ? Brushes.White : Brushes.Gray, new Rectangle(listrect.X + x + 150, listrect.Y + y, 100, 20));
-        //        if(i == SubMenu_Items_selected_i)
-        //        {
-        //            int j = 0;
-        //            void actions_remove() { guy.Inventory.Items.RemoveAt(guy.Inventory.Items.IndexOf(item)); }
-        //            void actions_remove_if_zero() { if (guy.Inventory.Items[guy.Inventory.Items.IndexOf(item)].Count == 0) actions_remove(); }
-        //            void actions_remove_one() { guy.Inventory.Items[guy.Inventory.Items.IndexOf(item)].Count--; actions_remove_if_zero(); }
-        //            void actions_drop_one() { NotificationsManager.AddNotification(NotificationsManager.NotificationTypes.SideLeft, $"- {item.Name} x 1", Color.Red); Core.Instance.SceneAdventure.World.GetChunk(guy.CurChunk).Entities.Add(new Lootable(guy.TilePositionF.i + guy.DirectionPointed, false, new Item(item) { Count=1 })); actions_remove_one(); }
-        //            void actions_drop_all() { NotificationsManager.AddNotification(NotificationsManager.NotificationTypes.SideLeft, $"- {item.Name} x {item.Count}", Color.Red); Core.Instance.SceneAdventure.World.GetChunk(guy.CurChunk).Entities.Add(new Lootable(guy.TilePositionF.i + guy.DirectionPointed, false, new Item(item))); actions_remove(); }
-        //            Action Remove = () => { NotificationsManager.AddNotification(NotificationsManager.NotificationTypes.SideLeft, $"- {item.Name} x {item.Count}", Color.Red); actions_remove(); };
-        //            Action Consume = () => { item.Consume(); actions_remove_if_zero(); };
-        //            Action Drop1 = () => actions_drop_one();
-        //            Action DropAll = () => actions_drop_all();
-        //            var list_submenuitems = new Dictionary<string, Action> {
-        //                ["Consume"] = Consume,
-        //                ["Drop 1"] = Drop1,
-        //                ["Drop All"] = DropAll,
-        //                ["Remove"] = Remove,
-        //            };
-        //            var list_sz = list_submenuitems.Select(k => TextRenderer.MeasureText(k.Key, font));
-        //            int max_sz_w = list_sz.Max(sz => sz.Width);
-        //            int max_sz_h = list_sz.Max(sz => sz.Height);
-        //            void draw(string txt, Action action)
-        //            {
-        //                var r = new Rectangle(rect.X + 40, rect.Y + 10 + max_sz_h * j, max_sz_w, max_sz_h);
-        //                Brush brush = Brushes.Gray;
-        //                if (txt == "Consume" && (!item.IsConsommable || !item.IsMenuConsommable)) brush = new SolidBrush(Color.FromArgb(80, 80, 80));
-        //                else brush = r.Contains(ms) ? Brushes.White : Brushes.Gray;
-        //                gui.FillRectangle(makebrush(r), r);
-        //                gui.DrawString(txt, font, brush, r);
-        //                SubMenu_Items_dropdownitems[r] = action;
-        //                j++;
-        //            }
-        //            foreach(var submenuitem in list_submenuitems)
-        //                draw(submenuitem.Key, submenuitem.Key == "Consume" && (!item.IsConsommable || !item.IsMenuConsommable) ? null : submenuitem.Value);
-        //        }
-        //        i++;
-        //    }
-        //}
     }
 }

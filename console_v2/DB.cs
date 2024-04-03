@@ -10,7 +10,7 @@ namespace console_v2
     public enum Sols { Vide = 0, Pierre = 10, Terre = 15, Herbe = 20, Pave = 30 }
     public enum Murs { Vide = 0, Pierre = 100, PierreFissuree = 110 }
     public enum Outils { Hache = 200, Pioche = 210, Faux = 220, Pelle = 230 }
-    public enum Objets { Buche = 500, Planche = 505, FibreDePlante = 510, Boue, EssenceViolys = 600, EssenceRougeo, EssenceJaunade, EssenceVerdacier, EssenceNoiranite, EssenceBlanchaine }
+    public enum Objets { Buche = 500, BoisDeChauffe = 501, Planche = 505, FibreDePlante = 510, Boue, EssenceViolys = 600, EssenceRougeo, EssenceJaunade, EssenceVerdacier, EssenceNoiranite, EssenceBlanchaine }
     public enum Consommables { Fraises = 1000 }
     public enum Plantes { Violys = 2000, Rougeo, Jaunade, Verdacier, Noiranite, Blanchaine }
 
@@ -40,6 +40,15 @@ namespace console_v2
             if (tileValue.Is<Outils>()) return typeof(Outils);
             if (tileValue.Is<Objets>()) return typeof(Objets);
             if (tileValue.Is<Consommables>()) return typeof(Consommables);
+            return null;
+        }
+        public static string GetEnumNameOf(int tileValue)
+        {
+            if (tileValue.Is<Sols>()) return Enum.GetName(typeof(Sols), tileValue);
+            if (tileValue.Is<Murs>()) return Enum.GetName(typeof(Murs), tileValue);
+            if (tileValue.Is<Outils>()) return Enum.GetName(typeof(Outils), tileValue);
+            if (tileValue.Is<Objets>()) return Enum.GetName(typeof(Objets), tileValue);
+            if (tileValue.Is<Consommables>()) return Enum.GetName(typeof(Consommables), tileValue);
             return null;
         }
 
@@ -108,6 +117,8 @@ namespace console_v2
                 _DBResSpe = ResourcesSpecials[_dbref];
             return (_CharToDisplay, _DBResSpe);
         }
+
+        public static string DefineName(int _dbref) => GetEnumNameOf(_dbref);
 
         static DB()
         {

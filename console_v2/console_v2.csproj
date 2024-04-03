@@ -73,6 +73,7 @@
     <Compile Include="ParticlesManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Recipes.cs" />
     <Compile Include="ResourcesManager.cs" />
     <Compile Include="res\DBResSpeDef\DBSpe_Verdacier.cs" />
     <Compile Include="res\DBResSpeDef\DBSpe_Blanchaine.cs" />

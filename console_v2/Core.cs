@@ -61,8 +61,7 @@ namespace console_v2
                 wooden_scythe,
                 wooden_shovel
                 );
-            for (int i = 0; i < 99; i++)
-                TheGuy.Inventory.Add(new Item(string.Concat(Enumerable.Repeat((char)RandomThings.rnd(30, 90), 4)), Objets.Boue, 1));
+            TheGuy.Inventory.Add(new Item("Buche", Objets.Buche, 5));
             Shortcuts = new List<Shortcut>
             {
                 new Shortcut(0, KB.Key.C, wooden_shovel),
