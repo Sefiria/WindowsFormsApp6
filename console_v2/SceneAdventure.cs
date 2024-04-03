@@ -72,6 +72,8 @@ namespace console_v2
         private void draw_shortcuts(Graphics gui)
         {
             var shortcuts = Core.Instance.Shortcuts;
+            if (shortcuts == null || shortcuts.Count == 0)
+                return;
             float sz = 10 + GraphicsManager.CharSize.Width + 10 + 10;
             float total_sz = shortcuts.Count * GraphicsManager.CharSize.Width + 20;
             float _x = DrawingRect.X + DrawingRect.Width / 2 - total_sz / 2;

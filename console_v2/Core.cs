@@ -61,7 +61,6 @@ namespace console_v2
                 wooden_scythe,
                 wooden_shovel
                 );
-            TheGuy.Inventory.Add(new Item("Buche", Objets.Buche, 5));
             Shortcuts = new List<Shortcut>
             {
                 new Shortcut(0, KB.Key.C, wooden_shovel),

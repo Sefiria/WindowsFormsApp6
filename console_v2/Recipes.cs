@@ -168,23 +168,29 @@ namespace console_v2
                 List<RecipeObj> results;
                 Recipe recipe;
 
-                needs = new RecipeObj[,] { { new RecipeObj((int)Outils.Hache, 1), new RecipeObj((int)Objets.Buche, 1) } };
-                results = new List<RecipeObj> { new RecipeObj((int)Objets.BoisDeChauffe, 1), new RecipeObj((int)Objets.EssenceBlanchaine, 2) };
-                recipe = Create("Bois de chauffe", RecipeMode.Chaos, needs, results);
-                Recipes.Add(recipe);
-
-                needs = new RecipeObj[,] { { new RecipeObj((int)Outils.Faux, 1), new RecipeObj((int)Objets.Buche, 1) } };
-                results = new List<RecipeObj> { new RecipeObj((int)Objets.BoisDeChauffe, 1) };
-                recipe = Create("Test ToolsOnTop", RecipeMode.ToolsOnTop, needs, results);
-                Recipes.Add(recipe);
-
+                #region 3x3
                 needs = new RecipeObj[,] {
-                    { null, new RecipeObj((int)Objets.Buche, 1), null },
-                    { null, new RecipeObj((int)Outils.Pelle, 1), null }
+                    { null,                                new RecipeObj((int)Outils.Hache, 1), null },
+                    { new RecipeObj((int)Objets.Buche, 1), new RecipeObj((int)Objets.Buche, 1), new RecipeObj((int)Objets.Buche, 1) }
                 };
-                results = new List<RecipeObj> { new RecipeObj((int)Objets.BoisDeChauffe, 1) };
-                recipe = Create("Test Static", RecipeMode.Static, needs, results);
+                results = new List<RecipeObj> { new RecipeObj((int)Objets.Planche, 1) };
+                recipe = Create("Planche", RecipeMode.Static, needs, results);
                 Recipes.Add(recipe);
+                #endregion
+
+                #region 2x2
+                needs = new RecipeObj[,] { { new RecipeObj((int)Outils.Hache, 1), new RecipeObj((int)Objets.Buche, 1) } };
+                results = new List<RecipeObj> { new RecipeObj((int)Objets.BoisDeChauffe, 1) };
+                recipe = Create("Bois de chauffe", RecipeMode.ToolsOnTop, needs, results);
+                Recipes.Add(recipe);
+                #endregion
+
+                #region 1x1
+                needs = new RecipeObj[,] { { new RecipeObj((int)Objets.Buche, 1) } };
+                results = new List<RecipeObj> { new RecipeObj((int)Objets.PetitBois, 16) };
+                recipe = Create("Petit bois", RecipeMode.Chaos, needs, results);
+                Recipes.Add(recipe);
+                #endregion
             }
             public static Recipe Create(string name, RecipeMode mode, RecipeObj[,] needs, List<RecipeObj> results)
             {

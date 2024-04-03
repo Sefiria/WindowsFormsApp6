@@ -10,7 +10,7 @@ namespace console_v2
     public enum Sols { Vide = 0, Pierre = 10, Terre = 15, Herbe = 20, Pave = 30 }
     public enum Murs { Vide = 0, Pierre = 100, PierreFissuree = 110 }
     public enum Outils { Hache = 200, Pioche = 210, Faux = 220, Pelle = 230 }
-    public enum Objets { Buche = 500, BoisDeChauffe = 501, Planche = 505, FibreDePlante = 510, Boue, EssenceViolys = 600, EssenceRougeo, EssenceJaunade, EssenceVerdacier, EssenceNoiranite, EssenceBlanchaine }
+    public enum Objets { Buche = 500, BoisDeChauffe, PetitBois, Planche = 505, FibreDePlante = 510, Boue, EssenceViolys = 600, EssenceRougeo, EssenceJaunade, EssenceVerdacier, EssenceNoiranite, EssenceBlanchaine }
     public enum Consommables { Fraises = 1000 }
     public enum Plantes { Violys = 2000, Rougeo, Jaunade, Verdacier, Noiranite, Blanchaine }
 
@@ -77,6 +77,7 @@ namespace console_v2
 
             [(int)Objets.Buche] = '¶',
             [(int)Objets.BoisDeChauffe] = '═',
+            [(int)Objets.PetitBois] = '⸗',
             [(int)Objets.Planche] = '║',
             [(int)Objets.FibreDePlante] = 'ˠ',
             [(int)Objets.Boue] = '░',

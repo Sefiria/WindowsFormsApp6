@@ -67,7 +67,7 @@ namespace console_v2
 
                 if (CharToDisplay > -1)
                     g.DrawString(string.Concat((char)CharToDisplay), font, Brushes.White, pos);
-                else
+                else if(DBResSpe != null)
                     g.DrawImage(DBResSpe, pos);
                 if(offset != Point.Empty)
                     g.DrawString(DisplayName, font, Count > 0 ? Brushes.White : Brushes.Gray, w * 2 + offset.X, offset.Y);
@@ -365,6 +365,8 @@ namespace console_v2
                 var needs = SlotsResult.First().Needs;
                 foreach (var need in needs)
                 {
+                    if(need == null)
+                        continue;
                     if (need.DBRef.Is<Outils>())
                     {
                         // TODO : give damages to the tool (ATM tool usePoint not implemented)
