@@ -15,8 +15,8 @@ namespace console_v2
         public float Y { get => Position.y; set => Position.y = value; }
         public float TileX => (int)(X / GraphicsManager.CharSize.Width);
         public float TileY => (int)(Y / GraphicsManager.CharSize.Height);
-        public Bitmap Image = null;
-        public int CharToDisplay = 'X';
+        public Bitmap Image = null, DBResSpe = null;
+        public int CharToDisplay = -1;
         public Color m_CharColor = Color.White;
         public Color CharColor
         {
@@ -49,7 +49,10 @@ namespace console_v2
 
         public virtual void Draw(Graphics g)
         {
-            GraphicsManager.DrawString(g, string.Concat((char)CharToDisplay), CharBrush, Position);
+            if(CharToDisplay != -1)
+                GraphicsManager.DrawString(g, string.Concat((char)CharToDisplay), CharBrush, Position);
+            else if(DBResSpe != null)
+                GraphicsManager.DrawImage(g, DBResSpe, Position);
         }
 
         public virtual void TickSecond() {}

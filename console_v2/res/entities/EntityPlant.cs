@@ -12,7 +12,7 @@ namespace console_v2.res.entities
     {
         public int DBPlant;
         public EntityPlant() : base() { }
-        public EntityPlant(vec tile, Plantes plant, bool addToCurrentChunkEntities = true) : base(tile.ToWorld(), addToCurrentChunkEntities)
+        public EntityPlant(vec tile, Ressources plant, bool addToCurrentChunkEntities = true) : base(tile.ToWorld(), addToCurrentChunkEntities)
         {
             DBPlant = (int)plant;
             Stats = new Statistics(new Dictionary<Statistics.Stat, int> { [Statistics.Stat.HPMax] = 3, [Statistics.Stat.HP] = 3 });
@@ -45,7 +45,7 @@ namespace console_v2.res.entities
             Stats._Substract(Statistics.Stat.HP, str);
             if (Stats._Get(Statistics.Stat.HP) <= 0)
             {
-                triggerer.Inventory.Add((int)Objets.EssenceViolys - (int)Plantes.Violys + DBPlant);
+                triggerer.Inventory.Add((int)Objets.EssenceViolys - (int)Ressources.Violys + DBPlant);
                 Exists = false;
                 ParticlesManager.Generate(Position + GraphicsManager.CharSize.Vf() / 2f, 3f, 4f, Color.White, 3, 100);
             }

@@ -143,6 +143,8 @@ namespace console_v2
                 chunk.Entities.Add(new EntityTree(v, false));
             }
 
+            //// RESOURCES
+
             // Generate Plants
 
             var available_harvestableGrounds = chunk.Tiles.Where(tile => chunk.Entities.At(tile.Key) == null && DB.HarvestableGrounds.Contains(tile.Value.Sol)).Select(tile => tile.Key).ToList();
@@ -150,10 +152,22 @@ namespace console_v2
             for (int i = 0; i < plantsCount; i++)
             {
                 var rnd_id = RandomThings.rnd(available_harvestableGrounds.Count);
-                var names = Enum.GetNames(typeof(Plantes));
-                var plant = (Plantes)Enum.Parse(typeof(Plantes), names[RandomThings.rnd(names.Length)]);
+                var names = DB.Plants.Select(pl => Enum.GetName(typeof(Ressources), pl)).ToArray();
+                var plant = (Ressources)Enum.Parse(typeof(Ressources), names[RandomThings.rnd(names.Length)]);
                 chunk.Entities.Add(new EntityPlant(available_harvestableGrounds.ElementAt(rnd_id), plant, false));
                 available_harvestableGrounds.RemoveAt(rnd_id);
+            }
+
+            // Generate Stones
+
+            var available_stoneGrounds = chunk.Tiles.Where(tile => chunk.Entities.At(tile.Key) == null && tile.Value.Sol == Sols.Pierre).Select(tile => tile.Key).ToList();
+            var stonesCount = RandomThings.rnd(Math.Min(2 * (int)mode, available_stoneGrounds.Count / 4));
+            for (int i = 0; i < stonesCount; i++)
+            {
+                var rnd_id = RandomThings.rnd(available_stoneGrounds.Count);
+                var results = new Dictionary<int, int> { [(int)Objets.Pierre] = 3, [(int)Objets.Cailloux] = 8, };
+                chunk.Entities.Add(new EntityResource(available_stoneGrounds.ElementAt(rnd_id), (int)Ressources.Rocher, Outils.Masse, rndResults:results, addToCurrentChunkEntities:false));
+                available_stoneGrounds.RemoveAt(rnd_id);
             }
         }
 

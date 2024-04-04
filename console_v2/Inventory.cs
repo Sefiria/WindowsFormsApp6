@@ -61,22 +61,23 @@ namespace console_v2
                 NotificationsManager.AddNotification(NotificationsManager.NotificationTypes.SideLeft, $" +{tool.Name} x {tool.Count}", DB.Colors[typeof(Outils)]);
             }
         }
-        public void Add(params int[] dbrefs)
+        public void Add(params (int id, int count)[] dbrefs)
         {
-            foreach (int dbref in dbrefs)
+            foreach (var dbref in dbrefs)
             {
-                if (dbref.Is<Objets>())
+                if (dbref.id.Is<Objets>())
                 {
-                    _addItem((dbref, 1));
-                    _addItemNotif((dbref, 1));
+                    _addItem((dbref.id, dbref.count));
+                    _addItemNotif((dbref.id, dbref.count));
                 }
-                else if (dbref.Is<Outils>())
+                else if (dbref.id.Is<Outils>())
                 {
-                    _addTool((dbref, 1));
-                    _addToolNotif((dbref, 1));
+                    _addTool((dbref.id, dbref.count));
+                    _addToolNotif((dbref.id, dbref.count));
                 }
             }
         }
+        public void Add(params int[] dbrefs) => Add(dbrefs.Select(i => (i, 1)).ToArray());
         private void _addItem(params (int dbref, int count)[] refs)
         {
             refs.ToList().ForEach(item => _addItem(item));

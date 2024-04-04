@@ -411,8 +411,7 @@ namespace console_v2
                         inv.RemoveSingle(need.DBRef);
                 }
                 foreach (var result in SlotsResult)
-                    for(int i=0; i<result.Count; i++)
-                        inv.Add(result.DBRef);
+                    inv.Add((result.DBRef, result.Count));
                 ResetListAndSlots(true);
             }
         }

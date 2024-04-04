@@ -56,10 +56,12 @@ namespace console_v2
             var wooden_axe = new Tool("Hache en Bois", Outils.Hache, 3);
             var wooden_scythe = new Tool("Faux en Bois", Outils.Faux, 1);
             var wooden_shovel = new Tool("Pelle en Bois", Outils.Pelle, 1);
+            var wooden_hammer = new Tool("Masse en Bois", Outils.Masse, 1);
             TheGuy.Inventory.Add(
                 wooden_axe,
                 wooden_scythe,
-                wooden_shovel
+                wooden_shovel,
+                wooden_hammer
                 );
             Shortcuts = new List<Shortcut>
             {

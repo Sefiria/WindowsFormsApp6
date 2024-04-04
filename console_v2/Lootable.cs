@@ -1,32 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Tooling;
 
 namespace console_v2
 {
     internal class Lootable : Entity
     {
-        List<int> Content = new List<int>();
+        List<(int dbref, int count)> Content = new List<(int dbref, int count)>();
         List<Item> Items = new List<Item>();
         List<Tool> Tools = new List<Tool>();
         int DBResSpe = -1;
 
         public Lootable() : base() { }
-        public Lootable(vec tile, bool addToCurrentChunkEntities = true, params Objets[] content) : base(tile.ToWorld(), addToCurrentChunkEntities)
+        public Lootable(vec tile, bool addToCurrentChunkEntities = true, params (Objets obj, int count)[] content) : base(tile.ToWorld(), addToCurrentChunkEntities)
         {
-            Content.AddRange(content.Select(c => (int)c));
+            Content.AddRange(content.Select(c => ((int)c.obj, c.count)));
             Initialize();
         }
-        public Lootable(vec tile, bool addToCurrentChunkEntities = true, params Outils[] content) : base(tile.ToWorld(), addToCurrentChunkEntities)
+        public Lootable(vec tile, bool addToCurrentChunkEntities = true, params (Outils obj, int count)[] content) : base(tile.ToWorld(), addToCurrentChunkEntities)
         {
-            Content.AddRange(content.Select(c => (int)c));
+            Content.AddRange(content.Select(c => ((int)c.obj, c.count)));
             Initialize();
         }
-        public Lootable(vec tile, bool addToCurrentChunkEntities = true, params int[] content) : base(tile.ToWorld(), addToCurrentChunkEntities)
+        public Lootable(vec tile, bool addToCurrentChunkEntities = true, params (int obj, int count)[] content) : base(tile.ToWorld(), addToCurrentChunkEntities)
         {
             Content.AddRange(content);
             Initialize();
@@ -41,11 +38,6 @@ namespace console_v2
             Tools.AddRange(tools);
             Initialize();
         }
-        public Lootable(vec tile, List<int> content, bool addToCurrentChunkEntities = true) : base(tile.ToWorld(), addToCurrentChunkEntities)
-        {
-            Content.AddRange(content);
-            Initialize();
-        }
         void Initialize()
         {
             CharToDisplay = 0;
@@ -56,7 +48,7 @@ namespace console_v2
                 else if (DB.ResourcesSpecials.ContainsKey(dbref))
                     DBResSpe = dbref;
             }
-            if (Content.Count == 1 && Items.Count == 0 && Tools.Count == 0) set(Content[0]);
+            if (Content.Count == 1 && Items.Count == 0 && Tools.Count == 0) set(Content[0].dbref);
             else if (Content.Count == 0 && Items.Count == 1 && Tools.Count == 0) set(Items[0].DBItem);
             else if (Content.Count == 0 && Items.Count == 0 && Tools.Count == 1) set(Tools[0].DBItem);
             if (CharToDisplay == 0 && DBResSpe == -1)

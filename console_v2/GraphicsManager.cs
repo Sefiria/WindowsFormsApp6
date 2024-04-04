@@ -55,5 +55,9 @@ namespace console_v2
                 g.DrawString("" + text[i], Font, brush, SceneAdventure.DrawingRect.Location.Plus((v + vf).pt.MinusF(5, 0)));
             }
         }
+        public static void DrawImage(Graphics g, Bitmap img, vecf v)
+        {
+            g.DrawImage(img, SceneAdventure.DrawingRect.Location.Plus(v.pt.MinusF(5, 0)));
+        }
     }
 }

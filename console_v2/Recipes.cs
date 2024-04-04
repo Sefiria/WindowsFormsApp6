@@ -183,6 +183,11 @@ namespace console_v2
                 results = new List<RecipeObj> { new RecipeObj((int)Objets.BoisDeChauffe, 1) };
                 recipe = Create("Bois de chauffe", RecipeMode.ToolsOnTop, needs, results);
                 Recipes.Add(recipe);
+                
+                needs = new RecipeObj[,] { { new RecipeObj((int)Objets.Cailloux, 1), new RecipeObj((int)Objets.Cailloux, 1), new RecipeObj((int)Objets.Cailloux, 1), new RecipeObj((int)Objets.Cailloux, 1) } };
+                results = new List<RecipeObj> { new RecipeObj((int)Objets.Pierre, 1) };
+                recipe = Create("Pierre", RecipeMode.Chaos, needs, results);
+                Recipes.Add(recipe);
                 #endregion
 
                 #region 1x1

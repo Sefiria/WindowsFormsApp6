@@ -82,6 +82,7 @@
     <Compile Include="res\DBResSpeDef\DBSpe_Jaunade.cs" />
     <Compile Include="res\DBResSpeDef\DBSpe_Violys.cs" />
     <Compile Include="res\DBResSpeDef\DBSpe_Stone.cs" />
+    <Compile Include="res\entities\EntityStone.cs" />
     <Compile Include="res\entities\EntityPlant.cs" />
     <Compile Include="res\entities\EntityTree.cs" />
     <Compile Include="SceneCraft.cs" />
