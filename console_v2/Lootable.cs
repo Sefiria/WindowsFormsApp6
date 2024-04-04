@@ -10,7 +10,7 @@ namespace console_v2
         List<(int dbref, int count)> Content = new List<(int dbref, int count)>();
         List<Item> Items = new List<Item>();
         List<Tool> Tools = new List<Tool>();
-        int DBResSpe = -1;
+        new int DBResSpe = -1;
 
         public Lootable() : base() { }
         public Lootable(vec tile, bool addToCurrentChunkEntities = true, params (Objets obj, int count)[] content) : base(tile.ToWorld(), addToCurrentChunkEntities)

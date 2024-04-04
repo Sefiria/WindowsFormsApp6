@@ -57,7 +57,9 @@ namespace console_v2
 
             gui.DrawRectangle(new Pen(Color.FromArgb(100, 100, 0)), new Rectangle(DrawingRect.Location, (Size)((Point)DrawingRect.Size).Minus(1)));
 
-            // TODO : add hint on what is pointed by the cursor (on top of Entity)
+            var ms = MouseStates.Position;
+            var ms_tile = ms.vecf().ToTile();
+            World.GetChunk().Entities.Where(e => e.Tile == ms_tile).ToList().ForEach(e => e.DrawHint(gui));
         }
 
         private void update_shortcuts()

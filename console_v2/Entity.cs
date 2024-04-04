@@ -15,6 +15,7 @@ namespace console_v2
         public float Y { get => Position.y; set => Position.y = value; }
         public float TileX => (int)(X / GraphicsManager.CharSize.Width);
         public float TileY => (int)(Y / GraphicsManager.CharSize.Height);
+        public vec Tile => (TileX, TileY).V();
         public Bitmap Image = null, DBResSpe = null;
         public int CharToDisplay = -1;
         public Color m_CharColor = Color.White;
@@ -53,6 +54,21 @@ namespace console_v2
                 GraphicsManager.DrawString(g, string.Concat((char)CharToDisplay), CharBrush, Position);
             else if(DBResSpe != null)
                 GraphicsManager.DrawImage(g, DBResSpe, Position);
+        }
+
+        public virtual void DrawHint(Graphics gui)
+        {
+            var text = Name;
+            var font = MidFont;
+            var sz = TextRenderer.MeasureText(text, font);
+            var position = MouseStates.Position.ToPoint().MinusF(sz.Width * 0.5f, sz.Height * 1.5f);
+            var margin = 10;
+            var rect = new Rectangle(position.Minus(margin, margin / 2), new Size(sz.Width + margin * 2, sz.Height + margin));
+            byte _opacity = (byte)(opacity * byte.MaxValue).ByteCut();
+            var brush = new SolidBrush(Color.FromArgb((byte)(opacity * 1.25f * byte.MaxValue).ByteCut(), Color.LightGray));
+            gui.FillRectangle(new SolidBrush(Color.FromArgb(_opacity, colorLight)), rect);
+            gui.DrawRectangle(new Pen(Color.FromArgb(_opacity, colorMid)), rect);
+            gui.DrawString(text, font, brush, position);
         }
 
         public virtual void TickSecond() {}
