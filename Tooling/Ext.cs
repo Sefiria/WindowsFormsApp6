@@ -203,6 +203,10 @@ namespace Tooling
         /// Return the byte-cutted integer [0-255] of an integer
         /// </summary>
         public static int ByteCut(this int i) => Math.Min(byte.MaxValue, Math.Max(byte.MinValue, i));
+        /// <summary>
+        /// Return the byte-cutted integer [0-255] of an floating point
+        /// </summary>
+        public static float ByteCut(this float i) => Math.Min(byte.MaxValue, Math.Max(byte.MinValue, i));
 
         public static Dictionary<T, U> ToDict<T, U>(this U value) where T : Enum where U : struct => Enum.GetValues(typeof(T)).Cast<T>().ToDictionary(s => s, s => value);
         public static bool ContainsName<T>(this List<T> list, string name) where T : class, IName => list?.FirstOrDefault(item => item.Name.CompareTo(name) == 0) != null;

@@ -336,8 +336,8 @@ namespace console_v2
                     g.DrawRectangle(Pens.White, rect.X + e.TileX, rect.Y + e.TileY, 1, 1);
                 if (chunk.Key == tg.CurChunk)
                 {
-                    g.DrawRectangle(new Pen(Color.FromArgb(150, Core.Instance.Ticks % 20 < 10 ? Color.Cyan : Color.Orange)), rect.X + tg.X - 1, rect.Y + tg.Y - 1, 3, 3);
-                    g.DrawRectangle(Pens.White, rect.X + tg.X, rect.Y + tg.Y, 1, 1);
+                    g.DrawRectangle(new Pen(Color.FromArgb(150, Core.Instance.Ticks % 20 < 10 ? Color.Cyan : Color.Orange)), rect.X + tg.TilePositionF.x - 1, rect.Y + tg.TilePositionF.y - 1, 3, 3);
+                    g.DrawRectangle(Pens.White, rect.X + tg.TilePositionF.x, rect.Y + tg.TilePositionF.y, 1, 1);
                     g.DrawRectangle(Pens.LightGray, rect);
                 }
             }

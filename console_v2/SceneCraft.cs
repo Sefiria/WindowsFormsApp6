@@ -14,6 +14,7 @@ namespace console_v2
         public class ListItem
         {
             public static Font font = new Font("Segoe UI", 14f);
+            public static Font MidFont = new Font("Segoe UI", 12f);
             public static Font MiniFont = new Font("Segoe UI", 10f);
             public static int sz = 50;
 
@@ -49,13 +50,13 @@ namespace console_v2
                 Count = copy.Count;
                 DBResSpe = copy.DBResSpe;
             }
-            public virtual void Draw(Graphics g)
+            public virtual void Draw(Graphics g, Graphics gui)
             {
                 if (Count > 0)
-                    DrawBoundsRelief(g, Bounds, 4f, 4, 4, Bounds.Contains(MouseStates.Position.ToPoint().Minus(listrect.Location)) ? ((SelectedTempItem?.Index ?? -1) == Index ? brushLight : null) : brushDark);
+                    DrawBoundsRelief(gui, Bounds, 4f, 4, 4, Bounds.Contains(MouseStates.Position.ToPoint().Minus(listrect.Location)) ? ((SelectedTempItem?.Index ?? -1) == Index ? brushLight : null) : brushDark);
                 int i = Index - (int)scroll;
                 if (i < 0f || i >= objs.Count) return;
-                DrawItemContent(g, Point.Empty);
+                DrawItemContent(gui, Point.Empty);
             }
             public void DrawItemContent(Graphics g, Point offset)
             {
@@ -91,6 +92,7 @@ namespace console_v2
         }
         public class Slot : ListItem
         {
+            private float opacity = 1f;
             public override Rectangle Bounds => new Rectangle((mainrect.Location.vecf().i + mainrect.Size.V() / 2 - CraftSize * (sz + slot_margin) / 2 + vec * (sz + slot_margin)).ipt, new Size(sz, sz));
             public Slot() : base()
             {
@@ -98,22 +100,53 @@ namespace console_v2
             public Slot(int x, int y) : base(x, y)
             {
             }
-            public override void Draw(Graphics gui)
+            public override void Draw(Graphics g, Graphics gui)
             {
                 var bounds = Bounds;
 
                 if((SelectedTempItem?.Index ?? -1) > -1 && bounds.Contains(MouseStates.Position.ToPoint()))
-                    DrawBoundsRelief(gui, bounds, 4f, 2, brush:brushLight);
+                    DrawBoundsRelief(g, bounds, 4f, 2, brush:brushLight);
                 else
-                    DrawBoundsRelief(gui, bounds, 4f, 2);
+                    DrawBoundsRelief(g, bounds, 4f, 2);
 
                 if (CharToDisplay > -1)
-                    gui.DrawString(string.Concat((char)CharToDisplay), font, Brushes.White, bounds.Location);
+                    g.DrawString(string.Concat((char)CharToDisplay), font, Brushes.White, bounds.Location);
                 else if(DBResSpe != null)
-                    gui.DrawImage(DBResSpe, bounds.Location);
+                    g.DrawImage(DBResSpe, bounds.Location);
 
                 if (Count > 0)
-                    gui.DrawString(Count.ToString(), MiniFont, Brushes.White, bounds.Location.Plus((Point)TextRenderer.MeasureText("A", font)));
+                {
+                    g.DrawString(Count.ToString(), MiniFont, Brushes.White, bounds.Location.Plus((Point)TextRenderer.MeasureText("A", font)));
+                    if (Bounds.Contains(MouseStates.Position.ToPoint()))
+                    {
+                        DrawHint(gui);
+                        if(opacity > 0.5f )
+                            opacity -= 0.01f;
+                    }
+                    else
+                        opacity = 1f;
+                }
+                else
+                    opacity = 1f;
+            }
+            private void DrawHint(Graphics gui)
+            {
+                var item = listItems?.FirstOrDefault(it => it.content == content);
+                if (item == null)
+                    return;
+                var text = item.Name + " x " + Count;
+                if(string.IsNullOrWhiteSpace(text))
+                    return;
+                var font = MidFont;
+                var sz = TextRenderer.MeasureText(text, font);
+                var position = MouseStates.Position.ToPoint().MinusF(sz.Width * 0.5f, sz.Height * 1.5f);
+                var margin = 10;
+                var rect = new Rectangle(position.Minus(margin, margin / 2), new Size(sz.Width + margin * 2, sz.Height + margin));
+                byte _opacity = (byte)(opacity * byte.MaxValue).ByteCut();
+                var brush = new SolidBrush(Color.FromArgb((byte)(opacity * 1.25f * byte.MaxValue).ByteCut(), Color.LightGray));
+                gui.FillRectangle(new SolidBrush(Color.FromArgb(_opacity, colorLight)), rect);
+                gui.DrawRectangle(new Pen(Color.FromArgb(_opacity, colorMid)), rect);
+                gui.DrawString(text, font, brush, position);
             }
         }
         public class SlotResult : Slot
@@ -412,7 +445,7 @@ namespace console_v2
             g.FillRectangle(brushDark, mainrect);
             g.DrawRectangle(Pens.Black, mainrect);
 
-            Slots.ForEach(slot => slot.Draw(gui));
+            Slots.ForEach(slot => slot.Draw(g, gui));
 
             Bitmap listBitmap = new Bitmap(listrect.Width, listrect.Height);
             Graphics listgui = Graphics.FromImage(listBitmap);
@@ -422,7 +455,7 @@ namespace console_v2
             int w = sz.Width;
             int h = sz.Height;
 
-            listItems.ForEach(listitem => listitem.Draw(listgui));
+            listItems.ForEach(listitem => listitem.Draw(null, listgui));
 
             if (hint_z_s > 0)
             {
@@ -445,7 +478,7 @@ namespace console_v2
                 item.DrawItemContent(gui, rect.Location);
             }
 
-            SlotsResult.ForEach(slot => slot.Draw(gui));
+            SlotsResult.ForEach(slot => slot.Draw(g, gui));
         }
     }
 }
