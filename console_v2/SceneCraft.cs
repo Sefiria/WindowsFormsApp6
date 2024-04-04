@@ -131,10 +131,12 @@ namespace console_v2
             }
             private void DrawHint(Graphics gui)
             {
-                var item = listItems?.FirstOrDefault(it => it.content == content);
-                if (item == null)
+                string name = listItems?.FirstOrDefault(it => it.content == content)?.Name;
+                if (string.IsNullOrWhiteSpace(name))
+                    name = Name;
+                if (string.IsNullOrWhiteSpace(name))
                     return;
-                var text = item.Name + " x " + Count;
+                var text = name + " x " + Count;
                 if(string.IsNullOrWhiteSpace(text))
                     return;
                 var font = MidFont;
