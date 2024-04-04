@@ -14,12 +14,14 @@ namespace console_v2
     public enum Sols { Vide = 0, Pierre = 10, Terre = 15, Herbe = 20, Pave = 30 }
     public enum Murs { Vide = 0, Pierre = 100, PierreFissuree = 110 }
     public enum Outils { Hache = 200, Pioche = 210, Faux = 220, Pelle = 230, Masse = 240 }
-    public enum Objets { Buche = 500, BoisDeChauffe, PetitBois, Planche = 505, FibreDePlante = 510, Boue,
+    public enum Objets { Buche = 500, BoisDeChauffe, Brindille, Planche = 505, FibreDePlante = 510, Boue,
         EssenceViolys = 600, EssenceRougeo, EssenceJaunade, EssenceVerdacier, EssenceNoiranite, EssenceBlanchaine,
         Pierre = 700, Cailloux,
     }
-    public enum Consommables { Fraises = 10000 }
-    public enum Ressources { Violys = 20000, Rougeo, Jaunade, Verdacier, Noiranite, Blanchaine, Rocher = 25000 }
+    public enum Consommables { Fraises = 10_000 }
+    public enum Ressources { Violys = 20_000, Rougeo, Jaunade, Verdacier, Noiranite, Blanchaine, Rocher = 25_000 }
+    public enum Structures { PetitAtelier = 100_000, AtelierModeste, GrandAtelier, Scierie,
+        Four = 1_000_000, /*FourAllumé = 1_000_001,*/ }
 
     public enum GenerationMode
     {
@@ -89,7 +91,7 @@ namespace console_v2
 
             [(int)Objets.Buche] = '¶',
             [(int)Objets.BoisDeChauffe] = '═',
-            [(int)Objets.PetitBois] = '⸗',
+            [(int)Objets.Brindille] = '⸗',
             [(int)Objets.Planche] = '║',
             [(int)Objets.FibreDePlante] = 'ˠ',
             [(int)Objets.Boue] = '░',
@@ -174,6 +176,9 @@ namespace console_v2
             ResourcesSpecials[(int)Ressources.Verdacier] = ResourcesSpecials[(int)Objets.EssenceVerdacier] = create(DBSpe_Verdacier.String, Color.White.ToArgb());
             ResourcesSpecials[(int)Ressources.Noiranite] = ResourcesSpecials[(int)Objets.EssenceNoiranite] = create(DBSpe_Noiranite.String, Color.White.ToArgb());
             ResourcesSpecials[(int)Ressources.Blanchaine] = ResourcesSpecials[(int)Objets.EssenceBlanchaine] = create(DBSpe_Blanchaine.String, Color.White.ToArgb());
+
+            ResourcesSpecials[(int)Structures.PetitAtelier] = create(DBSpe_PetitAtelier.StringOff, Color.White.ToArgb());
+            ResourcesSpecials[(int)Structures.PetitAtelier+1] = create(DBSpe_PetitAtelier.StringOn, Color.White.ToArgb());
         }
     }
 }

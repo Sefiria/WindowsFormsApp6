@@ -67,6 +67,7 @@ namespace console_v2
             {
                 new Shortcut(0, KB.Key.C, wooden_shovel),
             };
+            new EntityStructure((5, 5).V(), Structures.PetitAtelier);
         }
         public void ResetGraphics()
         {

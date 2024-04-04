@@ -192,8 +192,8 @@ namespace console_v2
 
                 #region 1x1
                 needs = new RecipeObj[,] { { new RecipeObj((int)Objets.Buche, 1) } };
-                results = new List<RecipeObj> { new RecipeObj((int)Objets.PetitBois, 16) };
-                recipe = Create("Petit bois", RecipeMode.Chaos, needs, results);
+                results = new List<RecipeObj> { new RecipeObj((int)Objets.Brindille, 16) };
+                recipe = Create("Brindille", RecipeMode.Chaos, needs, results);
                 Recipes.Add(recipe);
                 #endregion
             }

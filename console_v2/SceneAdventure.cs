@@ -37,7 +37,7 @@ namespace console_v2
 
             update_shortcuts();
 
-            if (KB.IsKeyPressed(KB.Key.Tab)) Core.Instance.SwitchScene(Core.Scenes.Craft, 3);
+            if (KB.IsKeyPressed(KB.Key.Tab)) Core.Instance.SwitchScene(Core.Scenes.Craft, 1);
             if (KB.IsKeyPressed(KB.Key.Escape)) Core.Instance.SwitchScene(Core.Scenes.Menu);
         }
 
@@ -56,6 +56,8 @@ namespace console_v2
             draw_shortcuts(gui);
 
             gui.DrawRectangle(new Pen(Color.FromArgb(100, 100, 0)), new Rectangle(DrawingRect.Location, (Size)((Point)DrawingRect.Size).Minus(1)));
+
+            // TODO : add hint on what is pointed by the cursor (on top of Entity)
         }
 
         private void update_shortcuts()

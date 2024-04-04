@@ -22,7 +22,7 @@ namespace console_v2
             particles.ForEach(e => { if (e.Exists) e.Draw(g); });
         }
 
-        public static void Generate(vecf position, float size_around, float force, Color color, int count_around, int duration_around)
+        public static void Generate(vecf position, float size_around, float force, Color color, int count_around, int duration_around, bool applyGravity = true)
         {
             int rnd = count_around == 1 ? 0 : RandomThings.rnd(count_around / 4, count_around / 2);
             int count = count_around == 1 ? 1 : RandomThings.rnd(count_around - rnd, count_around + rnd);
@@ -30,8 +30,15 @@ namespace console_v2
             float size = RandomThings.rnd(size_around - rndf, size_around + rndf);
             rnd = RandomThings.rnd(duration_around / 4, duration_around / 2);
             int duration = RandomThings.rnd(duration_around - rnd, duration_around + rnd);
+            Particle p;
             for (int i=0;i<count;i++)
-                Particles.Add(new Particle(position, size, (RandomThings.rnd1Around0(), -RandomThings.rnd1()).Vf(), force, color.ToArgb(), duration));
+            {
+                p = new Particle(position, size, (RandomThings.rnd1Around0(), -RandomThings.rnd1()).Vf(), force, color.ToArgb(), duration)
+                {
+                    ApplyGravity = applyGravity
+                };
+                Particles.Add(p);
+            }
         }
     }
 }
