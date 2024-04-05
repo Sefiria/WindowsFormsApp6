@@ -1,14 +1,34 @@
-﻿using System;
+﻿using console_v2.res.entities;
+using System;
 using System.Drawing;
 using System.Linq;
+using System.Windows.Forms;
 using Tooling;
 
 namespace console_v2
 {
     public class Entity
     {
+        protected int m_DBRef;
+        public int DBRef
+        {
+            get => m_DBRef;
+            set
+            {
+                m_DBRef = value;
+                ResetGraphicsRefs();
+            }
+        }
+
+        protected virtual void ResetGraphicsRefs()
+        {
+            (CharToDisplay, DBResSpe) = DB.RetrieveDBResOrSpe(m_DBRef);
+        }
+
+        public static Font MidFont => GraphicsManager.MidFont;
         public Guid ID = Guid.NewGuid();
         public bool Exists = true;
+        public string Name = null;
         public vecf Position = vecf.Zero;
         public vecf Offset = vecf.Zero;
         public float X { get => Position.x; set => Position.x = value; }
@@ -58,16 +78,13 @@ namespace console_v2
 
         public virtual void DrawHint(Graphics gui)
         {
-            var text = Name;
+            var text = (Name ?? DB.DefineName(DBRef)) ?? (this == Core.Instance.TheGuy ? "You" : null);
+            if (string.IsNullOrWhiteSpace(text))
+                return;
             var font = MidFont;
             var sz = TextRenderer.MeasureText(text, font);
             var position = MouseStates.Position.ToPoint().MinusF(sz.Width * 0.5f, sz.Height * 1.5f);
-            var margin = 10;
-            var rect = new Rectangle(position.Minus(margin, margin / 2), new Size(sz.Width + margin * 2, sz.Height + margin));
-            byte _opacity = (byte)(opacity * byte.MaxValue).ByteCut();
-            var brush = new SolidBrush(Color.FromArgb((byte)(opacity * 1.25f * byte.MaxValue).ByteCut(), Color.LightGray));
-            gui.FillRectangle(new SolidBrush(Color.FromArgb(_opacity, colorLight)), rect);
-            gui.DrawRectangle(new Pen(Color.FromArgb(_opacity, colorMid)), rect);
+            var brush = Brushes.LightGray;
             gui.DrawString(text, font, brush, position);
         }
 

@@ -10,7 +10,6 @@ namespace console_v2.res.entities
 {
     internal class EntityResource : Entity
     {
-        public int DBRef;
         public Outils NeededTool;
         public Dictionary<int, int> Results;
         public Dictionary<int, int> RndResults;

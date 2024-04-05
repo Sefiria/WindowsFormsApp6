@@ -10,21 +10,17 @@ namespace console_v2.res.entities
 {
     internal class EntityStructure : Entity
     {
-        private int m_DBRef;
-        public int DBRef
-        {
-            get => m_DBRef;
-            set
-            {
-                m_DBRef = value;
-                (CharToDisplay, DBResSpe) = DB.RetrieveDBResOrSpe(m_DBRef);
-                (CharToDisplayON, DBResSpeON) = DB.RetrieveDBResOrSpe(m_DBRef + 1);
-            }
-        }
         private int OnParticlesTIcks;
+
         public bool IsOn = false;
-        public int CharToDisplayON;
-        public Bitmap DBResSpeON;
+        public int CharToDisplayON = -1;
+        public Bitmap DBResSpeON = null;
+
+        protected override void ResetGraphicsRefs()
+        {
+            base.ResetGraphicsRefs();
+            (CharToDisplayON, DBResSpeON) = DB.RetrieveDBResOrSpe(m_DBRef + 1);
+        }
 
         public EntityStructure() : base() { }
         public EntityStructure(vec tile, Structures dbref, bool addToCurrentChunkEntities = true) : base(tile.ToWorld(), addToCurrentChunkEntities)

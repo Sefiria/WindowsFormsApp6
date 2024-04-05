@@ -25,7 +25,7 @@ namespace console_v2
                 var dtms = DateTime.UtcNow.Millisecond;
                 var cv = (int)(255 - (Bounds.Contains(ms) ? (dtms % 1000 < 500 ? 200 - (dtms / 1000f * 200) : dtms / 1000f * 200) : 0));
                 var color = Color.FromArgb(cv, IsSelected ? ForeColor.Reversed() : ForeColor);
-                g.DrawString(Text, GraphicsManager.Font, new SolidBrush(color), Bounds);
+                g.DrawString(Text, GraphicsManager.FontSQ, new SolidBrush(color), Bounds);
             }
         }
 
@@ -127,7 +127,7 @@ namespace console_v2
 
             Buttons.ForEach(b => b.Draw(g, selectedButton == b));
 
-            g.DrawString($"{Core.Instance.TheGuy.Inventory.Gils} Gils", GraphicsManager.Font, new SolidBrush(buttonsColor), gilsrect);
+            g.DrawString($"{Core.Instance.TheGuy.Inventory.Gils} Gils", GraphicsManager.FontSQ, new SolidBrush(buttonsColor), gilsrect);
 
 
             switch (selectedButton.Text)
@@ -276,7 +276,7 @@ namespace console_v2
         private void SubMenu_State_Draw(Graphics g)
         {
             var tg = Core.Instance.TheGuy;
-            var font = GraphicsManager.Font;
+            var font = GraphicsManager.FontSQ;
             var statfont = new Font("Segoe UI", 12);
             Rectangle rect, rect_guy = new Rectangle(mainrect.X + 20, mainrect.Y + 20, mainrect.Width - 40, 150);
             int x, y, w = 170, h = 25, i = 0, max_h = rect_guy.Height - 20;

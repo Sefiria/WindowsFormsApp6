@@ -57,14 +57,14 @@ namespace console_v2
 
             gui.DrawRectangle(new Pen(Color.FromArgb(100, 100, 0)), new Rectangle(DrawingRect.Location, (Size)((Point)DrawingRect.Size).Minus(1)));
 
-            var ms = MouseStates.Position;
+            var ms = MouseStates.Position.Minus(DrawingRect.Location);
             var ms_tile = ms.vecf().ToTile();
             World.GetChunk().Entities.Where(e => e.Tile == ms_tile).ToList().ForEach(e => e.DrawHint(gui));
         }
 
         private void update_shortcuts()
         {
-            Core.Instance.Shortcuts.ForEach(s =>
+            Core.Instance.Shortcuts?.ForEach(s =>
             {
                 if (s.IsPressed())
                 {
@@ -91,7 +91,7 @@ namespace console_v2
                 var dbref = Core.Instance.TheGuy.Inventory.GetDBRefByUniqueId(shortcuts[i].Ref.UniqueId);
                 (int CharToDisplay, Bitmap DBResSpe) = DB.RetrieveDBResOrSpe(dbref);
                 if(CharToDisplay > -1)
-                    gui.DrawString(string.Concat((char)CharToDisplay), GraphicsManager.Font, shortcuts[i].IsDown() ? Brushes.White : Brushes.Gray, x + 10, 50);
+                    gui.DrawString(string.Concat((char)CharToDisplay), GraphicsManager.FontSQ, shortcuts[i].IsDown() ? Brushes.White : Brushes.Gray, x + 10, 50);
                 else
                     gui.DrawImage(DBResSpe, x + 10, 50);
             }

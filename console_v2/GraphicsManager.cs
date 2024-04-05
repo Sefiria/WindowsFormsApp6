@@ -24,11 +24,15 @@ namespace console_v2
             public static implicit operator RGB(int d) => new RGB(d);
         }
 
-        public static Font Font = new Font("Courrier New", 24f, FontStyle.Regular);
+        public static Font FontSQ = new Font("Courrier New", 24f, FontStyle.Regular);
+        public static Font BigFont = new Font("Segoe UI", 14f);
+        public static Font MidFont = new Font("Segoe UI", 12f);
+        public static Font MiniFont = new Font("Segoe UI", 10f);
+
         public static Size ConsoleCharSize = new Size(8, 17);//new Size(8, 8);
         public static RGB[] Palette = Defaults.Palette;
         public static SolidBrush[] PaletteBrushes = Palette.Select(x => new SolidBrush(Color.FromArgb(x.R, x.G, x.B))).ToArray();
-        public static SizeF CharSize = new SizeF(1,1);
+        public static SizeF CharSize = new SizeF(21, 36);
         public static int TileWidth = (int)CharSize.Width;
         public static int TileHeight = (int)CharSize.Height;
 
@@ -52,7 +56,7 @@ namespace console_v2
                 int y = i / Chunk.ChunkSize.x;
                 float x = i * CharSize.Width - y * CharSize.Width * Chunk.ChunkSize.x;
                 vecf vf = (x, y * CharSize.Height).Vf();
-                g.DrawString("" + text[i], Font, brush, SceneAdventure.DrawingRect.Location.Plus((v + vf).pt.MinusF(5, 0)));
+                g.DrawString("" + text[i], FontSQ, brush, SceneAdventure.DrawingRect.Location.Plus((v + vf).pt.MinusF(5, 0)));
             }
         }
         public static void DrawImage(Graphics g, Bitmap img, vecf v)

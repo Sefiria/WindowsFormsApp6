@@ -10,11 +10,10 @@ namespace console_v2.res.entities
 {
     internal class EntityPlant : Entity
     {
-        public int DBPlant;
         public EntityPlant() : base() { }
         public EntityPlant(vec tile, Ressources plant, bool addToCurrentChunkEntities = true) : base(tile.ToWorld(), addToCurrentChunkEntities)
         {
-            DBPlant = (int)plant;
+            DBRef = (int)plant;
             Stats = new Statistics(new Dictionary<Statistics.Stat, int> { [Statistics.Stat.HPMax] = 3, [Statistics.Stat.HP] = 3 });
         }
 
@@ -26,12 +25,12 @@ namespace console_v2.res.entities
         }
         public override void Draw(Graphics g)
         {
-            g.DrawImage(DB.ResourcesSpecials[DBPlant], SceneAdventure.DrawingRect.Location.Plus(Position.pt));
+            g.DrawImage(DB.ResourcesSpecials[DBRef], SceneAdventure.DrawingRect.Location.Plus(Position.pt));
             var ui = new Bitmap(200, 200);
             using (var u = Graphics.FromImage(ui))
             {
                 u.Clear(Color.Black);
-                u.DrawImage(DB.ResourcesSpecials[DBPlant], Point.Empty);
+                u.DrawImage(DB.ResourcesSpecials[DBRef], Point.Empty);
             }
         }
         public override void Action(Entity triggerer)
@@ -45,7 +44,7 @@ namespace console_v2.res.entities
             Stats._Substract(Statistics.Stat.HP, str);
             if (Stats._Get(Statistics.Stat.HP) <= 0)
             {
-                triggerer.Inventory.Add((int)Objets.EssenceViolys - (int)Ressources.Violys + DBPlant);
+                triggerer.Inventory.Add((int)Objets.EssenceViolys - (int)Ressources.Violys + DBRef);
                 Exists = false;
                 ParticlesManager.Generate(Position + GraphicsManager.CharSize.Vf() / 2f, 3f, 4f, Color.White, 3, 100);
             }

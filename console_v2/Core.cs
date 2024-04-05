@@ -53,21 +53,22 @@ namespace console_v2
             CurrentScene = SceneAdventure;
             SceneAdventure.Initialize();
             TheGuy = new Guy();
-            var wooden_axe = new Tool("Hache en Bois", Outils.Hache, 3);
-            var wooden_scythe = new Tool("Faux en Bois", Outils.Faux, 1);
-            var wooden_shovel = new Tool("Pelle en Bois", Outils.Pelle, 1);
-            var wooden_hammer = new Tool("Masse en Bois", Outils.Masse, 1);
-            TheGuy.Inventory.Add(
-                wooden_axe,
-                wooden_scythe,
-                wooden_shovel,
-                wooden_hammer
-                );
-            Shortcuts = new List<Shortcut>
-            {
-                new Shortcut(0, KB.Key.C, wooden_shovel),
-            };
-            new EntityStructure((5, 5).V(), Structures.PetitAtelier);
+            //var wooden_axe = new Tool("Hache en Bois", Outils.Hache, 3);
+            //var wooden_scythe = new Tool("Faux en Bois", Outils.Faux, 1);
+            //var wooden_shovel = new Tool("Pelle en Bois", Outils.Pelle, 1);
+            //var wooden_hammer = new Tool("Masse en Bois", Outils.Masse, 1);
+            //TheGuy.Inventory.Add(
+            //    wooden_axe,
+            //    wooden_scythe,
+            //    wooden_shovel,
+            //    wooden_hammer
+            //    );
+            //Shortcuts = new List<Shortcut>
+            //{
+            //    new Shortcut(0, KB.Key.C, wooden_shovel),
+            //};
+            //new EntityStructure((5, 5).V(), Structures.PetitAtelier);
+            TheGuy.Inventory.Add(((int)Objets.Buche, 4));
         }
         public void ResetGraphics()
         {
@@ -84,10 +85,10 @@ namespace console_v2
                 gui = Graphics.FromImage(UIImage);
             }
 
-            if (first_init)
-            {
-                GraphicsManager.CharSize = g.MeasureString("A", GraphicsManager.Font, GraphicsManager.Font.Height, StringFormat.GenericTypographic);
-            }
+            //if (first_init)
+            //{
+            //    GraphicsManager.CharSize = g.MeasureString("A", GraphicsManager.FontSQ, GraphicsManager.FontSQ.Height, StringFormat.GenericTypographic);
+            //}
 
             g.Clear(Color.Black);
             gui.Clear(Color.Transparent);

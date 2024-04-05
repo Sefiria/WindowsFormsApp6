@@ -13,9 +13,9 @@ namespace console_v2
     {
         public class ListItem
         {
-            public static Font font = new Font("Segoe UI", 14f);
-            public static Font MidFont = new Font("Segoe UI", 12f);
-            public static Font MiniFont = new Font("Segoe UI", 10f);
+            public static Font font => GraphicsManager.BigFont;
+            public static Font MidFont => GraphicsManager.MidFont;
+            public static Font MiniFont => GraphicsManager.MiniFont;
             public static int sz = 50;
 
             public int Index;
@@ -461,11 +461,11 @@ namespace console_v2
             if (hint_z_s > 0)
             {
                 listgui.FillRectangle(new SolidBrush(Color.FromArgb(hint_z_s, colorDark)), listrect.Width / 2 - GraphicsManager.CharSize.Width / 2, 0, GraphicsManager.CharSize.Width * 2, GraphicsManager.CharSize.Height * 3);
-                listgui.DrawString("↑", GraphicsManager.Font, new SolidBrush(Color.FromArgb(hint_z_s, Color.Cyan)), listrect.Width / 2 - GraphicsManager.CharSize.Width / 2 + 5, 0);
-                listgui.DrawString("Z", GraphicsManager.Font, new SolidBrush(Color.FromArgb(hint_z_s, Color.Cyan))  , listrect.Width / 2 - 5, GraphicsManager.CharSize.Height * 1.5f);
+                listgui.DrawString("↑", GraphicsManager.FontSQ, new SolidBrush(Color.FromArgb(hint_z_s, Color.Cyan)), listrect.Width / 2 - GraphicsManager.CharSize.Width / 2 + 5, 0);
+                listgui.DrawString("Z", GraphicsManager.FontSQ, new SolidBrush(Color.FromArgb(hint_z_s, Color.Cyan))  , listrect.Width / 2 - 5, GraphicsManager.CharSize.Height * 1.5f);
                 listgui.FillRectangle(new SolidBrush(Color.FromArgb(hint_z_s, colorDark)), listrect.Width / 2 - GraphicsManager.CharSize.Width / 2, listrect.Height - GraphicsManager.CharSize.Height * 3, GraphicsManager.CharSize.Width * 2, GraphicsManager.CharSize.Height * 3);
-                listgui.DrawString("S", GraphicsManager.Font, new SolidBrush(Color.FromArgb(hint_z_s, Color.Cyan)), listrect.Width / 2 - GraphicsManager.CharSize.Width / 2 + 5, listrect.Height - GraphicsManager.CharSize.Height * 2);
-                listgui.DrawString("↓", GraphicsManager.Font, new SolidBrush(Color.FromArgb(hint_z_s, Color.Cyan)), listrect.Width / 2 - 5, listrect.Height - GraphicsManager.CharSize.Height * 2 + GraphicsManager.CharSize.Height);
+                listgui.DrawString("S", GraphicsManager.FontSQ, new SolidBrush(Color.FromArgb(hint_z_s, Color.Cyan)), listrect.Width / 2 - GraphicsManager.CharSize.Width / 2 + 5, listrect.Height - GraphicsManager.CharSize.Height * 2);
+                listgui.DrawString("↓", GraphicsManager.FontSQ, new SolidBrush(Color.FromArgb(hint_z_s, Color.Cyan)), listrect.Width / 2 - 5, listrect.Height - GraphicsManager.CharSize.Height * 2 + GraphicsManager.CharSize.Height);
                 hint_z_s -= 3;
             }
             gui.DrawImage(listBitmap, listrect.Location);

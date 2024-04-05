@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Tooling;
 
 namespace console_v2.res.entities
@@ -13,6 +14,7 @@ namespace console_v2.res.entities
         public EntityTree() : base() { }
         public EntityTree(vec tile, bool addToCurrentChunkEntities = true) : base(tile.ToWorld(), addToCurrentChunkEntities)
         {
+            Name = "Arbre";
             CharToDisplay = 'ῼ';
             Stats = new Statistics(new Dictionary<Statistics.Stat, int> { [Statistics.Stat.HPMax] = 30, [Statistics.Stat.HP] = 30 });
         }

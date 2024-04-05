@@ -10,6 +10,8 @@ namespace console_v2
 {
     /*
     ᴗѼѽѿ◊
+
+    obj de Scan pour hint sur entities &| déjà découverts
     */
     public enum Sols { Vide = 0, Pierre = 10, Terre = 15, Herbe = 20, Pave = 30 }
     public enum Murs { Vide = 0, Pierre = 100, PierreFissuree = 110 }
@@ -42,6 +44,8 @@ namespace console_v2
         /// </summary>
         public static IEnumerable<int> Entities => GetValues<Outils>().Concat(GetValues<Objets>()).Concat(GetValues<Consommables>());
 
+        public static List<int> Collectibles = GetValues<Objets>().Concat(GetValues<Consommables>()).Concat(GetValues<Stru>);
+
         public static Type GetEnumTypeOf(int tileValue)
         {
             if (tileValue.Is<Sols>()) return typeof(Sols);
@@ -58,6 +62,8 @@ namespace console_v2
             if (tileValue.Is<Outils>()) return Enum.GetName(typeof(Outils), tileValue);
             if (tileValue.Is<Objets>()) return Enum.GetName(typeof(Objets), tileValue);
             if (tileValue.Is<Consommables>()) return Enum.GetName(typeof(Consommables), tileValue);
+            if (tileValue.Is<Ressources>()) return Enum.GetName(typeof(Ressources), tileValue);
+            if (tileValue.Is<Structures>()) return Enum.GetName(typeof(Structures), tileValue);
             return null;
         }
 
