@@ -8,6 +8,6 @@ namespace Tooling
 {
     public interface IDBItem
     {
-        int DBItem { get; }
+        int DBRef { get; }
     }
 }

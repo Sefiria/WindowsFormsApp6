@@ -44,8 +44,6 @@ namespace console_v2
         /// </summary>
         public static IEnumerable<int> Entities => GetValues<Outils>().Concat(GetValues<Objets>()).Concat(GetValues<Consommables>());
 
-        public static List<int> Collectibles = GetValues<Objets>().Concat(GetValues<Consommables>()).Concat(GetValues<Stru>);
-
         public static Type GetEnumTypeOf(int tileValue)
         {
             if (tileValue.Is<Sols>()) return typeof(Sols);
@@ -53,6 +51,8 @@ namespace console_v2
             if (tileValue.Is<Outils>()) return typeof(Outils);
             if (tileValue.Is<Objets>()) return typeof(Objets);
             if (tileValue.Is<Consommables>()) return typeof(Consommables);
+            if (tileValue.Is<Ressources>()) return typeof(Ressources);
+            if (tileValue.Is<Structures>()) return typeof(Structures);
             return null;
         }
         public static string GetEnumNameOf(int tileValue)

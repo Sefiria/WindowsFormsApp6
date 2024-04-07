@@ -33,12 +33,12 @@ namespace console_v2.res.entities
         {
             if (!Exists) return;
 
-            var axes = triggerer.Inventory.Tools.Where(tool => tool.DBRef == Outils.Hache);
+            var axes = triggerer.Inventory.Tools.Where(tool => tool.DBRef == (int)Outils.Hache);
             var str = axes.Count() == 0 ? 1 : axes.Max(axe => axe.STR);
             Stats._Substract(Statistics.Stat.HP, str);
             if (Stats._Get(Statistics.Stat.HP) <= 0)
             {
-                new Lootable(Position.ToTile(), true, new Item("Buche", Objets.Buche, 1) { IsConsommable = false });
+                new Lootable(Position.ToTile(), true, new Item("Buche", (int)Objets.Buche, 1) { IsConsommable = false });
                 Exists = false;
                 ParticlesManager.Generate(Position + GraphicsManager.CharSize.Vf() / 2f, 5f, 10f, Color.White, 10, 100);
             }

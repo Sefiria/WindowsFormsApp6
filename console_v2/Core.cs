@@ -30,7 +30,7 @@ namespace console_v2
         public PictureBox Canvas;
         public Guy TheGuy;
         public long Ticks;
-        public List<Shortcut> Shortcuts;
+        public List<Shortcut> Shortcuts = new List<Shortcut>();
 
         public int ScreenWidth => Canvas.Width;
         public int ScreenHeight => Canvas.Height;

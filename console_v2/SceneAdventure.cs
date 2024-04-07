@@ -1,4 +1,5 @@
-﻿using System;
+﻿using console_v2.res.entities;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -11,11 +12,13 @@ namespace console_v2
 {
     public class SceneAdventure : Scene
     {
-        public World World;
         public static Rectangle DrawingRect => new RectangleF(Core.Instance.ScreenWidth / 2 - Chunk.ChunkSize.x * GraphicsManager.CharSize.Width / 2f,
                                                                                               Core.Instance.ScreenHeight / 2 - Chunk.ChunkSize.y * GraphicsManager.CharSize.Height / 2f,
                                                                                               Chunk.ChunkSize.x * GraphicsManager.CharSize.Width,
                                                                                               Chunk.ChunkSize.y * GraphicsManager.CharSize.Height).ToIntRect();
+
+        public World World;
+        public Item ItemToPlace = null;
 
         public SceneAdventure() : base()
         {
@@ -32,13 +35,27 @@ namespace console_v2
         {
             base.Update();
 
-            World.Update();
-            NotificationsManager.Update();
+            if (ItemToPlace != null)
+            {
+                if (KB.IsKeyPressed(KB.Key.Escape))
+                {
+                    ItemToPlace = null;
+                    return;
+                }
 
-            update_shortcuts();
+                ItemToPlaceUpdate();
+                NotificationsManager.Update();
+            }
+            else
+            {
+                World.Update();
+                NotificationsManager.Update();
 
-            if (KB.IsKeyPressed(KB.Key.Tab)) Core.Instance.SwitchScene(Core.Scenes.Craft, 1);
-            if (KB.IsKeyPressed(KB.Key.Escape)) Core.Instance.SwitchScene(Core.Scenes.Menu);
+                update_shortcuts();
+
+                if (KB.IsKeyPressed(KB.Key.Tab)) Core.Instance.SwitchScene(Core.Scenes.Craft, 1);
+                if (KB.IsKeyPressed(KB.Key.Escape)) Core.Instance.SwitchScene(Core.Scenes.Menu);
+            }
         }
 
         public override void TickSecond()
@@ -60,6 +77,9 @@ namespace console_v2
             var ms = MouseStates.Position.Minus(DrawingRect.Location);
             var ms_tile = ms.vecf().ToTile();
             World.GetChunk().Entities.Where(e => e.Tile == ms_tile).ToList().ForEach(e => e.DrawHint(gui));
+
+            if (ItemToPlace != null)
+                ItemToPlaceDraw(g, gui);
         }
 
         private void update_shortcuts()
@@ -95,6 +115,27 @@ namespace console_v2
                 else
                     gui.DrawImage(DBResSpe, x + 10, 50);
             }
+        }
+
+
+        private void ItemToPlaceUpdate()
+        {
+            if (MouseStates.IsButtonPressed(System.Windows.Forms.MouseButtons.Left))
+            {
+                var tile = (MouseStates.Position.vecf() - DrawingRect.Location.vecf()).ToTile();
+                Core.Instance.TheGuy.Inventory.RemoveOne(ItemToPlace.DBRef);
+                new EntityStructure(tile, (Structures)ItemToPlace.DBRef);
+                ItemToPlace = null;
+            }
+        }
+        public void ItemToPlaceDraw(Graphics g, Graphics gui)
+        {
+            var (CharToDisplay, DBResSpe) = DB.RetrieveDBResOrSpe(ItemToPlace.DBRef);
+            var Position = (MouseStates.Position.vecf() - DrawingRect.Location.vecf()).ToTile().ToWorld();
+            if (CharToDisplay != -1)
+                GraphicsManager.DrawString(g, string.Concat((char)CharToDisplay), new SolidBrush(Color.FromArgb(100, Color.White)), Position);
+            else if (DBResSpe != null)
+                GraphicsManager.DrawImage(g, DBResSpe.WithOpacity(100f/byte.MaxValue), Position);
         }
     }
 }

@@ -37,7 +37,7 @@ namespace console_v2.res.entities
         {
             if (!Exists) return;
 
-            var scythes = triggerer.Inventory.Tools.Where(tool => tool.DBRef == Outils.Faux);
+            var scythes = triggerer.Inventory.Tools.Where(tool => tool.DBRef == (int)Outils.Faux);
             if (scythes.Count() == 0)
                 return;
             var str = scythes.Max(scythe => scythe.STR);

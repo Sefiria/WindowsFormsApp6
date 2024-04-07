@@ -403,15 +403,19 @@ namespace console_v2
                     void actions_drop_one() { NotificationsManager.AddNotification(NotificationsManager.NotificationTypes.SideLeft, $"- {item.Name} x 1", Color.Red); Core.Instance.SceneAdventure.World.GetChunk(guy.CurChunk).Entities.Add(new Lootable(guy.TilePositionF.i + guy.DirectionPointed, false, new Item(item) { Count=1 })); actions_remove_one(); }
                     void actions_drop_all() { NotificationsManager.AddNotification(NotificationsManager.NotificationTypes.SideLeft, $"- {item.Name} x {item.Count}", Color.Red); Core.Instance.SceneAdventure.World.GetChunk(guy.CurChunk).Entities.Add(new Lootable(guy.TilePositionF.i + guy.DirectionPointed, false, new Item(item))); actions_remove(); }
                     Action Remove = () => { NotificationsManager.AddNotification(NotificationsManager.NotificationTypes.SideLeft, $"- {item.Name} x {item.Count}", Color.Red); actions_remove(); };
-                    Action Consume = () => { item.Consume(); actions_remove_if_zero(); };
+                    Action Use = () => { item.Use(); actions_remove_if_zero(); };
                     Action Drop1 = () => actions_drop_one();
                     Action DropAll = () => actions_drop_all();
-                    var list_submenuitems = new Dictionary<string, Action> {
-                        ["Consume"] = Consume,
-                        ["Drop 1"] = Drop1,
-                        ["Drop All"] = DropAll,
-                        ["Remove"] = Remove,
-                    };
+                    var list_submenuitems = new Dictionary<string, Action>();
+                    string use_name = "";
+                    var t = item.DBType;
+                    if (t == typeof(Consommables)) use_name = "Consumme";
+                    else if (t == typeof(Structures)) use_name = "Place";
+                    if(!string.IsNullOrWhiteSpace(use_name))
+                        list_submenuitems[use_name] = Use;
+                    list_submenuitems["Drop 1"] = Drop1;
+                    list_submenuitems["Drop All"] = DropAll;
+                    list_submenuitems["Remove"] = Remove;
                     var list_sz = list_submenuitems.Select(k => TextRenderer.MeasureText(k.Key, font));
                     int max_sz_w = list_sz.Max(sz => sz.Width);
                     int max_sz_h = list_sz.Max(sz => sz.Height);

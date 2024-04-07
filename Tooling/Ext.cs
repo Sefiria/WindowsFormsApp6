@@ -210,7 +210,7 @@ namespace Tooling
 
         public static Dictionary<T, U> ToDict<T, U>(this U value) where T : Enum where U : struct => Enum.GetValues(typeof(T)).Cast<T>().ToDictionary(s => s, s => value);
         public static bool ContainsName<T>(this List<T> list, string name) where T : class, IName => list?.FirstOrDefault(item => item.Name.CompareTo(name) == 0) != null;
-        public static bool ContainsItem<T>(this List<T> list, int dbref) where T : class, IDBItem => list?.FirstOrDefault(item => item.DBItem == dbref) != null;
+        public static bool ContainsItem<T>(this List<T> list, int dbref) where T : class, IDBItem => list?.FirstOrDefault(item => item.DBRef == dbref) != null;
 
         public static IEnumerable<TSource> Except<TSource>(this IEnumerable<TSource> first, TSource element) => first.Except(new[] { element });
     }

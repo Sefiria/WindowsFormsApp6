@@ -49,8 +49,8 @@ namespace console_v2
                     DBResSpe = dbref;
             }
             if (Content.Count == 1 && Items.Count == 0 && Tools.Count == 0) set(Content[0].dbref);
-            else if (Content.Count == 0 && Items.Count == 1 && Tools.Count == 0) set(Items[0].DBItem);
-            else if (Content.Count == 0 && Items.Count == 0 && Tools.Count == 1) set(Tools[0].DBItem);
+            else if (Content.Count == 0 && Items.Count == 1 && Tools.Count == 0) set(Items[0].DBRef);
+            else if (Content.Count == 0 && Items.Count == 0 && Tools.Count == 1) set(Tools[0].DBRef);
             if (CharToDisplay == 0 && DBResSpe == -1)
                 CharToDisplay = '▄';
         }

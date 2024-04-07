@@ -13,6 +13,8 @@ namespace console_v2
 {
     public class Inventory
     {
+        public static IEnumerable<int> Collectibles = DB.GetValues<Objets>().Concat(DB.GetValues<Consommables>()).Concat(DB.GetValues<Structures>());
+
         public Entity Owner;
         public long Gils;
         public List<Item> Items;
@@ -30,7 +32,7 @@ namespace console_v2
         public bool Contains(Outils tool) => Tools?.ContainsItem((int)tool) ?? false;
         public bool Contains(int dbref)
         {
-            if (dbref.Is<Objets>()) return Contains((Objets)dbref);
+            if (Collectibles.Contains(dbref)) return Items?.ContainsItem(dbref) ?? false;
             if (dbref.Is<Outils>()) return Contains((Outils)dbref);
             return false;
         }
@@ -65,7 +67,7 @@ namespace console_v2
         {
             foreach (var dbref in dbrefs)
             {
-                if (dbref.id.Is<Objets>())
+                if (Collectibles.Contains(dbref.id))
                 {
                     _addItem((dbref.id, dbref.count));
                     _addItemNotif((dbref.id, dbref.count));
@@ -85,10 +87,10 @@ namespace console_v2
         }
         private void _addItem((int dbref, int count) itemref)
         {
-            if (Contains((Objets)itemref.dbref))
-                Items[Items.IndexOf(Items.First(i => i.DBItem == itemref.dbref))].Count++;
+            if (Items?.ContainsItem(itemref.dbref) ?? false)
+                Items[Items.IndexOf(Items.First(i => i.DBRef == itemref.dbref))].Count++;
             else
-                Items?.AddRange(new[] { new Item(Enum.GetName(typeof(Objets), itemref.dbref), (Objets)itemref.dbref) { Count = itemref.count } });
+                Items?.AddRange(new[] { new Item(DB.DefineName(itemref.dbref), itemref.dbref, itemref.count) });
         }
         private void _addTool(params (int dbref, int count)[] refs)
         {
@@ -98,18 +100,18 @@ namespace console_v2
         private void _addTool((int dbref, int count) toolref)
         {
             if (Contains((Outils)toolref.dbref))
-                Tools[Tools.IndexOf(Tools.First(i => i.DBItem == toolref.dbref))].Count += toolref.count;
+                Tools[Tools.IndexOf(Tools.First(i => i.DBRef == toolref.dbref))].Count += toolref.count;
             else
                 Tools?.AddRange(new[] { new Tool(Enum.GetName(typeof(Outils), toolref.dbref), (Outils)toolref.dbref) { Count = toolref.count } });
         }
 
         public void Remove(params Item[] items) => Items?.AddRange(items);
         public void Remove(params Tool[] tools) => Tools?.AddRange(tools);
-        public void Remove(params int[] dbrefs)
+        public void RemoveAll(params int[] dbrefs)
         {
             foreach (int dbref in dbrefs)
             {
-                if (dbref.Is<Objets>())
+                if (Items?.ContainsItem(dbref) ?? false)
                 {
                     var item = Items.FirstOrDefault(it => (int)it.DBRef == dbref);
                     if(item != null)
@@ -123,11 +125,11 @@ namespace console_v2
                 }
             }
         }
-        public void RemoveSingle(params int[] dbrefs)
+        public void RemoveOne(params int[] dbrefs)
         {
             foreach (int dbref in dbrefs)
             {
-                if (dbref.Is<Objets>())
+                if (Items?.ContainsItem(dbref) ?? false)
                 {
                     var item = Items.FirstOrDefault(it => (int)it.DBRef == dbref);
                     if (item != null)
@@ -156,7 +158,7 @@ namespace console_v2
             {
                 foreach (var item in refs)
                 {
-                    string item_name = Items[Items.IndexOf(Items.First(i => i.DBItem == item.dbref))].Name;
+                    string item_name = Items[Items.IndexOf(Items.First(i => i.DBRef == item.dbref))].Name;
                     NotificationsManager.AddNotification(NotificationsManager.NotificationTypes.SideLeft, $"+ {item_name} x {item.count}", DB.Colors[typeof(Objets)]);
                 }
             }
@@ -167,7 +169,7 @@ namespace console_v2
             {
                 foreach (var tool in refs)
                 {
-                    string tool_name = Tools[Tools.IndexOf(Tools.First(i => i.DBItem == tool.dbref))].Name;
+                    string tool_name = Tools[Tools.IndexOf(Tools.First(i => i.DBRef == tool.dbref))].Name;
                     NotificationsManager.AddNotification(NotificationsManager.NotificationTypes.SideLeft, $"+ {tool_name} x {tool.count}", DB.Colors[typeof(Outils)]);
                 }
             }

@@ -408,7 +408,7 @@ namespace console_v2
                         continue;// don't remove tools but give them damage
                     }
                     for (int i = 0; i < need.Count; i++)
-                        inv.RemoveSingle(need.DBRef);
+                        inv.RemoveOne(need.DBRef);
                 }
                 foreach (var result in SlotsResult)
                     inv.Add((result.DBRef, result.Count));

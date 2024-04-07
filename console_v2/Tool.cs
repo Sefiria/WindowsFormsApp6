@@ -13,12 +13,10 @@ namespace console_v2
     {
         public Guid UniqueId { get; set; } = Guid.NewGuid();
         public string Name { get; set; } = "Unnamed_Tool";
-        public Outils DBRef;
+        public int DBRef { get; set; }
         public float Duration;
         public int Count;
         public int STR;
-
-        public int DBItem => (int)DBRef;
 
         public Tool()
         {
@@ -34,14 +32,14 @@ namespace console_v2
         {
             Name = name;
             Duration = 1f;
-            DBRef = dbref;
+            DBRef = (int)dbref;
             this.STR = STR;
             Count = 1;
         }
 
         public void Use(Entity triggerer)
         {
-            switch(DBRef)
+            switch((Outils)DBRef)
             {
                 case Outils.Pelle: UseShovel(triggerer); break;
             }
@@ -55,14 +53,14 @@ namespace console_v2
             {
                 var n = RandomThings.rnd(3);
                 if (n > 0)
-                    triggerer.Inventory.Add(new Item("Fibre De Plante", Objets.FibreDePlante, n));
+                    triggerer.Inventory.Add(new Item("Fibre De Plante", (int)Objets.FibreDePlante, n));
                 chunk.Tiles[tile].Sol = Sols.Terre;
             }
             else if (chunk.Tiles[tile].Sol == Sols.Terre)
             {
                 var n = RandomThings.rnd(2);
                 if (n > 0)
-                    triggerer.Inventory.Add(new Item("Boue", Objets.Boue, n));
+                    triggerer.Inventory.Add(new Item("Boue", (int)Objets.Boue, n));
                 chunk.Tiles[tile].Sol = Sols.Pierre;
             }
         }
