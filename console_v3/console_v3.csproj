@@ -77,6 +77,14 @@
     <Compile Include="res\entities\EntityStone.cs" />
     <Compile Include="res\entities\EntityPlant.cs" />
     <Compile Include="res\entities\EntityTree.cs" />
+    <Compile Include="res\ores\Ores_Base.cs" />
+    <Compile Include="res\ores\Ores_Emerald.cs" />
+    <Compile Include="res\ores\Ores_Diamond.cs" />
+    <Compile Include="res\ores\Ores_Gold.cs" />
+    <Compile Include="res\ores\Ores_Iron.cs" />
+    <Compile Include="res\ores\Ores_Wood.cs" />
+    <Compile Include="res\recipes\Recipes_Tools.cs" />
+    <Compile Include="res\recipes\tools\Recipes_Scythes.cs" />
     <Compile Include="SceneCraft.cs" />
     <Compile Include="SceneMenu.cs" />
     <Compile Include="Scene.cs" />
@@ -123,5 +131,6 @@
     <Content Include="Resources\textures.png" />
     <Content Include="Resources\rawtextures.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

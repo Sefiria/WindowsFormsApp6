@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.Remoting;
 using System.Text;
@@ -14,9 +15,11 @@ namespace console_v3
         public Guid UniqueId { get; set; } = Guid.NewGuid();
         public string Name { get; set; } = "Unnamed_Tool";
         public int DBRef { get; set; }
+        public int DBRef_Ore;
         public float Duration;
         public int Count;
         public int STR;
+        public Bitmap Image;
 
         public Tool()
         {
@@ -27,14 +30,25 @@ namespace console_v3
             Duration = copy.Duration;
             DBRef = copy.DBRef;
             Count = copy.Count;
+            ResetGraphics();
         }
-        public Tool(string name, int dbref, int STR = 1)
+        public Tool(string name, int dbref, int dbref_ore, int STR = 1)
         {
             Name = name;
             Duration = 1f;
-            DBRef = (int)dbref;
+            DBRef = dbref;
+            DBRef_Ore = dbref_ore;
             this.STR = STR;
             Count = 1;
+            ResetGraphics();
+        }
+        public void ResetGraphics()
+        {
+            Image = DB.GetTexture(DBRef);
+            var ore = DB.GetOre(DBRef_Ore);
+            Image.ChangeColor(Color.FromArgb(1, 0, 0), Color.FromArgb(ore.ColorDark));
+            Image.ChangeColor(Color.FromArgb(0, 1, 0), Color.FromArgb(ore.ColorMid));
+            Image.ChangeColor(Color.FromArgb(0, 0, 1), Color.FromArgb(ore.ColorLight));
         }
 
         public void Use(Entity triggerer)

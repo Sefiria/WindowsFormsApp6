@@ -7,12 +7,12 @@ namespace console_v3
 {
     internal class Lootable : Entity
     {
-        List<(int dbref, int count)> Content = new List<(int dbref, int count)>();
+        List<(int dbref, int ore, int count)> Content = new List<(int dbref, int ore, int count)>();
         List<Item> Items = new List<Item>();
         List<Tool> Tools = new List<Tool>();
 
         public Lootable() : base() { }
-        public Lootable(vec tile, bool addToCurrentChunkEntities = true, params (int obj, int count)[] content) : base(tile.ToWorld(), addToCurrentChunkEntities)
+        public Lootable(vec tile, bool addToCurrentChunkEntities = true, params (int obj, int ore, int count)[] content) : base(tile.ToWorld(), addToCurrentChunkEntities)
         {
             Content.AddRange(content);
             Initialize();
@@ -40,13 +40,21 @@ namespace console_v3
             // particules ?
         }
 
+        public override void Draw(Graphics g)
+        {
+            if (Content.Count == 0 && Items.Count == 0 && Tools.Count == 1)
+                GraphicsManager.Draw(g, Tools[0].Image, Position);
+            else
+                base.Draw(g);
+        }
+
         public override void Action(Entity triggerer)
         {
             if (!Exists) return;
 
             if (triggerer?.Inventory != null)
             {
-                Content.ForEach(c => triggerer.Inventory.Add(c));
+                Content.ForEach(c => { if (c.ore != -1) triggerer.Inventory.AddTool((c.dbref, c.ore, c.count)); else triggerer.Inventory.AddItem((c.dbref, c.count)); });
                 triggerer.Inventory.Add(Items.ToArray());
                 triggerer.Inventory.Add(Tools.ToArray());
             }

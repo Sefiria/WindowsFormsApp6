@@ -16,7 +16,7 @@ namespace console_v3.res.entities
         {
             Name = "Arbre";
             DBRef = RandomThings.arnd((int)DB.Tex.Tree_Spring_A, (int)DB.Tex.Tree_Spring_C);
-            Stats = new Statistics(new Dictionary<Statistics.Stat, int> { [Statistics.Stat.HPMax] = 1, [Statistics.Stat.HP] = 1 });
+            Stats = new Statistics(new Dictionary<Statistics.Stat, int> { [Statistics.Stat.HPMax] = 30, [Statistics.Stat.HP] = 30 });
         }
 
         public override void Update()

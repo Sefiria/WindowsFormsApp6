@@ -68,8 +68,9 @@ namespace console_v3
             //{
             //    new Shortcut(0, KB.Key.C, wooden_shovel),
             //};
-            //new EntityStructure((5, 5).V(), Structures.PetitAtelier);
-            //TheGuy.Inventory.Add(((int)DB.Tex.WoodLog, 4));
+            new EntityStructure((10, 10).V(), (int)DB.Tex.Workbench);
+            TheGuy.Inventory.AddItem(((int)DB.Tex.WoodLog, 4));
+            TheGuy.Inventory.AddTool(((int)DB.Tex.WoodScythe, (int)DB.Tex.Iron, 1));
         }
         public void ResetGraphics()
         {

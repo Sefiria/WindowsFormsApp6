@@ -29,7 +29,7 @@ namespace console_v3
         public bool Contains(int dbref)
         {
             if (DB.Collectibles.Contains(dbref)) return Items?.ContainsItem(dbref) ?? false;
-            if (dbref.IsTool()) return Contains(dbref);
+            if (dbref.IsTool()) Tools?.ContainsItem(dbref);
             return false;
         }
 
@@ -59,7 +59,7 @@ namespace console_v3
                 NotificationsManager.AddNotification(NotificationsManager.NotificationTypes.SideLeft, $" +{tool.Name} x {tool.Count}", DB.Colors["Tools"]);
             }
         }
-        public void Add(params (int id, int count)[] dbrefs)
+        public void AddItem(params (int id, int count)[] dbrefs)
         {
             foreach (var dbref in dbrefs)
             {
@@ -68,14 +68,20 @@ namespace console_v3
                     _addItem((dbref.id, dbref.count));
                     _addItemNotif((dbref.id, dbref.count));
                 }
-                else if (dbref.id.IsTool())
+            }
+        }
+        public void AddTool(params (int id, int ore, int count)[] dbrefs)
+        {
+            foreach (var dbref in dbrefs)
+            {
+                if (dbref.id.IsTool())
                 {
-                    _addTool((dbref.id, dbref.count));
-                    _addToolNotif((dbref.id, dbref.count));
+                    _addTool((dbref.id, dbref.ore, dbref.count));
+                    _addToolNotif((dbref.id, dbref.ore, dbref.count));
                 }
             }
         }
-        public void Add(params int[] dbrefs) => Add(dbrefs.Select(i => (i, 1)).ToArray());
+        //public void Add(params int[] dbrefs) => Add(dbrefs.Select(i => (i, 1)).ToArray());
         private void _addItem(params (int dbref, int count)[] refs)
         {
             refs.ToList().ForEach(item => _addItem(item));
@@ -88,17 +94,17 @@ namespace console_v3
             else
                 Items?.AddRange(new[] { new Item(DB.DefineName(itemref.dbref), itemref.dbref, itemref.count) });
         }
-        private void _addTool(params (int dbref, int count)[] refs)
+        private void _addTool(params (int dbref, int dbref_ore, int count)[] refs)
         {
             refs.ToList().ForEach(tool => _addTool(tool));
             _addToolNotif(refs);
         }
-        private void _addTool((int dbref, int count) toolref)
+        private void _addTool((int dbref, int dbref_ore, int count) toolref)
         {
             if (Contains(toolref.dbref))
                 Tools[Tools.IndexOf(Tools.First(i => i.DBRef == toolref.dbref))].Count += toolref.count;
             else
-                Tools?.AddRange(new[] { new Tool(DB.DefineName(toolref.dbref), toolref.dbref, toolref.count) });
+                Tools?.AddRange(new[] { new Tool(DB.DefineName(toolref.dbref), toolref.dbref, toolref.dbref_ore, toolref.count) });
         }
 
         public void Remove(params Item[] items) => Items?.AddRange(items);
@@ -159,14 +165,14 @@ namespace console_v3
                 }
             }
         }
-        private void _addToolNotif(params (int dbref, int count)[] refs)
+        private void _addToolNotif(params (int dbref, int dbref_ore, int count)[] refs)
         {
             if (Owner == Core.Instance.TheGuy)
             {
                 foreach (var tool in refs)
                 {
                     string tool_name = Tools[Tools.IndexOf(Tools.First(i => i.DBRef == tool.dbref))].Name;
-                    NotificationsManager.AddNotification(NotificationsManager.NotificationTypes.SideLeft, $"+ {tool_name} x {tool.count}", DB.Colors["Tools"]);
+                    NotificationsManager.AddNotification(NotificationsManager.NotificationTypes.SideLeft, $"+ {DB.DefineName(tool.dbref_ore)} {tool_name} x {tool.count}", DB.Colors["Tools"]);
                 }
             }
         }
