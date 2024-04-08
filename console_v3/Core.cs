@@ -12,6 +12,7 @@ namespace console_v3
 {
     internal class Core
     {
+        public static int TILE_SIZE = 32;
         private static Core m_Instance = null;
         public static Core Instance => m_Instance ?? (m_Instance = new Core());
         public static bool DEBUG = false;
@@ -68,7 +69,7 @@ namespace console_v3
             //    new Shortcut(0, KB.Key.C, wooden_shovel),
             //};
             //new EntityStructure((5, 5).V(), Structures.PetitAtelier);
-            TheGuy.Inventory.Add(((int)Objets.Buche, 4));
+            TheGuy.Inventory.Add(((int)DB.Tex.WoodLog, 4));
         }
         public void ResetGraphics()
         {

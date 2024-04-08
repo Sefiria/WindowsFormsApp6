@@ -355,8 +355,8 @@ namespace console_v3
                     for (int j = 0; j < Chunk.ChunkSize.y; j++)
                     {
                         var tile = chunk.Value.Tiles[(i, j).V()];
-                        var color = DB.ResColor[tile.Sol != 0 ? (int)tile.Sol : (int)tile.Mur];
-                        _g.DrawRectangle(new Pen(color), i, j, 1, 1);
+                        var color = DB.GetPxColor(tile.Value);
+                        _g.DrawRectangle(new Pen(Color.FromArgb(color)), i, j, 1, 1);
                     }
                 }
                 g.DrawImage(_img.Resize(szmini), g_x + szmini * chunk.Key.x, g_y + szmini * chunk.Key.y);
@@ -408,9 +408,8 @@ namespace console_v3
                     Action DropAll = () => actions_drop_all();
                     var list_submenuitems = new Dictionary<string, Action>();
                     string use_name = "";
-                    var t = item.DBType;
-                    if (t == typeof(Consommables)) use_name = "Consumme";
-                    else if (t == typeof(Structures)) use_name = "Place";
+                    if (item.DBRef.IsConsumable()) use_name = "Consumme";
+                    else if (item.DBRef.IsStructure()) use_name = "Place";
                     if(!string.IsNullOrWhiteSpace(use_name))
                         list_submenuitems[use_name] = Use;
                     list_submenuitems["Drop 1"] = Drop1;

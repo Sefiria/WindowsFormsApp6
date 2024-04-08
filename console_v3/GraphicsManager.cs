@@ -29,8 +29,8 @@ namespace console_v3
         public static Font MidFont = new Font("Segoe UI", 12f);
         public static Font MiniFont = new Font("Segoe UI", 10f);
 
-        public static Size ConsoleCharSize = new Size(8, 17);//new Size(8, 8);
-        public static int TileSize = 16;
+        public static Size ConsoleCharSize = new Size(8, 17);
+        public static int TileSize => Core.TILE_SIZE;
 
         public static void DrawTile(Graphics g, Tile tile, vec coordinates)
         {

@@ -73,7 +73,6 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Recipes.cs" />
-    <Compile Include="ResourcesManager.cs" />
     <Compile Include="res\entities\EntityStructure.cs" />
     <Compile Include="res\entities\EntityStone.cs" />
     <Compile Include="res\entities\EntityPlant.cs" />

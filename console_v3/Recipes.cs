@@ -18,7 +18,7 @@ namespace console_v3
         public class RecipeObj
         {
             public int DBRef, Count;
-            public List<int> OneOf = null;// TODO just added, check in all file (OneOf in priority, then DBRef)
+            public List<int> OneOf = new List<int>();
             public RecipeObj()
             {
             }
@@ -81,8 +81,9 @@ namespace console_v3
             {
                 var listA = _2DToList(Needs);
                 var listB = _2DToList(slots);
+                var allNeeds = listA.SelectMany(a => a?.OneOf.Concat(new List<int> { a.DBRef }));
                 RecipeObj match;
-                if (listB.Where(b => b != null).Any(b => !listA.Select(a => a?.DBRef).Contains(b?.DBRef)))
+                if (listB.Where(b => b != null).Any(b => !allNeeds.ToList().Contains(b.DBRef)))
                     return false;
                 for (int a = 0; a < listA.Count; a++)
                 {
@@ -102,7 +103,8 @@ namespace console_v3
                 int layer, layer_tool = 0, layer_item = int.MaxValue;
                 for (int a = 0; a < listA.Count; a++)
                 {
-                    match = listB.FirstOrDefault(slot => slot?.Count >= listA[a]?.Count && slot?.DBRef == listA[a]?.DBRef);
+                    var allNeeds = listA[a].OneOf.Concat((new List<int> { listA[a].DBRef })).ToList();
+                    match = listB.FirstOrDefault(slot => slot != null && slot.Count >= allNeeds.Count && allNeeds.Contains(slot.DBRef));
                     if (match == null)
                         return false;
                     layer = -1;
@@ -136,7 +138,8 @@ namespace console_v3
                 {
                     if (listA[a] == null)
                         continue;
-                    match = listB.FirstOrDefault(slot => slot?.Count >= listA[a]?.Count && slot?.DBRef == listA[a]?.DBRef);
+                    var allNeeds = listA[a].OneOf.Cast<int?>().Concat((new List<int?> { listA[a].DBRef })).ToList();
+                    match = listB.FirstOrDefault(slot => slot?.Count >= listA[a]?.Count && allNeeds.Contains(slot?.DBRef));
                     if (match == null)
                         return false;
                     for (int i = 0; i < slots.GetLength(0) && i < Needs.GetLength(0); i++)
@@ -175,35 +178,19 @@ namespace console_v3
                 Recipe recipe;
 
                 #region 3x3
-                needs = new RecipeObj[,] {
-                    { null,                                new RecipeObj((int)Outils.Hache, 1), null },
-                    { new RecipeObj((int)Objets.Buche, 1), new RecipeObj((int)Objets.Buche, 1), new RecipeObj((int)Objets.Buche, 1) }
-                };
-                results = new List<RecipeObj> { new RecipeObj((int)Objets.Planche, 1) };
-                recipe = Create("Planche", RecipeMode.Static, needs, results);
-                Recipes.Add(recipe);
                 #endregion
 
                 #region 2x2
-                needs = new RecipeObj[,] { { new RecipeObj(DB.TexName.Hache, 1), new RecipeObj(DB.TexName.Buche, 1) } };
-                results = new List<RecipeObj> { new RecipeObj(DB.TexName.BoisDeChauffe, 1) };
-                recipe = Create("Bois de chauffe", RecipeMode.ToolsOnTop, needs, results);
-                Recipes.Add(recipe);
-                
-                needs = new RecipeObj[,] { { new RecipeObj(DB.TexName.Cailloux, 1), new RecipeObj(DB.TexName.Cailloux, 1), new RecipeObj(DB.TexName.Cailloux, 1), new RecipeObj(DB.TexName.Cailloux, 1) } };
-                results = new List<RecipeObj> { new RecipeObj(DB.TexName.Pierre, 1) };
-                recipe = Create("Pierre", RecipeMode.Chaos, needs, results);
-                Recipes.Add(recipe);
                 #endregion
 
                 #region 1x1
-                needs = new RecipeObj[,] { { new RecipeObj(DB.TexName.Buche, 4) } };
-                results = new List<RecipeObj> { new RecipeObj((int)Structures.PetitAtelier, 1) };
+                needs = new RecipeObj[,] { { new RecipeObj((int)DB.Tex.WoodLog, 4) } };
+                results = new List<RecipeObj> { new RecipeObj((int)DB.Tex.Workbench2x2, 1) };
                 recipe = Create("Petit Atelier", RecipeMode.Chaos, needs, results);
                 Recipes.Add(recipe);
 
-                needs = new RecipeObj[,] { { new RecipeObj(DB.TexName.Buche, 1) } };
-                results = new List<RecipeObj> { new RecipeObj(DB.TexName.Brindille, 16) };
+                needs = new RecipeObj[,] { { new RecipeObj((int)DB.Tex.WoodLog, 1) } };
+                results = new List<RecipeObj> { new RecipeObj((int)DB.Tex.WoodMiniStick, 16) };
                 recipe = Create("Brindille", RecipeMode.Chaos, needs, results);
                 Recipes.Add(recipe);
                 #endregion

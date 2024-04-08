@@ -4,7 +4,6 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using Tooling;
-using static console_v3.SceneCraft;
 using static console_v3.TheRecipes;
 
 namespace console_v3
@@ -24,8 +23,7 @@ namespace console_v3
             public Guid content = Guid.Empty;
             public string Name;
             public string DisplayName => $"{Name} ( {Count} )";
-            public int DBRef, CharToDisplay = -1, Count = 0;
-            public Bitmap DBResSpe = null;
+            public int DBRef = -1, Count = 0;
             public virtual Rectangle Bounds => new Rectangle(20, (int)(20 + (Index - scroll) * (TextRenderer.MeasureText("A", font).Height * 1.5f)), TextRenderer.MeasureText("A", font).Width * 2 + TextRenderer.MeasureText(DisplayName, font).Width, TextRenderer.MeasureText("A", font).Height);
             public ListItem() { }
             public ListItem(int index)
@@ -46,9 +44,7 @@ namespace console_v3
                 content = copy.content;
                 Name = copy.Name;
                 DBRef = copy.DBRef;
-                CharToDisplay = copy.CharToDisplay;
                 Count = copy.Count;
-                DBResSpe = copy.DBResSpe;
             }
             public virtual void Draw(Graphics g, Graphics gui)
             {
@@ -66,10 +62,8 @@ namespace console_v3
                 int h = sz.Height;
                 int y = (int)(20 + (Index - scroll) * (h * 1.5f));
 
-                if (CharToDisplay > -1)
-                    g.DrawString(string.Concat((char)CharToDisplay), font, Brushes.White, pos);
-                else if(DBResSpe != null)
-                    g.DrawImage(DBResSpe, pos);
+                if(DBRef > -1)
+                    g.DrawImage(DB.GetTexture(DBRef, 32), pos);
                 if(offset != Point.Empty)
                     g.DrawString(DisplayName, font, Count > 0 ? Brushes.White : Brushes.Gray, w * 2 + offset.X, offset.Y);
                 else
@@ -109,10 +103,8 @@ namespace console_v3
                 else
                     DrawBoundsRelief(g, bounds, 4f, 2);
 
-                if (CharToDisplay > -1)
-                    g.DrawString(string.Concat((char)CharToDisplay), font, Brushes.White, bounds.Location);
-                else if(DBResSpe != null)
-                    g.DrawImage(DBResSpe, bounds.Location);
+                if(DBRef > -1)
+                    g.DrawImage(DB.GetTexture(DBRef, 28), bounds.Location);
 
                 if (Count > 0)
                 {
@@ -162,7 +154,6 @@ namespace console_v3
                 DBRef = result.DBRef;
                 Count = result.Count;
                 Name = DB.DefineName(DBRef);
-                (CharToDisplay, DBResSpe) = DB.RetrieveDBResOrSpe(DBRef);
             }
         }
 
@@ -233,8 +224,7 @@ namespace console_v3
             listItems = objs.Select(obj =>
             {
                 (string name, int dbref, int count, Guid content) = inv.GetFullInfosByUniqueId(obj);
-                (int CharToDisplay, Bitmap DBResSpe) = DB.RetrieveDBResOrSpe(dbref);
-                return new ListItem(objs.IndexOf(obj)) { Name = name, DBRef = dbref, CharToDisplay = CharToDisplay, DBResSpe = DBResSpe, Count = count, content = content };
+                return new ListItem(objs.IndexOf(obj)) { Name = name, DBRef = dbref, Count = count, content = content };
             }).ToList();
 
             if(keepSlotsIfPossible)
@@ -255,8 +245,6 @@ namespace console_v3
                         Slots[id].DBRef = prevSlot.DBRef;
                         Slots[id].content = prevSlot.content;
                         Slots[id].Count = count;
-                        Slots[id].CharToDisplay = prevSlot.CharToDisplay;
-                        Slots[id].DBResSpe = prevSlot.DBResSpe;
                         listItems[listItems.IndexOf(item)].Count -= count;
                     }
                 }
@@ -303,13 +291,9 @@ namespace console_v3
                             SelectedTempItem.Name = inter.Name;
                             SelectedTempItem.content = inter.content;
                             SelectedTempItem.Count = inter.Count;
-                            SelectedTempItem.CharToDisplay = inter.CharToDisplay;
-                            SelectedTempItem.DBResSpe = inter.DBResSpe;
                             slot.Index = -1;
                             slot.content = Guid.Empty;
                             slot.Count = 0;
-                            slot.CharToDisplay = -1;
-                            slot.DBResSpe = null;
                         }
                     }
                 }
@@ -341,8 +325,7 @@ namespace console_v3
                                 slot.Name = SelectedTempItem.Name;
                                 slot.content = SelectedTempItem.content;
                                 slot.Count = count;
-                                slot.CharToDisplay = SelectedTempItem.CharToDisplay;
-                                slot.DBResSpe = SelectedTempItem.DBResSpe;
+                                slot.DBRef = SelectedTempItem.DBRef;
                             }
 
                             if (SelectedTempItem != null && (slot.content == Guid.Empty || (SelectedTempItem?.Index ?? -1) == slot.Index))// already selection & ( slot same as selection OR slot empty )
@@ -382,8 +365,6 @@ namespace console_v3
                                 SelectedTempItem.Name = inter.Name;
                                 SelectedTempItem.content = inter.content;
                                 SelectedTempItem.Count = inter.Count;
-                                SelectedTempItem.CharToDisplay = inter.CharToDisplay;
-                                SelectedTempItem.DBResSpe = inter.DBResSpe; 
 
                             }
                         }
@@ -402,7 +383,7 @@ namespace console_v3
                 {
                     if(need == null)
                         continue;
-                    if (need.DBRef.Is<Outils>())
+                    if (need.DBRef.IsTool())
                     {
                         // TODO : give damages to the tool (ATM tool usePoint not implemented)
                         continue;// don't remove tools but give them damage
@@ -460,12 +441,12 @@ namespace console_v3
 
             if (hint_z_s > 0)
             {
-                listgui.FillRectangle(new SolidBrush(Color.FromArgb(hint_z_s, colorDark)), listrect.Width / 2 - GraphicsManager.TileSize.Width / 2, 0, GraphicsManager.TileSize.Width * 2, GraphicsManager.TileSize.Height * 3);
-                listgui.DrawString("↑", GraphicsManager.FontSQ, new SolidBrush(Color.FromArgb(hint_z_s, Color.Cyan)), listrect.Width / 2 - GraphicsManager.TileSize.Width / 2 + 5, 0);
-                listgui.DrawString("Z", GraphicsManager.FontSQ, new SolidBrush(Color.FromArgb(hint_z_s, Color.Cyan))  , listrect.Width / 2 - 5, GraphicsManager.TileSize.Height * 1.5f);
-                listgui.FillRectangle(new SolidBrush(Color.FromArgb(hint_z_s, colorDark)), listrect.Width / 2 - GraphicsManager.TileSize.Width / 2, listrect.Height - GraphicsManager.TileSize.Height * 3, GraphicsManager.TileSize.Width * 2, GraphicsManager.TileSize.Height * 3);
-                listgui.DrawString("S", GraphicsManager.FontSQ, new SolidBrush(Color.FromArgb(hint_z_s, Color.Cyan)), listrect.Width / 2 - GraphicsManager.TileSize.Width / 2 + 5, listrect.Height - GraphicsManager.TileSize.Height * 2);
-                listgui.DrawString("↓", GraphicsManager.FontSQ, new SolidBrush(Color.FromArgb(hint_z_s, Color.Cyan)), listrect.Width / 2 - 5, listrect.Height - GraphicsManager.TileSize.Height * 2 + GraphicsManager.TileSize.Height);
+                listgui.FillRectangle(new SolidBrush(Color.FromArgb(hint_z_s, colorDark)), listrect.Width / 2 - GraphicsManager.TileSize / 2, 0, GraphicsManager.TileSize * 2, GraphicsManager.TileSize * 3);
+                listgui.DrawString("↑", GraphicsManager.FontSQ, new SolidBrush(Color.FromArgb(hint_z_s, Color.Cyan)), listrect.Width / 2 - GraphicsManager.TileSize / 2 + 5, 0);
+                listgui.DrawString("Z", GraphicsManager.FontSQ, new SolidBrush(Color.FromArgb(hint_z_s, Color.Cyan))  , listrect.Width / 2 - 5, GraphicsManager.TileSize * 1.5f);
+                listgui.FillRectangle(new SolidBrush(Color.FromArgb(hint_z_s, colorDark)), listrect.Width / 2 - GraphicsManager.TileSize / 2, listrect.Height - GraphicsManager.TileSize * 3, GraphicsManager.TileSize * 2, GraphicsManager.TileSize * 3);
+                listgui.DrawString("S", GraphicsManager.FontSQ, new SolidBrush(Color.FromArgb(hint_z_s, Color.Cyan)), listrect.Width / 2 - GraphicsManager.TileSize / 2 + 5, listrect.Height - GraphicsManager.TileSize * 2);
+                listgui.DrawString("↓", GraphicsManager.FontSQ, new SolidBrush(Color.FromArgb(hint_z_s, Color.Cyan)), listrect.Width / 2 - 5, listrect.Height - GraphicsManager.TileSize * 2 + GraphicsManager.TileSize);
                 hint_z_s -= 3;
             }
             gui.DrawImage(listBitmap, listrect.Location);

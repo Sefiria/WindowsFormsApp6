@@ -12,30 +12,30 @@ namespace console_v3
 {
     public class Chunk
     {
-        public static vec ChunkSize = (24, 16).V();
+        public static vec ChunkSize = (24, 24).V();
         public static Dictionary<GenerationMode, Dictionary<float, int>> LayeredGrounds = new Dictionary<GenerationMode, Dictionary<float, int>>
         {
             [GenerationMode.Cave] = new Dictionary<float, int>
             {
-                [0.0f] = (int)DB.TexName.Rock,
-                [0.8f] = (int)DB.TexName.Dirt,
+                [0.0f] = (int)DB.Tex.Rock,
+                [0.8f] = (int)DB.Tex.Dirt,
             },
             [GenerationMode.Rocky] = new Dictionary<float, int>
             {
-                [0.0f] = (int)DB.TexName.Rock,
-                [0.6f] = (int)DB.TexName.Dirt,
-                [0.95f] = (int)DB.TexName.Grass,
+                [0.0f] = (int)DB.Tex.Rock,
+                [0.6f] = (int)DB.Tex.Dirt,
+                [0.95f] = (int)DB.Tex.Grass,
             },
             [GenerationMode.Plain] = new Dictionary<float, int>
             {
-                [0.0f] = (int)DB.TexName.Rock,
-                [0.1f] = (int)DB.TexName.Dirt,
-                [0.7f] = (int)DB.TexName.Grass,
+                [0.0f] = (int)DB.Tex.Rock,
+                [0.1f] = (int)DB.Tex.Dirt,
+                [0.7f] = (int)DB.Tex.Grass,
             },
             [GenerationMode.Forest] = new Dictionary<float, int>
             {
-                [0.0f] = (int)DB.TexName.Dirt,
-                [0.4f] = (int)DB.TexName.Grass,
+                [0.0f] = (int)DB.Tex.Dirt,
+                [0.4f] = (int)DB.Tex.Grass,
             },
         };
 

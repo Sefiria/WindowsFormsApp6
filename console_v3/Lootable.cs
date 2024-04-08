@@ -32,7 +32,7 @@ namespace console_v3
             if (Content.Count == 1 && Items.Count == 0 && Tools.Count == 0) DBRef = Content[0].dbref;
             else if (Content.Count == 0 && Items.Count == 1 && Tools.Count == 0) DBRef = Items[0].DBRef;
             else if (Content.Count == 0 && Items.Count == 0 && Tools.Count == 1) DBRef = Tools[0].DBRef;
-            else DBRef = (int)DB.TexName.Chest;
+            else DBRef = (int)DB.Tex.Chest;
         }
 
         public override void Update()

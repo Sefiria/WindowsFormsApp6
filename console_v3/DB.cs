@@ -1,5 +1,4 @@
 ﻿using console_v3.Properties;
-using console_v3.res.DBResSpeDef;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -32,15 +31,15 @@ namespace console_v3
             [GenerationMode.Forest] = Color.DarkGreen,
         };
 
-        public static string DefineName(int _dbref) => Enum.GetName(typeof(TexName), _dbref);
+        public static string DefineName(int _dbref) => Enum.GetName(typeof(Tex), _dbref);
 
         static DB()
         {
-            Textures = Resources.textures.Split2D(16);
+            Textures = Resources.textures.Split2DAndResize(16, Core.TILE_SIZE, true);
         }
 
         public static Bitmap[,] Textures;
-        public enum TexName { UnbreakableRock = 0x0 + 0x0 * 16, Obsidian = 0x1 + 0x0 * 16, HardRock = 0x2 + 0x0 * 16, DeepRock = 0x3 + 0x0 * 16, Rock = 0x4 + 0x0 * 16,
+        public enum Tex { UnbreakableRock = 0x0 + 0x0 * 16, Obsidian = 0x1 + 0x0 * 16, HardRock = 0x2 + 0x0 * 16, DeepRock = 0x3 + 0x0 * 16, Rock = 0x4 + 0x0 * 16,
             Dirt = 0x5 + 0x0 * 16, Grass = 0x6 + 0x0 * 16, Workbench2x2 = 0x8 + 0x0 * 16, Workbench3x3 = 0x9 + 0x0 * 16,
             CoalStone = 0x2 + 0x1 * 16, IronStone = 0x3 + 0x1 * 16, GoldStone = 0x4 + 0x1 * 16, DiamondStone = 0x5 + 0x1 * 16, EmeraldStone = 0x6 + 0x1 * 16,
             FurnaceOff = 0x8 + 0x1 * 16, FurnaceOn = 0x9 + 0x1 * 16,
@@ -58,81 +57,97 @@ namespace console_v3
             Tree_Spring_A = 0x5 + 0x7 * 16, Tree_Spring_B = 0x6 + 0x7 * 16, Tree_Spring_C = 0x7 + 0x7 * 16,
             Chest = 0x5 + 0x8 * 16,
         }
-        public static Bitmap GetTexture(int dbref) => Textures[dbref % 16, dbref / 16];
+        public static Dictionary<int, int> PxColors = new Dictionary<int, int>
+        {
+            [(int)Tex.UnbreakableRock] = Color.FromArgb(0, 0, 0).ToArgb(),
+            [(int)Tex.Obsidian] = Color.FromArgb(30, 10, 30).ToArgb(),
+            [(int)Tex.HardRock] = Color.FromArgb(50, 50, 50).ToArgb(),
+            [(int)Tex.DeepRock] = Color.FromArgb(70, 70, 70).ToArgb(),
+            [(int)Tex.Rock] = Color.FromArgb(100, 100, 100).ToArgb(),
+            [(int)Tex.Dirt] = Color.FromArgb(175, 115, 0).ToArgb(),
+            [(int)Tex.Grass] = Color.FromArgb(50, 150, 0).ToArgb(),
+        };
+        public static int GetPxColor(int dbref)
+        {
+            if(PxColors.ContainsKey(dbref))
+                return PxColors[dbref];
+            return Color.Black.ToArgb();
+        }
+        public static Bitmap GetTexture(int dbref, int new_size_in_px = -1) => new_size_in_px <= 0 ? Textures[dbref % 16, dbref / 16] : new Bitmap(Textures[dbref % 16, dbref / 16], new_size_in_px, new_size_in_px);
         public static List<int> Ores = new List<int>()
         {
-            (int)TexName.Iron,
-            (int)TexName.Gold,
-            (int)TexName.Diamond,
-            (int)TexName.Emerald,
+            (int)Tex.Iron,
+            (int)Tex.Gold,
+            (int)Tex.Diamond,
+            (int)Tex.Emerald,
         };
         public static List<int> Axes = new List<int>()
         {
-            (int)TexName.WoodAxe,
-            (int)TexName.IronAxe,
-            (int)TexName.GoldAxe,
-            (int)TexName.DiamondAxe,
-            (int)TexName.EmeraldAxe,
+            (int)Tex.WoodAxe,
+            (int)Tex.IronAxe,
+            (int)Tex.GoldAxe,
+            (int)Tex.DiamondAxe,
+            (int)Tex.EmeraldAxe,
         };
         public static List<int> Scythes = new List<int>()
         {
-            (int)TexName.WoodScythe,
-            (int)TexName.IronScythe,
-            (int)TexName.GoldScythe,
-            (int)TexName.DiamondScythe,
-            (int)TexName.EmeraldScythe,
+            (int)Tex.WoodScythe,
+            (int)Tex.IronScythe,
+            (int)Tex.GoldScythe,
+            (int)Tex.DiamondScythe,
+            (int)Tex.EmeraldScythe,
         };
         public static List<int> Pickaxes = new List<int>()
         {
-            (int)TexName.WoodPickaxe,
-            (int)TexName.IronPickaxe,
-            (int)TexName.GoldPickaxe,
-            (int)TexName.DiamondPickaxe,
-            (int)TexName.EmeraldPickaxe,
+            (int)Tex.WoodPickaxe,
+            (int)Tex.IronPickaxe,
+            (int)Tex.GoldPickaxe,
+            (int)Tex.DiamondPickaxe,
+            (int)Tex.EmeraldPickaxe,
         };
         public static List<int> Shovels = new List<int>()
         {
-            (int)TexName.WoodShovel,
-            (int)TexName.IronShovel,
-            (int)TexName.GoldShovel,
-            (int)TexName.DiamondShovel,
-            (int)TexName.EmeraldShovel,
+            (int)Tex.WoodShovel,
+            (int)Tex.IronShovel,
+            (int)Tex.GoldShovel,
+            (int)Tex.DiamondShovel,
+            (int)Tex.EmeraldShovel,
         };
         public static List<int> HarvestableGrounds = new List<int>
         {
-            (int)TexName.Dirt,
-            (int)TexName.Grass,
+            (int)Tex.Dirt,
+            (int)Tex.Grass,
         };
         public static List<int> Plants = new List<int>
         {
-            (int)TexName.Purpila,
-            (int)TexName.Blueseo,
-            (int)TexName.Yellilea,
-            (int)TexName.Blanca,
-            (int)TexName.Whiteneo,
-            (int)TexName.Redalis,
-            (int)TexName.Orangeno,
+            (int)Tex.Purpila,
+            (int)Tex.Blueseo,
+            (int)Tex.Yellilea,
+            (int)Tex.Blanca,
+            (int)Tex.Whiteneo,
+            (int)Tex.Redalis,
+            (int)Tex.Orangeno,
         };
         public static List<int> Structures = new List<int>
         {
-            (int)TexName.Workbench2x2,
-            (int)TexName.Workbench3x3,
-            (int)TexName.FurnaceOff,
-            (int)TexName.FurnaceOn,
+            (int)Tex.Workbench2x2,
+            (int)Tex.Workbench3x3,
+            (int)Tex.FurnaceOff,
+            (int)Tex.FurnaceOn,
         };// scierie ?
         public static List<int> Items = new List<int>
         {
-            (int)TexName.WoodLog,
-            (int)TexName.WoodPlank,
-            (int)TexName.WoodStick,
-            (int)TexName.WoodMiniStick,
-            (int)TexName.PurpilaEssence,
-            (int)TexName.BlueseoEssence,
-            (int)TexName.YellileaEssence,
-            (int)TexName.BlancaEssence,
-            (int)TexName.WhiteneoEssence,
-            (int)TexName.RedalisEssence,
-            (int)TexName.OrangenoEssence,
+            (int)Tex.WoodLog,
+            (int)Tex.WoodPlank,
+            (int)Tex.WoodStick,
+            (int)Tex.WoodMiniStick,
+            (int)Tex.PurpilaEssence,
+            (int)Tex.BlueseoEssence,
+            (int)Tex.YellileaEssence,
+            (int)Tex.BlancaEssence,
+            (int)Tex.WhiteneoEssence,
+            (int)Tex.RedalisEssence,
+            (int)Tex.OrangenoEssence,
         };
         public static List<int> Consommables = new List<int>()
         {
@@ -148,7 +163,7 @@ namespace console_v3
         public static bool IsPlant(this int dbref) => Plants.Contains(dbref);
         public static bool IsStructure(this int dbref) => Structures.Contains(dbref);
         public static bool IsItem(this int dbref) => Items.Contains(dbref);
-        public static bool IsConsommable(this int dbref) => Consommables.Contains(dbref);
+        public static bool IsConsumable(this int dbref) => Consommables.Contains(dbref);
         public static bool IsTool(this int dbref) => Tools.Contains(dbref);
         public static bool IsCollectible(this int dbref) => Collectibles.Contains(dbref);
 

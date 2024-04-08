@@ -12,10 +12,10 @@ namespace console_v3
 {
     public class SceneAdventure : Scene
     {
-        public static Rectangle DrawingRect => new RectangleF(Core.Instance.ScreenWidth / 2 - Chunk.ChunkSize.x * GraphicsManager.TileSize.Width / 2f,
-                                                                                              Core.Instance.ScreenHeight / 2 - Chunk.ChunkSize.y * GraphicsManager.TileSize.Height / 2f,
-                                                                                              Chunk.ChunkSize.x * GraphicsManager.TileSize.Width,
-                                                                                              Chunk.ChunkSize.y * GraphicsManager.TileSize.Height).ToIntRect();
+        public static Rectangle DrawingRect => new RectangleF(Core.Instance.ScreenWidth / 2 - Chunk.ChunkSize.x * GraphicsManager.TileSize / 2f,
+                                                                                              Core.Instance.ScreenHeight / 2 - Chunk.ChunkSize.y * GraphicsManager.TileSize / 2f,
+                                                                                              Chunk.ChunkSize.x * GraphicsManager.TileSize,
+                                                                                              Chunk.ChunkSize.y * GraphicsManager.TileSize).ToIntRect();
 
         public World World;
         public Item ItemToPlace = null;
@@ -98,15 +98,15 @@ namespace console_v3
             var shortcuts = Core.Instance.Shortcuts;
             if (shortcuts == null || shortcuts.Count == 0)
                 return;
-            float sz = 10 + GraphicsManager.TileSize.Width + 10 + 10;
-            float total_sz = shortcuts.Count * GraphicsManager.TileSize.Width + 20;
+            float sz = 10 + GraphicsManager.TileSize + 10 + 10;
+            float total_sz = shortcuts.Count * GraphicsManager.TileSize + 20;
             float _x = DrawingRect.X + DrawingRect.Width / 2 - total_sz / 2;
             SolidBrush brush = new SolidBrush(Color.FromArgb(100, Color.Gray));
 
             for (int i = 0; i < shortcuts.Count; i++)
             {
                 int x = (int)(_x + i * sz);
-                gui.FillRectangle(brush, x, 50, sz, GraphicsManager.TileSize.Height + 10);
+                gui.FillRectangle(brush, x, 50, sz, GraphicsManager.TileSize + 10);
 
                 var dbref = Core.Instance.TheGuy.Inventory.GetDBRefByUniqueId(shortcuts[i].Ref.UniqueId);
                 gui.DrawImage(DB.GetTexture(dbref), x + 10, 50);

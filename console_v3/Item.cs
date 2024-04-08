@@ -18,7 +18,6 @@ namespace console_v3
         public bool IsConsommable = true;
         public bool IsMenuConsommable = true;
         public int Count;
-        public Type DBType => DB.GetEnumTypeOf(DBRef);
 
         public Item()
         {
@@ -38,14 +37,11 @@ namespace console_v3
 
         public void Use()
         {
-            var type = DBType;
-            if (type == typeof(Objets))
+            if (DBRef.IsItem())
                 return;
-            else if (type == typeof(Consommables))
+            else if(DBRef.IsConsumable())
                 Consume();
-            else if (type == typeof(Ressources))
-                return;
-            else if (type == typeof(Structures))
+            else if(DBRef.IsStructure())
                 Place();
         }
 

@@ -27,6 +27,8 @@ namespace console_v3
         public Guy() : base(vecf.Zero)
         {
             Texture = Properties.Resources.Guy;
+            Texture.MakeTransparent(Color.FromArgb(0,255,0));
+            Texture = new Bitmap(Texture, GraphicsManager.TileSize, GraphicsManager.TileSize);
             TilePositionF = Chunk.ChunkSize.f  / 2f;
             Stats = new Statistics(new Dictionary<Statistics.Stat, int>
             {

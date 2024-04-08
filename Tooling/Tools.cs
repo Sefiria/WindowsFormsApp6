@@ -126,7 +126,7 @@ namespace Tooling
 
             return rotatedImage;
         }
-        public static Bitmap[,] Split2D(this Bitmap tex, int square_size)
+        public static Bitmap[,] Split2DAndResize(this Bitmap tex, int square_size, int new_size_in_px, bool make_transparent = false)
         {
             int s = square_size;
             int w = tex.Width, h = tex.Height;
@@ -134,7 +134,11 @@ namespace Tooling
             var result = new Bitmap[cw, ch];
             for (int i = 0; i < cw; i++)
                 for (int j = 0; j < ch; j++)
-                    result[i, j] = tex.Clone(new Rectangle(i*s, j*s, s, s), tex.PixelFormat);
+                {
+                    result[i, j] = new Bitmap(tex.Clone(new Rectangle(i * s, j * s, s, s), tex.PixelFormat), new_size_in_px, new_size_in_px);
+                    if (make_transparent)
+                        result[i, j].MakeTransparent(Color.FromArgb(0,255,0));
+                }
             return result;
         }
         public static List<Bitmap> Split(this Bitmap tex, int cx = 0, int cy = 0, int x = 0, int y = 0)
