@@ -69,7 +69,7 @@ namespace console_v3
             //    new Shortcut(0, KB.Key.C, wooden_shovel),
             //};
             //new EntityStructure((5, 5).V(), Structures.PetitAtelier);
-            TheGuy.Inventory.Add(((int)DB.Tex.WoodLog, 4));
+            //TheGuy.Inventory.Add(((int)DB.Tex.WoodLog, 4));
         }
         public void ResetGraphics()
         {

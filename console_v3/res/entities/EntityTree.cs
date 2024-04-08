@@ -16,7 +16,7 @@ namespace console_v3.res.entities
         {
             Name = "Arbre";
             DBRef = RandomThings.arnd((int)DB.Tex.Tree_Spring_A, (int)DB.Tex.Tree_Spring_C);
-            Stats = new Statistics(new Dictionary<Statistics.Stat, int> { [Statistics.Stat.HPMax] = 30, [Statistics.Stat.HP] = 30 });
+            Stats = new Statistics(new Dictionary<Statistics.Stat, int> { [Statistics.Stat.HPMax] = 1, [Statistics.Stat.HP] = 1 });
         }
 
         public override void Update()
@@ -40,11 +40,11 @@ namespace console_v3.res.entities
             {
                 new Lootable(Position.ToTile(), true, new Item("Buche", (int)DB.Tex.WoodLog, 1) { IsConsommable = false });
                 Exists = false;
-                ParticlesManager.Generate(Position + GraphicsManager.TileSize / 2f, 5f, 10f, Color.White, 10, 100);
+                ParticlesManager.Generate(Position + GraphicsManager.TileSize / 2f, 10f, 10f, Color.FromArgb(100, 50, 0), 10, 100);
             }
             else
             {
-                ParticlesManager.Generate(Position + GraphicsManager.TileSize / 2f, 2f, 3f, Color.White, str, 100);
+                ParticlesManager.Generate(Position + GraphicsManager.TileSize / 2f, 5f, 3f, Color.FromArgb(100, 50, 0), str, 100);
             }
         }
     }

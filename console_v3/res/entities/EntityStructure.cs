@@ -47,7 +47,7 @@ namespace console_v3.res.entities
         {
             if (!Exists) return;
 
-            Core.Instance.SwitchScene(Core.Scenes.Craft, 2);
+            Core.Instance.SwitchScene(Core.Scenes.Craft, 3);
         }
     }
 }

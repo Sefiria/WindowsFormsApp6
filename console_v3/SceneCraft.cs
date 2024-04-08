@@ -291,9 +291,11 @@ namespace console_v3
                             SelectedTempItem.Name = inter.Name;
                             SelectedTempItem.content = inter.content;
                             SelectedTempItem.Count = inter.Count;
+                            SelectedTempItem.DBRef = inter.DBRef;
                             slot.Index = -1;
                             slot.content = Guid.Empty;
                             slot.Count = 0;
+                            slot.DBRef = -1;
                         }
                     }
                 }
@@ -365,6 +367,7 @@ namespace console_v3
                                 SelectedTempItem.Name = inter.Name;
                                 SelectedTempItem.content = inter.content;
                                 SelectedTempItem.Count = inter.Count;
+                                SelectedTempItem.DBRef = inter.DBRef;
 
                             }
                         }

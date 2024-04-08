@@ -32,6 +32,15 @@ namespace console_v3
                 this.OneOf = OneOf;
                 this.Count = Count;
             }
+            public RecipeObj Clone()
+            {
+                return new RecipeObj
+                {
+                    DBRef = DBRef,
+                    Count = Count,
+                    OneOf = new List<int>(OneOf)
+                };
+            }
         }
         public class Recipe : IUniqueRef
         {
@@ -159,7 +168,7 @@ namespace console_v3
                 {
                     for (int j = 0; j < height; j++)
                     {
-                        ret.Add(array[i, j]);
+                        ret.Add(array[i, j]?.Clone() ?? null);
                     }
                 }
                 return ret;
@@ -178,14 +187,28 @@ namespace console_v3
                 Recipe recipe;
 
                 #region 3x3
+                needs = new RecipeObj[,] { {
+                        null, new RecipeObj((int)DB.Tex.WoodLog, 1), new RecipeObj((int)DB.Tex.WoodLog, 1),
+                        null, new RecipeObj((int)DB.Tex.WoodMiniStick, 1), null,
+                        null, new RecipeObj((int)DB.Tex.WoodMiniStick, 1), null,
+                    } };
+                results = new List<RecipeObj> { new RecipeObj((int)DB.Tex.WoodScythe, 1) };
+                recipe = Create("Faux en bois", RecipeMode.Static, needs, results);
+                Recipes.Add(recipe);
+
+                needs = new RecipeObj[,] { {
+                        null, null, new RecipeObj((int)DB.Tex.WoodMiniStick, 1),
+                        null, new RecipeObj((int)DB.Tex.WoodMiniStick, 1), null,
+                        new RecipeObj((int)DB.Tex.WoodMiniStick, 1), null, null,
+                    } };
+                results = new List<RecipeObj> { new RecipeObj((int)DB.Tex.WoodStick, 1) };
+                recipe = Create("Baton", RecipeMode.Static, needs, results);
+                Recipes.Add(recipe);
                 #endregion
 
                 #region 2x2
-                #endregion
-
-                #region 1x1
-                needs = new RecipeObj[,] { { new RecipeObj((int)DB.Tex.WoodLog, 4) } };
-                results = new List<RecipeObj> { new RecipeObj((int)DB.Tex.Workbench2x2, 1) };
+                needs = new RecipeObj[,] { { new RecipeObj((int)DB.Tex.WoodLog, 1), new RecipeObj((int)DB.Tex.WoodLog, 1), new RecipeObj((int)DB.Tex.WoodLog, 1), new RecipeObj((int)DB.Tex.WoodLog, 1) } };
+                results = new List<RecipeObj> { new RecipeObj((int)DB.Tex.Workbench, 1) };
                 recipe = Create("Petit Atelier", RecipeMode.Chaos, needs, results);
                 Recipes.Add(recipe);
 

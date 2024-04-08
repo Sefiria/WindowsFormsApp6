@@ -16,7 +16,7 @@ namespace console_v3
 
         public vecf TilePositionF;
         public vec CurDimension = vec.Zero, CurChunk = vec.Zero;
-        public float mv_speed = 0.07f;
+        public float mv_speed = 0.05f;
         public vec PreviousPosition = vec.Zero;
         public bool HasMoved => TilePositionF.i != PreviousPosition;
         public vec Direction => TilePositionF.i - PreviousPosition;

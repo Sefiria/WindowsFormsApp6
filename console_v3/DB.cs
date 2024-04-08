@@ -35,12 +35,12 @@ namespace console_v3
 
         static DB()
         {
-            Textures = Resources.textures.Split2DAndResize(16, Core.TILE_SIZE, true);
+            Textures = Resources.textures.Split2DAndResize(16, Core.TILE_SIZE, true, transparent_color: Color.FromArgb(0, 255, 0));
         }
 
         public static Bitmap[,] Textures;
         public enum Tex { UnbreakableRock = 0x0 + 0x0 * 16, Obsidian = 0x1 + 0x0 * 16, HardRock = 0x2 + 0x0 * 16, DeepRock = 0x3 + 0x0 * 16, Rock = 0x4 + 0x0 * 16,
-            Dirt = 0x5 + 0x0 * 16, Grass = 0x6 + 0x0 * 16, Workbench2x2 = 0x8 + 0x0 * 16, Workbench3x3 = 0x9 + 0x0 * 16,
+            Dirt = 0x5 + 0x0 * 16, Grass = 0x6 + 0x0 * 16, Sawmill = 0x8 + 0x0 * 16, Workbench = 0x9 + 0x0 * 16,
             CoalStone = 0x2 + 0x1 * 16, IronStone = 0x3 + 0x1 * 16, GoldStone = 0x4 + 0x1 * 16, DiamondStone = 0x5 + 0x1 * 16, EmeraldStone = 0x6 + 0x1 * 16,
             FurnaceOff = 0x8 + 0x1 * 16, FurnaceOn = 0x9 + 0x1 * 16,
             Coal = 0x2 + 0x2 * 16, Iron = 0x3 + 0x3 * 16, Gold = 0x4 + 0x4 * 16, Diamond = 0x5 + 0x5 * 16, Emerald = 0x6 + 0x6 * 16,
@@ -50,11 +50,11 @@ namespace console_v3
             GoldAxe = 0x0 + 0x5 * 16, GoldScythe = 0x1 + 0x5 * 16, GoldPickaxe = 0x2 + 0x5 * 16, GoldShovel = 0x3 + 0x5 * 16, GoldSword = 0x4 + 0x5 * 16,
             DiamondAxe = 0x0 + 0x6 * 16, DiamondScythe = 0x1 + 0x6 * 16, DiamondPickaxe = 0x2 + 0x6 * 16, DiamondShovel = 0x3 + 0x6 * 16, DiamondSword = 0x4 + 0x6 * 16,
             EmeraldAxe = 0x0 + 0x7 * 16, EmeraldScythe = 0x1 + 0x7 * 16, EmeraldPickaxe = 0x2 + 0x7 * 16, EmeraldShovel = 0x3 + 0x7 * 16, EmeraldSword = 0x4 + 0x7 * 16,
-            Purpila = 0x0 + 0x3 * 16, Blueseo = 0x1 + 0x3 * 16, Yellilea = 0x2 + 0x3 * 16, Blanca = 0x3 + 0x3 * 16, Whiteneo = 0x4 + 0x3 * 16, Redalis = 0x5 + 0x3 * 16, Orangeno = 0x6 + 0x3 * 16,
-            PurpilaEssence = 0x0 + 0x4 * 16, BlueseoEssence = 0x1 + 0x4 * 16, YellileaEssence = 0x2 + 0x4 * 16, BlancaEssence = 0x3 + 0x4 * 16, WhiteneoEssence = 0x4 + 0x4 * 16, RedalisEssence = 0x5 + 0x4 * 16, OrangenoEssence = 0x6 + 0x4 * 16,
-            Tree_Automn_A = 0x5 + 0x5 * 16, Tree_Automn_B = 0x6 + 0x5 * 16, Tree_Automn_C = 0x7 + 0x5 * 16,
-            Tree_Summer_A = 0x5 + 0x6 * 16, Tree_Summer_B = 0x6 + 0x6 * 16, Tree_Summer_C = 0x7 + 0x6 * 16,
-            Tree_Spring_A = 0x5 + 0x7 * 16, Tree_Spring_B = 0x6 + 0x7 * 16, Tree_Spring_C = 0x7 + 0x7 * 16,
+            Purpila = 0x8 + 0x3 * 16, Blueseo = 0x9+ 0x3 * 16, Yellilea = 0xA + 0x3 * 16, Blanca = 0xB + 0x3 * 16, Whiteneo = 0xC + 0x3 * 16, Redalis = 0xD + 0x3 * 16, Orangeno = 0xE + 0x3 * 16,
+            PurpilaEssence = 0x8 + 0x4 * 16, BlueseoEssence = 0x9 + 0x4 * 16, YellileaEssence = 0xA + 0x4 * 16, BlancaEssence = 0xB + 0x4 * 16, WhiteneoEssence = 0xC + 0x4 * 16, RedalisEssence = 0xD + 0x4 * 16, OrangenoEssence = 0xE + 0x4 * 16,
+            Tree_Automn_A = 0x8 + 0x5 * 16, Tree_Automn_B = 0x9 + 0x5 * 16, Tree_Automn_C = 0xA + 0x5 * 16,
+            Tree_Summer_A = 0x8 + 0x6 * 16, Tree_Summer_B = 0x9 + 0x6 * 16, Tree_Summer_C = 0xA + 0x6 * 16,
+            Tree_Spring_A = 0x8 + 0x7 * 16, Tree_Spring_B = 0x9 + 0x7 * 16, Tree_Spring_C = 0xA + 0x7 * 16,
             Chest = 0x5 + 0x8 * 16,
         }
         public static Dictionary<int, int> PxColors = new Dictionary<int, int>
@@ -130,8 +130,8 @@ namespace console_v3
         };
         public static List<int> Structures = new List<int>
         {
-            (int)Tex.Workbench2x2,
-            (int)Tex.Workbench3x3,
+            (int)Tex.Sawmill,
+            (int)Tex.Workbench,
             (int)Tex.FurnaceOff,
             (int)Tex.FurnaceOn,
         };// scierie ?
