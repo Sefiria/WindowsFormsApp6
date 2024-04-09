@@ -409,7 +409,7 @@ namespace console_v3
                     Action DropAll = () => actions_drop_all();
                     var list_submenuitems = new Dictionary<string, Action>();
                     string use_name = "";
-                    if (item.DBRef.IsConsumable()) use_name = "Consumme";
+                    if (item.DBRef.IsConsumable()) use_name = "Consume";
                     else if (item.DBRef.IsStructure()) use_name = "Place";
                     if(!string.IsNullOrWhiteSpace(use_name))
                         list_submenuitems[use_name] = Use;
