@@ -38,7 +38,7 @@ namespace console_v3.res.entities
             Stats._Substract(Statistics.Stat.HP, str);
             if (Stats._Get(Statistics.Stat.HP) <= 0)
             {
-                triggerer.Inventory.AddItem(DBRef + 16);
+                triggerer.Inventory.AddItem((DBRef + 16, 1));
                 Exists = false;
                 ParticlesManager.Generate(Position + GraphicsManager.TileSize / 2 / 2f, 3f, 4f, Color.White, 3, 100);
             }

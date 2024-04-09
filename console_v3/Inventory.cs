@@ -104,7 +104,8 @@ namespace console_v3
             if (Contains(toolref.dbref))
                 Tools[Tools.IndexOf(Tools.First(i => i.DBRef == toolref.dbref))].Count += toolref.count;
             else
-                Tools?.AddRange(new[] { new Tool(DB.DefineName(toolref.dbref), toolref.dbref, toolref.dbref_ore, toolref.count) });
+                for(int i=0;i< toolref.count;i++)
+                    Tools?.Add(new Tool(null, toolref.dbref, toolref.dbref_ore));
         }
 
         public void Remove(params Item[] items) => Items?.AddRange(items);
@@ -245,7 +246,7 @@ namespace console_v3
             return count;
         }
 
-        internal (string name, int dbref, int count, Guid content) GetFullInfosByUniqueId(Guid id)
+        internal (string name, int dbref, int count, Guid content, Bitmap modifiedImage) GetFullInfosByUniqueId(Guid id)
         {
             int dbref = -1;
             string name = "";
@@ -253,25 +254,27 @@ namespace console_v3
             Guid content = Guid.Empty;
             Item item = null;
             Tool tool = Tools.FirstOrDefault(t => t.UniqueId == id);
+            Bitmap modifiedImage = null;
             if (tool != null)
             {
-                dbref = (int)tool.DBRef;
+                dbref = tool.DBRef;
                 name = tool.Name;
                 count = tool.Count;
                 content = tool.UniqueId;
+                modifiedImage = tool.Image;
             }
             else
             {
                 item = Items.FirstOrDefault(it => it.UniqueId == id);
                 if (item != null)
                 {
-                    dbref = (int)item.DBRef;
+                    dbref = item.DBRef;
                     name = item.Name;
                     count = item.Count;
                     content = item.UniqueId;
                 }
             }
-            return (name, dbref, count, content);
+            return (name, dbref, count, content, modifiedImage);
         }
     }
 }

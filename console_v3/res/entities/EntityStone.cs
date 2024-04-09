@@ -42,12 +42,12 @@ namespace console_v3.res.entities
             {
                 if(Results != null)
                     foreach(var result in Results)
-                        triggerer.Inventory.Add((result.Key, result.Value));
+                        triggerer.Inventory.AddItem(((result.Key, result.Value)));
                 int count;
                 if(RndResults != null)
                     foreach (var rndResult in RndResults)
                         if ((count = RandomThings.rnd(rndResult.Value)) > 0)
-                        triggerer.Inventory.Add((rndResult.Key, count));
+                        triggerer.Inventory.AddItem((rndResult.Key, count));
                 Exists = false;
                 ParticlesManager.Generate(Position + GraphicsManager.TileSize / 2f, 3f, 4f, Color.White, 3, 100);
             }

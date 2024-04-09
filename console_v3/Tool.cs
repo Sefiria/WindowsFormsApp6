@@ -30,25 +30,33 @@ namespace console_v3
             Duration = copy.Duration;
             DBRef = copy.DBRef;
             Count = copy.Count;
-            ResetGraphics();
+            Image = ResetGraphics(DBRef, DBRef_Ore);
         }
-        public Tool(string name, int dbref, int dbref_ore, int STR = 1)
+        public Tool(string name, int dbref, int dbref_ore, int AddedSTR = 0)
         {
-            Name = name;
+            if(!dbref_ore.IsOre())
+                dbref_ore =  (int)DB.Tex.Wood;
+
+            Name = name ?? $"{DB.DefineName(dbref_ore)} { DB.DefineName(dbref)}";
             Duration = 1f;
             DBRef = dbref;
             DBRef_Ore = dbref_ore;
-            this.STR = STR;
+            STR = DB.GetOre(DBRef_Ore).ToolQuality + AddedSTR;
             Count = 1;
-            ResetGraphics();
+            Image = ResetGraphics(DBRef, DBRef_Ore);
         }
-        public void ResetGraphics()
+        public static Bitmap ResetGraphics(int dbref, int dbref_ore)
         {
-            Image = DB.GetTexture(DBRef);
-            var ore = DB.GetOre(DBRef_Ore);
-            Image.ChangeColor(Color.FromArgb(1, 0, 0), Color.FromArgb(ore.ColorDark));
-            Image.ChangeColor(Color.FromArgb(0, 1, 0), Color.FromArgb(ore.ColorMid));
-            Image.ChangeColor(Color.FromArgb(0, 0, 1), Color.FromArgb(ore.ColorLight));
+            Bitmap Image = null;
+            var ore = DB.GetOre(dbref_ore);
+            if (ore != null)
+            {
+                Image = DB.GetTexture(dbref)
+                                  .ChangeColor(Color.FromArgb(1, 0, 0), Color.FromArgb(ore.ColorDark))
+                                  .ChangeColor(Color.FromArgb(0, 1, 0), Color.FromArgb(ore.ColorMid))
+                                  .ChangeColor(Color.FromArgb(0, 0, 1), Color.FromArgb(ore.ColorLight));
+            }
+            return Image;
         }
 
         public void Use(Entity triggerer)

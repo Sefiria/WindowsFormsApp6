@@ -19,19 +19,28 @@ namespace console_v3
         }
         public class RecipeObj
         {
-            public int DBRef, Count;
+            public int DBRef, DBRef_Ore, Count;
             public Types Type = Types.Undefined;
             public RecipeObj()
             {
             }
-            public RecipeObj(int DBRef, int Count)
+            public RecipeObj(RecipeObj clone)
+            {
+                DBRef = clone.DBRef;
+                DBRef_Ore = clone.DBRef_Ore;
+                Count = clone.Count;
+                Type = clone.Type;
+            }
+            public RecipeObj(int DBRef, int Count, int DBRef_Ore = -1)
             {
                 this.DBRef = DBRef;
+                this.DBRef_Ore = DBRef_Ore;
                 this.Count = Count;
             }
-            public RecipeObj(Types Type, int Count)
+            public RecipeObj(Types Type, int Count, int DBRef_Ore = -1)
             {
                 this.Type = Type;
+                this.DBRef_Ore = DBRef_Ore;
                 this.Count = Count;
             }
             public RecipeObj Clone()
@@ -39,11 +48,12 @@ namespace console_v3
                 return new RecipeObj
                 {
                     DBRef = DBRef,
+                    DBRef_Ore = DBRef_Ore,
                     Count = Count,
                     Type = Type,
                 };
             }
-            public static RecipeObj[,] Create3x3(string format, params (Types type, Tex dbref, int count)[] args)
+            public static RecipeObj[,] Create3x3(string format, params (Types type, Tex dbref, Tex dbref_ore, int count)[] args)
             {
                 var objs = new RecipeObj[3, 3];
                 var lines = format.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
@@ -52,7 +62,7 @@ namespace console_v3
                 {
                     for (int y = 0; y < 3; y++)
                     {
-                        id = int.Parse("" + lines[y][x]) - 1;
+                        id = int.Parse("" + lines[x][y]) - 1;
                         if (id == -1)
                             objs[x, y] = null;
                         else
@@ -162,26 +172,52 @@ namespace console_v3
             }
             private bool SatisfiedBy_Static(RecipeObj[,] slots)
             {
+                var _slots = Duplicate(slots);
                 if (Needs.GetLength(0) == 0 || Needs.GetLength(1) == 0 || Needs.GetLength(0) != slots.GetLength(0) || Needs.GetLength(1) != slots.GetLength(1))
                     return false;
+                var single_need = -1;
                 for (int i = 0; i < Needs.GetLength(0); i++)
                 {
                     for (int j = 0; j < Needs.GetLength(1); j++)
                     {
                         var allNeeds = DB.GetListByType(Needs[i, j]?.Type ?? DB.Types.Undefined);
-                        if(allNeeds.Count > 0)
+                        if(allNeeds.Count > 0 && single_need == -1)
                         {
-                            if (!allNeeds.Contains(slots[i, j].DBRef))
+                            if (!(allNeeds.Contains(_slots[i, j]?.DBRef ?? -1) && _slots[i, j]?.Count >= Needs[i,j].Count))
                                 return false;
+                            if (_slots[i, j] != null)
+                            {
+                                _slots[i, j].Count -= Needs[i, j].Count;
+                                single_need = _slots[i, j].DBRef;
+                            }
                         }
                         else
                         {
-                            if ((Needs[i, j]?.DBRef ?? -1) != (slots[i, j]?.DBRef ?? -1))
+                            if ((allNeeds.Count > 0 && single_need > -1 ? single_need : (Needs[i, j]?.DBRef ?? -1)) != (_slots[i, j]?.DBRef ?? -1) || _slots[i, j]?.Count < Needs[i, j]?.Count)
                                 return false;
+                            if (_slots[i, j] != null && Needs[i, j] != null)
+                                _slots[i, j].Count -= Needs[i, j].Count;
                         }
+                        if (_slots[i, j]?.Count <= 0)
+                            _slots[i, j] = null;
                     }
                 }
                 return true;
+            }
+
+            static RecipeObj[,] Duplicate(RecipeObj[,] array)
+            {
+                int width = array.GetLength(0);
+                int height = array.GetLength(1);
+                RecipeObj[,] result = new RecipeObj[width,height];
+                for (int i = 0; i < width; i++)
+                {
+                    for (int j = 0; j < height; j++)
+                    {
+                        result[i, j] = array[i, j] != null ? new RecipeObj(array[i,j]) : null;
+                    }
+                }
+                return result;
             }
 
             static List<RecipeObj> _2DToList(RecipeObj[,] array)
@@ -212,7 +248,16 @@ namespace console_v3
                 Recipe recipe;
 
                 #region 3x3
-                Recipes.Add(Recipes_Scythes.Create());
+                Recipes.AddRange(new[]
+                {
+                    Recipes_Tools.CreateScytheA(),
+                    Recipes_Tools.CreateScytheB(),
+                    Recipes_Tools.CreateAxeA(),
+                    Recipes_Tools.CreateAxeB(),
+                    Recipes_Tools.CreatePickaxe(),
+                    Recipes_Tools.CreateShovel(),
+                    Recipes_Tools.CreateSword(),
+                });
 
                 needs = new RecipeObj[,] { {
                         null, null, new RecipeObj((int)DB.Tex.WoodMiniStick, 1),
@@ -225,12 +270,12 @@ namespace console_v3
                 #endregion
 
                 #region 2x2
-                needs = new RecipeObj[,] { { new RecipeObj((int)DB.Tex.WoodLog, 1), new RecipeObj((int)DB.Tex.WoodLog, 1), new RecipeObj((int)DB.Tex.WoodLog, 1), new RecipeObj((int)DB.Tex.WoodLog, 1) } };
+                needs = new RecipeObj[,] { { new RecipeObj((int)DB.Tex.Wood, 1), new RecipeObj((int)DB.Tex.Wood, 1), new RecipeObj((int)DB.Tex.Wood, 1), new RecipeObj((int)DB.Tex.Wood, 1) } };
                 results = new List<RecipeObj> { new RecipeObj((int)DB.Tex.Workbench, 1) };
                 recipe = Create("Petit Atelier", RecipeMode.Chaos, needs, results);
                 Recipes.Add(recipe);
 
-                needs = new RecipeObj[,] { { new RecipeObj((int)DB.Tex.WoodLog, 1) } };
+                needs = new RecipeObj[,] { { new RecipeObj((int)DB.Tex.Wood, 1) } };
                 results = new List<RecipeObj> { new RecipeObj((int)DB.Tex.WoodMiniStick, 16) };
                 recipe = Create("Brindille", RecipeMode.Chaos, needs, results);
                 Recipes.Add(recipe);

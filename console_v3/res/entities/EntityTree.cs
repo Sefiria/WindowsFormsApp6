@@ -38,7 +38,7 @@ namespace console_v3.res.entities
             Stats._Substract(Statistics.Stat.HP, str);
             if (Stats._Get(Statistics.Stat.HP) <= 0)
             {
-                new Lootable(Position.ToTile(), true, new Item("Buche", (int)DB.Tex.WoodLog, 1) { IsConsommable = false });
+                new Lootable(Position.ToTile(), true, new Item("Buche", (int)DB.Tex.Wood, 1) { IsConsommable = false });
                 Exists = false;
                 ParticlesManager.Generate(Position + GraphicsManager.TileSize / 2f, 10f, 10f, Color.FromArgb(100, 50, 0), 10, 100);
             }

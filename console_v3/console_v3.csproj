@@ -84,7 +84,6 @@
     <Compile Include="res\ores\Ores_Iron.cs" />
     <Compile Include="res\ores\Ores_Wood.cs" />
     <Compile Include="res\recipes\Recipes_Tools.cs" />
-    <Compile Include="res\recipes\tools\Recipes_Scythes.cs" />
     <Compile Include="SceneCraft.cs" />
     <Compile Include="SceneMenu.cs" />
     <Compile Include="Scene.cs" />

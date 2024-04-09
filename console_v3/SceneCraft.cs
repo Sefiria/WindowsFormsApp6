@@ -24,6 +24,7 @@ namespace console_v3
             public string Name;
             public string DisplayName => $"{Name} ( {Count} )";
             public int DBRef = -1, Count = 0;
+            public Bitmap ModifiedImage = null;
             public virtual Rectangle Bounds => new Rectangle(20, (int)(20 + (Index - scroll) * (TextRenderer.MeasureText("A", font).Height * 1.5f)), TextRenderer.MeasureText("A", font).Width * 2 + TextRenderer.MeasureText(DisplayName, font).Width, TextRenderer.MeasureText("A", font).Height);
             public ListItem() { }
             public ListItem(int index)
@@ -45,6 +46,7 @@ namespace console_v3
                 Name = copy.Name;
                 DBRef = copy.DBRef;
                 Count = copy.Count;
+                ModifiedImage = copy.ModifiedImage;
             }
             public virtual void Draw(Graphics g, Graphics gui)
             {
@@ -63,7 +65,7 @@ namespace console_v3
                 int y = (int)(20 + (Index - scroll) * (h * 1.5f));
 
                 if(DBRef > -1)
-                    g.DrawImage(DB.GetTexture(DBRef, 32), pos);
+                    g.DrawImage(ModifiedImage ?? DB.GetTexture(DBRef, 32), pos);
                 if(offset != Point.Empty)
                     g.DrawString(DisplayName, font, Count > 0 ? Brushes.White : Brushes.Gray, w * 2 + offset.X, offset.Y);
                 else
@@ -104,7 +106,7 @@ namespace console_v3
                     DrawBoundsRelief(g, bounds, 4f, 2);
 
                 if(DBRef > -1)
-                    g.DrawImage(DB.GetTexture(DBRef, 28), bounds.Location);
+                    g.DrawImage(ModifiedImage ?? DB.GetTexture(DBRef, 28), bounds.Location);
 
                 if (Count > 0)
                 {
@@ -148,12 +150,15 @@ namespace console_v3
             public override Rectangle Bounds => new Rectangle(mainrect.X + mainrect.Width / 2 - SlotsResult.Count * (sz + slot_margin) / 2 + x * (sz + slot_margin), mainrect.Y + mainrect.Height / 2 + CraftSize * (sz + slot_margin) / 2 + 50, sz, sz);
             public RecipeObj[,] Needs;
             public Recipe Recipe;
+            public int DBRef_Ore;
             public SlotResult(RecipeObj[,] needs, RecipeObj result) : base()
             {
                 Needs = needs;
                 DBRef = result.DBRef;
+                DBRef_Ore = result.DBRef_Ore;
                 Count = result.Count;
                 Name = DB.DefineName(DBRef);
+                ModifiedImage = Tool.ResetGraphics(DBRef, DBRef_Ore);
             }
         }
 
@@ -223,8 +228,8 @@ namespace console_v3
 
             listItems = objs.Select(obj =>
             {
-                (string name, int dbref, int count, Guid content) = inv.GetFullInfosByUniqueId(obj);
-                return new ListItem(objs.IndexOf(obj)) { Name = name, DBRef = dbref, Count = count, content = content };
+                (string name, int dbref, int count, Guid content, Bitmap modifiedImage) = inv.GetFullInfosByUniqueId(obj);
+                return new ListItem(objs.IndexOf(obj)) { Name = name, DBRef = dbref, Count = count, content = content, ModifiedImage = modifiedImage };
             }).ToList();
 
             if(keepSlotsIfPossible)
@@ -245,6 +250,7 @@ namespace console_v3
                         Slots[id].DBRef = prevSlot.DBRef;
                         Slots[id].content = prevSlot.content;
                         Slots[id].Count = count;
+                        Slots[id].ModifiedImage = prevSlot.ModifiedImage;
                         listItems[listItems.IndexOf(item)].Count -= count;
                     }
                 }
@@ -292,10 +298,12 @@ namespace console_v3
                             SelectedTempItem.content = inter.content;
                             SelectedTempItem.Count = inter.Count;
                             SelectedTempItem.DBRef = inter.DBRef;
+                            SelectedTempItem.ModifiedImage = inter.ModifiedImage;
                             slot.Index = -1;
                             slot.content = Guid.Empty;
                             slot.Count = 0;
                             slot.DBRef = -1;
+                            slot.ModifiedImage = null;
                         }
                     }
                 }
@@ -328,6 +336,7 @@ namespace console_v3
                                 slot.content = SelectedTempItem.content;
                                 slot.Count = count;
                                 slot.DBRef = SelectedTempItem.DBRef;
+                                slot.ModifiedImage = SelectedTempItem.ModifiedImage;
                             }
 
                             if (SelectedTempItem != null && (slot.content == Guid.Empty || (SelectedTempItem?.Index ?? -1) == slot.Index))// already selection & ( slot same as selection OR slot empty )
@@ -368,7 +377,7 @@ namespace console_v3
                                 SelectedTempItem.content = inter.content;
                                 SelectedTempItem.Count = inter.Count;
                                 SelectedTempItem.DBRef = inter.DBRef;
-
+                                SelectedTempItem.ModifiedImage = inter.ModifiedImage;
                             }
                         }
                     }
@@ -395,7 +404,12 @@ namespace console_v3
                         inv.RemoveOne(need.DBRef);
                 }
                 foreach (var result in SlotsResult)
-                    inv.Add((result.DBRef, result.Count));
+                {
+                    if(result.DBRef.IsTool())
+                        inv.AddTool((result.DBRef, result.DBRef_Ore, result.Count));
+                    else
+                        inv.AddItem((result.DBRef, result.Count));
+                }
                 ResetListAndSlots(true);
             }
         }
@@ -419,7 +433,7 @@ namespace console_v3
                 int x = 0;
                 if (recipe != null)
                     foreach (var result in recipe.Results)
-                        SlotsResult.Add(new SlotResult(recipe.Needs, result) { x = x++ });
+                        SlotsResult.Add(new SlotResult(recipe.Needs, new RecipeObj(result) { DBRef_Ore = Slots.First(s => s.DBRef.IsOre()).DBRef }) { x = x++ });
             }
         }
 
