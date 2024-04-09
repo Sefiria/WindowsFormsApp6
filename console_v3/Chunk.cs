@@ -104,7 +104,7 @@ namespace console_v3
                 for (int x = 0; x < w; x++)
                 {
                     index = (x, y).V();
-                    chunk.Tiles[index] = new Tile(index) { Value = GetLayeredGrounds(mode, arr[x, y]) };
+                    chunk.Tiles[index] = new Tile(index, GetLayeredGrounds(mode, arr[x, y]));
                 }
             }
 

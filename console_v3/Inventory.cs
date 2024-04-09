@@ -200,20 +200,21 @@ namespace console_v3
             }
             return (name, dbref);
         }
-        public int GetDBRefByUniqueId(Guid id)
+        public (Bitmap modifiedImage, int dbref) GetImageAndDBRefByUniqueId(Guid id)
         {
+            Bitmap modifiedImage = null;
             int dbref = -1;
             Item item = null;
             Tool tool = Tools.FirstOrDefault(t => t.UniqueId == id);
             if (tool != null)
-                dbref = (int)tool.DBRef;
+                modifiedImage = tool.Image;
             else
             {
                 item = Items.FirstOrDefault(it => it.UniqueId == id);
                 if (item != null)
-                    dbref = (int)item.DBRef;
+                    dbref = item.DBRef;
             }
-            return dbref;
+            return (modifiedImage, dbref);
         }
         public string GetNameByUniqueId(Guid id)
         {

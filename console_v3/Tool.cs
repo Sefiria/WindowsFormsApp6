@@ -66,22 +66,39 @@ namespace console_v3
 
         private void UseShovel(Entity triggerer)
         {
+            void loot(int v)
+            {
+                // missing FibreDePlante & Boue in DB
+                //int n;
+                //switch(chunk.Tiles[tile].Value)
+                //{
+                //    case (int)DB.TexName.Grass:
+                //        n = RandomThings.rnd(3);
+                //        if (n > 0) triggerer.Inventory.Add(new Item("Fibre De Plante", (int)DB.TexName.FibreDePlante, n));
+                //        break;
+                //    case (int)DB.TexName.Dirt:
+                //        n = RandomThings.rnd(2);
+                //        if (n > 0) triggerer.Inventory.Add(new Item("Boue", (int)DB.TexName.Boue, n));
+                //        break;
+                //}
+            }
             var tile = triggerer.Position.ToTile();
             var chunk = Core.Instance.SceneAdventure.World.GetChunk();
-            // missing FibreDePlante & Boue in DB
-            //int n;
-            //switch(chunk.Tiles[tile].Value)
-            //{
-            //    case (int)DB.TexName.Grass:
-            //        n = RandomThings.rnd(3);
-            //        if (n > 0) triggerer.Inventory.Add(new Item("Fibre De Plante", (int)DB.TexName.FibreDePlante, n));
-            //        break;
-            //    case (int)DB.TexName.Dirt:
-            //        n = RandomThings.rnd(2);
-            //        if (n > 0) triggerer.Inventory.Add(new Item("Boue", (int)DB.TexName.Boue, n));
-            //        break;
-            //}
-            chunk.Tiles[tile].Value--;
+            if (chunk.Tiles[tile].Value > 0)
+            {
+                chunk.Tiles[tile].Resistance -= STR;
+                if (chunk.Tiles[tile].Resistance <= 0)
+                {
+                    ParticlesManager.Generate(tile.ToWorld() + GraphicsManager.TileSize / 2f, 3f, 4f, Color.FromArgb(DB.PxColors[chunk.Tiles[tile].Value]), 5, 100);
+                    loot(chunk.Tiles[tile].Value);
+                    chunk.Tiles[tile].Value--;
+                    chunk.Tiles[tile].ResetAutoResistance();
+                }
+                else
+                {
+                    ParticlesManager.Generate(tile.ToWorld() + GraphicsManager.TileSize / 2f, 1f, 2f, Color.FromArgb(DB.PxColors[chunk.Tiles[tile].Value]), 3, 100);
+                }
+            }
         }
     }
 }

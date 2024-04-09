@@ -101,15 +101,15 @@ namespace console_v3
             float sz = 10 + GraphicsManager.TileSize + 10 + 10;
             float total_sz = shortcuts.Count * GraphicsManager.TileSize + 20;
             float _x = DrawingRect.X + DrawingRect.Width / 2 - total_sz / 2;
-            SolidBrush brush = new SolidBrush(Color.FromArgb(100, Color.Gray));
+            SolidBrush brush = new SolidBrush(Color.FromArgb(100, Color.White));
 
             for (int i = 0; i < shortcuts.Count; i++)
             {
                 int x = (int)(_x + i * sz);
-                gui.FillRectangle(brush, x, 50, sz, GraphicsManager.TileSize + 10);
+                gui.FillRectangle(brush, x, 50, 50, 50);
 
-                var dbref = Core.Instance.TheGuy.Inventory.GetDBRefByUniqueId(shortcuts[i].Ref.UniqueId);
-                gui.DrawImage(DB.GetTexture(dbref), x + 10, 50);
+                var (img, dbref) = Core.Instance.TheGuy.Inventory.GetImageAndDBRefByUniqueId(shortcuts[i].Ref.UniqueId);
+                gui.DrawImage(img ?? DB.GetTexture(dbref), x + 10, 60);
             }
         }
 

@@ -54,26 +54,19 @@ namespace console_v3
             CurrentScene = SceneAdventure;
             SceneAdventure.Initialize();
             TheGuy = new Guy();
-            //var wooden_axe = new Tool("Hache en Bois", Outils.Hache, 3);
-            //var wooden_scythe = new Tool("Faux en Bois", Outils.Faux, 1);
-            //var wooden_shovel = new Tool("Pelle en Bois", Outils.Pelle, 1);
-            //var wooden_hammer = new Tool("Masse en Bois", Outils.Masse, 1);
-            //TheGuy.Inventory.Add(
-            //    wooden_axe,
-            //    wooden_scythe,
-            //    wooden_shovel,
-            //    wooden_hammer
-            //    );
-            //Shortcuts = new List<Shortcut>
-            //{
-            //    new Shortcut(0, KB.Key.C, wooden_shovel),
-            //};
-            new EntityStructure((10, 10).V(), (int)DB.Tex.Workbench);
             TheGuy.Inventory.AddItem(((int)DB.Tex.Wood, 4));
-            TheGuy.Inventory.AddTool(((int)DB.Tex.Scythe, (int)DB.Tex.Whiteneo, 1));
+            TheGuy.Inventory.AddTool(((int)DB.Tex.Scythe, (int)DB.Tex.Emerald, 1));
             TheGuy.Inventory.AddTool(((int)DB.Tex.Axe, (int)DB.Tex.Emerald, 1));
+            TheGuy.Inventory.AddTool(((int)DB.Tex.Pickaxe, (int)DB.Tex.Emerald, 1));
+            TheGuy.Inventory.AddTool(((int)DB.Tex.Shovel, (int)DB.Tex.Emerald, 1));
+            TheGuy.Inventory.AddTool(((int)DB.Tex.Sword, (int)DB.Tex.Emerald, 1));
             TheGuy.Inventory.AddItem(((int)DB.Tex.WoodStick, 16));
             TheGuy.Inventory.AddItem(((int)DB.Tex.Iron, 4));
+            Shortcuts = new List<Shortcut>
+            {
+                new Shortcut(0, KB.Key.C, TheGuy.Inventory.Tools.First(t => t.DBRef is (int)DB.Tex.Shovel)),
+            };
+            new EntityStructure((10, 10).V(), (int)DB.Tex.Workbench);
         }
         public void ResetGraphics()
         {
