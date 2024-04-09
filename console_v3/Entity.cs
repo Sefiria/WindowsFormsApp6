@@ -56,7 +56,7 @@ namespace console_v3
             var font = MidFont;
             var sz = TextRenderer.MeasureText(text, font);
             var position = MouseStates.Position.ToPoint().MinusF(sz.Width * 0.5f, sz.Height * 1.5f);
-            var brush = Brushes.LightGray;
+            var brush = Brushes.Black;
             gui.DrawString(text, font, brush, position);
         }
 

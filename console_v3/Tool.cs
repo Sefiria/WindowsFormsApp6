@@ -98,7 +98,7 @@ namespace console_v3
                 }
                 else
                 {
-                    ParticlesManager.Generate(tile.ToWorld() + GraphicsManager.TileSize / 2f, 1f, 2f, Color.FromArgb(DB.PxColors[chunk.Tiles[tile].Value]), 3, 100);
+                    ParticlesManager.Generate(tile.ToWorld() + GraphicsManager.TileSize / 2f, 2f, 2f, Color.FromArgb(DB.PxColors[chunk.Tiles[tile].Value]), 3, 100);
                 }
             }
         }
