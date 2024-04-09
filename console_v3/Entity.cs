@@ -50,7 +50,7 @@ namespace console_v3
 
         public virtual void DrawHint(Graphics gui)
         {
-            var text = (Name ?? DB.DefineName(DBRef)) ?? (this == Core.Instance.TheGuy ? "You" : null);
+            var text = Name ?? (this == Core.Instance.TheGuy ? "You" : DB.DefineName(DBRef));
             if (string.IsNullOrWhiteSpace(text))
                 return;
             var font = MidFont;
