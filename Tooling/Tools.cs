@@ -138,7 +138,7 @@ namespace Tooling
                     result[i, j] = tex.Clone(new Rectangle(i * s, j * s, s, s), tex.PixelFormat);
                     if (make_transparent && transparent_color != null)
                         result[i, j].MakeTransparent(transparent_color.Value);
-                    result[i, j] = new Bitmap(result[i, j], new_size_in_px, new_size_in_px);
+                    result[i, j] = new Bitmap(result[i, j], new_size_in_px+1, new_size_in_px+1);
                 }
             return result;
         }

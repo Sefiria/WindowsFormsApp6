@@ -84,12 +84,21 @@ namespace console_v3
 
         private void update_shortcuts()
         {
-            Core.Instance.Shortcuts?.ForEach(s =>
+            var shortcuts = new List<Shortcut>(Core.Instance.Shortcuts);
+            shortcuts?.ForEach(s =>
             {
-                if (s.IsPressed())
+                var (img, dbref) = Core.Instance.TheGuy.Inventory.GetImageAndDBRefByUniqueId(s.Ref.UniqueId);
+                if (img == null && dbref == -1)
                 {
-                    (s.Ref as IItem)?.Consume();
-                    (s.Ref as ITool)?.Use(Core.Instance.TheGuy);
+                    Core.Instance.Shortcuts.Remove(s);
+                }
+                else
+                {
+                    if (s.IsPressed())
+                    {
+                        (s.Ref as IItem)?.Consume();
+                        (s.Ref as ITool)?.Use(Core.Instance.TheGuy);
+                    }
                 }
             });
         }
@@ -109,7 +118,8 @@ namespace console_v3
                 gui.FillRectangle(brush, x, 50, 50, 50);
 
                 var (img, dbref) = Core.Instance.TheGuy.Inventory.GetImageAndDBRefByUniqueId(shortcuts[i].Ref.UniqueId);
-                gui.DrawImage(img ?? DB.GetTexture(dbref), x + 10, 60);
+                if(img != null || dbref != -1)
+                    gui.DrawImage(img ?? DB.GetTexture(dbref), x + 10, 60);
             }
         }
 

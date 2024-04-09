@@ -416,6 +416,11 @@ namespace console_v3
                     list_submenuitems["Drop 1"] = Drop1;
                     list_submenuitems["Drop All"] = DropAll;
                     list_submenuitems["Remove"] = Remove;
+                    list_submenuitems["---------------------"] = () => { };
+                    list_submenuitems["Assign shortcut 1 [C]"] = () => Core.Instance.Shortcuts.Add(new Shortcut(0, KB.Key.C, item)); // TODO REPLACE SHORTCUT WHEN ALREADY EXIST (actual : add new one with same index
+                    list_submenuitems["Assign shortcut 2 [V]"] = () => Core.Instance.Shortcuts.Add(new Shortcut(1, KB.Key.V, item)); // TODO Shortcut.Index ??
+                    list_submenuitems["Assign shortcut 3 [B]"] = () => Core.Instance.Shortcuts.Add(new Shortcut(2, KB.Key.B, item));
+                    list_submenuitems["Assign shortcut 4 [N]"] = () => Core.Instance.Shortcuts.Add(new Shortcut(3, KB.Key.N, item));
                     var list_sz = list_submenuitems.Select(k => TextRenderer.MeasureText(k.Key, font));
                     int max_sz_w = list_sz.Max(sz => sz.Width);
                     int max_sz_h = list_sz.Max(sz => sz.Height);
@@ -472,7 +477,13 @@ namespace console_v3
                         ["Use"] = Use,
                         ["Drop 1"] = Drop1,
                         ["Drop All"] = DropAll,
+                        ["---------------------"] = () => {},
                         ["Remove"] = Remove,
+                        ["---------------------"] = () => {},
+                        ["Assign shortcut 1 [C]"] = () => Core.Instance.Shortcuts.Add(new Shortcut(0, KB.Key.C, tool)),
+                        ["Assign shortcut 2 [V]"] = () => Core.Instance.Shortcuts.Add(new Shortcut(1, KB.Key.V, tool)),
+                        ["Assign shortcut 3 [B]"] = () => Core.Instance.Shortcuts.Add(new Shortcut(2, KB.Key.B, tool)),
+                        ["Assign shortcut 4 [N]"] = () => Core.Instance.Shortcuts.Add(new Shortcut(3, KB.Key.N, tool)),
                     };
                     var list_sz = list_submenuitems.Select(k => TextRenderer.MeasureText(k.Key, font));
                     int max_sz_w = list_sz.Max(sz => sz.Width);

@@ -29,6 +29,8 @@ namespace console_v3
             Name = copy.Name;
             Duration = copy.Duration;
             DBRef = copy.DBRef;
+            DBRef_Ore = copy.DBRef_Ore;
+            STR = copy.STR;
             Count = copy.Count;
             Image = ResetGraphics(DBRef, DBRef_Ore);
         }

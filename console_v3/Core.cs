@@ -71,7 +71,6 @@ namespace console_v3
         public void ResetGraphics()
         {
             if (Canvas.Width == 0 || Canvas.Height == 0) return;
-            bool first_init = g == null;
             if (g == null)
             {
                 RenderImage = new Bitmap(Canvas.Width, Canvas.Height);
@@ -83,14 +82,8 @@ namespace console_v3
                 gui = Graphics.FromImage(UIImage);
             }
 
-            //if (first_init)
-            //{
-            //    GraphicsManager.CharSize = g.MeasureString("A", GraphicsManager.FontSQ, GraphicsManager.FontSQ.Height, StringFormat.GenericTypographic);
-            //}
-
             g.Clear(Color.Black);
             gui.Clear(Color.Transparent);
-            //g.Clip = new Region(SceneAdventure.DrawingRect);
         }
 
         public void Update()
