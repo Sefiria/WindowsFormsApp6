@@ -46,13 +46,16 @@ namespace console_v3
             FurnaceOff = 0x8 + 0x1 * 16, FurnaceOn = 0x9 + 0x1 * 16,
             Coal = 0x2 + 0x2 * 16, Iron = 0x3 + 0x2 * 16, Gold = 0x4 + 0x2 * 16, Diamond = 0x5 + 0x2 * 16, Emerald = 0x6 + 0x2 * 16,
             Wood = 0x8 + 0x2 * 16, WoodPlank = 0x9 + 0x2 * 16, WoodStick = 0xA + 0x2 * 16, WoodMiniStick = 0xB + 0x2 * 16,
-            Axe = 0x0 + 0x3 * 16, Scythe = 0x1 + 0x3 * 16, Pickaxe = 0x2 + 0x3 * 16, Shovel = 0x3 + 0x3 * 16, Sword = 0x4 + 0x3 * 16,
+            Axe = 0x0 + 0x3 * 16, Scythe = 0x1 + 0x3 * 16, Pickaxe = 0x2 + 0x3 * 16, Shovel = 0x3 + 0x3 * 16, Sword = 0x4 + 0x3 * 16, Hammer = 0x5 + 0x3 * 16,
             Purpila = 0x8 + 0x3 * 16, Blueseo = 0x9+ 0x3 * 16, Yellilea = 0xA + 0x3 * 16, Blanca = 0xB + 0x3 * 16, Whiteneo = 0xC + 0x3 * 16, Redalis = 0xD + 0x3 * 16, Orangeno = 0xE + 0x3 * 16,
             PurpilaEssence = 0x8 + 0x4 * 16, BlueseoEssence = 0x9 + 0x4 * 16, YellileaEssence = 0xA + 0x4 * 16, BlancaEssence = 0xB + 0x4 * 16, WhiteneoEssence = 0xC + 0x4 * 16, RedalisEssence = 0xD + 0x4 * 16, OrangenoEssence = 0xE + 0x4 * 16,
             Tree_Automn_A = 0x8 + 0x5 * 16, Tree_Automn_B = 0x9 + 0x5 * 16, Tree_Automn_C = 0xA + 0x5 * 16,
             Tree_Summer_A = 0x8 + 0x6 * 16, Tree_Summer_B = 0x9 + 0x6 * 16, Tree_Summer_C = 0xA + 0x6 * 16,
             Tree_Spring_A = 0x8 + 0x7 * 16, Tree_Spring_B = 0x9 + 0x7 * 16, Tree_Spring_C = 0xA + 0x7 * 16,
             Chest = 0x5 + 0x8 * 16,
+            PlantFiber = 0x0 + 0x4 * 16, Stone = 0x1 + 0x4 * 16, Pebble = 0x2 + 0x4 * 16,
+
+            Mud = 0x5 + 0x0 * 16,// dirt
         }
         public static Dictionary<int, int> PxColors = new Dictionary<int, int>
         {
@@ -114,17 +117,21 @@ namespace console_v3
             (int)Tex.WhiteneoEssence,
             (int)Tex.RedalisEssence,
             (int)Tex.OrangenoEssence,
+            (int)Tex.PlantFiber,
+            (int)Tex.Stone,
+            (int)Tex.Pebble,
         };
         public static List<int> Consumables = new List<int>()
         {
         };
-        public static List<int> Tools = new List<int> { (int)Tex.Axe, (int)Tex.Pickaxe, (int)Tex.Shovel, (int)Tex.Scythe };// masse ?
+        public static List<int> Tools = new List<int> { (int)Tex.Axe, (int)Tex.Pickaxe, (int)Tex.Shovel, (int)Tex.Scythe, (int)Tex.Hammer };
         public static List<int> Collectibles = Items.Concat(Consumables).Concat(Structures).Concat(Ores).ToList();
 
         public static bool IsAxe(this int dbref) => dbref == (int)Tex.Axe;
         public static bool IsScythe(this int dbref) => dbref == (int)Tex.Scythe;
         public static bool IsPickaxe(this int dbref) => dbref == (int)Tex.Pickaxe;
         public static bool IsShovel(this int dbref) => dbref == (int)Tex.Shovel;
+        public static bool IsHammer(this int dbref) => dbref == (int)Tex.Hammer;
         public static bool IsOre(this int dbref) => Ores.Contains(dbref);
         public static bool IsPlant(this int dbref) => Plants.Contains(dbref);
         public static bool IsStructure(this int dbref) => Structures.Contains(dbref);

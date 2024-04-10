@@ -68,24 +68,25 @@ namespace console_v3
 
         private void UseShovel(Entity triggerer)
         {
-            void loot(int v)
-            {
-                // missing FibreDePlante & Boue in DB
-                //int n;
-                //switch(chunk.Tiles[tile].Value)
-                //{
-                //    case (int)DB.TexName.Grass:
-                //        n = RandomThings.rnd(3);
-                //        if (n > 0) triggerer.Inventory.Add(new Item("Fibre De Plante", (int)DB.TexName.FibreDePlante, n));
-                //        break;
-                //    case (int)DB.TexName.Dirt:
-                //        n = RandomThings.rnd(2);
-                //        if (n > 0) triggerer.Inventory.Add(new Item("Boue", (int)DB.TexName.Boue, n));
-                //        break;
-                //}
-            }
             var tile = triggerer.Position.ToTile();
             var chunk = Core.Instance.SceneAdventure.World.GetChunk();
+
+            void loot(int v)
+            {
+                int n;
+                switch (chunk.Tiles[tile].Value)
+                {
+                    case (int)DB.Tex.Grass:
+                        n = RandomThings.rnd(3);
+                        if (n > 0) triggerer.Inventory.Add(new Item((int)DB.Tex.PlantFiber, n));
+                        break;
+                    case (int)DB.Tex.Dirt:
+                        n = RandomThings.rnd(2);
+                        if (n > 0) triggerer.Inventory.Add(new Item((int)DB.Tex.Mud, n));
+                        break;
+                }
+            }
+
             if (chunk.Tiles[tile].Value > 0)
             {
                 chunk.Tiles[tile].Resistance -= STR;

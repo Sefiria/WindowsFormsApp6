@@ -381,7 +381,7 @@ namespace console_v3
             var guy = Core.Instance.TheGuy;
             var items = new List<Item>(guy.Inventory.Items);
             var font = new Font("Segoe UI", 14f);
-            int x, y, w = 240, h = 25, i = 0;
+            int x, y, w = 240, h = 35, i = 0;
             var ms = MouseStates.Position.ToPoint();
             bool hover;
             Rectangle rect;
@@ -390,11 +390,11 @@ namespace console_v3
                 x = i / (mainrect.Height / h) * (w + 10);
                 if (x >= mainrect.Width) break;
                 y = (i - x / w * (mainrect.Height / h)) * h;
-                rect = new Rectangle(mainrect.X + x, mainrect.Y + y, 272, h);
+                rect = new Rectangle(mainrect.X + x, mainrect.Y + y, 280, h);
                 hover = i == SubMenu_Items_selected_i || (SubMenu_Items_selected_i == -1 && rect.Contains(ms));
-                g.DrawImage(DB.GetTexture(item.DBRef, 24), new Rectangle(mainrect.X + x, mainrect.Y + y, 32, 24));
-                g.DrawString(item.Name, font, hover ? Brushes.White : Brushes.Gray, new Rectangle(mainrect.X + 32 + x, mainrect.Y + y, 140, 24));
-                g.DrawString($"{item.Count,14}", font, hover ? Brushes.White : Brushes.Gray, new Rectangle(mainrect.X + 32 + x + 150, mainrect.Y + y, 100, 24));
+                g.DrawImage(DB.GetTexture(item.DBRef, 32), new Rectangle(mainrect.X + x, mainrect.Y + y, 32, 32));
+                g.DrawString(item.Name, font, hover ? Brushes.White : Brushes.Gray, new Rectangle(mainrect.X + 32 + x, mainrect.Y + y, 140, 32));
+                g.DrawString($"{item.Count,14}", font, hover ? Brushes.White : Brushes.Gray, new Rectangle(mainrect.X + 32 + x + 150, mainrect.Y + y, 100, 32));
                 if(i == SubMenu_Items_selected_i)
                 {
                     int j = 0;
@@ -446,7 +446,7 @@ namespace console_v3
             var guy = Core.Instance.TheGuy;
             var tools = new List<Tool>(guy.Inventory.Tools);
             var font = new Font("Segoe UI", 14f);
-            int x, y, w = 240, h = 25, i = 0;
+            int x, y, w = 240, h = 35, i = 0;
             var ms = MouseStates.Position.ToPoint();
             bool hover;
             Rectangle rect;
@@ -455,11 +455,11 @@ namespace console_v3
                 x = i / (mainrect.Height / h) * (w + 10);
                 if (x >= mainrect.Width) break;
                 y = (i - x / w * (mainrect.Height / h)) * h;
-                rect = new Rectangle(mainrect.X + x, mainrect.Y + y, 272, h);
+                rect = new Rectangle(mainrect.X + x, mainrect.Y + y, 280, h);
                 hover = i == SubMenu_Items_selected_i || (SubMenu_Items_selected_i == -1 && rect.Contains(ms));
-                g.DrawImage(tool.Image.Resize(24), new Rectangle(mainrect.X + x, mainrect.Y + y, 32, 24));
-                g.DrawString(tool.Name, font, hover ? Brushes.White : Brushes.Gray, new Rectangle(mainrect.X + 32 + x, mainrect.Y + y, 140, 24));
-                g.DrawString($"{tool.Count,14}", font, hover ? Brushes.White : Brushes.Gray, new Rectangle(mainrect.X + 32 + x + 150, mainrect.Y + y, 100, 24));
+                g.DrawImage(tool.Image.Resize(24), new Rectangle(mainrect.X + x, mainrect.Y + y, 32, 32));
+                g.DrawString(tool.Name, font, hover ? Brushes.White : Brushes.Gray, new Rectangle(mainrect.X + 32 + x, mainrect.Y + y, 140, 32));
+                g.DrawString($"{tool.Count,14}", font, hover ? Brushes.White : Brushes.Gray, new Rectangle(mainrect.X + 32 + x + 150, mainrect.Y + y, 100, 32));
                 if (i == SubMenu_Items_selected_i)
                 {
                     int j = 0;

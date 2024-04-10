@@ -433,7 +433,7 @@ namespace console_v3
                 int x = 0;
                 if (recipe != null)
                     foreach (var result in recipe.Results)
-                        SlotsResult.Add(new SlotResult(recipe.Needs, new RecipeObj(result) { DBRef_Ore = Slots.First(s => s.DBRef.IsOre()).DBRef }) { x = x++ });
+                        SlotsResult.Add(new SlotResult(recipe.Needs, new RecipeObj(result) { DBRef_Ore = Slots.FirstOrDefault(s => s.DBRef.IsOre())?.DBRef ?? -1 }) { x = x++ });
             }
         }
 

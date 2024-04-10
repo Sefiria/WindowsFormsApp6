@@ -92,7 +92,7 @@ namespace console_v3
             if (Items?.ContainsItem(itemref.dbref) ?? false)
                 Items[Items.IndexOf(Items.First(i => i.DBRef == itemref.dbref))].Count++;
             else
-                Items?.AddRange(new[] { new Item(DB.DefineName(itemref.dbref), itemref.dbref, itemref.count) });
+                Items?.AddRange(new[] { new Item(itemref.dbref, itemref.count) });
         }
         private void _addTool(params (int dbref, int dbref_ore, int count)[] refs)
         {

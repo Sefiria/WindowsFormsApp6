@@ -14,7 +14,7 @@ namespace console_v3.res.entities
         public EntityTree() : base() { }
         public EntityTree(vec tile, bool addToCurrentChunkEntities = true) : base(tile.ToWorld(), addToCurrentChunkEntities)
         {
-            Name = "Arbre";
+            Name = "Tree";
             DBRef = RandomThings.arnd((int)DB.Tex.Tree_Spring_A, (int)DB.Tex.Tree_Spring_C);
             Stats = new Statistics(new Dictionary<Statistics.Stat, int> { [Statistics.Stat.HPMax] = 30, [Statistics.Stat.HP] = 30 });
         }
@@ -38,7 +38,7 @@ namespace console_v3.res.entities
             Stats._Substract(Statistics.Stat.HP, str);
             if (Stats._Get(Statistics.Stat.HP) <= 0)
             {
-                new Lootable(Position.ToTile(), true, new Item("Buche", (int)DB.Tex.Wood, 1) { IsConsommable = false });
+                new Lootable(Position.ToTile(), true, new Item((int)DB.Tex.Wood, 1) { IsConsommable = false });
                 Exists = false;
                 ParticlesManager.Generate(Position + GraphicsManager.TileSize / 2f, 10f, 10f, Color.FromArgb(100, 50, 0), 10, 100);
             }

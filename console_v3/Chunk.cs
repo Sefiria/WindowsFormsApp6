@@ -64,7 +64,6 @@ namespace console_v3
         public void Draw(Graphics g)
         {
             List<(vecf vf, int res)> specials = new List<(vecf vf, int res)>();
-            string result = "";
             for (int y = 0; y < ChunkSize.y; y++)
                 for (int x = 0; x < ChunkSize.x; x++)
                     GraphicsManager.Draw(g, DB.GetTexture(Tiles[(x, y).V()].Value), (x * GraphicsManager.TileSize, y * GraphicsManager.TileSize).Vf());
@@ -143,15 +142,15 @@ namespace console_v3
 
             // Generate Stones
 
-            //var available_stoneGrounds = chunk.Tiles.Where(tile => chunk.Entities.At(tile.Key) == null && tile.Value.Value == DB.TexName.Stone).Select(tile => tile.Key).ToList();
-            //var stonesCount = RandomThings.rnd(Math.Min(2 * (int)mode, available_stoneGrounds.Count / 4));
-            //for (int i = 0; i < stonesCount; i++)
-            //{
-            //    var rnd_id = RandomThings.rnd(available_stoneGrounds.Count);
-            //    var results = new Dictionary<int, int> { [(int)Objets.Pierre] = 3, [(int)Objets.Cailloux] = 8, };
-            //    chunk.Entities.Add(new EntityResource(available_stoneGrounds.ElementAt(rnd_id), (int)Ressources.Rocher, Outils.Masse, rndResults:results, addToCurrentChunkEntities:false));
-            //    available_stoneGrounds.RemoveAt(rnd_id);
-            //}
+            var available_stoneGrounds = chunk.Tiles.Where(tile => chunk.Entities.At(tile.Key) == null && tile.Value.Value == (int)DB.Tex.Rock).Select(tile => tile.Key).ToList();
+            var stonesCount = RandomThings.rnd(Math.Min(2 * (int)mode, available_stoneGrounds.Count / 4));
+            for (int i = 0; i < stonesCount; i++)
+            {
+                var rnd_id = RandomThings.rnd(available_stoneGrounds.Count);
+                var results = new Dictionary<int, int> { [(int)DB.Tex.Stone] = 3, [(int)DB.Tex.Pebble] = 8, };
+                chunk.Entities.Add(new EntityResource(available_stoneGrounds.ElementAt(rnd_id), (int)DB.Tex.Stone, (int)DB.Tex.Hammer, rndResults: results, addToCurrentChunkEntities: false));
+                available_stoneGrounds.RemoveAt(rnd_id);
+            }
         }
 
         private static int GetLayeredGrounds(GenerationMode mode, float layer)

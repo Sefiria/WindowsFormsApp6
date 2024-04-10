@@ -17,7 +17,7 @@ namespace console_v3
         {
             Header, SideLeft, Footer, SideRight,
         }
-        public class Notification { public NotificationTypes Type; public string Text; public Color Color; public int Duration = 500, Ticks = 0; }
+        public class Notification { public NotificationTypes Type; public string Text; public Color Color; public int Duration = 200, Ticks = 0; }
 
         public static List<Notification> Notifications = new List<Notification>();
         public static Font Font = new Font("Segoe UI", 12f);

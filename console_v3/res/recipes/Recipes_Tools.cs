@@ -80,5 +80,15 @@ namespace console_v3.res.recipes.tools
             var results = new List<RecipeObj> { new RecipeObj((int)Tex.Sword, 1) };
             return RecipeFactory.Create(Enum.GetName(typeof(Types), Types.Ore) + " Sword", RecipeMode.Static, needs, results);
         }
+        public static Recipe CreateHammer()
+        {
+            var needs = RecipeObj.Create3x3(@"
+033
+023
+010
+", (Types.Ore, 0, 0, 1), (0, Tex.WoodStick, 0, 4), (Types.Ore, 0, 0, 2));
+            var results = new List<RecipeObj> { new RecipeObj((int)Tex.Hammer, 1) };
+            return RecipeFactory.Create(Enum.GetName(typeof(Types), Types.Ore) + " Hammer", RecipeMode.Static, needs, results);
+        }
     }
 }

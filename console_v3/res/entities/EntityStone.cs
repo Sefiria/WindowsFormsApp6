@@ -17,6 +17,7 @@ namespace console_v3.res.entities
         public EntityResource(vec tile, int dbref, int neededTool, Dictionary<int, int> results = null, bool addToCurrentChunkEntities = true, Dictionary<int, int> rndResults = null) : base(tile.ToWorld(), addToCurrentChunkEntities)
         {
             DBRef = dbref;
+            Name = DB.DefineName(dbref);
             NeededTool = neededTool;
             Results = results;
             RndResults = rndResults;
@@ -33,10 +34,10 @@ namespace console_v3.res.entities
         {
             if (!Exists) return;
 
-            var scythes = triggerer.Inventory.Tools.Where(tool => tool.DBRef == NeededTool);
-            if (scythes.Count() == 0)
+            var hammers = triggerer.Inventory.Tools.Where(tool => tool.DBRef == NeededTool);
+            if (hammers.Count() == 0)
                 return;
-            var str = scythes.Max(scythe => scythe.STR);
+            var str = hammers.Max(hammer => hammer.STR);
             Stats._Substract(Statistics.Stat.HP, str);
             if (Stats._Get(Statistics.Stat.HP) <= 0)
             {

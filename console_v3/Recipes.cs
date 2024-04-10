@@ -118,6 +118,7 @@ namespace console_v3
             */
             private bool SatisfiedBy_Chaos(RecipeObj[,] slots)
             {
+                List<RecipeObj> slot_already_used = new List<RecipeObj>();
                 var listA = _2DToList(Needs);
                 var listB = _2DToList(slots);
                 var allNeeds = listA.SelectMany(a => DB.GetListByType(a?.Type ?? DB.Types.Undefined).Concat(new List<int> { a.DBRef }));
@@ -126,11 +127,14 @@ namespace console_v3
                     return false;
                 for (int a = 0; a < listA.Count; a++)
                 {
-                    match = listB.FirstOrDefault(slot => slot?.Count >= listA[a]?.Count && slot?.DBRef == listA[a]?.DBRef);
+                    match = listB.Except(slot_already_used).FirstOrDefault(slot => slot?.Count >= listA[a]?.Count && slot?.DBRef == listA[a]?.DBRef);
                     if (match == null)
                         return false;
                     if (listB[listB.IndexOf(match)].DBRef.IsTool() == false)
+                    {
                         listB[listB.IndexOf(match)].Count--;
+                        slot_already_used.Add(listB[listB.IndexOf(match)]);
+                    }
                 }
                 return true;
             }
@@ -257,27 +261,27 @@ namespace console_v3
                     Recipes_Tools.CreatePickaxe(),
                     Recipes_Tools.CreateShovel(),
                     Recipes_Tools.CreateSword(),
+                    Recipes_Tools.CreateHammer(),
                 });
 
-                needs = new RecipeObj[,] { {
-                        null, null, new RecipeObj((int)DB.Tex.WoodMiniStick, 1),
-                        null, new RecipeObj((int)DB.Tex.WoodMiniStick, 1), null,
-                        new RecipeObj((int)DB.Tex.WoodMiniStick, 1), null, null,
-                    } };
+                needs = RecipeObj.Create3x3(@"
+001
+010
+100", (0, Tex.WoodMiniStick, 0, 1));
                 results = new List<RecipeObj> { new RecipeObj((int)DB.Tex.WoodStick, 1) };
-                recipe = Create("Baton", RecipeMode.Static, needs, results);
+                recipe = Create("WoodStick", RecipeMode.Static, needs, results);
                 Recipes.Add(recipe);
                 #endregion
 
                 #region 2x2
                 needs = new RecipeObj[,] { { new RecipeObj((int)DB.Tex.Wood, 1), new RecipeObj((int)DB.Tex.Wood, 1), new RecipeObj((int)DB.Tex.Wood, 1), new RecipeObj((int)DB.Tex.Wood, 1) } };
                 results = new List<RecipeObj> { new RecipeObj((int)DB.Tex.Workbench, 1) };
-                recipe = Create("Petit Atelier", RecipeMode.Chaos, needs, results);
+                recipe = Create("Workbench", RecipeMode.Chaos, needs, results);
                 Recipes.Add(recipe);
 
                 needs = new RecipeObj[,] { { new RecipeObj((int)DB.Tex.Wood, 1) } };
                 results = new List<RecipeObj> { new RecipeObj((int)DB.Tex.WoodMiniStick, 16) };
-                recipe = Create("Brindille", RecipeMode.Chaos, needs, results);
+                recipe = Create("WoodMiniStick", RecipeMode.Chaos, needs, results);
                 Recipes.Add(recipe);
                 #endregion
             }

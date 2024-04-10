@@ -34,6 +34,12 @@ namespace console_v3
             DBRef = dbref;
             Count = count;
         }
+        public Item(int dbref, int count = 1)
+        {
+            Name = DB.DefineName(dbref);
+            DBRef = dbref;
+            Count = count;
+        }
 
         public void Use()
         {
