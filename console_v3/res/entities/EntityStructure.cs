@@ -25,6 +25,12 @@ namespace console_v3.res.entities
 
         public override void Update()
         {
+            switch (DBRef)
+            {
+                case (int)DB.Tex.Workbench: break;
+                case (int)DB.Tex.FurnaceOff: case (int)DB.Tex.FurnaceOn: break;
+                case (int)DB.Tex.TorchOff: case (int)DB.Tex.TorchOn: break;
+            }
         }
         public override void TickSecond()
         {
@@ -47,7 +53,14 @@ namespace console_v3.res.entities
         {
             if (!Exists) return;
 
-            Core.Instance.SwitchScene(Core.Scenes.Craft, 3);
+            switch(DBRef)
+            {
+                case (int)DB.Tex.Workbench: Core.Instance.SwitchScene(Core.Scenes.Craft, 3); break;
+                case (int)DB.Tex.FurnaceOff: case (int)DB.Tex.FurnaceOn:  break;
+                case (int)DB.Tex.TorchOff: case (int)DB.Tex.TorchOn: break;
+            }
         }
     }
 }
+
+// TODO lights

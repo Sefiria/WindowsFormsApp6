@@ -54,6 +54,7 @@ namespace console_v3
             CurrentScene = SceneAdventure;
             SceneAdventure.Initialize();
             TheGuy = new Guy();
+            new EntityStructure((10, 10).V(), (int)DB.Tex.TorchOn);
         }
         public void ResetGraphics()
         {
