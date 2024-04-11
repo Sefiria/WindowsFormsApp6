@@ -81,6 +81,7 @@
     <Compile Include="res\ores\Ores_Emerald.cs" />
     <Compile Include="res\ores\Ores_Diamond.cs" />
     <Compile Include="res\ores\Ores_Gold.cs" />
+    <Compile Include="res\ores\Ores_Stone.cs" />
     <Compile Include="res\ores\Ores_Iron.cs" />
     <Compile Include="res\ores\Ores_Wood.cs" />
     <Compile Include="res\recipes\Recipes_Tools.cs" />

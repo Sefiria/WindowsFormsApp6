@@ -19,6 +19,18 @@ namespace console_v3
 
         public World World;
         public Item ItemToPlace = null;
+        public float m_Time;
+        public float Time
+        {
+            get => m_Time;
+            set
+            {
+                m_Time = value;
+                while (m_Time < 0F) m_Time += 24F;
+                while (m_Time >= 24F) m_Time -= 24F;
+            }
+        }
+        public float TimeSpeed = 2f;
 
         public SceneAdventure() : base()
         {
@@ -61,6 +73,7 @@ namespace console_v3
         public override void TickSecond()
         {
             World.TickSecond();
+            Time += TimeSpeed;
         }
 
         public override void Draw(Graphics g, Graphics gui)

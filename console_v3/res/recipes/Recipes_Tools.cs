@@ -16,7 +16,7 @@ namespace console_v3.res.recipes.tools
 011
 020
 020
-", (Types.Ore, 0, 0, 1), (0, Tex.WoodStick, 0, 4));
+", (Types.Ore, 0, 0, 1), (0, Tex.WoodStick, 0, 2));
             var results = new List<RecipeObj> { new RecipeObj((int)Tex.Scythe, 1) };
             return RecipeFactory.Create(Enum.GetName(typeof(Types), Types.Ore) + " Scythe", RecipeMode.Static, needs, results);
         }
@@ -26,7 +26,7 @@ namespace console_v3.res.recipes.tools
 110
 020
 020
-", (Types.Ore, 0, 0, 1), (0, Tex.WoodStick, 0, 4));
+", (Types.Ore, 0, 0, 1), (0, Tex.WoodStick, 0, 2));
             var results = new List<RecipeObj> { new RecipeObj((int)Tex.Scythe, 1) };
             return RecipeFactory.Create(Enum.GetName(typeof(Types), Types.Ore) + " Scythe", RecipeMode.Static, needs, results);
         }
@@ -36,7 +36,7 @@ namespace console_v3.res.recipes.tools
 011
 021
 020
-", (Types.Ore, 0, 0, 1), (0, Tex.WoodStick, 0, 4));
+", (Types.Ore, 0, 0, 1), (0, Tex.WoodStick, 0, 2));
             var results = new List<RecipeObj> { new RecipeObj((int)Tex.Axe, 1) };
             return RecipeFactory.Create(Enum.GetName(typeof(Types), Types.Ore) + " Axe", RecipeMode.Static, needs, results);
         }
@@ -46,7 +46,7 @@ namespace console_v3.res.recipes.tools
 110
 120
 020
-", (Types.Ore, 0, 0, 1), (0, Tex.WoodStick, 0, 4));
+", (Types.Ore, 0, 0, 1), (0, Tex.WoodStick, 0, 2));
             var results = new List<RecipeObj> { new RecipeObj((int)Tex.Axe, 1) };
             return RecipeFactory.Create(Enum.GetName(typeof(Types), Types.Ore) + " Axe", RecipeMode.Static, needs, results);
         }
@@ -56,7 +56,7 @@ namespace console_v3.res.recipes.tools
 111
 020
 020
-", (Types.Ore, 0, 0, 1), (0, Tex.WoodStick, 0, 4));
+", (Types.Ore, 0, 0, 1), (0, Tex.WoodStick, 0, 2));
             var results = new List<RecipeObj> { new RecipeObj((int)Tex.Pickaxe, 1) };
             return RecipeFactory.Create(Enum.GetName(typeof(Types), Types.Ore) + " Pickaxe", RecipeMode.Static, needs, results);
         }
@@ -66,7 +66,7 @@ namespace console_v3.res.recipes.tools
 010
 020
 020
-", (Types.Ore, 0, 0, 1), (0, Tex.WoodStick, 0, 4));
+", (Types.Ore, 0, 0, 1), (0, Tex.WoodStick, 0, 2));
             var results = new List<RecipeObj> { new RecipeObj((int)Tex.Shovel, 1) };
             return RecipeFactory.Create(Enum.GetName(typeof(Types), Types.Ore) + " Shovel", RecipeMode.Static, needs, results);
         }
@@ -76,7 +76,7 @@ namespace console_v3.res.recipes.tools
 010
 010
 020
-", (Types.Ore, 0, 0, 1), (0, Tex.WoodStick, 0, 4));
+", (Types.Ore, 0, 0, 1), (0, Tex.WoodStick, 0, 2));
             var results = new List<RecipeObj> { new RecipeObj((int)Tex.Sword, 1) };
             return RecipeFactory.Create(Enum.GetName(typeof(Types), Types.Ore) + " Sword", RecipeMode.Static, needs, results);
         }
@@ -86,7 +86,7 @@ namespace console_v3.res.recipes.tools
 033
 023
 010
-", (Types.Ore, 0, 0, 1), (0, Tex.WoodStick, 0, 4), (Types.Ore, 0, 0, 2));
+", (Types.Ore, 0, 0, 1), (0, Tex.WoodStick, 0, 2), (Types.Ore, 0, 0, 2));
             var results = new List<RecipeObj> { new RecipeObj((int)Tex.Hammer, 1) };
             return RecipeFactory.Create(Enum.GetName(typeof(Types), Types.Ore) + " Hammer", RecipeMode.Static, needs, results);
         }

@@ -109,6 +109,10 @@ namespace Tooling
         public static vecf Vf(this Size size) => new vecf(size.Width, size.Height);
         public static vec V(this SizeF size) => new vec(size.Width, size.Height);
         public static vec V(this Size size) => new vec(size.Width, size.Height);
+        public static float Distance(this vec a, vec b) => Maths.Distance(a, b);
+        public static float Distance(this vec a, vecf b) => Maths.Distance(a.f, b);
+        public static float Distance(this vecf a, vecf b) => Maths.Distance(a, b);
+        public static float Distance(this vecf a, vec b) => Maths.Distance(a, b.f);
         public static ICoords IC(this (int X, int Y) data) => ICoordsFactory.Create(data.X, data.Y);
         public static ICoords IC(this (float X, float Y) data) => ICoordsFactory.Create(data.X, data.Y);
         public static float DistanceFromLine(this PointF self, float ax, float by, float c) => Maths.DistanceFromLine(self, ax, by, c);

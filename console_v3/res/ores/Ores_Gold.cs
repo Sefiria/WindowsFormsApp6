@@ -17,7 +17,7 @@ namespace console_v3.res.ores
                 UniqueId = Guid.NewGuid(),
                 Name = "Gold",
                 Rarity = 0.6F,
-                ToolQuality = 4,
+                ToolQuality = 15,
                 ColorDark = Color.FromArgb(248, 175, 43).ToArgb(),
                 ColorMid = Color.FromArgb(252, 238, 75).ToArgb(),
                 ColorLight = Color.FromArgb(255, 255, 181).ToArgb(),

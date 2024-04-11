@@ -17,7 +17,7 @@ namespace console_v3.res.ores
                 UniqueId = Guid.NewGuid(),
                 Name = "Wood",
                 Rarity = 0F,
-                ToolQuality = 1,
+                ToolQuality = 2,
                 ColorDark = Color.FromArgb(100, 50, 0).ToArgb(),
                 ColorMid = Color.FromArgb(120, 70, 0).ToArgb(),
                 ColorLight = Color.FromArgb(150, 100, 0).ToArgb(),

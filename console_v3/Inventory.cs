@@ -90,7 +90,7 @@ namespace console_v3
         private void _addItem((int dbref, int count) itemref)
         {
             if (Items?.ContainsItem(itemref.dbref) ?? false)
-                Items[Items.IndexOf(Items.First(i => i.DBRef == itemref.dbref))].Count++;
+                Items[Items.IndexOf(Items.First(i => i.DBRef == itemref.dbref))].Count += itemref.count;
             else
                 Items?.AddRange(new[] { new Item(itemref.dbref, itemref.count) });
         }

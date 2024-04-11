@@ -43,7 +43,7 @@ namespace console_v3
         public enum Tex { UnbreakableRock = 0x0 + 0x0 * 16, Obsidian = 0x1 + 0x0 * 16, HardRock = 0x2 + 0x0 * 16, DeepRock = 0x3 + 0x0 * 16, Rock = 0x4 + 0x0 * 16,
             Dirt = 0x5 + 0x0 * 16, Grass = 0x6 + 0x0 * 16, Sawmill = 0x8 + 0x0 * 16, Workbench = 0x9 + 0x0 * 16,
             CoalStone = 0x2 + 0x1 * 16, IronStone = 0x3 + 0x1 * 16, GoldStone = 0x4 + 0x1 * 16, DiamondStone = 0x5 + 0x1 * 16, EmeraldStone = 0x6 + 0x1 * 16,
-            FurnaceOff = 0x8 + 0x1 * 16, FurnaceOn = 0x9 + 0x1 * 16,
+            Furnace = 0x8 + 0x1 * 16, FurnaceOn = 0x9 + 0x1 * 16,
             Coal = 0x2 + 0x2 * 16, Iron = 0x3 + 0x2 * 16, Gold = 0x4 + 0x2 * 16, Diamond = 0x5 + 0x2 * 16, Emerald = 0x6 + 0x2 * 16,
             Wood = 0x8 + 0x2 * 16, WoodPlank = 0x9 + 0x2 * 16, WoodStick = 0xA + 0x2 * 16, WoodMiniStick = 0xB + 0x2 * 16,
             Axe = 0x0 + 0x3 * 16, Scythe = 0x1 + 0x3 * 16, Pickaxe = 0x2 + 0x3 * 16, Shovel = 0x3 + 0x3 * 16, Sword = 0x4 + 0x3 * 16, Hammer = 0x5 + 0x3 * 16,
@@ -52,7 +52,7 @@ namespace console_v3
             Tree_Automn_A = 0x8 + 0x5 * 16, Tree_Automn_B = 0x9 + 0x5 * 16, Tree_Automn_C = 0xA + 0x5 * 16,
             Tree_Summer_A = 0x8 + 0x6 * 16, Tree_Summer_B = 0x9 + 0x6 * 16, Tree_Summer_C = 0xA + 0x6 * 16,
             Tree_Spring_A = 0x8 + 0x7 * 16, Tree_Spring_B = 0x9 + 0x7 * 16, Tree_Spring_C = 0xA + 0x7 * 16,
-            Chest = 0x5 + 0x8 * 16, TorchOff = 0x6 + 0x8 * 16, TorchOn = 0x7 + 0x8 * 16,
+            Chest = 0x8 + 0x8 * 16, Torch = 0x9 + 0x8 * 16, TorchOn = 0xA + 0x8 * 16,
             PlantFiber = 0x0 + 0x4 * 16, Stone = 0x1 + 0x4 * 16, Pebble = 0x2 + 0x4 * 16,
 
             Mud = 0x5 + 0x0 * 16,// dirt
@@ -77,6 +77,7 @@ namespace console_v3
         public static List<int> Ores = new List<int>()
         {
             (int)Tex.Wood,
+            (int)Tex.Stone,
             (int)Tex.Iron,
             (int)Tex.Gold,
             (int)Tex.Diamond,
@@ -101,10 +102,8 @@ namespace console_v3
         {
             (int)Tex.Sawmill,
             (int)Tex.Workbench,
-            (int)Tex.FurnaceOff,
-            (int)Tex.FurnaceOn,
-            (int)Tex.TorchOff,
-            (int)Tex.TorchOn,
+            (int)Tex.Furnace,
+            (int)Tex.Torch,
         };// scierie ?
         public static List<int> Items = new List<int>
         {
