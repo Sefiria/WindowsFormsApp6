@@ -55,6 +55,8 @@ namespace console_v3
             SceneAdventure.Initialize();
             TheGuy = new Guy();
             new EntityStructure((10, 10).V(), (int)DB.Tex.Torch) { IsOn = true };
+            new EntityStructure((10,11).V(), (int)DB.Tex.Workbench);
+            TheGuy.Inventory.AddTool(((int)DB.Tex.Axe, (int)DB.Tex.Iron, 1));
         }
         public void ResetGraphics()
         {

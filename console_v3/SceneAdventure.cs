@@ -19,7 +19,7 @@ namespace console_v3
 
         public World World;
         public Item ItemToPlace = null;
-        public float m_Time = 12f;
+        public float m_Time = 23f;
         public float Time
         {
             get => m_Time;
