@@ -102,7 +102,7 @@ namespace console_v3
         public override void Draw(Graphics g)
         {
             //GraphicsManager.Draw(g, Texture, TilePositionF.i.f * GraphicsManager.TileSize);
-            GraphicsManager.Draw(g, Texture, WorldPosition - GraphicsManager.TileSize*0.4f);
+            GraphicsManager.Draw(g, GetTexLum(Texture), WorldPosition - GraphicsManager.TileSize*0.4f);
         }
 
         public override void TickSecond()

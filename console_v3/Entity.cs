@@ -45,7 +45,24 @@ namespace console_v3
 
         public virtual void Draw(Graphics g)
         {
-            GraphicsManager.Draw(g, DB.GetTexture(DBRef), Position);
+            GraphicsManager.Draw(g, GetTexLum(DB.GetTexture(DBRef)), Position);
+        }
+
+        public Bitmap GetTexLum(Bitmap src)
+        {
+            const float LUM_DIST = 6F;
+            const float LUM_BRIGHT = 0.35F;
+            float time = Core.Instance.SceneAdventure.Time;
+            float timelum = LUM_BRIGHT * (((int)(time / 12) == 0 ? time : 12F - (time - 11F)) % 12F) / 12F;
+            var tex = src;
+            var torchs_coords = Core.Instance.SceneAdventure.World.CurrentDimension.CurrentChunk.Entities.Where(e => (e as EntityStructure)?.DBRef == (int)DB.Tex.Torch).Select(t => t.Tile);
+            var torchs_near = torchs_coords.Select(c => c.Distance(Tile)).Where(d => d <= LUM_DIST);
+            float lum = torchs_near.Count() == 0 ? 0F : (LUM_DIST - torchs_near.Min()) * (LUM_BRIGHT / LUM_DIST);
+            if (lum > 0f)
+                tex = tex.GetAdjusted(1.001f - LUM_BRIGHT + timelum + lum);
+            else
+                tex = tex.GetAdjusted(1f - LUM_BRIGHT + timelum);
+            return tex;
         }
 
         public virtual void DrawHint(Graphics gui)

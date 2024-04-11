@@ -40,7 +40,7 @@ namespace console_v3.res.entities
         }
         public override void Draw(Graphics g)
         {
-            GraphicsManager.Draw(g, DB.GetTexture(DBRef + (IsOn ? 1 : 0)), Position);
+            GraphicsManager.Draw(g, GetTexLum(DB.GetTexture(DBRef + (IsOn ? 1 : 0))), Position);
         }
         public override void Action(Entity triggerer)
         {

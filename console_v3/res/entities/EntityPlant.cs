@@ -23,10 +23,6 @@ namespace console_v3.res.entities
         public override void TickSecond()
         {
         }
-        public override void Draw(Graphics g)
-        {
-            GraphicsManager.Draw(g, DB.GetTexture(DBRef), Position);
-        }
         public override void Action(Entity triggerer)
         {
             if (!Exists) return;

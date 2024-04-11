@@ -25,10 +25,6 @@ namespace console_v3.res.entities
         public override void TickSecond()
         {
         }
-        public override void Draw(Graphics g)
-        {
-            base.Draw(g);
-        }
         public override void Action(Entity triggerer)
         {
             if (!Exists) return;
