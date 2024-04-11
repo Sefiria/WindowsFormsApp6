@@ -57,6 +57,7 @@ namespace console_v3
             new EntityStructure((10, 10).V(), (int)DB.Tex.Torch) { IsOn = true };
             new EntityStructure((10,11).V(), (int)DB.Tex.Workbench);
             TheGuy.Inventory.AddTool(((int)DB.Tex.Axe, (int)DB.Tex.Iron, 1));
+            TheGuy.Inventory.AddTool(((int)DB.Tex.Pickaxe, (int)DB.Tex.Iron, 1));
         }
         public void ResetGraphics()
         {
