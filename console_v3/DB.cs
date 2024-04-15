@@ -66,6 +66,11 @@ namespace console_v3
             [(int)Tex.Rock] = Color.FromArgb(100, 100, 100).ToArgb(),
             [(int)Tex.Dirt] = Color.FromArgb(175, 115, 0).ToArgb(),
             [(int)Tex.Grass] = Color.FromArgb(50, 150, 0).ToArgb(),
+
+            [(int)Tex.IronStone] = Ores_Iron.Instance.ColorMid,
+            [(int)Tex.GoldStone] = Ores_Gold.Instance.ColorMid,
+            [(int)Tex.DiamondStone] = Ores_Diamond.Instance.ColorMid,
+            [(int)Tex.EmeraldStone] = Ores_Emerald.Instance.ColorMid,
         };
         public static int GetPxColor(int dbref)
         {

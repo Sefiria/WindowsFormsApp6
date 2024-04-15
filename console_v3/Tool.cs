@@ -110,14 +110,16 @@ namespace console_v3
         {
             var tile = triggerer.Position.ToTile();
             var chunk = Core.Instance.SceneAdventure.World.GetChunk();
-            int dbref = chunk.Tiles[tile].Value;
+            int ore = chunk.Tiles[tile].DBRef_Ore;
+            int dbref = ore > -1 ? ore : chunk.Tiles[tile].Value;
 
             void loot()
             {
                 int n;
-                switch (dbref)
+                switch (chunk.Tiles[tile].Value)
                 {
                     case (int)DB.Tex.Rock:
+                        if(ore > -1) triggerer.Inventory.Add(new Item(ore + 0x1 * 16));
                         n = RandomThings.rnd(2);
                         if (n > 0) triggerer.Inventory.Add(new Item((int)DB.Tex.Stone, n));
                         n = RandomThings.rnd(8);
@@ -152,7 +154,10 @@ namespace console_v3
                     else
                         ParticlesManager.Generate(tile.ToWorld() + GraphicsManager.TileSize / 2f, 5f, 3f, Color.FromArgb(DB.PxColors[dbref]), 20, 200);
                     loot();
-                    chunk.Tiles[tile].Value--;
+                    if (chunk.Tiles[tile].Value == (int)DB.Tex.Rock)
+                        chunk.Tiles[tile].Value = (int)DB.Tex.DeepRock;
+                    else
+                        chunk.Tiles[tile].Value--;
                     chunk.Tiles[tile].ResetAutoResistance();
                 }
                 else
