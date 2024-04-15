@@ -69,38 +69,52 @@ namespace console_v3
             float timelum = LUM_BRIGHT * (((int)(time / 12) == 0 ? time : 12F - (time - 11F)) % 12F) / 12F;
             IEnumerable<float> torchs_near;
             Tile tile;
-            
+
             // apply adjusted luminosity only on common temp tex (3 / 4 in the chunk) and then draw them
-            var texs = Tiles.Values.Select(t => t.Value).Distinct().ToDictionary(t => t, t =>DB.GetTexture(t).GetAdjusted(1f - LUM_BRIGHT + timelum));
+            var texs = Tiles.Values.Select(t => t.Value).Distinct().ToDictionary(t => t, t => DB.GetTexture(t).GetAdjusted(1f - LUM_BRIGHT + timelum));
+            var texs_rock = Tiles.Values.Where(t => t.Value == (int)DB.Tex.Rock && t.DBRef_Ore > -1).GroupBy(t => t.DBRef_Ore).Select(t => t.First()).ToDictionary(t => t.DBRef_Ore, t => t.GetTexture().GetAdjusted(1f - LUM_BRIGHT + timelum));
 
             // torchs locations
             var torchs_coords = Entities.Where(e => e.DBRef == (int)DB.Tex.Torch).Select(t => t.Tile);
 
             // opti : adjust for lum only single time, others just use cached tex
-            // tile has to have same value and same luminosity
+            // tile has to have same value, same luminosity, and same orevalue if value is rock
             var cached_adjusted_texs = new Dictionary<(int type, float lum), Bitmap>();
+            var cached_adjusted_texs_rocks = new Dictionary<(int type, float lum, int ore), Bitmap>();
 
             for (int y = 0; y < ChunkSize.y; y++)
             {
                 for (int x = 0; x < ChunkSize.x; x++)
                 {
                     tile = Tiles[(x, y).V()];
-                    tex = texs[tile.Value];
+                    var ore = tile.DBRef_Ore;
+                    tex = (tile.Value == (int)DB.Tex.Rock && ore > -1) ? texs_rock.First(txr => txr.Key == ore).Value : texs[tile.Value];
                     torchs_near = torchs_coords.Select(c => c.Distance(tile.Index)).Where(d => d <= LUM_DIST);
                     float lum = torchs_near.Count() == 0 ? 0F : (LUM_DIST - torchs_near.Min()) * (LUM_BRIGHT / LUM_DIST);
+                    var cached = (tile.Value, lum);
+                    var cached_rock = (tile.Value, lum, ore);
                     if (lum > 0f)
                     {
-                        if (cached_adjusted_texs.ContainsKey((tile.Value, lum)))
-                            tex = cached_adjusted_texs[(tile.Value, lum)];
+                        if (tile.Value == (int)DB.Tex.Rock)
+                        {
+                            if(cached_adjusted_texs_rocks.ContainsKey(cached_rock))
+                                tex = cached_adjusted_texs_rocks[cached_rock];
+                            else
+                                tex = cached_adjusted_texs_rocks[cached_rock] = tex.GetAdjusted(1.001f + lum * (LUM_BRIGHT - timelum) * 1.2f);
+                        }
                         else
-                            tex = cached_adjusted_texs[(tile.Value, lum)] = tex.GetAdjusted(1.001f + lum * (LUM_BRIGHT - timelum) * 1.2f);
+                        {
+                            if (cached_adjusted_texs.ContainsKey(cached))
+                                tex = cached_adjusted_texs[cached];
+                            else
+                                tex = cached_adjusted_texs[cached] = tex.GetAdjusted(1.001f + lum * (LUM_BRIGHT - timelum) * 1.2f);
+                        }
                     }
                     GraphicsManager.Draw(g, tex, (x * GraphicsManager.TileSize, y * GraphicsManager.TileSize).Vf());
                 }
             }
             new List<Entity>(Entities).ForEach(e => { if (e.Exists) e.Draw(g); });
         }
-
 
         public static Chunk Generate(GenerationMode mode, vec chunk_index)
         {

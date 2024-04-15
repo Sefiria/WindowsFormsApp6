@@ -30,7 +30,7 @@ namespace console_v3
                 while (m_Time >= 24F) m_Time -= 24F;
             }
         }
-        public float TimeSpeed = 0.2f;
+        public float TimeSpeed = 2f;
 
         public SceneAdventure() : base()
         {

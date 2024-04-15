@@ -36,10 +36,10 @@ namespace console_v3
         }
         public Tool(string name, int dbref, int dbref_ore, int AddedSTR = 0)
         {
-            if(!dbref_ore.IsOre())
-                dbref_ore =  (int)DB.Tex.Wood;
+            if (!dbref_ore.IsOre())
+                dbref_ore = (int)DB.Tex.Wood;
 
-            Name = name ?? $"{DB.DefineName(dbref_ore)} { DB.DefineName(dbref)}";
+            Name = name ?? $"{DB.DefineName(dbref_ore)} {DB.DefineName(dbref)}";
             Duration = 1f;
             DBRef = dbref;
             DBRef_Ore = dbref_ore;
@@ -63,18 +63,20 @@ namespace console_v3
 
         public void Use(Entity triggerer)
         {
-            if(DBRef.IsShovel()) UseShovel(triggerer);
+            if (DBRef.IsShovel()) UseShovel(triggerer);
+            if (DBRef.IsPickaxe()) UsePickaxe(triggerer);
         }
 
         private void UseShovel(Entity triggerer)
         {
             var tile = triggerer.Position.ToTile();
             var chunk = Core.Instance.SceneAdventure.World.GetChunk();
+            int dbref = chunk.Tiles[tile].Value;
 
-            void loot(int v)
+            void loot()
             {
                 int n;
-                switch (chunk.Tiles[tile].Value)
+                switch (dbref)
                 {
                     case (int)DB.Tex.Grass:
                         n = RandomThings.rnd(3);
@@ -87,19 +89,78 @@ namespace console_v3
                 }
             }
 
-            if (chunk.Tiles[tile].Value > 0)
+            if (dbref == (int)DB.Tex.Grass || dbref == (int)DB.Tex.Dirt)
             {
                 chunk.Tiles[tile].Resistance -= STR;
                 if (chunk.Tiles[tile].Resistance <= 0)
                 {
-                    ParticlesManager.Generate(tile.ToWorld() + GraphicsManager.TileSize / 2f, 3f, 4f, Color.FromArgb(DB.PxColors[chunk.Tiles[tile].Value]), 5, 100);
-                    loot(chunk.Tiles[tile].Value);
+                    ParticlesManager.Generate(tile.ToWorld() + GraphicsManager.TileSize / 2f, 3f, 4f, Color.FromArgb(DB.PxColors[dbref]), 5, 100);
+                    loot();
                     chunk.Tiles[tile].Value--;
                     chunk.Tiles[tile].ResetAutoResistance();
                 }
                 else
                 {
-                    ParticlesManager.Generate(tile.ToWorld() + GraphicsManager.TileSize / 2f, 2f, 2f, Color.FromArgb(DB.PxColors[chunk.Tiles[tile].Value]), 3, 100);
+                    ParticlesManager.Generate(tile.ToWorld() + GraphicsManager.TileSize / 2f, 2f, 2f, Color.FromArgb(DB.PxColors[dbref]), 3, 100);
+                }
+            }
+        }
+
+        private void UsePickaxe(Entity triggerer)
+        {
+            var tile = triggerer.Position.ToTile();
+            var chunk = Core.Instance.SceneAdventure.World.GetChunk();
+            int dbref = chunk.Tiles[tile].Value;
+
+            void loot()
+            {
+                int n;
+                switch (dbref)
+                {
+                    case (int)DB.Tex.Rock:
+                        n = RandomThings.rnd(2);
+                        if (n > 0) triggerer.Inventory.Add(new Item((int)DB.Tex.Stone, n));
+                        n = RandomThings.rnd(8);
+                        if (n > 0) triggerer.Inventory.Add(new Item((int)DB.Tex.Pebble, n));
+                        break;
+                    case (int)DB.Tex.DeepRock:
+                        n = RandomThings.rnd(5);
+                        if (n > 0) triggerer.Inventory.Add(new Item((int)DB.Tex.Stone, n));
+                        n = RandomThings.rnd(15);
+                        if (n > 0) triggerer.Inventory.Add(new Item((int)DB.Tex.Pebble, n));
+                        break;
+                    case (int)DB.Tex.HardRock:
+                        n = RandomThings.rnd(10);
+                        if (n > 0) triggerer.Inventory.Add(new Item((int)DB.Tex.Stone, n));
+                        break;
+                    case (int)DB.Tex.Obsidian:
+                        n = RandomThings.rnd(30);
+                        if (n > 0) triggerer.Inventory.Add(new Item((int)DB.Tex.Stone, n));
+                        n = RandomThings.rnd(2);
+                        if (n > 0) triggerer.Inventory.Add(new Item((int)DB.Tex.Obsidian, n));
+                        break;
+                }
+            }
+
+            if (dbref != (int)DB.Tex.Grass && dbref != (int)DB.Tex.Dirt && dbref > 0)
+            {
+                chunk.Tiles[tile].Resistance -= STR;
+                if (chunk.Tiles[tile].Resistance <= 0)
+                {
+                    if (dbref == (int)DB.Tex.Obsidian)
+                        ParticlesManager.Generate(tile.ToWorld() + GraphicsManager.TileSize / 2f, 5f, 3f, Color.FromArgb(DB.PxColors[dbref]), 8, 200);
+                    else
+                        ParticlesManager.Generate(tile.ToWorld() + GraphicsManager.TileSize / 2f, 5f, 3f, Color.FromArgb(DB.PxColors[dbref]), 20, 200);
+                    loot();
+                    chunk.Tiles[tile].Value--;
+                    chunk.Tiles[tile].ResetAutoResistance();
+                }
+                else
+                {
+                    if(dbref == (int)DB.Tex.Obsidian)
+                        ParticlesManager.Generate(tile.ToWorld() + GraphicsManager.TileSize / 2f, 2f, 5f, Color.FromArgb(DB.PxColors[dbref]), STR / 20, 100);
+                    else
+                        ParticlesManager.Generate(tile.ToWorld() + GraphicsManager.TileSize / 2f, 2f, 5f, Color.FromArgb(DB.PxColors[dbref]), 10, 100);
                 }
             }
         }
