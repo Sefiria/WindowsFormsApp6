@@ -83,6 +83,7 @@
     <Compile Include="res\ores\Ores_Gold.cs" />
     <Compile Include="res\ores\Ores_Stone.cs" />
     <Compile Include="res\ores\Ores_Iron.cs" />
+    <Compile Include="res\ores\Ores_Coal.cs" />
     <Compile Include="res\ores\Ores_Wood.cs" />
     <Compile Include="res\recipes\Recipes_Tools.cs" />
     <Compile Include="SceneCraft.cs" />

@@ -10,7 +10,8 @@ namespace console_v3.res.ores
     internal class Ores_Emerald : Ores_Base
     {
         public static Ores_Emerald Instance;
-        static Ores_Emerald()
+        public Ores_Emerald() : base((int)DB.Tex.Emerald) { }
+        public static void DefineInstance()
         {
             Instance = new Ores_Emerald
             {
@@ -23,6 +24,10 @@ namespace console_v3.res.ores
                 ColorLight = Color.FromArgb(217, 255, 235).ToArgb(),
                 ColorParticles = Color.FromArgb(23, 221, 98).ToArgb(),
             };
+        }
+        public static void DefineOreStoneImage()
+        {
+            Instance.OreStoneImage = ResetGraphics((int)DB.Tex.OreStone, (int)DB.Tex.Emerald);
         }
     }
 }

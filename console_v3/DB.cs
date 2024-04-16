@@ -36,10 +36,41 @@ namespace console_v3
 
         static DB()
         {
+            TexturesSources = Resources.textures.Split2DAndResize(16, 16, true, transparent_color: Color.FromArgb(0, 255, 0));
             Textures = Resources.textures.Split2DAndResize(16, Core.TILE_SIZE, true, transparent_color: Color.FromArgb(0, 255, 0));
+
+            Ores_Wood.DefineInstance();
+            Ores_Coal.DefineInstance();
+            Ores_Iron.DefineInstance();
+            Ores_Gold.DefineInstance();
+            Ores_Diamond.DefineInstance();
+            Ores_Emerald.DefineInstance();
+
+            PxColors = new Dictionary<int, int>
+            {
+                [(int)Tex.UnbreakableRock] = Color.FromArgb(0, 0, 0).ToArgb(),
+                [(int)Tex.Obsidian] = Color.FromArgb(30, 10, 30).ToArgb(),
+                [(int)Tex.HardRock] = Color.FromArgb(50, 50, 50).ToArgb(),
+                [(int)Tex.DeepRock] = Color.FromArgb(70, 70, 70).ToArgb(),
+                [(int)Tex.Rock] = Color.FromArgb(100, 100, 100).ToArgb(),
+                [(int)Tex.Dirt] = Color.FromArgb(175, 115, 0).ToArgb(),
+                [(int)Tex.Grass] = Color.FromArgb(50, 150, 0).ToArgb(),
+
+                [(int)Tex.IronStone] = Ores_Iron.Instance.ColorMid,
+                [(int)Tex.GoldStone] = Ores_Gold.Instance.ColorMid,
+                [(int)Tex.DiamondStone] = Ores_Diamond.Instance.ColorMid,
+                [(int)Tex.EmeraldStone] = Ores_Emerald.Instance.ColorMid,
+            };
+
+            Ores_Wood.DefineOreStoneImage();
+            Ores_Coal.DefineOreStoneImage();
+            Ores_Iron.DefineOreStoneImage();
+            Ores_Gold.DefineOreStoneImage();
+            Ores_Diamond.DefineOreStoneImage();
+            Ores_Emerald.DefineOreStoneImage();
         }
 
-        public static Bitmap[,] Textures;
+        public static Bitmap[,] Textures, TexturesSources;
         public enum Tex { UnbreakableRock = 0x0 + 0x0 * 16, Obsidian = 0x1 + 0x0 * 16, HardRock = 0x2 + 0x0 * 16, DeepRock = 0x3 + 0x0 * 16,
             Dirt = 0x5 + 0x0 * 16, Grass = 0x6 + 0x0 * 16, Sawmill = 0x8 + 0x0 * 16, Workbench = 0x9 + 0x0 * 16,
             Rock = 0x1 + 0x1 * 16, CoalStone = 0x2 + 0x1 * 16, IronStone = 0x3 + 0x1 * 16, GoldStone = 0x4 + 0x1 * 16, DiamondStone = 0x5 + 0x1 * 16, EmeraldStone = 0x6 + 0x1 * 16,
@@ -56,32 +87,22 @@ namespace console_v3
             PlantFiber = 0x0 + 0x4 * 16, Pebble = 0x1 + 0x4 * 16,
 
             Mud = 0x5 + 0x0 * 16,// dirt
-        }
-        public static Dictionary<int, int> PxColors = new Dictionary<int, int>
-        {
-            [(int)Tex.UnbreakableRock] = Color.FromArgb(0, 0, 0).ToArgb(),
-            [(int)Tex.Obsidian] = Color.FromArgb(30, 10, 30).ToArgb(),
-            [(int)Tex.HardRock] = Color.FromArgb(50, 50, 50).ToArgb(),
-            [(int)Tex.DeepRock] = Color.FromArgb(70, 70, 70).ToArgb(),
-            [(int)Tex.Rock] = Color.FromArgb(100, 100, 100).ToArgb(),
-            [(int)Tex.Dirt] = Color.FromArgb(175, 115, 0).ToArgb(),
-            [(int)Tex.Grass] = Color.FromArgb(50, 150, 0).ToArgb(),
 
-            [(int)Tex.IronStone] = Ores_Iron.Instance.ColorMid,
-            [(int)Tex.GoldStone] = Ores_Gold.Instance.ColorMid,
-            [(int)Tex.DiamondStone] = Ores_Diamond.Instance.ColorMid,
-            [(int)Tex.EmeraldStone] = Ores_Emerald.Instance.ColorMid,
-        };
+            OreStone = 0x7 + 0x1 * 16,
+        }
+        public static Dictionary<int, int> PxColors;
         public static int GetPxColor(int dbref)
         {
             if(PxColors.ContainsKey(dbref))
                 return PxColors[dbref];
             return Color.Black.ToArgb();
         }
+        public static Bitmap GetTextureSource(int dbref, int new_size_in_px = -1) => (new_size_in_px <= 0 && new_size_in_px != Core.TILE_SIZE )? TexturesSources[dbref % 16, dbref / 16] : new Bitmap(TexturesSources[dbref % 16, dbref / 16], new_size_in_px, new_size_in_px);
         public static Bitmap GetTexture(int dbref, int new_size_in_px = -1) => new_size_in_px <= 0 ? Textures[dbref % 16, dbref / 16] : new Bitmap(Textures[dbref % 16, dbref / 16], new_size_in_px, new_size_in_px);
         public static List<int> Ores = new List<int>()
         {
             (int)Tex.Wood,
+            //(int)Tex.Coal,
             (int)Tex.Stone,
             (int)Tex.Iron,
             (int)Tex.Gold,
@@ -177,6 +198,7 @@ namespace console_v3
             {
                 default: return null;
                 case (int)Tex.Wood: return Ores_Wood.Instance;
+                case (int)Tex.Coal: return Ores_Wood.Instance;
                 case (int)Tex.Stone: return Ores_Stone.Instance;
                 case (int)Tex.Iron: return Ores_Iron.Instance;
                 case (int)Tex.Gold: return Ores_Gold.Instance;

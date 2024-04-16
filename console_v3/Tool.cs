@@ -155,7 +155,14 @@ namespace console_v3
                         ParticlesManager.Generate(tile.ToWorld() + GraphicsManager.TileSize / 2f, 5f, 3f, Color.FromArgb(DB.PxColors[dbref]), 20, 200);
                     loot();
                     if (chunk.Tiles[tile].Value == (int)DB.Tex.Rock)
-                        chunk.Tiles[tile].Value = (int)DB.Tex.DeepRock;
+                    {
+                        if (ore != -1)
+                        {
+                            chunk.Tiles[tile].DBRef_Ore = -1;
+                        }
+                        else
+                            chunk.Tiles[tile].Value = (int)DB.Tex.HardRock;
+                    }
                     else
                         chunk.Tiles[tile].Value--;
                     chunk.Tiles[tile].ResetAutoResistance();

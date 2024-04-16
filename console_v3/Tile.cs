@@ -49,7 +49,7 @@ namespace console_v3
         public Bitmap GetTexture()
         {
             // if tile value is rock, draw ore seed-related (take only the X in "00000000-XXXX-..." as integer)
-            return DB.GetTexture((Value == (int)DB.Tex.Rock && DBRef_Ore > -1) ? DBRef_Ore : Value);
+            return (Value == (int)DB.Tex.Rock && DBRef_Ore > 17) ? DB.GetOre(DBRef_Ore + 0x1 * 16).OreStoneImage : DB.GetTexture(Value);
         }
         public int OreCalculation()
         {

@@ -10,7 +10,8 @@ namespace console_v3.res.ores
     internal class Ores_Wood : Ores_Base
     {
         public static Ores_Wood Instance;
-        static Ores_Wood()
+        public Ores_Wood() : base((int)DB.Tex.Wood) { }
+        public static void DefineInstance()
         {
             Instance = new Ores_Wood
             {
@@ -23,6 +24,10 @@ namespace console_v3.res.ores
                 ColorLight = Color.FromArgb(150, 100, 0).ToArgb(),
                 ColorParticles = Color.FromArgb(100, 50, 0).ToArgb(),
             };
+        }
+        public static void DefineOreStoneImage()
+        {
+            Instance.OreStoneImage = ResetGraphics((int)DB.Tex.OreStone, (int)DB.Tex.Wood);
         }
     }
 }

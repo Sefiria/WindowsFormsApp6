@@ -10,7 +10,8 @@ namespace console_v3.res.ores
     internal class Ores_Iron : Ores_Base
     {
         public static Ores_Iron Instance;
-        static Ores_Iron()
+        public Ores_Iron() : base((int)DB.Tex.Iron) { }
+        public static void DefineInstance()
         {
             Instance = new Ores_Iron
             {
@@ -23,6 +24,10 @@ namespace console_v3.res.ores
                 ColorLight = Color.FromArgb(226, 192, 170).ToArgb(),
                 ColorParticles = Color.FromArgb(175, 142, 119).ToArgb(),
             };
+        }
+        public static void DefineOreStoneImage()
+        {
+            Instance.OreStoneImage = ResetGraphics((int)DB.Tex.OreStone, (int)DB.Tex.Iron);
         }
     }
 }
