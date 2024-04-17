@@ -411,6 +411,13 @@ namespace console_v3
                         inv.AddItem((result.DBRef, result.Count));
                 }
                 ResetListAndSlots(true);
+
+                // put result sent to list into the selection
+                var slot = SlotsResult.First(s => s.Bounds.Contains(msbase));
+                ItemListSelectedPoint = msbase.Minus(slot.Bounds.Location);
+                var item = listItems.First(i => i.Name == slot.Name);
+                SelectedTempItem = item.Clone();
+                listItems[item.Index].Count = 0;
             }
         }
 
