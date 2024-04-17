@@ -283,6 +283,17 @@ namespace console_v3
                 results = new List<RecipeObj> { new RecipeObj((int)DB.Tex.WoodMiniStick, 16) };
                 recipe = Create("WoodMiniStick", RecipeMode.Chaos, needs, results);
                 Recipes.Add(recipe);
+
+                needs = new RecipeObj[,] { { new RecipeObj((int)DB.Tex.Pebble, 1), new RecipeObj((int)DB.Tex.Pebble, 1) },
+                                                          { new RecipeObj((int)DB.Tex.Pebble, 1), new RecipeObj((int)DB.Tex.Pebble, 1) }};
+                results = new List<RecipeObj> { new RecipeObj((int)DB.Tex.Stone, 1) };
+                recipe = Create("Stone", RecipeMode.Chaos, needs, results);
+                Recipes.Add(recipe);
+
+                needs = new RecipeObj[,] { { new RecipeObj((int)DB.Tex.Stone, 1) }};
+                results = new List<RecipeObj> { new RecipeObj((int)DB.Tex.Pebble, 4) };
+                recipe = Create("Pebble", RecipeMode.Chaos, needs, results);
+                Recipes.Add(recipe);
                 #endregion
             }
             public static Recipe Create(string name, RecipeMode mode, RecipeObj[,] needs, List<RecipeObj> results)

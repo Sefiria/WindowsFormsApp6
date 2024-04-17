@@ -15,17 +15,18 @@ namespace console_v3
             [GenerationMode.Cave] = new Dictionary<float, int>
             {
                 [0.0f] = (int)DB.Tex.Rock,
+                [0.2f] = (int)DB.Tex.SoftRock,
                 [0.8f] = (int)DB.Tex.Dirt,
             },
             [GenerationMode.Rocky] = new Dictionary<float, int>
             {
-                [0.0f] = (int)DB.Tex.Rock,
+                [0.0f] = (int)DB.Tex.SoftRock,
                 [0.6f] = (int)DB.Tex.Dirt,
                 [0.95f] = (int)DB.Tex.Grass,
             },
             [GenerationMode.Plain] = new Dictionary<float, int>
             {
-                [0.0f] = (int)DB.Tex.Rock,
+                [0.0f] = (int)DB.Tex.SoftRock,
                 [0.1f] = (int)DB.Tex.Dirt,
                 [0.7f] = (int)DB.Tex.Grass,
             },

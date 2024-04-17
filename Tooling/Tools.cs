@@ -128,6 +128,7 @@ namespace Tooling
         }
         public static Bitmap[,] Split2DAndResize(this Bitmap tex, int square_size, int new_size_in_px, bool make_transparent = false, Color? transparent_color = null)
         {
+            bool resize = new_size_in_px != square_size;
             int s = square_size;
             int w = tex.Width, h = tex.Height;
             int cw = w / s, ch = h / s;
@@ -138,7 +139,8 @@ namespace Tooling
                     result[i, j] = tex.Clone(new Rectangle(i * s, j * s, s, s), tex.PixelFormat);
                     if (make_transparent && transparent_color != null)
                         result[i, j].MakeTransparent(transparent_color.Value);
-                    result[i, j] = new Bitmap(result[i, j], new_size_in_px+1, new_size_in_px+1);
+                    if(resize)
+                        result[i, j] = new Bitmap(result[i, j], new_size_in_px+1, new_size_in_px+1);
                 }
             return result;
         }

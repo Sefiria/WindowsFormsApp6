@@ -25,7 +25,7 @@ namespace console_v3
             Index = index;
             Value = value;
             Seed = Guid.NewGuid();
-            DBRef_Ore = Value == (int)DB.Tex.Rock ? OreCalculation() : - 1;
+            DBRef_Ore = OreCalculation();
             Resistance = resistance;
             if (Resistance == -1)
                 ResetAutoResistance();
@@ -36,12 +36,15 @@ namespace console_v3
             {
                 case (int)DB.Tex.Grass: Resistance = 10; break;
                 case (int)DB.Tex.Dirt: Resistance = 20; break;
-                case (int)DB.Tex.Rock: Resistance = 50; break;
-                case (int)DB.Tex.DeepRock: Resistance = 100; break;
-                case (int)DB.Tex.HardRock: Resistance = 500; break;
-                case (int)DB.Tex.Obsidian: Resistance = 5000; break;
+                case (int)DB.Tex.SoftRock: Resistance = 50; break;
+                case (int)DB.Tex.Rock: Resistance = 100; break;
+                case (int)DB.Tex.DeepRock: Resistance = 500; break;
+                case (int)DB.Tex.HardRock: Resistance = 2000; break;
+                case (int)DB.Tex.Obsidian: Resistance = 10000; break;
                 case (int)DB.Tex.UnbreakableRock: Resistance = int.MaxValue; break;
             }
+            if (DBRef_Ore != -1)
+                Resistance *= DB.Ores.IndexOf(DBRef_Ore + 16) - 1;
         }
         public void Update()
         {
@@ -66,7 +69,7 @@ namespace console_v3
                 if (key >= rnd && key < rnd + gap)
                     id = i;
             }
-            return id == -1 ? (int)DB.Tex.Rock : ores[id] - 0x1 * 16;
+            return id == -1 ? -1 : ores[id] - 0x1 * 16;
         }
     }
 }

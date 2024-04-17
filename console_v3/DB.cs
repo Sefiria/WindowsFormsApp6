@@ -53,6 +53,7 @@ namespace console_v3
                 [(int)Tex.HardRock] = Color.FromArgb(50, 50, 50).ToArgb(),
                 [(int)Tex.DeepRock] = Color.FromArgb(70, 70, 70).ToArgb(),
                 [(int)Tex.Rock] = Color.FromArgb(100, 100, 100).ToArgb(),
+                [(int)Tex.SoftRock] = Color.FromArgb(135, 115, 110).ToArgb(),
                 [(int)Tex.Dirt] = Color.FromArgb(175, 115, 0).ToArgb(),
                 [(int)Tex.Grass] = Color.FromArgb(50, 150, 0).ToArgb(),
 
@@ -72,7 +73,7 @@ namespace console_v3
 
         public static Bitmap[,] Textures, TexturesSources;
         public enum Tex { UnbreakableRock = 0x0 + 0x0 * 16, Obsidian = 0x1 + 0x0 * 16, HardRock = 0x2 + 0x0 * 16, DeepRock = 0x3 + 0x0 * 16,
-            Dirt = 0x5 + 0x0 * 16, Grass = 0x6 + 0x0 * 16, Sawmill = 0x8 + 0x0 * 16, Workbench = 0x9 + 0x0 * 16,
+            SoftRock = 0x5 + 0x0 * 16, Dirt = 0x6 + 0x0 * 16, Grass = 0x7 + 0x0 * 16, Sawmill = 0x8 + 0x0 * 16, Workbench = 0x9 + 0x0 * 16,
             Rock = 0x1 + 0x1 * 16, CoalStone = 0x2 + 0x1 * 16, IronStone = 0x3 + 0x1 * 16, GoldStone = 0x4 + 0x1 * 16, DiamondStone = 0x5 + 0x1 * 16, EmeraldStone = 0x6 + 0x1 * 16,
             Furnace = 0x8 + 0x1 * 16, FurnaceOn = 0x9 + 0x1 * 16,
             Wood = 0x0 + 0x2 * 16, Stone = 0x1 + 0x2 * 16, Coal = 0x2 + 0x2 * 16, Iron = 0x3 + 0x2 * 16, Gold = 0x4 + 0x2 * 16, Diamond = 0x5 + 0x2 * 16, Emerald = 0x6 + 0x2 * 16,
@@ -102,8 +103,8 @@ namespace console_v3
         public static List<int> Ores = new List<int>()
         {
             (int)Tex.Wood,
-            //(int)Tex.Coal,
             (int)Tex.Stone,
+            (int)Tex.Coal,
             (int)Tex.Iron,
             (int)Tex.Gold,
             (int)Tex.Diamond,

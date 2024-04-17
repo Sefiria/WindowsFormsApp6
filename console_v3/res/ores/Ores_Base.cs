@@ -33,7 +33,7 @@ namespace console_v3.res.ores
                                   .ChangeColor(Color.FromArgb(1, 0, 0), Color.FromArgb(ore.ColorDark))
                                   .ChangeColor(Color.FromArgb(0, 1, 0), Color.FromArgb(ore.ColorMid))
                                   .ChangeColor(Color.FromArgb(0, 0, 1), Color.FromArgb(ore.ColorLight))
-                                  .Resize(Core.TILE_SIZE);
+                                  .Resize(Core.TILE_SIZE + 1);
             }
             return Image ?? DB.GetTexture(dbref);
         }

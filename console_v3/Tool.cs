@@ -86,22 +86,29 @@ namespace console_v3
                         n = RandomThings.rnd(2);
                         if (n > 0) triggerer.Inventory.Add(new Item((int)DB.Tex.Mud, n));
                         break;
+                    case (int)DB.Tex.SoftRock:
+                        n = RandomThings.rnd(2);
+                        if (n > 0) triggerer.Inventory.Add(new Item((int)DB.Tex.Pebble, n));
+                        break;
                 }
             }
 
-            if (dbref == (int)DB.Tex.Grass || dbref == (int)DB.Tex.Dirt)
+            if (dbref == (int)DB.Tex.Grass || dbref == (int)DB.Tex.Dirt || dbref == (int)DB.Tex.SoftRock)
             {
                 chunk.Tiles[tile].Resistance -= STR;
                 if (chunk.Tiles[tile].Resistance <= 0)
                 {
-                    ParticlesManager.Generate(tile.ToWorld() + GraphicsManager.TileSize / 2f, 3f, 4f, Color.FromArgb(DB.PxColors[dbref]), 5, 100);
+                    ParticlesManager.Generate(tile.ToWorld() + GraphicsManager.TileSize / 2f, 3f, 4f, Color.FromArgb(DB.PxColors[dbref]), dbref == (int)DB.Tex.SoftRock ? 10 : 5, 100);
                     loot();
-                    chunk.Tiles[tile].Value--;
+                    if (chunk.Tiles[tile].Value == (int)DB.Tex.SoftRock)
+                        chunk.Tiles[tile].Value = (int)DB.Tex.Rock;
+                    else
+                        chunk.Tiles[tile].Value--;
                     chunk.Tiles[tile].ResetAutoResistance();
                 }
                 else
                 {
-                    ParticlesManager.Generate(tile.ToWorld() + GraphicsManager.TileSize / 2f, 2f, 2f, Color.FromArgb(DB.PxColors[dbref]), 3, 100);
+                    ParticlesManager.Generate(tile.ToWorld() + GraphicsManager.TileSize / 2f, 2f, 5f, Color.FromArgb(DB.PxColors[dbref]), dbref == (int)DB.Tex.SoftRock ? 8 : 3, 100);
                 }
             }
         }
@@ -118,6 +125,10 @@ namespace console_v3
                 int n;
                 switch (chunk.Tiles[tile].Value)
                 {
+                    case (int)DB.Tex.SoftRock:
+                        n = RandomThings.rnd(2);
+                        if (n > 0) triggerer.Inventory.Add(new Item((int)DB.Tex.Pebble, n));
+                        break;
                     case (int)DB.Tex.Rock:
                         if(ore > -1) triggerer.Inventory.Add(new Item(ore + 0x1 * 16));
                         n = RandomThings.rnd(2);
@@ -154,14 +165,16 @@ namespace console_v3
                     else
                         ParticlesManager.Generate(tile.ToWorld() + GraphicsManager.TileSize / 2f, 5f, 3f, Color.FromArgb(DB.PxColors[dbref]), 20, 200);
                     loot();
-                    if (chunk.Tiles[tile].Value == (int)DB.Tex.Rock)
-                    {
+                    if (chunk.Tiles[tile].Value == (int)DB.Tex.SoftRock)
+                        chunk.Tiles[tile].Value = (int)DB.Tex.Rock;
+                    else if (chunk.Tiles[tile].Value == (int)DB.Tex.Rock)
+                        {
                         if (ore != -1)
                         {
                             chunk.Tiles[tile].DBRef_Ore = -1;
                         }
                         else
-                            chunk.Tiles[tile].Value = (int)DB.Tex.HardRock;
+                            chunk.Tiles[tile].Value = (int)DB.Tex.DeepRock;
                     }
                     else
                         chunk.Tiles[tile].Value--;
