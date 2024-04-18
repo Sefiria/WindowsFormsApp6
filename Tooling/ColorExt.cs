@@ -313,7 +313,7 @@ namespace Tooling
             Bitmap originalImage = new Bitmap(src);
             Bitmap adjustedImage = new Bitmap(src.Width, src.Height);
             if (brightness == 1F && contrast == 1F && gamma == 1F)
-                return adjustedImage;
+                return src;
 
             float adjustedBrightness = brightness - 1.0f;
             // create matrix that will brighten and contrast the image
