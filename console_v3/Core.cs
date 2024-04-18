@@ -54,13 +54,18 @@ namespace console_v3
             CurrentScene = SceneAdventure;
             SceneAdventure.Initialize();
             TheGuy = new Guy();
-            new EntityStructure((10, 10).V(), (int)DB.Tex.Torch) { IsOn = true };
+            //new EntityStructure((10, 10).V(), (int)DB.Tex.Torch) { IsOn = true };
+            //new EntityStructure((10,11).V(), (int)DB.Tex.Workbench);
+            //TheGuy.Inventory.AddTool(((int)DB.Tex.Axe, (int)DB.Tex.Emerald, 1));
+            //TheGuy.Inventory.AddTool(((int)DB.Tex.Shovel, (int)DB.Tex.Emerald, 1));
+            //TheGuy.Inventory.AddTool(((int)DB.Tex.Pickaxe, (int)DB.Tex.Emerald, 1));
+            //TheGuy.Inventory.AddItem(((int)DB.Tex.Stone, 16));
+            //TheGuy.Inventory.AddItem(((int)DB.Tex.WoodStick, 64));
+            //Shortcuts.Add(new Shortcut(0, KB.Key.C, TheGuy.Inventory.Tools.First(t => t.DBRef == (int)DB.Tex.Shovel)));
+            //Shortcuts.Add(new Shortcut(0, KB.Key.V, TheGuy.Inventory.Tools.First(t => t.DBRef == (int)DB.Tex.Pickaxe)));
             new EntityStructure((10,11).V(), (int)DB.Tex.Workbench);
-            TheGuy.Inventory.AddTool(((int)DB.Tex.Axe, (int)DB.Tex.Iron, 1));
-            TheGuy.Inventory.AddTool(((int)DB.Tex.Shovel, (int)DB.Tex.Iron, 1));
-            TheGuy.Inventory.AddTool(((int)DB.Tex.Pickaxe, (int)DB.Tex.Iron, 1));
-            Shortcuts.Add(new Shortcut(0, KB.Key.C, TheGuy.Inventory.Tools.First(t => t.DBRef == (int)DB.Tex.Shovel)));
-            Shortcuts.Add(new Shortcut(0, KB.Key.V, TheGuy.Inventory.Tools.First(t => t.DBRef == (int)DB.Tex.Pickaxe)));
+            TheGuy.Inventory.AddItem(((int)DB.Tex.WoodStick, 64));
+            TheGuy.Inventory.AddItem(((int)DB.Tex.Iron, 16));
         }
         public void ResetGraphics()
         {

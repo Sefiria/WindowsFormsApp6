@@ -243,9 +243,16 @@ namespace console_v3
         {
             public RecipeFactory()
             {
+                DefineRecipes();
             }
             static RecipeFactory()
             {
+                DefineRecipes();
+            }
+            public static void DefineRecipes()
+            {
+                if (Recipes != null)
+                    return;
                 Recipes = new List<Recipe>();
                 RecipeObj[,] needs;
                 List<RecipeObj> results;
@@ -290,7 +297,7 @@ namespace console_v3
                 recipe = Create("Stone", RecipeMode.Chaos, needs, results);
                 Recipes.Add(recipe);
 
-                needs = new RecipeObj[,] { { new RecipeObj((int)DB.Tex.Stone, 1) }};
+                needs = new RecipeObj[,] { { new RecipeObj((int)DB.Tex.Stone, 1) } };
                 results = new List<RecipeObj> { new RecipeObj((int)DB.Tex.Pebble, 4) };
                 recipe = Create("Pebble", RecipeMode.Chaos, needs, results);
                 Recipes.Add(recipe);

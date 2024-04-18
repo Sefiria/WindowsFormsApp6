@@ -40,6 +40,7 @@ namespace console_v3
             Textures = Resources.textures.Split2DAndResize(16, Core.TILE_SIZE, true, transparent_color: Color.FromArgb(0, 255, 0));
 
             Ores_Wood.DefineInstance();
+            Ores_Stone.DefineInstance();
             Ores_Coal.DefineInstance();
             Ores_Iron.DefineInstance();
             Ores_Gold.DefineInstance();
@@ -64,6 +65,7 @@ namespace console_v3
             };
 
             Ores_Wood.DefineOreStoneImage();
+            Ores_Stone.DefineOreStoneImage();
             Ores_Coal.DefineOreStoneImage();
             Ores_Iron.DefineOreStoneImage();
             Ores_Gold.DefineOreStoneImage();
@@ -73,8 +75,8 @@ namespace console_v3
 
         public static Bitmap[,] Textures, TexturesSources;
         public enum Tex { UnbreakableRock = 0x0 + 0x0 * 16, Obsidian = 0x1 + 0x0 * 16, HardRock = 0x2 + 0x0 * 16, DeepRock = 0x3 + 0x0 * 16,
-            SoftRock = 0x5 + 0x0 * 16, Dirt = 0x6 + 0x0 * 16, Grass = 0x7 + 0x0 * 16, Sawmill = 0x8 + 0x0 * 16, Workbench = 0x9 + 0x0 * 16,
-            Rock = 0x1 + 0x1 * 16, CoalStone = 0x2 + 0x1 * 16, IronStone = 0x3 + 0x1 * 16, GoldStone = 0x4 + 0x1 * 16, DiamondStone = 0x5 + 0x1 * 16, EmeraldStone = 0x6 + 0x1 * 16,
+            Rock = 0x4 + 0x0 * 16, SoftRock = 0x5 + 0x0 * 16, Dirt = 0x6 + 0x0 * 16, Grass = 0x7 + 0x0 * 16, Sawmill = 0x8 + 0x0 * 16, Workbench = 0x9 + 0x0 * 16,
+            CoalStone = 0x2 + 0x1 * 16, IronStone = 0x3 + 0x1 * 16, GoldStone = 0x4 + 0x1 * 16, DiamondStone = 0x5 + 0x1 * 16, EmeraldStone = 0x6 + 0x1 * 16,
             Furnace = 0x8 + 0x1 * 16, FurnaceOn = 0x9 + 0x1 * 16,
             Wood = 0x0 + 0x2 * 16, Stone = 0x1 + 0x2 * 16, Coal = 0x2 + 0x2 * 16, Iron = 0x3 + 0x2 * 16, Gold = 0x4 + 0x2 * 16, Diamond = 0x5 + 0x2 * 16, Emerald = 0x6 + 0x2 * 16,
             WoodPlank = 0x9 + 0x2 * 16, WoodStick = 0xA + 0x2 * 16, WoodMiniStick = 0xB + 0x2 * 16,
@@ -89,7 +91,7 @@ namespace console_v3
 
             Mud = 0x5 + 0x0 * 16,// dirt
 
-            OreStone = 0x7 + 0x1 * 16,
+            OreStoneA = 0x6 + 0x1 * 16, OreStoneB = 0x7 + 0x1 * 16,
         }
         public static Dictionary<int, int> PxColors;
         public static int GetPxColor(int dbref)

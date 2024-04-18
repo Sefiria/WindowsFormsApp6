@@ -401,7 +401,7 @@ namespace console_v3
                         continue;// don't remove tools but give them damage
                     }
                     for (int i = 0; i < need.Count; i++)
-                        inv.RemoveOne(need.DBRef);
+                        inv.RemoveOne(need.Type == DB.Types.Ore ? SlotsResult.First().DBRef_Ore : need.DBRef);
                 }
                 foreach (var result in SlotsResult)
                 {
@@ -415,7 +415,7 @@ namespace console_v3
                 // put result sent to list into the selection
                 var slot = SlotsResult.First(s => s.Bounds.Contains(msbase));
                 ItemListSelectedPoint = msbase.Minus(slot.Bounds.Location);
-                var item = listItems.First(i => i.Name == slot.Name);
+                var item = listItems.First(i => i.Name == ((slot.DBRef_Ore == -1 || !slot.DBRef.IsTool()) ? slot.Name:$"{DB.DefineName(slot.DBRef_Ore)} {slot.Name}"));
                 SelectedTempItem = item.Clone();
                 listItems[item.Index].Count = 0;
             }
@@ -434,6 +434,7 @@ namespace console_v3
                     slots[x, y] = _Slot.content == Guid.Empty ? null : new RecipeObj(listItems.First(it => it.content == _Slot.content).DBRef, _Slot.Count);
                 }
             }
+            new RecipeFactory();
             if (Recipes != null)
             {
                 Recipe recipe = Recipes.FirstOrDefault(r => r.SatisfiedBy(slots));

@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tooling;
 
 namespace console_v3.res.ores
 {
@@ -27,7 +28,7 @@ namespace console_v3.res.ores
         }
         public static void DefineOreStoneImage()
         {
-            Instance.OreStoneImage = ResetGraphics((int)DB.Tex.OreStone, (int)DB.Tex.Iron);
+            Instance.OreStoneImage = ResetGraphics(RandomThings.arnd((int)DB.Tex.OreStoneA, (int)DB.Tex.OreStoneB), (int)DB.Tex.Iron);
         }
     }
 }
