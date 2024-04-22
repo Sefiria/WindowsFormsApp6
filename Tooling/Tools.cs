@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
 using ILGPU.Runtime.Cuda;
+using System.Windows;
 
 namespace Tooling
 {
@@ -126,6 +127,25 @@ namespace Tooling
 
             return rotatedImage;
         }
+        public static Bitmap[,] Split2D(this Bitmap tex, int square_size, bool make_transparent = true, Color? transparent_color = null)
+        {
+            int s = square_size;
+            int w = tex.Width, h = tex.Height;
+            int cw = w / s, ch = h / s;
+            var result = new Bitmap[cw, ch];
+            for (int i = 0; i < cw; i++)
+                for (int j = 0; j < ch; j++)
+                {
+                    result[i, j] = tex.Clone(new Rectangle(i * s, j * s, s, s), tex.PixelFormat);
+                    if (make_transparent)
+                    {
+                        if (transparent_color == null)
+                            transparent_color = Color.White;
+                        result[i, j].MakeTransparent(transparent_color.Value);
+                    }
+                }
+            return result;
+        }
         public static Bitmap[,] Split2DAndResize(this Bitmap tex, int square_size, int new_size_in_px, bool make_transparent = false, Color? transparent_color = null)
         {
             bool resize = new_size_in_px != square_size;
@@ -141,6 +161,41 @@ namespace Tooling
                         result[i, j].MakeTransparent(transparent_color.Value);
                     if(resize)
                         result[i, j] = new Bitmap(result[i, j], new_size_in_px+1, new_size_in_px+1);
+                }
+            return result;
+        }
+        public static Bitmap[,] Split2D(this Bitmap tex, int tw, int th, bool make_transparent = true, Color? transparent_color = null)
+        {
+            int w = tex.Width, h = tex.Height;
+            int cw = w / tw, ch = h / th;
+            var result = new Bitmap[cw, ch];
+            for (int i = 0; i < cw; i++)
+                for (int j = 0; j < ch; j++)
+                {
+                    result[i, j] = tex.Clone(new Rectangle(i * tw, j * th, tw, th), tex.PixelFormat);
+                    if (make_transparent)
+                    {
+                        if (transparent_color == null)
+                            transparent_color = Color.White;
+                        result[i, j].MakeTransparent(transparent_color.Value);
+                    }
+                }
+            return result;
+        }
+        public static Bitmap[,] Split2DAndResize(this Bitmap tex, int tw, int th, int new_tw, int new_th, bool make_transparent = false, Color? transparent_color = null)
+        {
+            bool resize = new_tw != tw || new_th != th;
+            int w = tex.Width, h = tex.Height;
+            int cw = w / tw, ch = h / th;
+            var result = new Bitmap[cw, ch];
+            for (int i = 0; i < cw; i++)
+                for (int j = 0; j < ch; j++)
+                {
+                    result[i, j] = tex.Clone(new Rectangle(i * tw, j * th, tw, th), tex.PixelFormat);
+                    if (make_transparent && transparent_color != null)
+                        result[i, j].MakeTransparent(transparent_color.Value);
+                    if (resize)
+                        result[i, j] = new Bitmap(result[i, j], new_tw + 1, new_th + 1);
                 }
             return result;
         }
