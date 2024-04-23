@@ -171,5 +171,9 @@ namespace Tooling
         {
             return (IsKeyDown(Key.Z), IsKeyDown(Key.Q), IsKeyDown(Key.S), IsKeyDown(Key.D));
         }
+        public static bool AnyZQSD()
+        {
+            return IsKeyDown(Key.Z) || IsKeyDown(Key.Q) || IsKeyDown(Key.S) || IsKeyDown(Key.D);
+        }
     }
 }

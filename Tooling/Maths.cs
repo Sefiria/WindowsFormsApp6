@@ -1,5 +1,4 @@
-﻿using ILGPU.IR.Rewriting;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -51,7 +50,8 @@ namespace Tooling
         public static float DistanceFromLine(PointF pt, float ax, float by, float c) => Abs(ax * pt.X + by * pt.Y + c) / Sqrt(Sq(ax) + Sq(by));
         public static float ScalarProduct(PointF AB, PointF AP) => AB.X * AP.X + AB.Y * AP.Y;
         public static float ScalarProduct(PointF A, PointF B, PointF P) => ScalarProduct(B.MinusF(A), P.MinusF(A));
-        public static float Abs(float K) => Sqrt(Sq(K));
+        //public static float Abs(float K) => Sqrt(Sq(K));
+        public static float Abs(float K) => K < 0F ? -K : K;
         public static float Sign(float K) => (float)Math.Round(K / Abs(K));
         public static float Normalize(float K) => K / Abs(K);
         public static PointF Normale(PointF a, PointF b) => new PointF(b.Y - b.Y, a.X - b.X).x(1F / Distance(a, b));
@@ -284,6 +284,37 @@ namespace Tooling
             hit = HitThat(10F);
             return hit;
         }
+        public static RaycastHitInfo SimpleRaycastHit(PointF src, PointF look, float speed, float max_distance, List<Segment> segments)
+        {
+            RaycastHitInfo result = new RaycastHitInfo(-1, src);
+            float d = 0F;
+            Segment hit_seg;
+            int hit = -1;
+            int HitThat(float angle)
+            {
+                while (d < max_distance)
+                {
+                    result.LastPoint = result.LastPoint.PlusF(look.Rotate(angle).x(speed));
+                    d += speed;
+                    hit_seg = segments.FirstOrDefault(s => IsPointLeftToSegment(s.A.vecf(), s.B.vecf(), result.LastPoint.vecf()));
+                    if (hit_seg == null)
+                        continue;
+                    return segments.IndexOf(hit_seg);
+                }
+                return -1;
+            }
+
+            result.Index = HitThat(0F);
+            if (result.Index > -1) return result;
+            result.Index = HitThat(-5F);
+            if (result.Index > -1) return result;
+            result.Index = HitThat(5F);
+            if (result.Index > -1) return result;
+            result.Index = HitThat(-10F);
+            if (result.Index > -1) return result;
+            result.Index = HitThat(10F);
+            return result;
+        }
         public static bool CollisionSquareSquare(float x1, float y1, float w1, float h1, float x2, float y2, float w2, float h2)
         {
             RectangleF box1 = new RectangleF(x1, y1, w1, h1);
@@ -303,13 +334,7 @@ namespace Tooling
         }
         public static bool CollisionSquareCircle(float x1, float y1, float w1, float h1, float x2, float y2, float r)
         {
-            //RectangleF box1 = new RectangleF(x1, y1, w1, h1);
-            //var a = box1.TopLeft();
-            //var z = box1.TopRight();
-            //var q = box1.BottomLeft();
-            //var s = box1.BottomRight();
-            //return Maths.Distance();
-            return false;
+            return new RectangleF(x1, y1, w1, h1).IntersectsWith(new RectangleF(x2, y2, r * 2, r * 2));
         }
 
         public static bool CollisionBoxBox(Box box1, Box box2)
@@ -410,5 +435,17 @@ namespace Tooling
         }
         public static PointF ProjectionSurRectangle(RectangleF rect, PointF pt) => ProjectionSurRectangle(rect.ToIntRect(), pt);
         public static PointF ProjectionSurRectangleSimple(RectangleF rect, PointF pt) => ProjectionSurRectangleSimple(rect.ToIntRect(), pt);
+    }
+
+    public class RaycastHitInfo
+    {
+        public int Index;
+        public PointF LastPoint;
+        public RaycastHitInfo(){}
+        public RaycastHitInfo(int Index, PointF LastPoint)
+        {
+            this.Index = Index;
+            this.LastPoint = LastPoint;
+        }
     }
 }

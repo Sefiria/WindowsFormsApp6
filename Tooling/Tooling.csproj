@@ -121,6 +121,7 @@
     <Compile Include="RandomThings.cs" />
     <Compile Include="RangeValue.cs" />
     <Compile Include="RPDialog.cs" />
+    <Compile Include="Segment.cs" />
     <Compile Include="Tools.cs" />
     <Compile Include="UI\IUIContainer.cs" />
     <Compile Include="UI\UI.cs" />
