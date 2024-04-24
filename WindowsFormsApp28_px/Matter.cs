@@ -31,6 +31,7 @@ namespace WindowsFormsApp28_px
         public List<Item> Inventory { get; set; } = new List<Item>();
 
         public PointF Point => new PointF(x, y);
+        public PointF Look => (1F, 0F).P().Rotate(A);
 
         public Matter() : base(0, 0, 0)
         {

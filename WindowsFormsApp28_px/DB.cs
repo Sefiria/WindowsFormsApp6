@@ -4,7 +4,7 @@ using WindowsFormsApp28_px.Properties;
 
 namespace WindowsFormsApp28_px
 {
-    internal class DB
+    public class DB
     {
         public static readonly int ItemSize = 32;
 
@@ -15,7 +15,7 @@ namespace WindowsFormsApp28_px
 
         public enum Tex
         {
-            LaserGun = 0x46
+            T46 = 0x46
         }
 
         public static Bitmap[,] Textures;

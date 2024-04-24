@@ -73,5 +73,9 @@ namespace WindowsFormsApp28_px
         {
             return inv.Any(it => it.Id == id);
         }
+        public static bool Contains(this List<Item> inv, DB.Tex tex)
+        {
+            return inv.Any(it => it.Id == (int)tex);
+        }
     }
 }

@@ -22,9 +22,10 @@ namespace WindowsFormsApp28_px
         {
             InitializeComponent();
 
-            MouseStates.Initialize();
+            MouseStates.Initialize();            
 
             Common.Initialize();
+            ParticlesManager.Bounds = new Rectangle(0, 0, Render.Width, Render.Height);
 
             RenderImage = new Bitmap(Render.Width, Render.Height);
             g = Graphics.FromImage(RenderImage);
@@ -38,7 +39,9 @@ namespace WindowsFormsApp28_px
         private void Update(object sender, EventArgs e)
         {
             Common.Update();
+            KB.Update();
             MouseStates.Update();
+            ParticlesManager.Update();
         }
 
         private void Draw(object sender, EventArgs e)
@@ -46,6 +49,7 @@ namespace WindowsFormsApp28_px
             g.Clear(Color.Black);
 
             Common.Draw(g);
+            ParticlesManager.Draw(g);
             Common.DrawUI(g);
 
             Render.Image = RenderImage;

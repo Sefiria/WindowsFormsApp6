@@ -10,6 +10,7 @@ namespace WindowsFormsApp28_px
     {
         public static List<Segment> Segments;
         public static List<IMatter> Matters;
+        public static List<Bullet> Bullets;
 
         public static void Initialize()
         {
@@ -22,15 +23,19 @@ namespace WindowsFormsApp28_px
                 new Controllable(120, 100, 16, Color.Cyan.ToArgb()),
                 new Chest(300, 200, 20, 12, Segments[0].Angle, Color.Yellow.ToArgb(), ( 0x46, 0x01 )),
             };
+            Bullets = new List<Bullet>();
         }
         public static void Update()
         {
             Matters.ForEach(e => e.Update());
+            var bullets = new List<Bullet>(Bullets);
+            bullets.ForEach(b => { if (!b.Exists) Bullets.Remove(b); else b.Update(); });
         }
         public static void Draw(Graphics g)
         {
             Segments.ForEach(s => s.Draw(g));
             Matters.ForEach(e => e.Draw(g));
+            Bullets.ForEach(b => b.Draw(g));
         }
         public static void DrawUI(Graphics g)
         {

@@ -116,7 +116,34 @@ namespace Tooling
         public static ICoords IC(this (int X, int Y) data) => ICoordsFactory.Create(data.X, data.Y);
         public static ICoords IC(this (float X, float Y) data) => ICoordsFactory.Create(data.X, data.Y);
         public static float DistanceFromLine(this PointF self, float ax, float by, float c) => Maths.DistanceFromLine(self, ax, by, c);
+        public static float DistanceFromSegment(this PointF pt, PointF A, PointF B)
+        {
+            float a = B.Y - A.Y;
+            float b = A.X - B.X;
+            float c = B.X * A.Y - B.Y * A.X;
 
+            // Calculer la distance du point à la ligne
+            float distance = Maths.Abs(a * pt.X + b * pt.Y + c) / Maths.Sqrt(Maths.Sq(a) + Maths.Sq(b));
+
+            // Calculer le point projeté P
+            float px = (b * (b * pt.X - a * pt.Y) - a * c) / (Maths.Sq(a) + Maths.Sq(b));
+            float py = (a * (-b * pt.X + a * pt.Y) - b * c) / (Maths.Sq(a) + Maths.Sq(b));
+            PointF P = new PointF(px, py);
+
+            // Vérifier si P tombe sur le segment AB
+            float AB = Maths.Sqrt(Maths.Sq(A.X - B.X) + Maths.Sq(A.Y - B.Y));
+            float AP = Maths.Sqrt(Maths.Sq(A.X - P.X) + Maths.Sq(A.Y - P.Y));
+            float PB = Maths.Sqrt(Maths.Sq(B.X - P.X) + Maths.Sq(B.Y - P.Y));
+
+            // Si P est sur AB, alors la somme des distances AP et PB est égale à AB
+            if (Maths.Abs(AP + PB - AB) > 0.01) // tolérance pour les erreurs d'arrondi
+            {
+                // P n'est pas sur le segment AB, donc retourner la distance minimale à A ou B
+                distance = Math.Min(AP, PB);
+            }
+
+            return distance;
+        }
 
         public static Rectangle ToIntRect(this RectangleF rect) => new Rectangle((int)rect.X, (int)rect.Y, (int)rect.Width, (int)rect.Height);
 

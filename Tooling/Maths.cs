@@ -234,10 +234,34 @@ namespace Tooling
         }
         public static bool IsPointLeftToSegment(vecf a, vecf b, vecf o)
         {
-            var vs = new Vector(b.x - a.x, b.y - a.y);
-            var vo = new Vector(o.x - a.x, o.y - a.y);
-            var product = Vector.CrossProduct(vs, vo);
-            return product >= 0F;
+            float crossProduct = (b.x - a.x) * (o.y - a.y) - (b.y - a.y) * (o.x - a.x);
+            bool withinBounds = o.x >= Math.Min(a.x, b.x) && o.x <= Math.Max(a.x, b.x) && o.y >= Math.Min(a.y, b.y) && o.y <= Math.Max(a.y, b.y);
+            return crossProduct < 0 && withinBounds;
+        }
+        public static bool IsLeftOfSegment(PointF A, PointF B, PointF o)
+        {
+            // Calcul du produit vectoriel
+            double crossProduct = (B.X - A.X) * (o.Y - A.Y) - (B.Y - A.Y) * (o.X - A.X);
+
+            // Si le produit vectoriel est négatif, le point est à gauche du segment
+            if (crossProduct < 0)
+            {
+                // Vérification si le point est dans les limites du segment AB
+                double dotProduct = (o.X - A.X) * (B.X - A.X) + (o.Y - A.Y) * (B.Y - A.Y);
+                if (dotProduct < 0 || dotProduct > Math.Pow(B.X - A.X, 2) + Math.Pow(B.Y - A.Y, 2))
+                {
+                    return false;
+                }
+                return true;
+            }
+
+            // Si le produit vectoriel est positif ou nul, le point n'est pas à gauche du segment
+            return false;
+        }
+        public static bool IsPointLeftToLine(vecf a, vecf b, vecf o)
+        {
+            float crossProduct = (b.x - a.x) * (o.y - a.y) - (b.y - a.y) * (o.x - a.x);
+            return crossProduct > 0;
         }
         public static vecf Round(this vecf v, int digits) => ((float)Math.Round(v.x, digits), (float)Math.Round(v.y, digits)).Vf();
         public static PointF Round(this PointF pt) => new PointF((float)Math.Round(pt.X), (float)Math.Round(pt.Y));
@@ -296,7 +320,8 @@ namespace Tooling
                 {
                     result.LastPoint = result.LastPoint.PlusF(look.Rotate(angle).x(speed));
                     d += speed;
-                    hit_seg = segments.FirstOrDefault(s => IsPointLeftToSegment(s.A.vecf(), s.B.vecf(), result.LastPoint.vecf()));
+                    var _segments = segments.Where(s => result.LastPoint.DistanceFromSegment(s.A, s.B) < max_distance);
+                    hit_seg = _segments.FirstOrDefault(s => IsLeftOfSegment(s.A, s.B, result.LastPoint));
                     if (hit_seg == null)
                         continue;
                     return segments.IndexOf(hit_seg);
