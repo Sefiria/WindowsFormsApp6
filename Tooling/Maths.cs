@@ -54,7 +54,17 @@ namespace Tooling
         public static float Abs(float K) => K < 0F ? -K : K;
         public static float Sign(float K) => (float)Math.Round(K / Abs(K));
         public static float Normalize(float K) => K / Abs(K);
-        public static PointF Normale(PointF a, PointF b) => new PointF(b.Y - b.Y, a.X - b.X).x(1F / Distance(a, b));
+        public static PointF Normale(PointF a, PointF b)
+        {
+            float dx = b.X - a.X;
+            float dy = b.Y - a.Y;
+            float magnitude = Distance(a, b);
+            return new PointF(dx / magnitude, dy / magnitude);
+        }
+        public static PointF Perpendiculaire(PointF a, PointF b, PointF normale = default)
+        {
+            return (normale == default ? Normale(a, b) : normale).Rotate(-90F);
+        }
         public static float Sq(float i) => i * i;
         public static unsafe float Sqrt(float number)
         {
@@ -78,14 +88,6 @@ namespace Tooling
             float distance = Length(v);
             if (Math.Round(distance, 4) == 0F) return new vecf(0F, 0F);
             return new vecf(v.x / distance, v.y / distance);
-        }
-        public static bool CollisionPointCercle(float x, float y, float CX, float CY, float CR)
-        {
-            float d2 = (x - CX) * (x - CX) + (y - CY) * (y - CY);
-            if (d2 > CR * CR)
-                return false;
-            else
-                return true;
         }
         public static bool CollisionDroite(PointF A, PointF B, float CX, float CY, float CR)
         {
@@ -241,17 +243,17 @@ namespace Tooling
         public static bool IsLeftOfSegment(PointF A, PointF B, PointF o)
         {
             // Calcul du produit vectoriel
-            double crossProduct = (B.X - A.X) * (o.Y - A.Y) + (B.Y - A.Y) * (o.X - A.X);
-
+            double crossProduct = (B.X - A.X) * (o.Y - A.Y) - (B.Y - A.Y) * (o.X - A.X);
             // Si le produit vectoriel est négatif, le point est à gauche du segment
             if (crossProduct < 0)
             {
-                // Vérification si le point est dans les limites du segment AB
-                double dotProduct = (o.X - A.X) * (B.X - A.X) - (o.Y - A.Y) * (B.Y - A.Y);
-                if (dotProduct > 0 || dotProduct > Math.Pow(B.X - A.X, 2) + Math.Pow(B.Y - A.Y, 2))
-                {
-                    return false;
-                }
+                return true;
+            }
+
+            // Vérification si le point est dans les limites du segment AB
+            double dotProduct = (o.X - A.X) * (B.X - A.X) + (o.Y - A.Y) * (B.Y - A.Y);
+            if (dotProduct < 0 || dotProduct > Math.Pow(B.X - A.X, 2) + Math.Pow(B.Y - A.Y, 2))
+            {
                 return true;
             }
 
@@ -285,15 +287,15 @@ namespace Tooling
             int hit = -1;
             int HitThat(float angle)
             {
-                while (d < max_distance)
-                {
+                //while (d < max_distance)
+                //{
                     pt = pt.PlusF(look.Rotate(angle).x(speed));
                     d += speed;
                     hit_rect = objects.FirstOrDefault(obj => obj.Contains(pt));
-                    if (hit_rect == null)
-                        continue;
+                    if (hit_rect !=/*==*/ null)
+                        //continue;
                     return objects.IndexOf(hit_rect);
-                }
+                //}
                 return -1;
             }
 
@@ -374,14 +376,16 @@ namespace Tooling
             else
                 return true;
         }
-        public static bool CollisionPointCercle(float x, float y, Circle C)
+
+        public static bool CollisionPointCercle(float x, float y, float CX, float CY, float CR)
         {
-            float d2 = (x - C.x) * (x - C.x) + (y - C.y) * (y - C.y);
-            if (d2 > C.r * C.r)
-                return false;
-            else
-                return true;
+            float d2 = (x - CX) * (x - CX) + (y - CY) * (y - CY);
+            return d2 <= CR * CR;
         }
+        public static bool CollisionPointCercle(float x, float y, Circle C) => CollisionPointCercle(x, y, C.x, C.y, C.r);
+        public static bool CollisionPointCercle(PointF point, Circle C) => CollisionPointCercle(point.X, point.Y, C);
+        public static bool CollisionPointCercle(PointF point, float CX, float CY, float CR) => CollisionPointCercle(point.X, point.Y, CX, CY, CR);
+
         public static bool CollisionPointBox(float curseur_x, float curseur_y, Box box)
         {
             if (curseur_x >= box.x

@@ -127,6 +127,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsFormsApp27_comb", "W
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsFormsApp28_px", "WindowsFormsApp28_px\WindowsFormsApp28_px.csproj", "{3BFE34FD-5124-4569-8ADD-0F7285063A7F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tooling_Mapper", "Tooling_Mapper\Tooling_Mapper.csproj", "{18F8D689-0B5A-490C-9772-85D78C2D6E66}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -365,6 +367,10 @@ Global
 		{3BFE34FD-5124-4569-8ADD-0F7285063A7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3BFE34FD-5124-4569-8ADD-0F7285063A7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3BFE34FD-5124-4569-8ADD-0F7285063A7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18F8D689-0B5A-490C-9772-85D78C2D6E66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18F8D689-0B5A-490C-9772-85D78C2D6E66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18F8D689-0B5A-490C-9772-85D78C2D6E66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18F8D689-0B5A-490C-9772-85D78C2D6E66}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

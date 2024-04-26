@@ -19,7 +19,7 @@ namespace ToolingGranularity
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Form form = null;
-            switch(mode)
+            switch (mode)
             {
                 case 0: form = new FormMain(); break;
             }

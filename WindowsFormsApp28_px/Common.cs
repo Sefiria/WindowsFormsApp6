@@ -16,12 +16,14 @@ namespace WindowsFormsApp28_px
         {
             Segments = new List<Segment>
             {
-                new Segment(100, 200, 350, 220),
+                new Segment(100, 50, 50, 100),
+                new Segment(50, 100, 100, 200),
+                new Segment(100, 200, 500, 300),
             };
             Matters = new List<IMatter>
             {
                 new Controllable(120, 100, 16, Color.Cyan.ToArgb()),
-                new Chest(300, 200, 20, 12, Segments[0].Angle, Color.Yellow.ToArgb(), ( 0x46, 0x01 )),
+                new Chest(150, 150, 20, 12, Segments[0].Angle, Color.Yellow.ToArgb(), ( 0x46, 0x01 )),
             };
             Bullets = new List<Bullet>();
         }

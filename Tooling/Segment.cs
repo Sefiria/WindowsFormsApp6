@@ -17,6 +17,7 @@ namespace Tooling
             {
                 m_A = value;
                 N = Maths.Normale(m_A, m_B);
+                P = Maths.Perpendiculaire(m_A, m_B, N);
                 Angle = Maths.GetAngle(m_B.MinusF(m_A));
             }
         }
@@ -27,10 +28,11 @@ namespace Tooling
             {
                 m_B = value;
                 N = Maths.Normale(m_A, m_B);
+                P = Maths.Perpendiculaire(m_A, m_B, N);
                 Angle = Maths.GetAngle(m_B.MinusF(m_A));
             }
         }
-        public PointF N;
+        public PointF N, P;
         public float Angle;
         public Segment()
         {

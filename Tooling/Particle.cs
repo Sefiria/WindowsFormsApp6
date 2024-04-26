@@ -10,8 +10,11 @@ namespace Tooling
         public float Size, Speed;
         public int ArgbColor, Duration, Ticks;
         public bool ApplyGravity = false;
+        public delegate void AfterUpdateHandler(Particle context);
+        public event AfterUpdateHandler OnAfterUpdate;
+
         public Particle(){}
-        public Particle(vecf position, float size, vecf look, float force, int color, int duration)
+        public Particle(vecf position, float size, vecf look, float force, int color, int duration, AfterUpdateHandler onAfterUpdate = null)
         {
             Position = position;
             Size = size;
@@ -20,6 +23,8 @@ namespace Tooling
             ArgbColor = color;
             Duration = duration;
             Ticks = 0;
+            if (onAfterUpdate != null)
+                OnAfterUpdate += onAfterUpdate;
         }
         public void Update()
         {
@@ -35,6 +40,9 @@ namespace Tooling
             Ticks++;
             if (Ticks > Duration)
                 Exists = false;
+
+            if (Exists)
+                OnAfterUpdate?.Invoke(this);
         }
         public void Draw(Graphics g)
         {

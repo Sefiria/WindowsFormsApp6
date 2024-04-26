@@ -36,7 +36,6 @@ namespace WindowsFormsApp28_px
             else
             {
                 var raycast = Maths.SimpleRaycastHit(Position, Look, Speed, Distance, Common.Segments);
-                Console.WriteLine(Position);
                 if (raycast.Index != -1 && !Maths.IsLeftOfSegment(Common.Segments[raycast.Index].A, Common.Segments[raycast.Index].B, Position))
                     Exists = false;
             }

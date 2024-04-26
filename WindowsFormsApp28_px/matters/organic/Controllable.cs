@@ -30,27 +30,29 @@ namespace WindowsFormsApp28_px.matters.organic
             var (z, q, s, d) = KB.ZQSD();
 
             float x = this.x, y = this.y, a = A;
+            var look = Look;
 
             if (q) a -= SA;
             if (d) a += SA;
 
             void move_forward(float speed)
             {
-                var r = (1F, 0F).P().Rotate(a);
-                x += r.X * speed;
-                y += r.Y * speed;
+                x += look.X * speed;
+                y += look.Y * speed;
             }
 
             if (z) move_forward(SM);
             if (s) move_forward(-SM);
 
+            var p = (x, y).P();
             foreach (Segment segment in Common.Segments)
             {
-                if (Maths.CollisionSegment(segment.A.X, segment.A.Y, segment.B.X, segment.B.Y, x, y, r))
+                //if (Maths.CollisionSegment(segment.A.X, segment.A.Y, segment.B.X, segment.B.Y, x, y, r))
+                if(!Maths.IsLeftOfSegment(segment.A, segment.B, p.PlusF(look.x(SM * r))) || Maths.CollisionPointCercle(segment.A, x, y, r))
                 {
-                    var n = segment.N;
-                    x += n.X * SM;
-                    y += n.Y * SM;
+                    var perp = segment.P;
+                    x += perp.X * SM;
+                    y += perp.Y * SM;
                 }
             }
 
@@ -118,32 +120,37 @@ namespace WindowsFormsApp28_px.matters.organic
             {
                 look = Look.Rotate(RandomThings.arnd(-side_diffusion, side_diffusion)).vecf();
                 color = (RandomThings.rnd(10) < 5 ? Color.Orange : Color.Yellow).ToArgb();
-                ParticlesManager.Particles.Add(new Particle(position.vecf() + look * 24, 2F, look, 10F, color, 40));
+                ParticlesManager.Particles.Add(new Particle(position.vecf() + look * 24, 2F, look, 10F, color, 40, ParticleRemoveRule));
             }
 
-            Common.Bullets.Add(new Bullet(position, A, 6, 8F, Color.White.ToArgb(), 200));
+            Common.Bullets.Add(new Bullet(position, A, 6, 8F, Color.White.ToArgb(), 500));
         }
+        private void ParticleRemoveRule(Particle context)
+        {
+            context.Exists = !Common.Segments.Any(s => !Maths.IsLeftOfSegment(s.A, s.B, context.Position.pt));
+        }
+
         public override void Draw(Graphics g)
         {
             base.Draw(g);
 
-            //var anybt = KB.AnyZQSD() || KB.IsKeyDown(KB.Key.Space);
-            //if (timer_display_look > 0F || anybt)
-            //{
-            //    timer_display_look -= 0.05F;
-            //    float look_size = 24F;
-            //    var raycast = Maths.SimpleRaycastHit(Point, Look, SM, look_size, Common.Segments);
+            var anybt = KB.AnyZQSD() || KB.IsKeyDown(KB.Key.Space);
+            if (timer_display_look > 0F || anybt)
+            {
+                timer_display_look -= 0.05F;
+                float look_size = 24F;
+                var raycast = Maths.SimpleRaycastHit(Point, Look, SM, look_size, Common.Segments);
 
-            //    g.DrawLine(new Pen(Color.FromArgb((int)(byte.MaxValue * Math.Max(0F, timer_display_look)), Color.FromArgb(C)), 2F), Point, raycast.LastPoint);
-            //    if (anybt)
-            //        timer_display_look = 1F;
-            //}
+                g.DrawLine(new Pen(Color.FromArgb((int)(byte.MaxValue * Math.Max(0F, timer_display_look)), Color.FromArgb(C)), 2F), Point, raycast.LastPoint);
+                if (anybt)
+                    timer_display_look = 1F;
+            }
 
-            //if (Inventory.Contains(DB.Tex.T46))
-            //{
-            //    var raycast = Maths.SimpleRaycastHit(Point, Look, SM, 10000F, Common.Segments);
-            //    g.DrawLine(Pens.DarkRed, Point, raycast.LastPoint);
-            //}
+            if (Inventory.Contains(DB.Tex.T46))
+            {
+                var raycast = Maths.SimpleRaycastHit(Point, Look, SM, 10000F, Common.Segments);
+                g.DrawLine(Pens.DarkRed, Point, raycast.LastPoint);
+            }
         }
     }
 }

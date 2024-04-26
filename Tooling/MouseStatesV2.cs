@@ -28,6 +28,24 @@ namespace Tooling
                 ReleasedButtons[b] = true;
             }
         }
+        public static void Initialize(PictureBox render)
+        {
+            ButtonsDown.Clear();
+            ReleasedButtons.Clear();
+            foreach (MouseButtons b in Enum.GetValues(typeof(MouseButtons)))
+            {
+                ButtonsDown[b] = false;
+                ReleasedButtons[b] = true;
+            }
+
+            render.MouseDown += (s, e) => ButtonsDown[e.Button] = true;
+            render.MouseUp += (s, e) => ButtonsDown[e.Button] = false;
+            render.MouseMove += (s, e) =>
+            {
+                OldPosition = Position;
+                Position = e.Location;
+            };
+        }
         public static void Update()
         {
             Delta = 0;
