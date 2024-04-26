@@ -241,14 +241,14 @@ namespace Tooling
         public static bool IsLeftOfSegment(PointF A, PointF B, PointF o)
         {
             // Calcul du produit vectoriel
-            double crossProduct = (B.X - A.X) * (o.Y - A.Y) - (B.Y - A.Y) * (o.X - A.X);
+            double crossProduct = (B.X - A.X) * (o.Y - A.Y) + (B.Y - A.Y) * (o.X - A.X);
 
             // Si le produit vectoriel est négatif, le point est à gauche du segment
             if (crossProduct < 0)
             {
                 // Vérification si le point est dans les limites du segment AB
-                double dotProduct = (o.X - A.X) * (B.X - A.X) + (o.Y - A.Y) * (B.Y - A.Y);
-                if (dotProduct < 0 || dotProduct > Math.Pow(B.X - A.X, 2) + Math.Pow(B.Y - A.Y, 2))
+                double dotProduct = (o.X - A.X) * (B.X - A.X) - (o.Y - A.Y) * (B.Y - A.Y);
+                if (dotProduct > 0 || dotProduct > Math.Pow(B.X - A.X, 2) + Math.Pow(B.Y - A.Y, 2))
                 {
                     return false;
                 }
@@ -313,15 +313,17 @@ namespace Tooling
             RaycastHitInfo result = new RaycastHitInfo(-1, src);
             float d = 0F;
             Segment hit_seg;
-            int hit = -1;
+
             int HitThat(float angle)
             {
                 while (d < max_distance)
                 {
                     result.LastPoint = result.LastPoint.PlusF(look.Rotate(angle).x(speed));
                     d += speed;
-                    var _segments = segments.Where(s => result.LastPoint.DistanceFromSegment(s.A, s.B) < max_distance);
-                    hit_seg = _segments.FirstOrDefault(s => IsLeftOfSegment(s.A, s.B, result.LastPoint));
+                    var _segments = segments
+                        .Where(s => result.LastPoint.DistanceFromSegment(s.A, s.B) < max_distance)
+                        .OrderBy(s => result.LastPoint.DistanceFromSegment(s.A, s.B)); // Tri des segments par distance
+                    hit_seg = _segments.FirstOrDefault(s => !IsLeftOfSegment(s.A, s.B, result.LastPoint));
                     if (hit_seg == null)
                         continue;
                     return segments.IndexOf(hit_seg);

@@ -118,7 +118,7 @@ namespace WindowsFormsApp28_px.matters.organic
             {
                 look = Look.Rotate(RandomThings.arnd(-side_diffusion, side_diffusion)).vecf();
                 color = (RandomThings.rnd(10) < 5 ? Color.Orange : Color.Yellow).ToArgb();
-                ParticlesManager.Particles.Add(new Particle(position.vecf(), 2F, look, 10F, color, 40));
+                ParticlesManager.Particles.Add(new Particle(position.vecf() + look * 24, 2F, look, 10F, color, 40));
             }
 
             Common.Bullets.Add(new Bullet(position, A, 6, 8F, Color.White.ToArgb(), 200));
@@ -139,7 +139,7 @@ namespace WindowsFormsApp28_px.matters.organic
             //        timer_display_look = 1F;
             //}
 
-            //if(Inventory.Contains(DB.Tex.T46))
+            //if (Inventory.Contains(DB.Tex.T46))
             //{
             //    var raycast = Maths.SimpleRaycastHit(Point, Look, SM, 10000F, Common.Segments);
             //    g.DrawLine(Pens.DarkRed, Point, raycast.LastPoint);
