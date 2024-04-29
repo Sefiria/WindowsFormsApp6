@@ -23,7 +23,8 @@ namespace Tooling_Mapper
         List<(string text, int time)> Notifs = new List<(string text, int time)>();
         int SelectedSegmentIndex = -1, SelectedPointIndex = -1;
         PointF SelectedOffset;
-        PointF Center;
+        PointF Center, Cam;
+        float CamSpeed = 5F;
 
         public Form1()
         {
@@ -34,6 +35,7 @@ namespace Tooling_Mapper
 
             init_draw();
 
+            Cam = PointF.Empty;
             Center = (Render.Width / 2F, Render.Height / 2F).P();
             RenderImage = new Bitmap(Render.Width, Render.Height);
             g = Graphics.FromImage(RenderImage);
@@ -47,7 +49,13 @@ namespace Tooling_Mapper
         private static string ToValidJson(string input) => input.Replace("=", ":").Replace("X", "\"X\"").Replace("Y", "\"Y\"");
         private void Update(object sender, EventArgs e)
         {
-            if(KB.LeftCtrl)
+            (bool _z, bool _q, bool _s, bool _d) = KB.ZQSD();
+            if (_z) Cam.Y -= CamSpeed;
+            if (_q) Cam.X -= CamSpeed;
+            if (_s) Cam.Y += CamSpeed;
+            if (_d) Cam.X += CamSpeed;
+
+            if (KB.LeftCtrl)
             {
                 if(KB.IsKeyPressed(KB.Key.Z) && Segments.Count > 0)
                     Segments.RemoveAt(Segments.Count - 1);
@@ -214,50 +222,43 @@ namespace Tooling_Mapper
         }
         private void DrawRule()
         {
-            var w = this.w / 2F;
-            var h = this.h / 2F;
+            var wh = w / 2;
+            var hh = h / 2;
             p = new Pen(c);
-            for (int x = 0; x < w; x += 100)
-            {
-                strsz = g.MeasureString(x.ToString(), fontMini);
-                g.DrawLine(p, w - x, h + 0, w - x, h + 16);
-                g.DrawLine(p, w + x, h + 0, w + x, h + 16);
-                    g.DrawString("-" + x, fontMini, b, w - (x == 0 ? 4 : x - strsz.Width / 2F), h + (x == 0 ? 4 : strsz.Height + 4));
-                if (x != 0)
-                    g.DrawString("" + x, fontMini, b, w + (x == 0 ? 4 : x - strsz.Width / 2F), h + (x == 0 ? 4 : strsz.Height + 4));
-            }
-            for (int x = 50; x < w; x += 100)
-            {
-                g.DrawLine(p, w - x, h + 0, w - x, h + 10);
-                g.DrawLine(p, w + x, h + 0, w + x, h + 10);
-            }
-            for (int x = 25; x < w; x += 50)
-            {
-                g.DrawLine(p, w - x, h + 0, w - x, h + 4);
-                g.DrawLine(p, w + x, h + 0, w + x, h + 4);
-            }
 
-            for (int y = 0; y < h; y += 100)
+            void _draw_0(int x)
             {
-                strsz = g.MeasureString(y.ToString(), fontMini);
-                g.DrawLine(p, w + 0, h - y, w + 16, h - y);
-                g.DrawLine(p, w + 0, h + y, w + 16, h + y);
+                var str = "" + (x - Cam.X);
+                strsz = g.MeasureString(str, fontMini);
+                g.DrawLine(p, wh + x, hh -8, wh + x, hh + 8);
+                g.DrawString(str, fontMini, (x - Cam.X) == 0 ? Brushes.Gray : b, wh + (x == 0 ? 4 : x - strsz.Width / 2F), hh + (x == 0 ? 4 : strsz.Height + 4));
+            }
+            void _draw_1(int x, int sz) => g.DrawLine(p, wh + x, hh - sz / 2, wh + x, hh + sz / 2);
+            void _draw_2(int y)
+            {
+                var str = "" + (y - Cam.Y);
+                strsz = g.MeasureString(str, fontMini);
+                g.DrawLine(p, wh - 8, hh + y, wh + 8, hh + y);
                 if (y != 0)
-                {
-                    g.DrawString("-" + y, fontMini, b, w + (y == 0 ? 4 : strsz.Width + 4), h - (y == 0 ? 4 : y - strsz.Height / 2F));
-                    g.DrawString("" + y, fontMini, b, w + (y == 0 ? 4 : strsz.Width + 4), h + (y == 0 ? 4 : y - strsz.Height / 2F));
-                }
+                    g.DrawString(str, fontMini, (y - Cam.Y) == 0 ? Brushes.Gray : b, wh + (y == 0 ? 4 : strsz.Width + 4), hh + (y == 0 ? 4 : y - strsz.Height / 2F));
             }
-            for (int y = 50; y < h; y += 100)
-            {
-                g.DrawLine(p, w + 0, h - y, w + 10, h - y);
-                g.DrawLine(p, w + 0, h + y, w + 10, h + y);
-            }
-            for (int y = 25; y < h; y += 50)
-            {
-                g.DrawLine(p, w + 0, h - y, w + 4, h - y);
-                g.DrawLine(p, w + 0, h + y, w + 4, h + y);
-            }
+            void _draw_3(int y, int sz) => g.DrawLine(p, wh - sz / 2, hh + y, wh + sz / 2, hh + y);
+
+            g.DrawLine(p, 0, hh, w, hh);
+            for (int x = (int)Cam.X; x > -wh; x -= 100) _draw_0(x);
+            for (int x = (int)Cam.X; x < wh; x += 100) _draw_0(x);
+            for (int x = (int)Cam.X - 50; x > -wh; x -= 100) _draw_1(x, 10);
+            for (int x = (int)Cam.X + 50; x < wh; x += 100) _draw_1(x, 10);
+            for (int x = (int)Cam.X - 25; x > -wh; x -= 50) _draw_1(x, 5);
+            for (int x = (int)Cam.X - 25; x < wh; x += 50) _draw_1(x, 5);
+
+            g.DrawLine(p, wh, 0, wh, h);
+            for (int y = (int)Cam.Y; y > -hh; y -= 100) _draw_2(y);
+            for (int y = (int)Cam.Y; y < hh; y += 100) _draw_2(y);
+            for (int y = (int)Cam.Y - 50; y > -hh; y -= 100) _draw_3(y, 10);
+            for (int y = (int)Cam.Y + 50; y < hh; y += 100) _draw_3(y, 10);
+            for (int y = (int)Cam.Y - 25; y > -hh; y -= 50) _draw_3(y, 5);
+            for (int y = (int)Cam.Y + 25; y < hh; y += 50) _draw_3(y, 5);
         }
         private void DrawSegments()
         {
