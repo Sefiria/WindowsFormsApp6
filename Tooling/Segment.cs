@@ -48,9 +48,13 @@ namespace Tooling
             B = new PointF(bx, by);
         }
 
-        public void Draw(Graphics g)
+        public void Draw(Graphics g, PointF? Offset = null)
         {
-            g.DrawLine(Pens.White, A, B);
+            if(Offset != null)
+                g.DrawLine(Pens.White, A.PlusF(Offset.Value), B.PlusF(Offset.Value));
+            else
+                g.DrawLine(Pens.White, A, B);
+            //g.DrawLine(new Pen(Color.FromArgb(100, 0, 0), 8F), A.MinusF(P.x(5F)), B.MinusF(P.x(5F)));
         }
     }
 }

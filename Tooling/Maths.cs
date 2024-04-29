@@ -260,6 +260,14 @@ namespace Tooling
             // Si le produit vectoriel est positif ou nul, le point n'est pas à gauche du segment
             return false;
         }
+        public static bool IsLeftOfSegment(Segment s, PointF o, float distance)
+        {
+            if (IsLeftOfSegment(s.A, s.B, o))
+                return true;
+            if (IsLeftOfSegment(s.A.MinusF(s.P.x(distance)), s.B.MinusF(s.P.x(distance)), o) == false)// if at right but after the distance, then it is ok
+                return true;
+            return false;
+        }
         public static bool IsPointLeftToLine(vecf a, vecf b, vecf o)
         {
             float crossProduct = (b.x - a.x) * (o.y - a.y) - (b.y - a.y) * (o.x - a.x);
@@ -326,6 +334,40 @@ namespace Tooling
                         .Where(s => result.LastPoint.DistanceFromSegment(s.A, s.B) < max_distance)
                         .OrderBy(s => result.LastPoint.DistanceFromSegment(s.A, s.B)); // Tri des segments par distance
                     hit_seg = _segments.FirstOrDefault(s => !IsLeftOfSegment(s.A, s.B, result.LastPoint));
+                    if (hit_seg == null)
+                        continue;
+                    return segments.IndexOf(hit_seg);
+                }
+                return -1;
+            }
+
+            result.Index = HitThat(0F);
+            if (result.Index > -1) return result;
+            result.Index = HitThat(-5F);
+            if (result.Index > -1) return result;
+            result.Index = HitThat(5F);
+            if (result.Index > -1) return result;
+            result.Index = HitThat(-10F);
+            if (result.Index > -1) return result;
+            result.Index = HitThat(10F);
+            return result;
+        }
+        public static RaycastHitInfo SimpleRaycastHit(PointF src, PointF look, float speed, float max_distance, List<Segment> segments, float segment_right_distance)
+        {
+            RaycastHitInfo result = new RaycastHitInfo(-1, src);
+            float d = 0F;
+            Segment hit_seg;
+
+            int HitThat(float angle)
+            {
+                while (d < max_distance)
+                {
+                    result.LastPoint = result.LastPoint.PlusF(look.Rotate(angle).x(speed));
+                    d += speed;
+                    var _segments = segments
+                        .Where(s => result.LastPoint.DistanceFromSegment(s.A, s.B) < max_distance)
+                        .OrderBy(s => result.LastPoint.DistanceFromSegment(s.A, s.B)); // Tri des segments par distance
+                    hit_seg = _segments.FirstOrDefault(s => !IsLeftOfSegment(s, result.LastPoint, segment_right_distance));
                     if (hit_seg == null)
                         continue;
                     return segments.IndexOf(hit_seg);

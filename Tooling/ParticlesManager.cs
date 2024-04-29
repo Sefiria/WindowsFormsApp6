@@ -12,10 +12,10 @@ namespace Tooling
             var particles = new List<Particle>(Particles);
             particles.ForEach(p => { if (p.Exists == false) Particles.Remove(p); else p.Update(); });
         }
-        public static void Draw(Graphics g)
+        public static void Draw(Graphics g, PointF? Offset = null)
         {
             var particles = new List<Particle>(Particles);
-            particles.ForEach(e => { if (e.Exists) e.Draw(g); });
+            particles.ForEach(e => { if (e.Exists) e.Draw(g, Offset); });
         }
 
         public static void Generate(vecf position, float size_around, float force, Color color, int count_around, int duration_around, bool applyGravity = false)

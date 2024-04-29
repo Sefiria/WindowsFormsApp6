@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text.Json;
 using System.Windows.Forms;
 using Tooling;
 
@@ -22,6 +23,7 @@ namespace Tooling_Mapper
         List<(string text, int time)> Notifs = new List<(string text, int time)>();
         int SelectedSegmentIndex = -1, SelectedPointIndex = -1;
         PointF SelectedOffset;
+        PointF Center;
 
         public Form1()
         {
@@ -32,6 +34,7 @@ namespace Tooling_Mapper
 
             init_draw();
 
+            Center = (Render.Width / 2F, Render.Height / 2F).P();
             RenderImage = new Bitmap(Render.Width, Render.Height);
             g = Graphics.FromImage(RenderImage);
 
@@ -41,6 +44,7 @@ namespace Tooling_Mapper
             TimerDraw.Tick += Draw;
         }
 
+        private static string ToValidJson(string input) => input.Replace("=", ":").Replace("X", "\"X\"").Replace("Y", "\"Y\"");
         private void Update(object sender, EventArgs e)
         {
             if(KB.LeftCtrl)
@@ -51,7 +55,8 @@ namespace Tooling_Mapper
                 {
                     try
                     {
-                        Clipboard.SetText(string.Join("|", Segments.Select(s => string.Join("&", new[] { s.A.ToString(), s.B.ToString() }))));
+                        var data = ToValidJson(string.Join("|", Segments.Select(s => string.Join("&", new[] { s.A.ToPoint().ToString(), s.B.ToPoint().ToString() }))));
+                        Clipboard.SetText(data);
                         Notifs.Add(("Copied !", 0));
                     }
                     catch(Exception ex)
@@ -63,21 +68,18 @@ namespace Tooling_Mapper
                 {
                     try
                     {
-                        string str = Clipboard.GetText();
-                        List<Segment> segments = new List<Segment>();
-                        var segs = str.Split('|');
-                        string[] ab, a_parts, b_parts;
-                        int ax, ay, bx, by;
-                        foreach (var seg in segs )
+                        string data = Clipboard.GetText();
+                        data = data.Replace("\\\"", "\"");
+                        var segments = new List<Segment>();
+                        string[] segs = data.Split('|');
+                        foreach (var seg in segs)
                         {
-                            ab = seg.Split('&');
-                            a_parts = ab[0].Split(new[] { ", " }, StringSplitOptions.None);
-                            ax = int.Parse(string.Concat(string.Concat(a_parts[0].SkipWhile(c => c != '=')).Skip(1)));
-                            ay = int.Parse(string.Concat(a_parts[1].Skip(2).TakeWhile(c => c != '}')));
-                            b_parts = ab[1].Split(new[] { ", " }, StringSplitOptions.None);
-                            bx = int.Parse(string.Concat(string.Concat(b_parts[0].SkipWhile(c => c != '=')).Skip(1)));
-                            by = int.Parse(string.Concat(b_parts[1].Skip(2).TakeWhile(c => c != '}')));
-                            segments.Add(new Segment(new PointF(ax, ay), new PointF(bx, by)));
+                            string[] pts = seg.Split('&');
+                            PointF A = JsonSerializer.Deserialize<PointF>(pts[0]);
+                            PointF B = JsonSerializer.Deserialize<PointF>(pts[1]);
+                            if (A == B)
+                                continue;
+                            segments.Add(new Segment(A, B));
                         }
                         if (segments.Count > 0)
                         {
@@ -134,17 +136,17 @@ namespace Tooling_Mapper
             {
                 bool col(PointF pt)
                 {
-                    return Maths.CollisionPointCercle(MouseStates.Position, pt.X - point_size / 2F, pt.Y - point_size / 2F, point_size);
+                    return Maths.CollisionPointCercle(Center.MinusF(MouseStates.Position), pt.X - point_size / 2F, pt.Y - point_size / 2F, point_size);
                 }
                 var segs = Segments.Select(s => (Segments.IndexOf(s), col(s.A), col(s.B))).Where(i => i.Item2 || i.Item3);
                 if (segs.Count() > 0)
                 {
-                    var SelectedSegment = segs.MinBy(i => Maths.Distance(i.Item2 ? Segments[i.Item1].A : Segments[i.Item1].B, MouseStates.Position));
+                    var SelectedSegment = segs.MinBy(i => Maths.Distance(i.Item2 ? Segments[i.Item1].A : Segments[i.Item1].B, Center.MinusF(MouseStates.Position)));
                     if (left_pressed)
                     {
                         SelectedSegmentIndex = SelectedSegment.Item1;
                         SelectedPointIndex = SelectedSegment.Item2 ? 0 : 1;
-                        SelectedOffset = (SelectedSegment.Item2 ? Segments[SelectedSegmentIndex].A : Segments[SelectedSegmentIndex].B).MinusF(MouseStates.Position);
+                        SelectedOffset = (SelectedSegment.Item2 ? Segments[SelectedSegmentIndex].A : Segments[SelectedSegmentIndex].B).MinusF(Center.MinusF(MouseStates.Position));
                         mode = SelectedSegment.Item2 ? 3 : 4;
                     }
                     else if(right_pressed)
@@ -159,16 +161,16 @@ namespace Tooling_Mapper
                 if (mode == 0)
                 {
                     mode = 1;
-                    A = MouseStates.Position;
+                    A = B = MouseStates.Position.MinusF(Center);
                 }
             }
             else if (left_down)
             {
                 switch (mode)
                 {
-                    case 1: B = MouseStates.Position; break;
-                    case 3: Segments[SelectedSegmentIndex].A = MouseStates.Position.PlusF(SelectedOffset); break;
-                    case 4: Segments[SelectedSegmentIndex].B = MouseStates.Position.PlusF(SelectedOffset); break;
+                    case 1: B = MouseStates.Position.MinusF(Center); break;
+                    case 3: Segments[SelectedSegmentIndex].A = MouseStates.Position.MinusF(Center).PlusF(SelectedOffset); break;
+                    case 4: Segments[SelectedSegmentIndex].B = MouseStates.Position.MinusF(Center).PlusF(SelectedOffset); break;
                 }
             }
             else
@@ -201,7 +203,7 @@ namespace Tooling_Mapper
         {
             g.DrawLine(Pens.Cyan, MouseStates.Position, MouseStates.Position.Plus(10));
             g.FillEllipse(Brushes.Cyan, MouseStates.Position.X + 10, MouseStates.Position.Y + 10, 8, 8);
-            g.DrawString(MouseStates.Position.ToString(), fontNormal, b, MouseStates.Position.Plus(20));
+            g.DrawString(MouseStates.Position.MinusF(w/2F, h/2F).ToString(), fontNormal, b, MouseStates.Position.Plus(20));
         }
         private void DrawCrossGrid()
         {
@@ -212,36 +214,49 @@ namespace Tooling_Mapper
         }
         private void DrawRule()
         {
+            var w = this.w / 2F;
+            var h = this.h / 2F;
             p = new Pen(c);
             for (int x = 0; x < w; x += 100)
             {
                 strsz = g.MeasureString(x.ToString(), fontMini);
-                g.DrawLine(p, x, 0, x, 16);
-                g.DrawString(x.ToString(), fontMini, b, x == 0 ? 4 : x - strsz.Width / 2F, x == 0 ? 4 : strsz.Height + 4);
+                g.DrawLine(p, w - x, h + 0, w - x, h + 16);
+                g.DrawLine(p, w + x, h + 0, w + x, h + 16);
+                    g.DrawString("-" + x, fontMini, b, w - (x == 0 ? 4 : x - strsz.Width / 2F), h + (x == 0 ? 4 : strsz.Height + 4));
+                if (x != 0)
+                    g.DrawString("" + x, fontMini, b, w + (x == 0 ? 4 : x - strsz.Width / 2F), h + (x == 0 ? 4 : strsz.Height + 4));
             }
             for (int x = 50; x < w; x += 100)
             {
-                g.DrawLine(p, x, 0, x, 10);
-                g.DrawLine(p, x, 0, x, 10);
+                g.DrawLine(p, w - x, h + 0, w - x, h + 10);
+                g.DrawLine(p, w + x, h + 0, w + x, h + 10);
             }
             for (int x = 25; x < w; x += 50)
             {
-                g.DrawLine(p, x, 0, x, 4);
+                g.DrawLine(p, w - x, h + 0, w - x, h + 4);
+                g.DrawLine(p, w + x, h + 0, w + x, h + 4);
             }
 
             for (int y = 0; y < h; y += 100)
             {
                 strsz = g.MeasureString(y.ToString(), fontMini);
-                g.DrawLine(p, 0, y, 16, y);
-                g.DrawString(y.ToString(), fontMini, b, y == 0 ? 4 : strsz.Width + 4, y == 0 ? 4 : y - strsz.Height / 2F);
+                g.DrawLine(p, w + 0, h - y, w + 16, h - y);
+                g.DrawLine(p, w + 0, h + y, w + 16, h + y);
+                if (y != 0)
+                {
+                    g.DrawString("-" + y, fontMini, b, w + (y == 0 ? 4 : strsz.Width + 4), h - (y == 0 ? 4 : y - strsz.Height / 2F));
+                    g.DrawString("" + y, fontMini, b, w + (y == 0 ? 4 : strsz.Width + 4), h + (y == 0 ? 4 : y - strsz.Height / 2F));
+                }
             }
             for (int y = 50; y < h; y += 100)
             {
-                g.DrawLine(p, 0, y, 10, y);
+                g.DrawLine(p, w + 0, h - y, w + 10, h - y);
+                g.DrawLine(p, w + 0, h + y, w + 10, h + y);
             }
             for (int y = 25; y < h; y += 50)
             {
-                g.DrawLine(p, 0, y, 4, y);
+                g.DrawLine(p, w + 0, h - y, w + 4, h - y);
+                g.DrawLine(p, w + 0, h + y, w + 4, h + y);
             }
         }
         private void DrawSegments()
@@ -250,27 +265,27 @@ namespace Tooling_Mapper
             foreach (var segment in segments)
             {
                 PointF perp = Maths.Perpendiculaire(segment.A, segment.B);
-                g.DrawLine(Pens.White, segment.A, segment.B);
-                g.DrawLine(new Pen(Color.FromArgb(100, 0, 0), 8F), segment.A.MinusF(perp.x(5F)), segment.B.MinusF(perp.x(5F)));
+                g.DrawLine(Pens.White, Center.PlusF(segment.A), Center.PlusF(segment.B));
+                g.DrawLine(new Pen(Color.FromArgb(100, 0, 0), 8F), Center.PlusF(segment.A.MinusF(perp.x(5F))), Center.PlusF(segment.B.MinusF(perp.x(5F))));
                 if (KB.LeftCtrl)
                 {
                     bool col(PointF pt)
                     {
-                        return Maths.CollisionPointCercle(MouseStates.Position, pt.X - point_size / 2F, pt.Y - point_size / 2F, point_size);
+                        return Maths.CollisionPointCercle(Center.MinusF(MouseStates.Position), pt.X - point_size / 2F, pt.Y - point_size / 2F, point_size);
                     }
                     var segs = Segments.Select(s => (Segments.IndexOf(s), col(s.A), col(s.B))).Where(i => i.Item2 || i.Item3);
                     (int, bool, bool) SelectedSegment = (-1, false, false);
                     if (segs.Count() > 0)
                     {
-                        SelectedSegment = segs.MinBy(i => Maths.Distance(i.Item2 ? Segments[i.Item1].A : Segments[i.Item1].B, MouseStates.Position));
+                        SelectedSegment = segs.MinBy(i => Maths.Distance(i.Item2 ? Segments[i.Item1].A : Segments[i.Item1].B, Center.MinusF(MouseStates.Position)));
                         SelectedSegmentIndex = SelectedSegment.Item1;
                         SelectedPointIndex = SelectedSegment.Item2 ? 0 : 1;
-                        SelectedOffset = (SelectedSegment.Item2 ? Segments[SelectedSegmentIndex].A : Segments[SelectedSegmentIndex].B).MinusF(MouseStates.Position);
+                        SelectedOffset = (SelectedSegment.Item2 ? Segments[SelectedSegmentIndex].A : Segments[SelectedSegmentIndex].B).MinusF(Center.MinusF(MouseStates.Position));
                         mode = SelectedSegment.Item2 ? 3 : 4;
                     }
                     bool hover = SelectedSegment.Item1 > -1 && Segments[SelectedSegment.Item1] == segment;
-                    g.DrawEllipse(hover && SelectedPointIndex == 0 ? Pens.White : Pens.DarkGray, segment.A.X - point_size / 2F, segment.A.Y - point_size / 2F, point_size, point_size);
-                    g.DrawEllipse(hover && SelectedPointIndex == 1 ? Pens.White : Pens.DarkGray, segment.B.X - point_size / 2F, segment.B.Y - point_size / 2F, point_size, point_size);
+                    g.DrawEllipse(hover && SelectedPointIndex == 0 ? Pens.White : Pens.DarkGray, Center.X + segment.A.X - point_size / 2F, Center.Y + segment.A.Y - point_size / 2F, point_size, point_size);
+                    g.DrawEllipse(hover && SelectedPointIndex == 1 ? Pens.White : Pens.DarkGray, Center.X + segment.B.X - point_size / 2F, Center.Y + segment.B.Y - point_size / 2F, point_size, point_size);
                 }
             }
         }
@@ -279,8 +294,8 @@ namespace Tooling_Mapper
             if (mode != 1)
                 return;
             PointF perp = Maths.Perpendiculaire(A, B);
-            g.DrawLine(Pens.White, A, B);
-            g.DrawLine(new Pen(Color.FromArgb(100, 0, 0), 8F), A.MinusF(perp.x(5F)), B.MinusF(perp.x(5F)));
+            g.DrawLine(Pens.White, Center.PlusF(A), Center.PlusF(B));
+            g.DrawLine(new Pen(Color.FromArgb(100, 0, 0), 8F), Center.PlusF(A.MinusF(perp.x(5F))), Center.PlusF(B.MinusF(perp.x(5F))));
         }
         private void DrawNotifs()
         {

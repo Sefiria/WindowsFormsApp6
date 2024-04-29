@@ -32,7 +32,7 @@ namespace Tooling
                 return;
 
             Position += Look * Speed;
-            if (Position.x - Size < 0 || Position.x + Size > ParticlesManager.Bounds.Width || Position.y + Size > ParticlesManager.Bounds.Height)
+            if (Position.x - Size < ParticlesManager.Bounds.X || Position.y - Size < ParticlesManager.Bounds.Y || Position.x + Size > ParticlesManager.Bounds.Width || Position.y + Size > ParticlesManager.Bounds.Height)
                 Exists = false;
             if(ApplyGravity)
                 Look.y += Gravity;
@@ -44,10 +44,9 @@ namespace Tooling
             if (Exists)
                 OnAfterUpdate?.Invoke(this);
         }
-        public void Draw(Graphics g)
+        public void Draw(Graphics g, PointF? Offset = null)
         {
-            if(Position.y - Size >= 0)
-                g.FillRectangle(new SolidBrush(Color.FromArgb((byte)((Duration - Ticks) / (float)Duration * byte.MaxValue), Color.FromArgb(ArgbColor))), Position.x, Position.y, Size, Size);
+            g.FillRectangle(new SolidBrush(Color.FromArgb((byte)((Duration - Ticks) / (float)Duration * byte.MaxValue), Color.FromArgb(ArgbColor))), Position.x + Offset?.X ?? 0, Position.y + Offset?.Y ?? 0, Size, Size);
         }
     }
 }

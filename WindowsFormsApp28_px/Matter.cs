@@ -54,9 +54,9 @@ namespace WindowsFormsApp28_px
         {
         }
 
-        public virtual void Draw(Graphics g)
+        public virtual void Draw(Graphics g, PointF? Offset = null)
         {
-            g.DrawEllipse(new Pen(Color.FromArgb(C)), x - r, y - r, diameter, diameter);
+            g.DrawEllipse(new Pen(Color.FromArgb(C)), x - r + Offset?.X ?? 0, y - r + Offset?.Y ?? 0, diameter, diameter);
         }
         public virtual void DrawUI(Graphics g)
         {

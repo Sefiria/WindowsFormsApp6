@@ -28,21 +28,36 @@ namespace WindowsFormsApp28_px
             if (!Exists)
                 return;
 
+            float wh = Common.ScreenWidth / 2F;
+            float hh = Common.ScreenHeight / 2F;
+
             Position = Position.PlusF(Look.x(Speed));
             if(StartPosition.vecf().Distance(Position.vecf()) > Distance)
                 Exists = false;
-            else if (Position.X - Radius < 0 || Position.Y - Radius < 0 || Position.X + Radius > ParticlesManager.Bounds.Width || Position.Y + Radius > ParticlesManager.Bounds.Height)
+            else if (Position.X - Radius < -wh || Position.Y - Radius < -hh || Position.X + Radius > wh || Position.Y + Radius > hh)
                 Exists = false;
             else
             {
-                var raycast = Maths.SimpleRaycastHit(Position, Look, Speed, Distance, Common.Segments);
-                if (raycast.Index != -1 && !Maths.IsLeftOfSegment(Common.Segments[raycast.Index].A, Common.Segments[raycast.Index].B, Position))
-                    Exists = false;
+                var raycast = Maths.SimpleRaycastHit(Position, Look, Speed, Distance, Common.Segments, 10F + Speed);
+                if (raycast.Index != -1)
+                {
+                    if (!Maths.IsLeftOfSegment(Common.Segments[raycast.Index], Position, 10F + Speed))
+                        Exists = false;
+                }
+                else
+                {
+                    raycast = Maths.SimpleRaycastHit(Position, Look.x(-1F), Speed, Distance, Common.Segments, 10F + Speed);
+                    if (raycast.Index != -1)
+                    {
+                        if (!Maths.IsLeftOfSegment(Common.Segments[raycast.Index], Position, 10F + Speed))
+                            Exists = false;
+                    }
+                }
             }
         }
-        public void Draw(Graphics g)
+        public void Draw(Graphics g, PointF? Offset = null)
         {
-            g.FillEllipse(new SolidBrush(Color.FromArgb(ArgbColor)), Position.X - Radius / 2, Position.Y - Radius / 2, Diameter, Diameter);
+            g.FillEllipse(new SolidBrush(Color.FromArgb(ArgbColor)), Position.X - Radius / 2 + Offset?.X ?? 0, Position.Y - Radius / 2 + Offset?.Y ?? 0, Diameter, Diameter);
         }
     }
 }

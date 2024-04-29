@@ -72,7 +72,7 @@ namespace WindowsFormsApp28_px.matters.non_organic
 
         public override void DrawUI(Graphics g)
         {
-            base.Draw(g);
+            //base.Draw(g, Common.Cam.x(-1F));
 
             //if(IsOpen)
             //{

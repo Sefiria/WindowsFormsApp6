@@ -17,7 +17,7 @@ namespace WindowsFormsApp28_px
 
         void Update();
         void Action(IMatter triggerer);
-        void Draw(Graphics g);
+        void Draw(Graphics g, PointF? Offset = null);
         void DrawUI(Graphics g);
 
     }

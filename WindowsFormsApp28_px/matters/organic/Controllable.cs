@@ -18,6 +18,8 @@ namespace WindowsFormsApp28_px.matters.organic
         }
         public Controllable(float X, float Y, int diameter, int color) : base(X, Y, diameter, color)
         {
+            Inventory.Add(DB.Tex.T46);
+            SM = 2F;
         }
 
         public override void Update()
@@ -47,8 +49,7 @@ namespace WindowsFormsApp28_px.matters.organic
             var p = (x, y).P();
             foreach (Segment segment in Common.Segments)
             {
-                //if (Maths.CollisionSegment(segment.A.X, segment.A.Y, segment.B.X, segment.B.Y, x, y, r))
-                if(!Maths.IsLeftOfSegment(segment.A, segment.B, p.PlusF(look.x(SM * r))) || Maths.CollisionPointCercle(segment.A, x, y, r))
+                if(!Maths.IsLeftOfSegment(segment, p.PlusF(look.x(SM * r)), 10F) || Maths.CollisionPointCercle(segment.A, x, y, r))
                 {
                     var perp = segment.P;
                     x += perp.X * SM;
@@ -116,6 +117,7 @@ namespace WindowsFormsApp28_px.matters.organic
             int color;
             int side_diffusion = RandomThings.arnd(20, 40);
             var position = Point.Plus(Look.x(10F));
+            var offset = (Common.ScreenWidth / 2F, Common.ScreenHeight / 2F).P();
             for (int i = 0; i < 10; i++)
             {
                 look = Look.Rotate(RandomThings.arnd(-side_diffusion, side_diffusion)).vecf();
@@ -127,29 +129,30 @@ namespace WindowsFormsApp28_px.matters.organic
         }
         private void ParticleRemoveRule(Particle context)
         {
-            context.Exists = !Common.Segments.Any(s => !Maths.IsLeftOfSegment(s.A, s.B, context.Position.pt));
+            context.Exists = !Common.Segments.Any(s =>   !Maths.IsLeftOfSegment(s, context.Position.pt, 10F));
         }
 
-        public override void Draw(Graphics g)
+        public override void Draw(Graphics g, PointF? Offset = null)
         {
-            base.Draw(g);
+            var offset = (Common.ScreenWidth / 2F, Common.ScreenHeight / 2F).P();
+            g.DrawEllipse(new Pen(Color.FromArgb(C)), offset.X - r, offset.Y - r, diameter, diameter);
 
             var anybt = KB.AnyZQSD() || KB.IsKeyDown(KB.Key.Space);
             if (timer_display_look > 0F || anybt)
             {
                 timer_display_look -= 0.05F;
                 float look_size = 24F;
-                var raycast = Maths.SimpleRaycastHit(Point, Look, SM, look_size, Common.Segments);
+                var raycast = Maths.SimpleRaycastHit(Point, Look, SM, look_size, Common.Segments, 10F);
 
-                g.DrawLine(new Pen(Color.FromArgb((int)(byte.MaxValue * Math.Max(0F, timer_display_look)), Color.FromArgb(C)), 2F), Point, raycast.LastPoint);
+                g.DrawLine(new Pen(Color.FromArgb((int)(byte.MaxValue * Math.Max(0F, timer_display_look)), Color.FromArgb(C)), 2F), offset, offset.PlusF(raycast.LastPoint.MinusF(Point)));
                 if (anybt)
                     timer_display_look = 1F;
             }
 
             if (Inventory.Contains(DB.Tex.T46))
             {
-                var raycast = Maths.SimpleRaycastHit(Point, Look, SM, 10000F, Common.Segments);
-                g.DrawLine(Pens.DarkRed, Point, raycast.LastPoint);
+                var raycast = Maths.SimpleRaycastHit(Point, Look, SM, 1000F, Common.Segments, 10F);
+                g.DrawLine(Pens.DarkRed, offset, offset.PlusF(raycast.LastPoint.MinusF(Point)));
             }
         }
     }

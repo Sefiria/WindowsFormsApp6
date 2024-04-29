@@ -52,7 +52,7 @@ namespace WindowsFormsApp28_px
         {
         }
 
-        public virtual void Draw(Graphics g)
+        public virtual void Draw(Graphics g, PointF? Offset = null)
         {
             var w = this.w / 2F;
             var h = this.h / 2F;
@@ -70,7 +70,7 @@ namespace WindowsFormsApp28_px
             path.CloseFigure();
 
             Matrix matrix = new Matrix();
-            matrix.Translate(x, y);
+            matrix.Translate(x + Offset?.X ?? 0, y + Offset?.Y ?? 0);
             matrix.Rotate(A);
             path.Transform(matrix);
 

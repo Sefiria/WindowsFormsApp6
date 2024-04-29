@@ -32,6 +32,14 @@ namespace WindowsFormsApp28_px
             else
                 inv[inv.IndexOf(inv_it)].Count += count;
         }
+        public static void Add(this List<Item> inv, DB.Tex id)
+        {
+            var inv_it = inv.FirstOrDefault(it => it.Id == (int)id);
+            if (inv_it == null)
+                inv.Add(new Item((int)id, 1));
+            else
+                inv[inv.IndexOf(inv_it)].Count += 1;
+        }
         /// <summary>
         /// Removes instantly the item
         /// </summary>
