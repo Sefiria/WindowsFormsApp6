@@ -126,6 +126,8 @@ namespace Tooling_Mapper
             DrawSegments();
             DrawCreatingSegment();
 
+            DrawUI();
+
             DrawNotifs();
 
             DrawCursor();
@@ -278,7 +280,7 @@ namespace Tooling_Mapper
                 g.DrawLine(new Pen(Color.FromArgb(100, 0, 0), 8F), Center.PlusF(segment.A.MinusF(perp.x(5F)).MinusF(Cam)), Center.PlusF(segment.B.MinusF(perp.x(5F)).MinusF(Cam)));
                 if (KB.LeftAlt)
                 {
-                    bool hover = SelectedSegment.Item1 != -1 && Segments[SelectedSegment.Item1] == segment;
+                    bool hover = SelectedSegment.Item1 != -1 && SelectedSegment.Item1< Segments.Count && Segments[SelectedSegment.Item1] == segment;
                     g.DrawEllipse(hover && SelectedPointIndex == 0 ? Pens.White : Pens.DarkGray, Center.X + segment.A.X - Cam.X - point_size / 2F, Center.Y + segment.A.Y - Cam.Y - point_size / 2F, point_size, point_size);
                     g.DrawEllipse(hover && SelectedPointIndex == 1 ? Pens.White : Pens.DarkGray, Center.X + segment.B.X - Cam.X - point_size / 2F, Center.Y + segment.B.Y - Cam.Y - point_size / 2F, point_size, point_size);
                 }
@@ -302,6 +304,35 @@ namespace Tooling_Mapper
                 Notifs.RemoveAt(Notifs.Count - 1);
             else
                 Notifs[Notifs.Count - 1] = (notif.text, notif.time + 1);
+        }
+        private void DrawUI()
+        {
+            Size sz = g.MeasureString("O", fontMini).ToSize();
+            PointF text_loc;
+            var (z, q, s, d) = KB.ZQSD();
+            var ctrl = KB.IsKeyDown(KB.Key.LeftCtrl);
+            var alt = KB.IsKeyDown(KB.Key.LeftAlt);
+            var lc = MouseStates.ButtonsDown[MouseButtons.Left];
+            var rc = MouseStates.ButtonsDown[MouseButtons.Right];
+
+            var ui_ctrl = new { rect=new Rectangle(10,h - sz.Height - 50, sz.Width + 30, sz.Height + 10), text="CTRL", pressed= ctrl };
+            var ui_z = new { rect=new Rectangle(60,h - sz.Height - 50, sz.Width + 10, sz.Height + 10), text="Z", pressed=z };
+            var ui_alt = new { rect=new Rectangle(90,h - sz.Height - 50, sz.Width + 30, sz.Height + 10), text="ALT", pressed = alt };
+            var ui_q = new { rect=new Rectangle(30, h - sz.Height - 20, sz.Width + 10, sz.Height + 10), text="Q", pressed=q };
+            var ui_s = new { rect=new Rectangle(60, h - sz.Height - 20, sz.Width + 10, sz.Height + 10), text="S", pressed=s };
+            var ui_d = new { rect=new Rectangle(90, h - sz.Height - 20, sz.Width + 10, sz.Height + 10), text="D", pressed=d };
+            var ui_lc = new { rect=new Rectangle(140, h - sz.Height - 20, sz.Width + 30, sz.Height + 10), text="Left", pressed = lc };
+            var ui_rc = new { rect=new Rectangle(190, h - sz.Height - 20, sz.Width + 30, sz.Height + 10), text="Right", pressed = rc };
+
+            var ui_list = new List<dynamic> { ui_ctrl, ui_z, ui_alt, ui_q, ui_s, ui_d, ui_lc, ui_rc };
+
+            foreach(var ui_item in ui_list)
+            {
+                text_loc = new PointF(ui_item.rect.X + 5, ui_item.rect.Y + 5);
+
+                g.DrawRectangle(ui_item.pressed ? Pens.Gray : Pens.DimGray, ui_item.rect);
+                g.DrawString(ui_item.text, fontMini, ui_item.pressed ? Brushes.Gray : Brushes.DimGray, text_loc);
+            }
         }
     }
 }
