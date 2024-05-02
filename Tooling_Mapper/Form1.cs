@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text.Json;
 using System.Windows.Forms;
 using Tooling;
@@ -122,7 +123,7 @@ namespace Tooling_Mapper
             g.Clear(Color.Black);
 
             DrawCrossGrid();
-            DrawRule();
+            DrawRules();
 
             DrawSegments();
             DrawCreatingSegment();
@@ -236,16 +237,19 @@ namespace Tooling_Mapper
 
         SizeF strsz;
         byte color_brightness;
-        Color c;
-        Pen p;
-        Brush b;
+        Color c, cs;
+        Pen p, ps;
+        Brush b, bs;
         int w, h, notif_duration, point_size = 16;
         private void init_draw()
         {
             color_brightness = 64;
-            c = Color.FromArgb(color_brightness, color_brightness, color_brightness);
+            c = Color.FromArgb((byte)(color_brightness * 0.5F), (byte)(color_brightness * 0.5F), (byte)(color_brightness * 0.5F));
+            cs = Color.FromArgb(color_brightness, color_brightness, color_brightness);
             p = new Pen(c);
+            ps = new Pen(cs);
             b = new SolidBrush(c);
+            bs = new SolidBrush(cs);
             w = Render.Width;
             h = Render.Height;
             notif_duration = 50;
@@ -254,40 +258,58 @@ namespace Tooling_Mapper
         {
             g.DrawLine(Pens.Cyan, MouseStates.Position, MouseStates.Position.Plus(10));
             g.FillEllipse(Brushes.Cyan, MouseStates.Position.X + 10, MouseStates.Position.Y + 10, 8, 8);
-            g.DrawString(MouseStates.Position.MinusF(w/2F, h/2F).ToString(), fontNormal, b, MouseStates.Position.Plus(20));
+            g.DrawString(MouseStates.Position.MinusF(w/2F, h/2F).PlusF(Cam).ToString(), fontNormal, bs, MouseStates.Position.Plus(20));
         }
         private void DrawCrossGrid()
         {
-            p.DashStyle = System.Drawing.Drawing2D.DashStyle.Dash;
-            p.DashPattern = new[] { 6F, 4F };
-            g.DrawLine(p, MouseStates.Position.X, 0, MouseStates.Position.X, h);
-            g.DrawLine(p, 0, MouseStates.Position.Y, w, MouseStates.Position.Y);
+            ps.DashStyle = System.Drawing.Drawing2D.DashStyle.Dash;
+            ps.DashPattern = new[] { 6F, 4F };
+            g.DrawLine(ps, MouseStates.Position.X, 0, MouseStates.Position.X, h);
+            g.DrawLine(ps, 0, MouseStates.Position.Y, w, MouseStates.Position.Y);
+            ps.DashStyle = System.Drawing.Drawing2D.DashStyle.Solid;
         }
-        private void DrawRule()
+        private void DrawRules()
         {
             var wh = w / 2;
             var hh = h / 2;
-            p = new Pen(c);
 
             void _draw_0(int x)
             {
                 var str = "" + (x + Cam.X);
                 strsz = g.MeasureString(str, fontMini);
                 g.DrawLine(p, wh + x, hh -8, wh + x, hh + 8);
-                g.DrawString(str, fontMini, (x + Cam.X) == 0 ? Brushes.Gray : b, wh + (x == 0 ? 4 : x - strsz.Width / 2F), hh + (x == 0 ? 4 : strsz.Height + 4));
+                g.DrawString(str, fontMini, b, wh + (x == 0 ? 4 : x - strsz.Width / 2F), hh + (x == 0 ? 4 : strsz.Height + 4));
+                // center static
+                g.DrawLine(ps, wh + x, hh - Cam.Y - 8, wh + x, hh - Cam.Y + 8);
+                g.DrawString(str, fontMini, bs, wh + (x == 0 ? 4 : x - strsz.Width / 2F), hh - Cam.Y + (x == 0 ? 4 : strsz.Height + 4));
             }
-            void _draw_1(int x, int sz) => g.DrawLine(p, wh + x, hh - sz / 2, wh + x, hh + sz / 2);
+            void _draw_1(int x, int sz)
+            {
+                g.DrawLine(p, wh + x, hh - sz / 2, wh + x, hh + sz / 2);
+                // center static
+                g.DrawLine(ps, wh + x, hh - Cam.Y - sz / 2, wh + x, hh - Cam.Y + sz / 2);
+            }
             void _draw_2(int y)
             {
                 var str = "" + (y + Cam.Y);
                 strsz = g.MeasureString(str, fontMini);
                 g.DrawLine(p, wh - 8, hh + y, wh + 8, hh + y);
                 if (y != 0)
-                    g.DrawString(str, fontMini, (y + Cam.Y) == 0 ? Brushes.Gray : b, wh + (y == 0 ? 4 : strsz.Width + 4), hh + (y == 0 ? 4 : y - strsz.Height / 2F));
+                    g.DrawString(str, fontMini, b, wh + (y == 0 ? 4 : strsz.Width + 4), hh + (y == 0 ? 4 : y - strsz.Height / 2F));
+                // center static
+                g.DrawLine(ps, wh - Cam.X - 8, hh + y, wh - Cam.X + 8, hh + y);
+                if (y != 0)
+                    g.DrawString(str, fontMini, bs, wh - Cam.X + (y == 0 ? 4 : strsz.Width + 4), hh + (y == 0 ? 4 : y - strsz.Height / 2F));
             }
-            void _draw_3(int y, int sz) => g.DrawLine(p, wh - sz / 2, hh + y, wh + sz / 2, hh + y);
+            void _draw_3(int y, int sz)
+            {
+                g.DrawLine(p, wh - sz / 2, hh + y, wh + sz / 2, hh + y);
+                // center static
+                g.DrawLine(ps, wh - Cam.X - sz / 2, hh + y, wh - Cam.X + sz / 2, hh + y);
+            }
 
             g.DrawLine(p, 0, hh, w, hh);
+            g.DrawLine(ps, 0, hh - Cam.Y, w, hh - Cam.Y);
             for (int x = -(int)Cam.X; x > -wh; x -= 100) _draw_0(x);
             for (int x = -(int)Cam.X; x < wh; x += 100) _draw_0(x);
             for (int x = -(int)Cam.X - 50; x > -wh; x -= 100) _draw_1(x, 10);
@@ -296,6 +318,7 @@ namespace Tooling_Mapper
             for (int x = -(int)Cam.X - 25; x < wh; x += 50) _draw_1(x, 5);
 
             g.DrawLine(p, wh, 0, wh, h);
+            g.DrawLine(ps, wh - Cam.X, 0, wh - Cam.X, h);
             for (int y = -(int)Cam.Y; y > -hh; y -= 100) _draw_2(y);
             for (int y = -(int)Cam.Y; y < hh; y += 100) _draw_2(y);
             for (int y = -(int)Cam.Y - 50; y > -hh; y -= 100) _draw_3(y, 10);
@@ -319,6 +342,10 @@ namespace Tooling_Mapper
                     Pen p = hover && reverse_mode ? ((DateTime.Now.Ticks / 1000) % 4000 < 2000 ? Pens.Red: Pens.White) : (SelectedPointIndex == 0 ? Pens.White : Pens.DarkGray);
                     g.DrawEllipse(p, Center.X + segment.A.X - Cam.X - point_size / 2F, Center.Y + segment.A.Y - Cam.Y - point_size / 2F, point_size, point_size);
                     g.DrawEllipse(p, Center.X + segment.B.X - Cam.X - point_size / 2F, Center.Y + segment.B.Y - Cam.Y - point_size / 2F, point_size, point_size);
+                    var sz = g.MeasureString(Center.PlusF(segment.A).MinusF(Cam).ToString(), fontNormal);
+                    g.DrawString(Center.PlusF(segment.A).MinusF(Cam).ToString(), fontNormal, Brushes.DarkGray, Center.PlusF(segment.A).MinusF(Cam).MinusF(0, 20).MinusF(sz.ToPointF().DivF(2F)));
+                    sz = g.MeasureString(Center.PlusF(segment.B).MinusF(Cam).ToString(), fontNormal);
+                    g.DrawString(Center.PlusF(segment.B).MinusF(Cam).ToString(), fontNormal, Brushes.DarkGray, Center.PlusF(segment.B).MinusF(Cam).MinusF(0, 20).MinusF(sz.ToPointF().DivF(2F)));
                 }
             }
         }
@@ -329,6 +356,10 @@ namespace Tooling_Mapper
             PointF perp = Maths.Perpendiculaire(A, B);
             g.DrawLine(Pens.White, Center.PlusF(A).MinusF(Cam), Center.PlusF(B).MinusF(Cam));
             g.DrawLine(new Pen(Color.FromArgb(100, 0, 0), 8F), Center.PlusF(A.MinusF(perp.x(5F))).MinusF(Cam), Center.PlusF(B.MinusF(perp.x(5F))).MinusF(Cam));
+            var sz = g.MeasureString(Center.PlusF(A).MinusF(Cam).ToString(), fontNormal);
+            g.DrawString(Center.PlusF(A).MinusF(Cam).ToString(), fontNormal, Brushes.White, Center.PlusF(A).MinusF(Cam).MinusF(0, 20).MinusF(sz.ToPointF().DivF(2F)));
+            sz = g.MeasureString(Center.PlusF(B).MinusF(Cam).ToString(), fontNormal);
+            g.DrawString(Center.PlusF(B).MinusF(Cam).ToString(), fontNormal, Brushes.White, Center.PlusF(B).MinusF(Cam).MinusF(0, 20).MinusF(sz.ToPointF().DivF(2F)));
         }
         private void DrawNotifs()
         {
