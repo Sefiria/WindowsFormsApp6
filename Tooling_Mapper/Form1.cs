@@ -26,6 +26,7 @@ namespace Tooling_Mapper
         PointF SelectedOffset;
         PointF Center, Cam;
         float CamSpeed = 5F;
+        bool merge_nodes_mode = true;
 
         public Form1()
         {
@@ -145,6 +146,7 @@ namespace Tooling_Mapper
             bool right_pressed = MouseStates.IsButtonPressed(MouseButtons.Right);
             bool left_down = MouseStates.IsButtonDown(MouseButtons.Left);
             var ms = MouseStates.Position.MinusF(Center).PlusF(Cam);
+            bool reverse_mode = KB.IsKeyDown(KB.Key.LeftCtrl) && KB.IsKeyDown(KB.Key.LeftAlt);
 
 
             if (KB.LeftAlt)
@@ -161,8 +163,17 @@ namespace Tooling_Mapper
                     if (left_pressed)
                     {
                         SelectedSegmentIndex = SelectedSegment.Item1;
-                        SelectedOffset = (SelectedSegment.Item2 ? Segments[SelectedSegmentIndex].A : Segments[SelectedSegmentIndex].B).MinusF(ms);
-                        mode = SelectedSegment.Item2 ? 3 : 4;
+                        if (reverse_mode)
+                        {
+                            var a = new PointF(Segments[SelectedSegmentIndex].A.X, Segments[SelectedSegmentIndex].A.Y);
+                            Segments[SelectedSegmentIndex].A = Segments[SelectedSegmentIndex].B;
+                            Segments[SelectedSegmentIndex].B = a;
+                        }
+                        else
+                        {
+                            SelectedOffset = (SelectedSegment.Item2 ? Segments[SelectedSegmentIndex].A : Segments[SelectedSegmentIndex].B).MinusF(ms);
+                            mode = SelectedSegment.Item2 ? 3 : 4;
+                        }
                     }
                     else if (right_pressed)
                     {
@@ -173,29 +184,52 @@ namespace Tooling_Mapper
                     SelectedPointIndex = -1;
             }
 
-            if (left_pressed)
+            if (!reverse_mode)
             {
-                if (mode == 0)
+                if (left_pressed)
                 {
-                    mode = 1;
-                    A = B = ms;
+                    if (mode == 0)
+                    {
+                        mode = 1;
+                        A = B = ms;
+                    }
                 }
-            }
-            else if (left_down)
-            {
-                switch (mode)
+                else if (left_down)
                 {
-                    case 1: B = ms; break;
-                    case 3: Segments[SelectedSegmentIndex].A = ms.PlusF(SelectedOffset); break;
-                    case 4: Segments[SelectedSegmentIndex].B = ms.PlusF(SelectedOffset); break;
+                    if (merge_nodes_mode)
+                    {
+                        var current_moving_point = mode == 1 ? B : (mode == 3 ? Segments[SelectedSegmentIndex].A : Segments[SelectedSegmentIndex].B);
+                        var pts = Segments.Select(s => (PointF?)s.A).Concat(Segments.Select(s => (PointF?)s.B)).ToList();
+                        if (pts.Count(pt => pt == current_moving_point) > (KB.IsKeyDown(KB.Key.LeftAlt) ? 1 : 1))
+                            pts.RemoveAt(pts.IndexOf(pts.First(pt => pt == current_moving_point)));
+                        PointF? node = pts.FirstOrDefault(pt => Maths.Distance(ms, pt.Value) < point_size);
+                        Console.WriteLine(node);
+                        switch (mode)
+                        {
+                            case 1: B = node ?? ms; break;
+                            case 3: Segments[SelectedSegmentIndex].A = node ?? ms.PlusF(SelectedOffset); break;
+                            case 4: Segments[SelectedSegmentIndex].B = node ?? ms.PlusF(SelectedOffset); break;
+                        }
+                    }
+                    else
+                    {
+                        switch (mode)
+                        {
+                            case 1: B = ms; break;
+                            case 3: Segments[SelectedSegmentIndex].A = ms.PlusF(SelectedOffset); break;
+                            case 4: Segments[SelectedSegmentIndex].B = ms.PlusF(SelectedOffset); break;
+                        }
+                    }
+                }
+                else
+                {
+                    if (mode == 1)
+                        Segments.Add(new Segment(A, B));
+                    mode = 0;
                 }
             }
             else
-            {
-                if (mode == 1)
-                    Segments.Add(new Segment(A, B));
                 mode = 0;
-            }
         }
 
 
@@ -281,8 +315,10 @@ namespace Tooling_Mapper
                 if (KB.LeftAlt)
                 {
                     bool hover = SelectedSegment.Item1 != -1 && SelectedSegment.Item1< Segments.Count && Segments[SelectedSegment.Item1] == segment;
-                    g.DrawEllipse(hover && SelectedPointIndex == 0 ? Pens.White : Pens.DarkGray, Center.X + segment.A.X - Cam.X - point_size / 2F, Center.Y + segment.A.Y - Cam.Y - point_size / 2F, point_size, point_size);
-                    g.DrawEllipse(hover && SelectedPointIndex == 1 ? Pens.White : Pens.DarkGray, Center.X + segment.B.X - Cam.X - point_size / 2F, Center.Y + segment.B.Y - Cam.Y - point_size / 2F, point_size, point_size);
+                    bool reverse_mode = KB.IsKeyDown(KB.Key.LeftCtrl) && KB.IsKeyDown(KB.Key.LeftAlt);
+                    Pen p = hover && reverse_mode ? ((DateTime.Now.Ticks / 1000) % 4000 < 2000 ? Pens.Red: Pens.White) : (SelectedPointIndex == 0 ? Pens.White : Pens.DarkGray);
+                    g.DrawEllipse(p, Center.X + segment.A.X - Cam.X - point_size / 2F, Center.Y + segment.A.Y - Cam.Y - point_size / 2F, point_size, point_size);
+                    g.DrawEllipse(p, Center.X + segment.B.X - Cam.X - point_size / 2F, Center.Y + segment.B.Y - Cam.Y - point_size / 2F, point_size, point_size);
                 }
             }
         }
