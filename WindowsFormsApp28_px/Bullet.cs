@@ -34,8 +34,8 @@ namespace WindowsFormsApp28_px
             Position = Position.PlusF(Look.x(Speed));
             if(StartPosition.vecf().Distance(Position.vecf()) > Distance)
                 Exists = false;
-            else if (Position.X - Radius < -wh || Position.Y - Radius < -hh || Position.X + Radius > wh || Position.Y + Radius > hh)
-                Exists = false;
+            //else if (Position.X - Radius < - wh || Position.Y - Radius < -hh || Position.X + Radius > wh || Position.Y + Radius > hh)
+            //    Exists = false;
             else
             {
                 var raycast = Maths.SimpleRaycastHit(Position, Look, Speed, Distance, Common.Segments, 10F + Speed);

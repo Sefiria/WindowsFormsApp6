@@ -17,8 +17,8 @@ namespace Tooling
             set
             {
                 m_value = value;
-                while (m_value < min) m_value += max + 1;
-                while (m_value > max) m_value -= max + 1;
+                while (m_value < min) m_value += max - min + 1;
+                while (m_value > max) m_value -= max - min + 1;
             }
         }
         public LoopValue()
@@ -43,8 +43,8 @@ namespace Tooling
             set
             {
                 m_value = value;
-                while (m_value < min) m_value += max;
-                while (m_value >= max) m_value -= max;
+                while (m_value < min) m_value += max - min;
+                while (m_value >= max) m_value -= max - min;
             }
         }
         public LoopValueF()

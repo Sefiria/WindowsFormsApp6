@@ -22,7 +22,7 @@ namespace WindowsFormsApp28_px
         {
             InitializeComponent();
 
-            MouseStates.Initialize();
+            MouseStates.Initialize(Render);
             KB.Init();
 
             Common.Initialize(Render.Width, Render.Height);
@@ -54,20 +54,6 @@ namespace WindowsFormsApp28_px
             Common.DrawUI(g);
 
             Render.Image = RenderImage;
-        }
-
-        private void Render_MouseDown(object sender, MouseEventArgs e)
-        {
-            MouseStates.ButtonsDown[e.Button] = true;
-        }
-        private void Render_MouseUp(object sender, MouseEventArgs e)
-        {
-            MouseStates.ButtonsDown[e.Button] = false;
-        }
-        private void Render_MouseMove(object sender, MouseEventArgs e)
-        {
-            MouseStates.OldPosition = MouseStates.Position;
-            MouseStates.Position = e.Location;
         }
     }
 }

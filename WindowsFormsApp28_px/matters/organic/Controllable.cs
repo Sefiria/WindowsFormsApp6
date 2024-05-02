@@ -2,6 +2,7 @@
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Windows.Forms;
 using Tooling;
 
 namespace WindowsFormsApp28_px.matters.organic
@@ -35,7 +36,12 @@ namespace WindowsFormsApp28_px.matters.organic
             var look = Look;
 
             if (q) a -= SA;
-            if (d) a += SA;
+            else if (d) a += SA;
+            else
+            {
+                if (MouseStates.PositionChanged)
+                    a = Maths.GetAngle(MouseStates.Position.MinusF(Common.Cam).PlusF(r, 0).MinusF(X, Y));
+            }
 
             void move_forward(float speed)
             {
@@ -103,11 +109,11 @@ namespace WindowsFormsApp28_px.matters.organic
         }
         public void Update_Actions()
         {
-            if (KB.IsKeyDown(KB.Key.Space))
+            if (KB.IsKeyDown(KB.Key.Space) || MouseStates.ButtonsDown[MouseButtons.Left])
             {
                 var nears = Common.Matters.Except(this).Where(e => e.Point.vecf().Distance(Point.vecf()) < diameter + SM * 4F).ToList();
                 nears.ForEach(e => e.Action(this));
-                if (KB.IsKeyPressed(KB.Key.Space) && Inventory.Contains(DB.Tex.T46) && nears.Count == 0)
+                if ((KB.IsKeyPressed(KB.Key.Space) || MouseStates.IsButtonPressed(MouseButtons.Left)) && Inventory.Contains(DB.Tex.T46) && nears.Count == 0)
                     Shot();
             }
         }
@@ -137,7 +143,7 @@ namespace WindowsFormsApp28_px.matters.organic
             var offset = (Common.ScreenWidth / 2F, Common.ScreenHeight / 2F).P();
             g.DrawEllipse(new Pen(Color.FromArgb(C)), offset.X - r, offset.Y - r, diameter, diameter);
 
-            var anybt = KB.AnyZQSD() || KB.IsKeyDown(KB.Key.Space);
+            var anybt = KB.AnyZQSD() || KB.IsKeyDown(KB.Key.Space) || MouseStates.ButtonsDown[MouseButtons.Left] || MouseStates.PositionChanged;
             if (timer_display_look > 0F || anybt)
             {
                 timer_display_look -= 0.05F;
