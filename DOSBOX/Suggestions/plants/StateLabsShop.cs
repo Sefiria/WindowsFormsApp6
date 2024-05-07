@@ -1,13 +1,11 @@
 ﻿using DOSBOX.Suggestions.plants;
-using DOSBOX.Suggestions.plants.Fruits;
 using DOSBOX.Utilities;
 using DOSBOX.Utilities.effects;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Windows;
+using Tooling;
 
 namespace DOSBOX.Suggestions
 {

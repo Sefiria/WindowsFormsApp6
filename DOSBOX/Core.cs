@@ -1,8 +1,8 @@
 ﻿using DOSBOX.Suggestions;
-using DOSBOX.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using Tooling;
 
 namespace DOSBOX
 {

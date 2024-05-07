@@ -115,7 +115,8 @@ namespace ConfigureRoute.Entities
                 Status = DrivingStatus.HardBrake;
                 SetStopWhenNoSpeed();
             }
-            DoFocus(data);
+            if(data.road != null)
+                DoFocus(data);
         }
         void statusmgt(PointF look, Road road)
         {

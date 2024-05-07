@@ -2,6 +2,7 @@
 using DOSBOX.Utilities;
 using System;
 using System.Linq;
+using Tooling;
 
 namespace DOSBOX.Suggestions
 {

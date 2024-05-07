@@ -70,7 +70,7 @@ namespace ConfigureRoute.Entities
 
 			float d;
 			Car str8 = null;
-            int hit_index = Maths.SimpleRaycastHit(Pos, data.look, Speed.Value, Core.Cube * 2F, Core.Map.CarsExcept(this).Select(c => c.BoundsF).ToList());
+            int hit_index = Maths.SimpleRaycastHit(Pos, data.look, Speed.Value, Core.Cube * 2F, Core.Map.CarsExcept(this).Select(c => c.BoundsF).ToList()).Index;
 			if (hit_index >= 0)
 			{
 				str8 = Core.Map.Cars[hit_index];

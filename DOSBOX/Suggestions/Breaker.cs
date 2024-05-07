@@ -1,15 +1,11 @@
 ﻿using DOSBOX.Utilities;
-using DOSBOX.Utilities.effects;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Security.RightsManagement;
-using System.Windows.Media.Animation;
-using static DOSBOX.Suggestions.Road;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
+using Tooling;
+using Box = DOSBOX.Utilities.Box;
+using Circle = DOSBOX.Utilities.Circle;
+using Maths = DOSBOX.Utilities.Maths;
 
 namespace DOSBOX.Suggestions
 {

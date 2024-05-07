@@ -1,8 +1,4 @@
-﻿using DOSBOX.Utilities;
-using DOSBOX.Utilities.effects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Tooling;
 
 namespace DOSBOX.Suggestions
 {

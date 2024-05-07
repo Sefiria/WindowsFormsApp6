@@ -1,13 +1,9 @@
 ﻿using DOSBOX.Utilities;
 using DOSBOX.Utilities.effects;
-using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Threading;
-using System.Windows.Forms;
-using System.Windows.Input;
-using System.Windows.Media.Effects;
+using Tooling;
 
 namespace DOSBOX.Suggestions
 {

@@ -1,14 +1,12 @@
 ﻿using DOSBOX.Suggestions.plants;
-using DOSBOX.Suggestions.plants.Fruits;
 using DOSBOX.Utilities;
 using DOSBOX.Utilities.effects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using static DOSBOX.Utilities.effects.effect;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Windows;
+using Tooling;
+using static DOSBOX.Utilities.effects.effect;
 
 namespace DOSBOX.Suggestions
 {

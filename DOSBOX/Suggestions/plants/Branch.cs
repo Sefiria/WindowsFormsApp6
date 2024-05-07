@@ -3,6 +3,8 @@ using DOSBOX.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Tooling;
+using Maths = DOSBOX.Utilities.Maths;
 
 namespace DOSBOX.Suggestions
 {

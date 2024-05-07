@@ -1,11 +1,9 @@
 ﻿using DOSBOX.Suggestions.city;
 using DOSBOX.Utilities;
-using DOSBOX.Utilities.effects;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Tooling;
 
 namespace DOSBOX.Suggestions
 {
@@ -106,7 +104,7 @@ namespace DOSBOX.Suggestions
             }
             else
             {
-                float move_speed = 2F;
+                float move_speed = 1F;
 
                 bool up = KB.IsKeyDown(KB.Key.Up);
                 bool down = KB.IsKeyDown(KB.Key.Down);
@@ -149,7 +147,7 @@ namespace DOSBOX.Suggestions
                 Display_Map();
 
             Text.DisplayText("                                ", 0, 7 * Tile.TSZ, 0);
-            Text.DisplayText(Core.Cam.ToString(), 0, 7 * Tile.TSZ, 0);
+            Text.DisplayText((Core.Cam.i / Tile.TSZ).ToString(), 0, 7 * Tile.TSZ, 0);
 
             for (int i = 0; i < Tile.TSZ; i++)
                 for (int j = 0; j < Tile.TSZ; j++)

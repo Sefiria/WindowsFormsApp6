@@ -102,6 +102,8 @@ namespace ConfigureRoute
                 Core.Map.Signs.Clear();
                 Core.Map.Entities.Clear();
             }
+            if (IsKeyPressed(Key.N))
+                Tool = Tool == RouteTools.Road ? RouteTools.Sign : RouteTools.Road;
         }
 
         private void Draw(object _, EventArgs e)
@@ -265,8 +267,8 @@ namespace ConfigureRoute
             var panel = new UIPanelSelection() { Position=(10, 10).Vf(), Size=(400, 40).Vf() };
             panel.Content.AddRange(new List<UI>
             {
-                new UIButton() { Position = (10+(int)(sz*1.5F)*0, 10).Vf(), Size = (sz*1.25F, sz*1.25F).Vf(), Tex = btRoad, OnClick=()=>Tool=RouteTools.Road },
-                new UIButton() { Position = (10+(int)(sz*1.5F)*1, 10).Vf(), Size = (sz*1.25F, sz*1.25F).Vf(), Tex = btSign, OnClick=()=>Tool=RouteTools.Sign },
+                new UIButton() { Position = (10+(int)(sz*1.5F)*0, 10).Vf(), Size = (sz*1.25F, sz*1.25F).Vf(), Tex = btRoad, OnClick=(e)=>Tool=RouteTools.Road },
+                new UIButton() { Position = (10+(int)(sz*1.5F)*1, 10).Vf(), Size = (sz*1.25F, sz*1.25F).Vf(), Tex = btSign, OnClick=(e)=>Tool=RouteTools.Sign },
             });
 
             UIMgt.UI.Add(panel);

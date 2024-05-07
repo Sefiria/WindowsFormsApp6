@@ -1,10 +1,5 @@
 ﻿using DOSBOX.Suggestions.plants.Fruits;
-using DOSBOX.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Tooling;
 
 namespace DOSBOX.Suggestions
 {

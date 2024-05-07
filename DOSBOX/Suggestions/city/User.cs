@@ -1,12 +1,7 @@
-﻿using DOSBOX.Utilities;
-using DOSBOX.Utilities.effects;
+﻿using DOSBOX.Utilities.effects;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media.Animation;
-using static DOSBOX.Suggestions.city.User;
+using Tooling;
 
 namespace DOSBOX.Suggestions.city
 {
@@ -111,7 +106,7 @@ namespace DOSBOX.Suggestions.city
         public User()
         {
             Core.KeepCamCoords = true;
-            Core.Cam = new vecf(Data.Instance.map.Blocks.GetLength(0) / 2F * Tile.TSZ, Data.Instance.map.Blocks.GetLength(1) / 2F * Tile.TSZ);
+            Core.Cam = new vecf(Data.Instance.map.Blocks.GetLength(0) / 2F, Data.Instance.map.Blocks.GetLength(1) / 2F);
         }
 
         public void Update()

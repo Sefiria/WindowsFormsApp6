@@ -1,14 +1,10 @@
 ﻿using DOSBOX.Properties;
 using DOSBOX.Utilities;
-using DOSBOX.Utilities.effects;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.ComTypes;
 using System.Text.Json;
+using Tooling;
 
 namespace DOSBOX.Suggestions
 {

@@ -278,91 +278,54 @@ namespace Tooling
         public static Point Round(this Point pt) => new Point((int)Math.Round((double)pt.X), (int)Math.Round((double)pt.Y));
         public static float Round(this float f, int digits) => (float)Math.Round(f, digits);
 
-        /// <summary>
-        ///  TODO: TO BE MODIFIED FOR ANGLES...
-        /// </summary>
-        /// <param name="src"></param>
-        /// <param name="look"></param>
-        /// <param name="speed"></param>
-        /// <param name="max_distance"></param>
-        /// <param name="objects"></param>
-        /// <returns></returns>
-        public static int SimpleRaycastHit(PointF src, PointF look, float speed, float max_distance, List<RectangleF> objects)
-        {
-            PointF pt = new PointF(src.X, src.Y);
-            float d = 0F;
-            RectangleF hit_rect;
-            int hit = -1;
-            int HitThat(float angle)
-            {
-                //while (d < max_distance)
-                //{
-                    pt = pt.PlusF(look.Rotate(angle).x(speed));
-                    d += speed;
-                    hit_rect = objects.FirstOrDefault(obj => obj.Contains(pt));
-                    if (hit_rect !=/*==*/ null)
-                        //continue;
-                    return objects.IndexOf(hit_rect);
-                //}
-                return -1;
-            }
-
-            hit = HitThat(0F);
-            if(hit > -1) return hit;
-            hit = HitThat(-5F);
-            if(hit > -1) return hit;
-            hit = HitThat(5F);
-            if (hit > -1) return hit;
-            hit = HitThat(-10F);
-            if (hit > -1) return hit;
-            hit = HitThat(10F);
-            return hit;
-        }
-        public static RaycastHitInfo SimpleRaycastHit(PointF src, PointF look, float speed, float max_distance, List<Segment> segments)
+        public static RaycastHitInfo SimpleRaycastHit(PointF src, PointF look, float speed, float max_distance, List<RectangleF> rectangles, float angle = 10F, float angle_step = 1F)
         {
             RaycastHitInfo result = new RaycastHitInfo(-1, src);
             float d = 0F;
-            Segment hit_seg;
+            RectangleF hit_seg;
 
-            int HitThat(float angle)
+            int HitThat(float _angle)
             {
                 while (d < max_distance)
                 {
-                    result.LastPoint = result.LastPoint.PlusF(look.Rotate(angle).x(speed));
+                    result.LastPoint = result.LastPoint.PlusF(look.Rotate(_angle).x(speed));
                     d += speed;
-                    var _segments = segments
-                        .Where(s => result.LastPoint.DistanceFromSegment(s.A, s.B) < max_distance)
-                        .OrderBy(s => result.LastPoint.DistanceFromSegment(s.A, s.B)); // Tri des segments par distance
-                    hit_seg = _segments.FirstOrDefault(s => !IsLeftOfSegment(s.A, s.B, result.LastPoint));
+                    var _rects = rectangles
+                        .Where(r => Maths.Distance(r.Location.MinusF(result.LastPoint)) < max_distance )
+                        .OrderBy(r => Maths.Distance(r.Location.MinusF(result.LastPoint))); // Tri des rectangles par distance
+                    hit_seg = _rects.FirstOrDefault(r => r.Contains(result.LastPoint));
                     if (hit_seg == null)
                         continue;
-                    return segments.IndexOf(hit_seg);
+                    return rectangles.IndexOf(hit_seg);
                 }
                 return -1;
             }
 
-            result.Index = HitThat(0F);
-            if (result.Index > -1) return result;
-            result.Index = HitThat(-5F);
-            if (result.Index > -1) return result;
-            result.Index = HitThat(5F);
-            if (result.Index > -1) return result;
-            result.Index = HitThat(-10F);
-            if (result.Index > -1) return result;
-            result.Index = HitThat(10F);
+            if (angle_step == 0F)
+                angle_step = 1F;
+            for (float a = 0F; a <= angle; a += angle_step)
+            {
+                result.Index = HitThat(a);
+                if (result.Index > -1) return result;
+                if (a != 0F)
+                {
+                    result.Index = HitThat(-a);
+                    if (result.Index > -1) return result;
+                }
+            }
             return result;
         }
-        public static RaycastHitInfo SimpleRaycastHit(PointF src, PointF look, float speed, float max_distance, List<Segment> segments, float segment_right_distance)
+        public static RaycastHitInfo SimpleRaycastHit(PointF src, PointF look, float speed, float max_distance, List<Segment> segments, float segment_right_distance = 1F, float angle = 0F, float angle_step = 1F)
         {
             RaycastHitInfo result = new RaycastHitInfo(-1, src);
             float d = 0F;
             Segment hit_seg;
 
-            int HitThat(float angle)
+            int HitThat(float _angle)
             {
                 while (d < max_distance)
                 {
-                    result.LastPoint = result.LastPoint.PlusF(look.Rotate(angle).x(speed));
+                    result.LastPoint = result.LastPoint.PlusF(look.Rotate(_angle).x(speed));
                     d += speed;
                     var _segments = segments
                         .Where(s => result.LastPoint.DistanceFromSegment(s.A, s.B) < max_distance)
@@ -375,15 +338,18 @@ namespace Tooling
                 return -1;
             }
 
-            result.Index = HitThat(0F);
-            if (result.Index > -1) return result;
-            result.Index = HitThat(-5F);
-            if (result.Index > -1) return result;
-            result.Index = HitThat(5F);
-            if (result.Index > -1) return result;
-            result.Index = HitThat(-10F);
-            if (result.Index > -1) return result;
-            result.Index = HitThat(10F);
+            if (angle_step == 0F)
+                angle_step = 1F;
+            for (float a = 0F; a <= angle; a += angle_step)
+            {
+                result.Index = HitThat(a);
+                if (result.Index > -1) return result;
+                if (a != 0F)
+                {
+                    result.Index = HitThat(-a);
+                    if (result.Index > -1) return result;
+                }
+            }
             return result;
         }
         public static bool CollisionSquareSquare(float x1, float y1, float w1, float h1, float x2, float y2, float w2, float h2)

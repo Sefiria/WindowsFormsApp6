@@ -1,12 +1,8 @@
 ﻿using DOSBOX.Suggestions.plants;
 using DOSBOX.Utilities;
-using DOSBOX.Utilities.effects;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.RightsManagement;
-using static DOSBOX.Suggestions.plants.Data;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
+using Tooling;
 
 namespace DOSBOX.Suggestions
 {
