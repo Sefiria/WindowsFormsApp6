@@ -72,10 +72,10 @@ namespace DOSBOX.Suggestions
             new List<Particule>(particules).ForEach(b => b.Update());
 
             room.Display(samus.vec);
-            samus.Display(1, Core.Cam.n.i);
+            samus.Display(1, Core.Cam.i);
             room.DisplayFront(samus.vec);
-            bullets.ForEach(b => b.Display(1, Core.Cam.n.i));
-            particules.ForEach(b => b.Display(1, Core.Cam.n.i));
+            bullets.ForEach(b => b.Display(1, Core.Cam.i));
+            particules.ForEach(b => b.Display(1, Core.Cam.i));
 
 
             DisplayUI();

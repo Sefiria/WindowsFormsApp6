@@ -345,7 +345,6 @@ namespace DOSBOX.Utilities
         public static void DisplayText(string text, vec v, int layer) => DisplayText(text, v.x, v.y, layer);
         public static void DisplayText(string text, int x, int y, int layer)
         {
-            Console.WriteLine(text);
             foreach (char c in text)
             {
                 var b = GetBytesFromChar(c);
