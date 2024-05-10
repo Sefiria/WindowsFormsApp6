@@ -1,0 +1,408 @@
+﻿using System;
+using System.Linq;
+using Tooling;
+
+namespace DOSBOX2
+{
+    public class Text
+    {
+        public static byte[,] _0 = new byte[3, 5]
+        {
+            { 0, 0, 0, 0, 0},
+            { 0, 3, 3, 3, 0},
+            { 0, 0, 0, 0, 0}
+        };
+
+        public static byte[,] _1 = new byte[3, 5]
+        {
+            { 0, 0, 0, 0, 0},
+            { 3, 0, 3, 3, 3},
+            { 3, 3, 0, 3, 3}
+        };
+
+        public static byte[,] _2 = new byte[3, 5]
+        {
+            { 3, 0, 3, 3, 0},
+            { 0, 3, 0, 3, 0},
+            { 0, 3, 3, 0, 0}
+        };
+
+        public static byte[,] _3 = new byte[3, 5]
+        {
+            { 3, 0, 0, 0, 3},
+            { 0, 3, 0, 3, 0},
+            { 0, 3, 3, 3, 0}
+        };
+
+        public static byte[,] _4 = new byte[3, 5]
+        {
+            { 0, 0, 0, 0, 0},
+            { 3, 3, 0, 3, 3},
+            { 0, 0, 0, 3, 3}
+        };
+
+        public static byte[,] _5 = new byte[3, 5]
+        {
+            { 0, 3, 3, 0, 3},
+            { 0, 3, 0, 3, 0},
+            { 0, 0, 0, 3, 0}
+        };
+
+        public static byte[,] _6 = new byte[3, 5]
+        {
+            { 0, 3, 3, 0, 3},
+            { 3, 0, 0, 3, 0},
+            { 3, 3, 0, 0, 3}
+        };
+
+        public static byte[,] _7 = new byte[3, 5]
+        {
+            { 0, 0, 3, 3, 3},
+            { 0, 3, 0, 3, 3},
+            { 0, 3, 3, 0, 0}
+        };
+
+        public static byte[,] _8 = new byte[3, 5]
+        {
+            { 3, 0, 3, 0, 3},
+            { 0, 3, 0, 3, 0},
+            { 3, 0, 3, 0, 3}
+        };
+
+        public static byte[,] _9 = new byte[3, 5]
+        {
+            { 3, 0, 0, 0, 0},
+            { 0, 3, 0, 3, 3},
+            { 3, 0, 3, 3, 3}
+        };
+
+        public static byte[,] A = new byte[3, 5]
+        {
+            { 3, 0, 0, 0, 0},
+            { 0, 3, 0, 3, 3},
+            { 3, 0, 0, 0, 0}
+        };
+
+        public static byte[,] B = new byte[3, 5]
+        {
+            { 0, 0, 3, 0, 0},
+            { 0, 3, 0, 3, 0},
+            { 0, 0, 0, 0, 0}
+        };
+
+        public static byte[,] C = new byte[3, 5]
+        {
+            { 0, 3, 3, 3, 0},
+            { 0, 3, 3, 3, 0},
+            { 3, 0, 0, 0, 3}
+        };
+
+        public static byte[,] D = new byte[3, 5]
+        {
+            { 3, 0, 0, 0, 3},
+            { 0, 3, 3, 3, 0},
+            { 0, 0, 0, 0, 0}
+        };
+
+        public static byte[,] E = new byte[3, 5]
+        {
+            { 0, 3, 3, 3, 0},
+            { 0, 3, 0, 3, 0},
+            { 0, 0, 0, 0, 0}
+        };
+
+        public static byte[,] F = new byte[3, 5]
+        {
+            { 0, 3, 3, 3, 3},
+            { 0, 3, 0, 3, 3},
+            { 0, 0, 0, 0, 0}
+        };
+
+        public static byte[,] G = new byte[3, 5]
+        {
+            { 0, 3, 0, 0, 3},
+            { 0, 3, 0, 3, 0},
+            { 3, 0, 0, 0, 3}
+        };
+
+        public static byte[,] H = new byte[3, 5]
+        {
+            { 0, 0, 0, 0, 0},
+            { 3, 3, 0, 3, 3},
+            { 0, 0, 0, 0, 0}
+        };
+
+        public static byte[,] I = new byte[3, 5]
+        {
+            { 3, 3, 3, 3, 3},
+            { 0, 0, 0, 0, 0},
+            { 3, 3, 3, 3, 3}
+        };
+
+        public static byte[,] J = new byte[3, 5]
+        {
+            { 0, 0, 0, 0, 3},
+            { 0, 3, 3, 3, 0},
+            { 0, 3, 3, 0, 3}
+        };
+
+        public static byte[,] K = new byte[3, 5]
+        {
+            { 0, 0, 3, 0, 0},
+            { 3, 3, 0, 3, 3},
+            { 0, 0, 0, 0, 0}
+        };
+
+        public static byte[,] L = new byte[3, 5]
+        {
+            { 3, 3, 3, 3, 0},
+            { 3, 3, 3, 3, 0},
+            { 0, 0, 0, 0, 0}
+        };
+
+        public static byte[,] M = new byte[3, 5]
+        {
+            { 0, 0, 0, 0, 0},
+            { 2, 1, 0, 3, 3},
+            { 0, 0, 0, 0, 0}
+        };
+
+        public static byte[,] N = new byte[3, 5]
+        {
+            { 0, 0, 0, 0, 0},
+            { 2, 1, 0, 1, 2},
+            { 0, 0, 0, 0, 0}
+        };
+
+        public static byte[,] O = new byte[3, 5]
+        {
+            { 3, 0, 0, 0, 3},
+            { 0, 3, 3, 3, 0},
+            { 3, 0, 0, 0, 3}
+        };
+
+        public static byte[,] P = new byte[3, 5]
+        {
+            { 0, 0, 3, 3, 3},
+            { 0, 3, 0, 3, 3},
+            { 0, 0, 0, 0, 0}
+        };
+
+        public static byte[,] Q = new byte[3, 5]
+        {
+            { 3, 0, 0, 0, 1},
+            { 0, 3, 3, 1, 0},
+            { 3, 0, 0, 0, 3}
+        };
+
+        public static byte[,] R = new byte[3, 5]
+        {
+            { 0, 0, 3, 0, 0},
+            { 0, 3, 0, 3, 3},
+            { 0, 0, 0, 0, 0}
+        };
+
+        public static byte[,] S = new byte[3, 5]
+        {
+            { 0, 3, 3, 0, 3},
+            { 0, 3, 0, 3, 0},
+            { 3, 0, 3, 3, 0}
+        };
+
+        public static byte[,] T = new byte[3, 5]
+        {
+            { 0, 3, 3, 3, 3},
+            { 0, 0, 0, 0, 0},
+            { 0, 3, 3, 3, 3}
+        };
+
+        public static byte[,] U = new byte[3, 5]
+        {
+            { 0, 0, 0, 0, 3},
+            { 3, 3, 3, 3, 0},
+            { 0, 0, 0, 0, 3}
+        };
+
+        public static byte[,] V = new byte[3, 5]
+        {
+            { 0, 0, 0, 3, 3},
+            { 3, 3, 1, 0, 0},
+            { 0, 0, 0, 3, 3}
+        };
+
+        public static byte[,] W = new byte[3, 5]
+        {
+            { 0, 0, 0, 0, 0},
+            { 3, 3, 0, 1, 3},
+            { 0, 0, 0, 0, 0}
+        };
+
+        public static byte[,] X = new byte[3, 5]
+        {
+            { 0, 0, 3, 0, 0},
+            { 3, 3, 0, 3, 3},
+            { 0, 0, 3, 0, 0}
+        };
+
+        public static byte[,] Y = new byte[3, 5]
+        {
+            { 0, 0, 3, 3, 3},
+            { 3, 3, 0, 0, 0},
+            { 0, 0, 3, 3, 3}
+        };
+
+        public static byte[,] Z = new byte[3, 5]
+        {
+            { 0, 0, 3, 3, 0},
+            { 0, 3, 0, 3, 0},
+            { 0, 3, 3, 0, 0}
+        };
+
+        public static byte[,] _Space = new byte[3, 5]
+        {
+            { 3, 3, 3, 3, 3},
+            { 3, 3, 3, 3, 3},
+            { 3, 3, 3, 3, 3}
+        };
+
+        public static byte[,] _Dash = new byte[3, 5]
+        {
+            { 3, 3, 0, 3, 3},
+            { 3, 3, 0, 3, 3},
+            { 3, 3, 0, 3, 3}
+        };
+
+        public static byte[,] _ArrowLeft = new byte[3, 5]
+        {
+            { 3, 1, 0, 1, 3},
+            { 3, 2, 0, 2, 3},
+            { 3, 3, 0, 3, 3}
+        };
+
+        public static byte[,] _ArrowRight = new byte[3, 5]
+        {
+            { 3, 3, 0, 3, 3},
+            { 3, 2, 0, 2, 3},
+            { 3, 1, 0, 1, 3}
+        };
+
+        public static byte[,] _ParenthesisOpen = new byte[3, 5]
+        {
+            { 0, 3, 3, 3, 0},
+            { 1, 1, 3, 1, 1},
+            { 3, 1, 0, 1, 3},
+        };
+
+        public static byte[,] _ParenthesisClose = new byte[3, 5]
+        {
+            { 3, 1, 0, 1, 3},
+            { 1, 1, 3, 1, 1},
+            { 0, 3, 3, 3, 0},
+        };
+
+        public static byte[,] _Slash = new byte[3, 5]
+        {
+            { 0, 1, 3, 3, 3},
+            { 3, 0, 0, 0, 3},
+            { 3, 3, 3, 1, 0}
+        };
+
+        public static byte[,] DoubleDots = new byte[3, 5]
+        {
+            { 3, 3, 3, 3, 3},
+            { 3, 0, 3, 0, 3},
+            { 3, 3, 3, 3, 3}
+        };
+
+        public static byte[,] template = new byte[3, 5]
+        {
+            { 3, 3, 3, 3, 3},
+            { 3, 3, 3, 3, 3},
+            { 3, 3, 3, 3, 3}
+        };
+
+        public static void Display(byte[,] batch, int x, int y) => Graphic.SetBatch(batch, x, y, reverse:true);
+
+        public static void DisplaySingleNumber(int n, int x, int y)
+        {
+            switch (n)
+            {
+                default: return;
+                case 0: Display(_0, x, y); break;
+                case 1: Display(_1, x, y); break;
+                case 2: Display(_2, x, y); break;
+                case 3: Display(_3, x, y); break;
+                case 4: Display(_4, x, y); break;
+                case 5: Display(_5, x, y); break;
+                case 6: Display(_6, x, y); break;
+                case 7: Display(_7, x, y); break;
+                case 8: Display(_8, x, y); break;
+                case 9: Display(_9, x, y); break;
+            }
+        }
+
+        public static void DisplayText(string text, int x, int y)
+        {
+            foreach (char c in text)
+            {
+                var b = GetBytesFromChar(c);
+                if (b != null)
+                    Display(b, x, y);
+                x += 5;
+            }
+        }
+
+        private static byte[,] GetBytesFromChar(char c)
+        {
+            switch((""+c).ToUpper().First())
+            {
+                default: return null;
+                case '0': return _0;
+                case '1': return _1;
+                case '2': return _2;
+                case '3': return _3;
+                case '4': return _4;
+                case '5': return _5;
+                case '6': return _6;
+                case '7': return _7;
+                case '8': return _8;
+                case '9': return _9;
+                case 'A': return A;
+                case 'B': return B;
+                case 'C': return C;
+                case 'D': return D;
+                case 'E': return E;
+                case 'F': return F;
+                case 'G': return G;
+                case 'H': return H;
+                case 'I': return I;
+                case 'J': return J;
+                case 'K': return K;
+                case 'L': return L;
+                case 'M': return M;
+                case 'N': return N;
+                case 'O': return O;
+                case 'P': return P;
+                case 'Q': return Q;
+                case 'R': return R;
+                case 'S': return S;
+                case 'T': return T;
+                case 'U': return U;
+                case 'V': return V;
+                case 'W': return W;
+                case 'X': return X;
+                case 'Y': return Y;
+                case 'Z': return Z;
+                case ' ': return _Space;
+                case '-': return _Dash;
+                case '←': case '◄': return _ArrowLeft;
+                case '→': case '►': return _ArrowRight;
+                case '(': return _ParenthesisOpen;
+                case ')': return _ParenthesisClose;
+                case '/': return _Slash;
+                case ':': return DoubleDots;
+            }
+        }
+
+    }
+}

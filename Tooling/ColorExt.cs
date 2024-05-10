@@ -335,5 +335,7 @@ namespace Tooling
 
             return adjustedImage;
         }
+        public static int ToArgb(this (int a, int r, int g, int b) argb) => Color.FromArgb(argb.a, argb.r, argb.g, argb.b).ToArgb();
+        public static int ToArgb(this (int r, int g, int b) rgb) => (255, rgb.r, rgb.g, rgb.b).ToArgb();
     }
 }

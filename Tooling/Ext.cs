@@ -275,5 +275,41 @@ namespace Tooling
                 return min;
             }
         }
+        public static void ForEach<T>(this T[,] array, Action<T> action)
+        {
+            int w = array.GetLength(0);
+            int h = array.GetLength(1);
+
+            for (int x = 0; x < w; x++)
+                for (int y = 0; y < h; y++)
+                    action(array[x, y]);
+        }
+        public static void For<T>(this T[,] array, int x, int y, int w, int h, Action<T> action)
+        {
+            w = Math.Min(w, array.GetLength(0));
+            h = Math.Min(h, array.GetLength(1));
+
+            for (; x < w; x++)
+                for (; y < h; y++)
+                    action(array[x, y]);
+        }
+        public static void SetEach<T>(this T[,] array, Func<vec, T, T> behavior)
+        {
+            int w = array.GetLength(0);
+            int h = array.GetLength(1);
+
+            for (int x = 0; x < w; x++)
+                for (int y = 0; y < h; y++)
+                    array[x, y] = behavior((x,y).V(), array[x, y]);
+        }
+        public static void Set<T>(this T[,] array, int x, int y, int w, int h, Func<vec, T, T> behavior)
+        {
+            w = Math.Min(w, array.GetLength(0));
+            h = Math.Min(h, array.GetLength(1));
+
+            for (; x < w; x++)
+                for (; y < h; y++)
+                    array[x, y] = behavior((x,y).V(), array[x, y]);
+        }
     }
 }

@@ -180,6 +180,14 @@ namespace Tooling
         {
             return new PointF(Lerp(v0.X, v1.X, t), Lerp(v0.Y, v1.Y, t));
         }
+        public static vecf Lerp(vecf v0, vecf v1, double t)
+        {
+            return new vecf(Lerp(v0.x, v1.x, t), Lerp(v0.y, v1.y, t));
+        }
+        public static vec Lerp(vec v0, vec v1, double t)
+        {
+            return new vec(Lerp(v0.x, v1.x, t), Lerp(v0.y, v1.y, t));
+        }
 
         public static PointF GetRayToolingLine(PointF v, PointF look, float bx, float by, float bw, float bh) => GetRayToolingLine(v, look, new RectangleF(bx, by, bw, bh));
         public static PointF GetRayToolingLine(PointF r, PointF look, RectangleF bounds)

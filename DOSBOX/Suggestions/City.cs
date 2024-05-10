@@ -1,5 +1,8 @@
 ﻿using DOSBOX.Suggestions.city;
 using DOSBOX.Utilities;
+using Newtonsoft.Json;
+using System.IO;
+using System.Linq;
 using Tooling;
 
 namespace DOSBOX.Suggestions
@@ -31,7 +34,6 @@ namespace DOSBOX.Suggestions
             Core.Layers.Add(new byte[64, 64]); // Sprites
             Core.Layers.Add(new byte[64, 64]); // FG
             Core.Layers.Add(new byte[64, 64]); // UI
-
         }
 
         public void Update()
