@@ -10,5 +10,6 @@ namespace DOSBOX2.Scenes
     {
         void Init();
         void Update();
+        void Dispose();
     }
 }

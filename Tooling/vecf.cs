@@ -61,6 +61,7 @@ namespace Tooling
         public static vecf operator /(vecf a, int b) => b == 0 ? a : new vecf((a?.x / b).Value, (a?.y / b).Value);
         public static vecf operator /(vecf a, float b) => Math.Round(b, 4) == 0F ? a : new vecf((a?.x / b).Value, (a?.y / b).Value);
         public static vecf operator %(vecf a, float b) => new vecf((a?.x % b).Value, (a?.y % b).Value);
+        public static vecf operator %(vecf a, vecf b) => new vecf((a?.x % b?.x).Value, (a?.y % b?.y).Value);
 
         public override string ToString()
         {

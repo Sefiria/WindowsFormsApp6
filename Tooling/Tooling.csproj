@@ -128,6 +128,7 @@
     <Compile Include="UI\IUIContainer.cs" />
     <Compile Include="UI\UI.cs" />
     <Compile Include="UI\UIBar.cs" />
+    <Compile Include="UI\UIImage.cs" />
     <Compile Include="UI\UIButton.cs" />
     <Compile Include="UI\UIDisplay.cs" />
     <Compile Include="UI\UIPanelSelection.cs" />

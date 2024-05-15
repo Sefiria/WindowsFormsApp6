@@ -18,7 +18,7 @@ namespace Tooling
             Num1, Num2,Num3,Num4,Num5,Num6,Num7,Num8,Num9, Num0, CharDegree, CharPlus, Add, Substract,
             Numpad1, Numpad2, Numpad3, Numpad4, Numpad5, Numpad6, Numpad7, Numpad8, Numpad9, Numpad0,
             LeftAlt, RightAlt, LeftShift, RightShift, LeftCtrl, RightCtrl,
-            Tab, Supr,
+            Tab, Supr, Back
         }
 
         static Dictionary<System.Windows.Input.Key, bool> Released = new Dictionary<System.Windows.Input.Key, bool>()
@@ -88,6 +88,7 @@ namespace Tooling
             [System.Windows.Input.Key.RightCtrl] = true,
             [System.Windows.Input.Key.Tab] = true,
             [System.Windows.Input.Key.Delete] = true,
+            [System.Windows.Input.Key.Back] = true,
         };
 
         static readonly List<System.Windows.Input.Key> AvailableKeys = new List<System.Windows.Input.Key>()
@@ -157,6 +158,7 @@ namespace Tooling
             System.Windows.Input.Key.RightCtrl,
             System.Windows.Input.Key.Tab,
             System.Windows.Input.Key.Delete,
+            System.Windows.Input.Key.Back,
         };
 
         public static void Init() => Update();
@@ -167,9 +169,9 @@ namespace Tooling
         public static bool LeftShift => Keyboard.IsKeyDown(System.Windows.Input.Key.LeftShift);
         public static bool LeftCtrl => Keyboard.IsKeyDown(System.Windows.Input.Key.LeftCtrl);
         public static bool LeftAlt => Keyboard.IsKeyDown(System.Windows.Input.Key.LeftAlt);
-        public static (bool z, bool q, bool s, bool d) ZQSD()
+        public static (bool z, bool q, bool s, bool d) ZQSD(bool pressed = false)
         {
-            return (IsKeyDown(Key.Z), IsKeyDown(Key.Q), IsKeyDown(Key.S), IsKeyDown(Key.D));
+            return pressed ? (IsKeyPressed(Key.Z), IsKeyPressed(Key.Q), IsKeyPressed(Key.S), IsKeyPressed(Key.D)) : (IsKeyDown(Key.Z), IsKeyDown(Key.Q), IsKeyDown(Key.S), IsKeyDown(Key.D));
         }
         public static bool AnyZQSD()
         {

@@ -15,5 +15,9 @@ namespace DOSBOX2.Scenes
         public void Update()
         {
         }
+
+        public void Dispose()
+        {
+        }
     }
 }

@@ -131,6 +131,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tooling_Mapper", "Tooling_M
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DOSBOX2", "DOSBOX2\DOSBOX2.csproj", "{3F85F27A-B9DF-4E61-9337-F2F925AE59A3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DOSBOX_HEX_EDIT", "DOSBOX_HEX_EDIT\DOSBOX_HEX_EDIT.csproj", "{0D93F8C5-BC7F-4EDF-BA65-7264B0D17035}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -377,6 +379,10 @@ Global
 		{3F85F27A-B9DF-4E61-9337-F2F925AE59A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3F85F27A-B9DF-4E61-9337-F2F925AE59A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3F85F27A-B9DF-4E61-9337-F2F925AE59A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D93F8C5-BC7F-4EDF-BA65-7264B0D17035}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D93F8C5-BC7F-4EDF-BA65-7264B0D17035}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D93F8C5-BC7F-4EDF-BA65-7264B0D17035}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D93F8C5-BC7F-4EDF-BA65-7264B0D17035}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

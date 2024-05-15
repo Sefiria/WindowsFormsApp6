@@ -13,16 +13,16 @@ namespace DOSBOX2
             public Palette palette;
         }
 
-        public static readonly int resolution = 480, pixel_size = 4;
-        public static readonly int screen_size = resolution / pixel_size;
-        public static byte[,] pixels = new byte[resolution, resolution];
+        public static readonly int screen_size = 480, pixel_size = 4;
+        public static readonly int resolution = screen_size / pixel_size;
+        public static byte[,] pixels = new byte[screen_size, screen_size];
         public static Config config;
-        public static Bitmap Bitmap = new Bitmap(resolution, resolution);
+        public static Bitmap Bitmap = new Bitmap(screen_size, screen_size);
         public static Graphics g = Graphics.FromImage(Bitmap);
 
         private static List<vec> refresh_indexes = new List<vec>();
 
-        public static bool isout(int x, int y) => x < 0 || y < 0 || x >= resolution || y >= resolution;
+        public static bool isout(int x, int y) => x < 0 || y < 0 || x >= screen_size || y >= screen_size;
         public static bool isin(int x, int y) => !isout(x,y);
 
         public static void Initialize(Config config)

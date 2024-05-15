@@ -10,7 +10,7 @@ namespace Tooling
     {
         public static Dictionary<MouseButtons, bool> ButtonsDown = new Dictionary<MouseButtons, bool>();
         public static Dictionary<MouseButtons, bool> ReleasedButtons = new Dictionary<MouseButtons, bool>();
-        public static bool IsDown => ButtonsDown.Count > 0;
+        public static bool IsDown => ButtonsDown.Any(b => b.Value);
         public static bool IsUp => !IsDown;
         public static bool IsButtonDown(MouseButtons button, bool pressed = false) => pressed ? IsButtonPressed(button) : ButtonsDown[button];
         public static bool IsButtonPressed(MouseButtons button) => ButtonsDown[button] && ReleasedButtons[button];
@@ -44,20 +44,18 @@ namespace Tooling
             render.MouseUp += (s, e) => ButtonsDown[e.Button] = false;
             render.MouseMove += (s, e) =>
             {
-                OldPosition = Position;
                 Position = e.Location;
             };
+            render.MouseWheel += (s, e) => Delta = e.Delta;
         }
         public static void Update()
         {
+            if (Render.IsDisposed)
+                return;
             Delta = 0;
             foreach (MouseButtons b in Enum.GetValues(typeof(MouseButtons)))
                 ReleasedButtons[b] = !ButtonsDown[b];
-            if (Render != null)
-            {
-                OldPosition = Position;
-                Position = Render.PointToClient(Cursor.Position);
-            }
+            OldPosition = Position;
         }
     }
 }
