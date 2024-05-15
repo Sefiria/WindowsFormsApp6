@@ -180,7 +180,17 @@ namespace DOSBOX_HEX_EDIT
             if (s) cam.y += cam_speed;
             if (q) cam.x -= cam_speed;
             if (d) cam.x += cam_speed;
-            if (MouseStates.Delta != 0f) scale = Math.Min(max_scale, Math.Max(min_scale, scale + MouseStates.Delta / 100F));
+            if (MouseStates.Delta != 0f)
+            {
+                if (KB.LeftShift) // pen size
+                {
+                    pen_size = (byte)(pen_size + MouseStates.Delta / 100F).ByteCut();
+                }
+                else // zoom
+                {
+                    scale = Math.Min(max_scale, Math.Max(min_scale, scale + MouseStates.Delta / 100F));
+                }
+            }
             if (KB.IsKeyDown(KB.Key.Numpad0)) color_selection = 0;
             if (KB.IsKeyDown(KB.Key.Numpad1)) color_selection = 1;
             if (KB.IsKeyDown(KB.Key.Numpad2)) color_selection = 2;
@@ -190,12 +200,31 @@ namespace DOSBOX_HEX_EDIT
         }
         void do_tool()
         {
+            switch(tool_selection)
+            {
+                case 0: do_tool_pen(); break;
+                case 1: do_tool_bucket(); break;
+            }
+        }
+        void do_tool_pen()
+        {
             if (MouseStates.ButtonsDown[MouseButtons.Left])
             {
                 float L = MouseStates.LenghtDiff;
                 for (float t = 0F; t <= 1F; t += 1F / L)
-                    set(Maths.Lerp(msold, ms, t), color_selection);
+                {
+                    for (int x = 0; x < pen_size; x++)
+                    {
+                        for (int y = 0; y < pen_size; y++)
+                        {
+                            set(Maths.Lerp((msold.x + x, msold.y + y).Vf(), (ms.x + x, ms.y + y).Vf(), t), color_selection);
+                        }
+                    }
+                }
             }
+        }
+        void do_tool_bucket()
+        {
         }
 
         void global_draw()
@@ -209,8 +238,14 @@ namespace DOSBOX_HEX_EDIT
                     g.FillRectangle(b[get(x, y)], pt.X, pt.Y, scale * 8, scale * 8);
                 }
             }
-            pt = WorldToScreen(ms.i.f).pt;  
-            g.DrawRectangle(new Pen(Color.FromArgb(100, Color.Black)), pt.X, pt.Y, scale * 8, scale * 8);
+            for (int x = 0; x < pen_size; x++)
+            {
+                for (int y = 0; y < pen_size; y++)
+                {
+                    pt = WorldToScreen((int)ms.x + x, (int)ms.y + y).pt;
+                    g.DrawRectangle(new Pen(Color.FromArgb(100, Color.Black)), pt.X, pt.Y, scale * 8, scale * 8);
+                }
+            }
         }
 
         private void Form1_Resize(object sender, EventArgs e)
