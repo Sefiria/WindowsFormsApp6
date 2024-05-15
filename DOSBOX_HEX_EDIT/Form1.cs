@@ -23,6 +23,10 @@ namespace DOSBOX_HEX_EDIT
         byte[] pixels = new byte[256 * 256];
         byte color_selection = 0, tool_selection = 0, pen_size = 1;
 
+        bool IsOutScreen(vec v) => v.x < 0 || v.y < 0 || v.x >= form_size.x || v.y >= form_size.y;
+        bool IsOutScreen(PointF pt) => pt.X < 0 || pt.Y < 0 || pt.X >= form_size.x || pt.Y >= form_size.y;
+        bool IsintScreen(vec v) => !IsOutScreen(v);
+        bool IsintScreen(PointF pt) => !IsOutScreen(pt);
         vecf WorldToScreen(float x, float y) => new vecf(x * scale * 8 - (cam.x * scale - form_size.x / 2), y * scale * 8 - (cam.y * scale - form_size.y / 2));
         vecf WorldToScreen(vecf v) => WorldToScreen(v.x, v.y);
         vecf ScreenToWorld(float x, float y) => new vecf((x + (cam.x * scale - form_size.x / 2)) / (scale * 8), (y + (cam.y * scale - form_size.y / 2)) / (scale * 8));
@@ -328,7 +332,8 @@ namespace DOSBOX_HEX_EDIT
                 for (int y = 0; y < 256; y++)
                 {
                     pt = WorldToScreen(x, y).pt;
-                    g.FillRectangle(b[get(x, y)], pt.X, pt.Y, scale * 8, scale * 8);
+                    if(IsintScreen(pt))
+                        g.FillRectangle(b[get(x, y)], pt.X, pt.Y, scale * 8, scale * 8);
                 }
             }
 
@@ -339,7 +344,8 @@ namespace DOSBOX_HEX_EDIT
                     for (int y = 0; y < pen_size; y++)
                     {
                         pt = WorldToScreen((int)ms.x + x, (int)ms.y + y).pt;
-                        g.DrawRectangle(new Pen(Color.FromArgb(100, Color.Black)), pt.X, pt.Y, scale * 8, scale * 8);
+                        if(IsintScreen(pt))
+                            g.DrawRectangle(new Pen(Color.FromArgb(100, Color.Black)), pt.X, pt.Y, scale * 8, scale * 8);
                     }
                 }
             }
@@ -355,7 +361,8 @@ namespace DOSBOX_HEX_EDIT
                     for (int y = 0; y < 256; y++)
                     {
                         pt = WorldToScreen(x, y).pt;
-                        g.FillRectangle(_b[bucket_preview_bytes[y * 256 + x]], pt.X, pt.Y, scale * 8, scale * 8);
+                        if(IsintScreen(pt))
+                            g.FillRectangle(_b[bucket_preview_bytes[y * 256 + x]], pt.X, pt.Y, scale * 8, scale * 8);
                     }
                 }
             }
