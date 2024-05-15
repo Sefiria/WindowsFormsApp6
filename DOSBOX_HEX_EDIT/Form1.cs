@@ -30,10 +30,14 @@ namespace DOSBOX_HEX_EDIT
         vecf ms => ScreenToWorld(MouseStates.Position.vecf());
         vecf msold => ScreenToWorld(MouseStates.OldPosition.vecf());
         bool isout(int x, int y) => x < 0 || y < 0 || x > 255 || y > 255;
+        bool isout(vec v) => isout(v.x, v.y);
         bool isin(int x, int y) => !isout(x, y);
+        bool isin(vec v) => isin(v.x, v.y);
         byte get(int x, int y) => isin(x, y) ? pixels[y * 256 + x] : (byte)3;
+        byte get(vec v) => get(v.x, v.y);
         void set(int x, int y, int v) { if(isin(x, y)) pixels[y * 256 + x] = (byte) v; }
-        void set(vecf vec, int v) => set((int)vec.x, (int)vec.y, v);
+        void set(vec vec, int v) => set(vec.x, vec.y, v);
+        void set(vecf vec, int v) => set(vec.i, v);
         void clear()
         {
             for (int x = 0; x < 256; x++)
@@ -225,6 +229,95 @@ namespace DOSBOX_HEX_EDIT
         }
         void do_tool_bucket()
         {
+            if (MouseStates.IsButtonPressed(MouseButtons.Left))
+            {
+                List<vec> nodes = new List<vec> { ms.i };
+                List<vec> next_nodes = new List<vec>();
+                byte to_replace = get(nodes[0]);
+
+                if (to_replace == color_selection)
+                    return;
+
+                void recursive_4_ways(vec v)
+                {
+                    void check(int x, int y)
+                    {
+                        var p = (v.x + x, v.y + y).V();
+                        if (isin(p) && get(p) == to_replace)
+                            next_nodes.Add(p);
+                    }
+
+                    if (get(v) == to_replace)
+                    {
+                        set(v, color_selection);
+                        check(-1, 0);
+                        check(1, 0);
+                        check(0, -1);
+                        check(0, 1);
+                    }
+                }
+
+                int timout = 128;
+                while (nodes.Count > 0 && timout > 0)
+                {
+                    for (int i = 0; i < nodes.Count; i++)
+                    {
+                        recursive_4_ways(nodes[i]);
+                        nodes.RemoveAt(i--);
+                    }
+                    nodes.AddRange(next_nodes);
+                    next_nodes.Clear();
+                    timout--;
+                }
+            }
+        }
+
+        byte[] bucket_preview_bytes;
+        void bucket_preview()
+        {
+            bucket_preview_bytes = new byte[256 * 256];
+
+            for (int x = 0; x < 256; x++)
+                for (int y = 0; y < 256; y++)
+                    bucket_preview_bytes[y * 256 + x] = get(x, y);
+            List<vec> nodes = new List<vec> { ms.i };
+            List<vec> next_nodes = new List<vec>();
+            byte to_replace = get(nodes[0]);
+
+            if (to_replace == color_selection)
+                return;
+
+            void recursive_4_ways(vec v)
+            {
+                void check(int x, int y)
+                {
+                    var p = (v.x + x, v.y + y).V();
+                    if (isin(p) && get(p) == to_replace && bucket_preview_bytes[p.y * 256 + p.x] != color_selection)
+                        next_nodes.Add(p);
+                }
+
+                if (get(v) == to_replace)
+                {
+                    bucket_preview_bytes[v.y * 256 + v.x] = color_selection;
+                    check(-1, 0);
+                    check(1, 0);
+                    check(0, -1);
+                    check(0, 1);
+                }
+            }
+
+            int timout = 8;
+            while (nodes.Count > 0 && timout > 0)
+            {
+                for (int i = 0; i < nodes.Count; i++)
+                {
+                    recursive_4_ways(nodes[i]);
+                    nodes.RemoveAt(i--);
+                }
+                nodes.AddRange(next_nodes);
+                next_nodes.Clear();
+                timout--;
+            }
         }
 
         void global_draw()
@@ -238,12 +331,32 @@ namespace DOSBOX_HEX_EDIT
                     g.FillRectangle(b[get(x, y)], pt.X, pt.Y, scale * 8, scale * 8);
                 }
             }
-            for (int x = 0; x < pen_size; x++)
+
+            if (tool_selection == 0)
             {
-                for (int y = 0; y < pen_size; y++)
+                for (int x = 0; x < pen_size; x++)
                 {
-                    pt = WorldToScreen((int)ms.x + x, (int)ms.y + y).pt;
-                    g.DrawRectangle(new Pen(Color.FromArgb(100, Color.Black)), pt.X, pt.Y, scale * 8, scale * 8);
+                    for (int y = 0; y < pen_size; y++)
+                    {
+                        pt = WorldToScreen((int)ms.x + x, (int)ms.y + y).pt;
+                        g.DrawRectangle(new Pen(Color.FromArgb(100, Color.Black)), pt.X, pt.Y, scale * 8, scale * 8);
+                    }
+                }
+            }
+            else if (tool_selection == 1)
+            {
+                SolidBrush[] _b = new SolidBrush[4];
+                for (int i = 0; i < 4; i++)
+                    _b[i] = new SolidBrush(Color.FromArgb(127, b[i].Color));
+                if(MouseStates.LenghtDiff > 0)
+                    bucket_preview();
+                for (int x = 0; x < 256; x++)
+                {
+                    for (int y = 0; y < 256; y++)
+                    {
+                        pt = WorldToScreen(x, y).pt;
+                        g.FillRectangle(_b[bucket_preview_bytes[y * 256 + x]], pt.X, pt.Y, scale * 8, scale * 8);
+                    }
                 }
             }
         }
