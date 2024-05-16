@@ -22,9 +22,12 @@ namespace DOSBOX_HEX_EDIT
         SolidBrush[] b = new SolidBrush[4];
         byte[] pixels = new byte[256 * 256];
         byte color_selection = 0, tool_selection = 0, pen_size = 1;
+        float screen_margin => 2 * scale * 8;
+        byte[] snapshot = new byte[256 * 256];
+        bool undo_available = false, tool_pen_prevLeftDown = false;
 
-        bool IsOutScreen(vec v) => v.x < 0 || v.y < 0 || v.x >= form_size.x || v.y >= form_size.y;
-        bool IsOutScreen(PointF pt) => pt.X < 0 || pt.Y < 0 || pt.X >= form_size.x || pt.Y >= form_size.y;
+        bool IsOutScreen(vec v) => v.x < -screen_margin || v.y < -screen_margin || v.x >= form_size.x + screen_margin || v.y >= form_size.y + screen_margin;
+        bool IsOutScreen(PointF pt) => pt.X < -screen_margin || pt.Y < -screen_margin || pt.X >= form_size.x + screen_margin || pt.Y >= form_size.y + screen_margin;
         bool IsintScreen(vec v) => !IsOutScreen(v);
         bool IsintScreen(PointF pt) => !IsOutScreen(pt);
         vecf WorldToScreen(float x, float y) => new vecf(x * scale * 8 - (cam.x * scale - form_size.x / 2), y * scale * 8 - (cam.y * scale - form_size.y / 2));
@@ -71,6 +74,7 @@ namespace DOSBOX_HEX_EDIT
             };
             set_brushes();
             clear();
+            pixels.CopyTo(snapshot, 0);
 
             UIButton UIButtonFactory_Create(int x, int y, int w, int h, string name, Action<UI> onClick)
             {
@@ -184,10 +188,13 @@ namespace DOSBOX_HEX_EDIT
         void do_controls()
         {
             var (z, q, s, d) = KB.ZQSD();
-            if (z) cam.y -= cam_speed;
-            if (s) cam.y += cam_speed;
-            if (q) cam.x -= cam_speed;
-            if (d) cam.x += cam_speed;
+            if (!KB.LeftCtrl)
+            {
+                if (z) cam.y -= cam_speed;
+                if (s) cam.y += cam_speed;
+                if (q) cam.x -= cam_speed;
+                if (d) cam.x += cam_speed;
+            }
             if (MouseStates.Delta != 0f)
             {
                 if (KB.LeftShift) // pen size
@@ -196,7 +203,7 @@ namespace DOSBOX_HEX_EDIT
                 }
                 else // zoom
                 {
-                    scale = Math.Min(max_scale, Math.Max(min_scale, scale + MouseStates.Delta / 100F));
+                    scale = Math.Min(max_scale, Math.Max(min_scale, scale + MouseStates.Delta / 1000F));
                 }
             }
             if (KB.IsKeyDown(KB.Key.Numpad0)) color_selection = 0;
@@ -205,6 +212,8 @@ namespace DOSBOX_HEX_EDIT
             if (KB.IsKeyDown(KB.Key.Numpad3)) color_selection = 3;
             if (KB.IsKeyDown(KB.Key.P)) tool_selection = 0;// pen
             if (KB.IsKeyDown(KB.Key.B)) tool_selection = 1;// bucket
+            if (KB.LeftCtrl && undo_available && z)
+                do_undo();
         }
         void do_tool()
         {
@@ -218,6 +227,8 @@ namespace DOSBOX_HEX_EDIT
         {
             if (MouseStates.ButtonsDown[MouseButtons.Left])
             {
+                tool_pen_prevLeftDown = true;
+                prepare_undo();
                 float L = MouseStates.LenghtDiff;
                 for (float t = 0F; t <= 1F; t += 1F / L)
                 {
@@ -230,11 +241,16 @@ namespace DOSBOX_HEX_EDIT
                     }
                 }
             }
+            else
+            {
+                tool_pen_prevLeftDown = false;
+            }
         }
         void do_tool_bucket()
         {
             if (MouseStates.IsButtonPressed(MouseButtons.Left))
             {
+                prepare_undo();
                 List<vec> nodes = new List<vec> { ms.i };
                 List<vec> next_nodes = new List<vec>();
                 byte to_replace = get(nodes[0]);
@@ -275,6 +291,16 @@ namespace DOSBOX_HEX_EDIT
                 }
             }
         }
+        void prepare_undo()
+        {
+            pixels.CopyTo(snapshot, 0);
+            undo_available = true;
+        }
+        void do_undo()
+        {
+            snapshot.CopyTo(pixels, 0);
+            undo_available = false;
+        }
 
         byte[] bucket_preview_bytes;
         void bucket_preview()
@@ -300,7 +326,7 @@ namespace DOSBOX_HEX_EDIT
                         next_nodes.Add(p);
                 }
 
-                if (get(v) == to_replace)
+                if (isin(v) && get(v) == to_replace)
                 {
                     bucket_preview_bytes[v.y * 256 + v.x] = color_selection;
                     check(-1, 0);
