@@ -313,7 +313,9 @@ namespace DOSBOX_HEX_EDIT
         {
             if (KB.LeftAlt)
             {
-                do_selection();
+                //if (rect_selection_start != vec.Null && rect_selection_end != vec.Null)
+
+                    do_selection();
             }
             else
             {
@@ -322,6 +324,9 @@ namespace DOSBOX_HEX_EDIT
                     case 0: do_tool_pen(); break;
                     case 1: do_tool_bucket(); break;
                     case 2: do_tool_line(); break;
+                    case 3: do_tool_cut(); break;
+                    case 4: do_tool_copy(); break;
+                    case 5: do_tool_paste(); break;
                 }
             }
         }
@@ -426,9 +431,13 @@ namespace DOSBOX_HEX_EDIT
         }
         void do_tool_cut()
         {
+            if (rect_selection_start == vec.Null || rect_selection_end == vec.Null)
+                return;
         }
         void do_tool_copy()
         {
+            if (rect_selection_start == vec.Null || rect_selection_end == vec.Null)
+                return;
         }
         void do_tool_paste()
         {
