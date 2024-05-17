@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using Tooling;
@@ -20,10 +21,11 @@ namespace DOSBOX_HEX_EDIT
         vec form_size;
         Graphics g;
         SolidBrush[] b = new SolidBrush[4];
-        byte[] pixels = new byte[256 * 256];
+        byte w = 255, h = 255;
+        byte[] pixels;
         byte color_selection = 0, tool_selection = 0, pen_size = 1;
         float screen_margin => 2 * scale * 8;
-        byte[] snapshot = new byte[256 * 256];
+        byte[] snapshot;
         bool undo_available = false, tool_pen_prevLeftDown = false;
 
         bool IsOutScreen(vec v) => v.x < -screen_margin || v.y < -screen_margin || v.x >= form_size.x + screen_margin || v.y >= form_size.y + screen_margin;
@@ -36,20 +38,20 @@ namespace DOSBOX_HEX_EDIT
         vecf ScreenToWorld(vecf v) => ScreenToWorld(v.x, v.y);
         vecf ms => ScreenToWorld(MouseStates.Position.vecf());
         vecf msold => ScreenToWorld(MouseStates.OldPosition.vecf());
-        bool isout(int x, int y) => x < 0 || y < 0 || x > 255 || y > 255;
+        bool isout(int x, int y) => x < 0 || y < 0 || x >= w || y >= h;
         bool isout(vec v) => isout(v.x, v.y);
         bool isin(int x, int y) => !isout(x, y);
         bool isin(vec v) => isin(v.x, v.y);
-        byte get(int x, int y) => isin(x, y) ? pixels[y * 256 + x] : (byte)3;
+        byte get(int x, int y) => isin(x, y) ? pixels[y * w + x] : (byte)3;
         byte get(vec v) => get(v.x, v.y);
-        void set(int x, int y, int v) { if(isin(x, y)) pixels[y * 256 + x] = (byte) v; }
+        void set(int x, int y, int v) { if(isin(x, y)) pixels[y * w + x] = (byte) v; }
         void set(vec vec, int v) => set(vec.x, vec.y, v);
         void set(vecf vec, int v) => set(vec.i, v);
         void clear()
         {
-            for (int x = 0; x < 256; x++)
-                for (int y = 0; y < 256; y++)
-                    pixels[y * 256 + x] = 3;
+            for (int x = 0; x < w; x++)
+                for (int y = 0; y < h; y++)
+                    pixels[y * w + x] = 3;
         }
         void set_brushes()
         {
@@ -61,7 +63,7 @@ namespace DOSBOX_HEX_EDIT
         {
             InitializeComponent();
             form_size = Size.V();
-            cam = form_size.f / 2f / scale;
+            cam = form_size.f / 2f;
             KB.Init();
             MouseStates.Initialize(Render);
             UIMgt.MouseStatesVersion = 2;
@@ -73,12 +75,22 @@ namespace DOSBOX_HEX_EDIT
                 (219, 229, 219).ToArgb()
             };
             set_brushes();
+            pixels = new byte[w * h];
+            snapshot = new byte[w * h];
             clear();
             pixels.CopyTo(snapshot, 0);
 
+            init_ui();
+
+            TimerUpdate.Tick += Update;
+            TimerDraw.Tick += Draw;
+        }
+        void init_ui()
+        {
             UIButton UIButtonFactory_Create(int x, int y, int w, int h, string name, Action<UI> onClick)
             {
-                return new UIButton() {
+                return new UIButton()
+                {
                     Position = (x, y).Vf(),
                     Size = (w, h).Vf(),
                     IsDrawingName = true,
@@ -89,17 +101,17 @@ namespace DOSBOX_HEX_EDIT
                 };
             }
 
-            UIMgt.UI.Add(UIButtonFactory_Create(2 + 102 * 0, 2, 100, 30, "Palette", (e) => ClickPalette()));
-            UIMgt.UI.Add(UIButtonFactory_Create(2 + 102 * 1, 2, 100, 30, "New", (e) => ClickNew()));
-            UIMgt.UI.Add(UIButtonFactory_Create(2 + 102 * 2, 2, 100, 30, "Load", (e) => ClickLoad()));
-            UIMgt.UI.Add(UIButtonFactory_Create(2 + 102 * 3, 2, 100, 30, "Save", (e) => ClickSave()));
-            UIMgt.UI.Add(new UIImage("pal0", palette[0], palette[0], 2 + 102 * 4 + 30 * 0, 2, 30, 30));
-            UIMgt.UI.Add(new UIImage("pal1", palette[1], palette[0], 2 + 102 * 4 + 30 * 1, 2, 30, 30));
-            UIMgt.UI.Add(new UIImage("pal2", palette[2], palette[0], 2 + 102 * 4 + 30 * 2, 2, 30, 30));
-            UIMgt.UI.Add(new UIImage("pal3", palette[3], palette[0], 2 + 102 * 4 + 30 * 3, 2, 30, 30));
-
-            TimerUpdate.Tick += Update;
-            TimerDraw.Tick += Draw;
+            int ix = 0;
+            UIMgt.UI.Add(UIButtonFactory_Create(2 + 102 * ix++, 2, 100, 30, "Palette", (e) => ClickPalette()));
+            UIMgt.UI.Add(UIButtonFactory_Create(2 + 102 * ix++, 2, 100, 30, "Size", (e) => ClickSize()));
+            UIMgt.UI.Add(UIButtonFactory_Create(2 + 102 * ix++, 2, 100, 30, "New", (e) => ClickNew()));
+            UIMgt.UI.Add(UIButtonFactory_Create(2 + 102 * ix++, 2, 100, 30, "Load", (e) => ClickLoad()));
+            UIMgt.UI.Add(UIButtonFactory_Create(2 + 102 * ix++, 2, 100, 30, "Save", (e) => ClickSave()));
+            UIMgt.UI.Add(UIButtonFactory_Create(2 + 102 * ix++, 2, 100, 30, "Recenter", (e) => cam = vecf.Zero));
+            UIMgt.UI.Add(new UIImage("pal0", palette[0], palette[0], 2 + 102 * ix + 30 * 0, 2, 30, 30));
+            UIMgt.UI.Add(new UIImage("pal1", palette[1], palette[0], 2 + 102 * ix + 30 * 1, 2, 30, 30));
+            UIMgt.UI.Add(new UIImage("pal2", palette[2], palette[0], 2 + 102 * ix + 30 * 2, 2, 30, 30));
+            UIMgt.UI.Add(new UIImage("pal3", palette[3], palette[0], 2 + 102 * ix + 30 * 3, 2, 30, 30));
         }
 
         private void Update(object _, EventArgs e)
@@ -169,16 +181,74 @@ namespace DOSBOX_HEX_EDIT
                 UIMgt.GetUIByName<UIImage>($"pal{i}").NewImageFromArgb(palette[i]);
             }
         }
+        private void ClickSize()
+        {
+            string nm_w = "Width", nm_h = "Height";
+            var db = new DataTable();
+            db.Columns.Add(nm_w, typeof(byte));
+            db.Columns.Add(nm_h, typeof(byte));
+            db.Rows.Add(w, h);
+            var box = new DGVBox(db);
+            box.ShowDialog();
+            var row = db.Rows[0];
+            byte ow = w;
+            byte oh = h;
+            w = (byte)row[nm_w];
+            h = (byte)row[nm_h];
+            resize_array(ref pixels, ow, oh, w, h, 3);
+        }
+        void resize_array(ref byte[] array, int ow, int oh, int nw, int nh, byte defaultValue)
+        {
+            byte[] new_array = new byte[nw * nh];
+            for (int i = 0; i < new_array.Length; i++)
+            {
+                int x = i % nw;
+                int y = i / nw;
+                new_array[i] = (x < ow && y < oh) ? array[y * ow + x] : defaultValue;
+            }
+            array = new_array;
+        }
         private void ClickNew()
         {
+            pixels.CopyTo(snapshot, 0);
+            undo_available = true;
+            pixels = new byte[w * h];
+            clear();
         }
         private void ClickLoad()
         {
+            var box = new OpenFileDialog()
+            {
+                Filter = "HEX Files|*.hex",
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+            };
+            if (box.ShowDialog() == DialogResult.OK)
+            {
+                using (BinaryReader reader = new BinaryReader(File.Open(box.FileName, FileMode.Open)))
+                {
+                    w = reader.ReadByte();
+                    h = reader.ReadByte();
+                    pixels = reader.ReadBytes(w * h);
+                }
+            }
         }
         private void ClickSave()
         {
+            var box = new SaveFileDialog()
+            {
+                Filter = "HEX Files|*.hex",
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+            };
+            if (box.ShowDialog() == DialogResult.OK)
+            {
+                using (BinaryWriter writer = new BinaryWriter(File.Open(box.FileName, FileMode.Create)))
+                {
+                    writer.Write(w);
+                    writer.Write(h);
+                    writer.Write(pixels);
+                }
+            }
         }
-
 
         void global_update()
         {
@@ -277,7 +347,7 @@ namespace DOSBOX_HEX_EDIT
                     }
                 }
 
-                int timout = 128;
+                int timout = 255;
                 while (nodes.Count > 0 && timout > 0)
                 {
                     for (int i = 0; i < nodes.Count; i++)
@@ -305,11 +375,11 @@ namespace DOSBOX_HEX_EDIT
         byte[] bucket_preview_bytes;
         void bucket_preview()
         {
-            bucket_preview_bytes = new byte[256 * 256];
+            bucket_preview_bytes = new byte[w * h];
 
-            for (int x = 0; x < 256; x++)
-                for (int y = 0; y < 256; y++)
-                    bucket_preview_bytes[y * 256 + x] = get(x, y);
+            for (int x = 0; x < w; x++)
+                for (int y = 0; y < h; y++)
+                    bucket_preview_bytes[y * w + x] = get(x, y);
             List<vec> nodes = new List<vec> { ms.i };
             List<vec> next_nodes = new List<vec>();
             byte to_replace = get(nodes[0]);
@@ -322,13 +392,13 @@ namespace DOSBOX_HEX_EDIT
                 void check(int x, int y)
                 {
                     var p = (v.x + x, v.y + y).V();
-                    if (isin(p) && get(p) == to_replace && bucket_preview_bytes[p.y * 256 + p.x] != color_selection)
+                    if (isin(p) && bucket_preview_bytes[p.y * w + p.x] != color_selection && get(p) == to_replace)
                         next_nodes.Add(p);
                 }
 
                 if (isin(v) && get(v) == to_replace)
                 {
-                    bucket_preview_bytes[v.y * 256 + v.x] = color_selection;
+                    bucket_preview_bytes[v.y * w + v.x] = color_selection;
                     check(-1, 0);
                     check(1, 0);
                     check(0, -1);
@@ -336,7 +406,7 @@ namespace DOSBOX_HEX_EDIT
                 }
             }
 
-            int timout = 8;
+            int timout = 64;
             while (nodes.Count > 0 && timout > 0)
             {
                 for (int i = 0; i < nodes.Count; i++)
@@ -344,7 +414,7 @@ namespace DOSBOX_HEX_EDIT
                     recursive_4_ways(nodes[i]);
                     nodes.RemoveAt(i--);
                 }
-                nodes.AddRange(next_nodes);
+                nodes.AddRange(next_nodes.Distinct().ToList());
                 next_nodes.Clear();
                 timout--;
             }
@@ -353,9 +423,9 @@ namespace DOSBOX_HEX_EDIT
         void global_draw()
         {
             PointF pt;
-            for (int x = 0; x < 256; x++)
+            for (int x = 0; x < w; x++)
             {
-                for (int y = 0; y < 256; y++)
+                for (int y = 0; y < h; y++)
                 {
                     pt = WorldToScreen(x, y).pt;
                     if(IsintScreen(pt))
@@ -382,13 +452,14 @@ namespace DOSBOX_HEX_EDIT
                     _b[i] = new SolidBrush(Color.FromArgb(127, b[i].Color));
                 if(MouseStates.LenghtDiff > 0)
                     bucket_preview();
-                for (int x = 0; x < 256; x++)
+                for (int x = 0; x < w; x++)
                 {
-                    for (int y = 0; y < 256; y++)
+                    for (int y = 0; y < h; y++)
                     {
+                        if ((x + y) % 2 != 0) continue;
                         pt = WorldToScreen(x, y).pt;
                         if(IsintScreen(pt))
-                            g.FillRectangle(_b[bucket_preview_bytes[y * 256 + x]], pt.X, pt.Y, scale * 8, scale * 8);
+                            g.FillRectangle(_b[bucket_preview_bytes[y * w + x]], pt.X, pt.Y, scale * 8, scale * 8);
                     }
                 }
             }
