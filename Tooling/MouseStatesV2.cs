@@ -57,5 +57,10 @@ namespace Tooling
                 ReleasedButtons[b] = !ButtonsDown[b];
             OldPosition = Position;
         }
+        public static void ForceReleaseAllButtons()
+        {
+            foreach (MouseButtons b in Enum.GetValues(typeof(MouseButtons)))
+                ReleasedButtons[b] = ButtonsDown[b] = false;
+        }
     }
 }

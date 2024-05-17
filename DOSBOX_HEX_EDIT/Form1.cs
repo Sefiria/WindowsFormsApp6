@@ -21,7 +21,7 @@ namespace DOSBOX_HEX_EDIT
         vec form_size;
         Graphics g;
         SolidBrush[] b = new SolidBrush[4];
-        byte w = 255, h = 255;
+        byte w = 255, h = 96;
         byte[] pixels;
         byte color_selection = 0, tool_selection = 0, pen_size = 1;
         float screen_margin => 2 * scale * 8;
@@ -234,6 +234,7 @@ namespace DOSBOX_HEX_EDIT
                     pixels = reader.ReadBytes(w * h);
                 }
                 undo_available = false;
+                MouseStates.ForceReleaseAllButtons();
             }
         }
         private void ClickSave()
@@ -303,7 +304,8 @@ namespace DOSBOX_HEX_EDIT
         {
             if (MouseStates.ButtonsDown[MouseButtons.Left])
             {
-                prepare_undo();
+                if (MouseStates.IsButtonPressed(MouseButtons.Left))
+                    prepare_undo();
                 float L = MouseStates.LenghtDiff;
                 for (float t = 0F; t <= 1F; t += 1F / L)
                 {
@@ -389,6 +391,7 @@ namespace DOSBOX_HEX_EDIT
         }
         void prepare_undo()
         {
+            snapshot = new byte[pixels.Length];
             pixels.CopyTo(snapshot, 0);
             undo_available = true;
         }
