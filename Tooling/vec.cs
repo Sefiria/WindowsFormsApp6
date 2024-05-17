@@ -22,6 +22,7 @@ namespace Tooling
         [JsonIgnore] public Point ipt => new Point(x, y);
         [JsonIgnore] public PointF pt => new PointF(x, y);
 
+        [JsonIgnore] public static vec Null => new vec(int.MaxValue, int.MaxValue);
         [JsonIgnore] public static vec Zero => new vec(0, 0);
 
         public vec tile(int sz) => new vec(x / sz, y / sz);
