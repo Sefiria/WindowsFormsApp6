@@ -21,13 +21,14 @@ namespace DOSBOX_HEX_EDIT
         vec form_size;
         Graphics g;
         SolidBrush[] b = new SolidBrush[4];
-        byte w = 255, h = 96;
+        byte w = 128, h = 32;
         byte[] pixels;
         byte color_selection = 0, tool_selection = 0, pen_size = 1;
         float screen_margin => 2 * scale * 8;
         byte[] snapshot;
         bool undo_available = false;
         vec tool_line_first_node = vec.Null;
+        vec rect_selection_start = vec.Null, rect_selection_end = vec.Null;
 
         bool IsOutScreen(vec v) => v.x < -screen_margin || v.y < -screen_margin || v.x >= form_size.x + screen_margin || v.y >= form_size.y + screen_margin;
         bool IsOutScreen(PointF pt) => pt.X < -screen_margin || pt.Y < -screen_margin || pt.X >= form_size.x + screen_margin || pt.Y >= form_size.y + screen_margin;
@@ -117,6 +118,8 @@ namespace DOSBOX_HEX_EDIT
 
         private void Update(object _, EventArgs e)
         {
+            if (!Focused)
+                return;
             if (KB.IsKeyPressed(KB.Key.Escape))
                 Close();
             global_update();
@@ -234,8 +237,8 @@ namespace DOSBOX_HEX_EDIT
                     pixels = reader.ReadBytes(w * h);
                 }
                 undo_available = false;
-                MouseStates.ForceReleaseAllButtons();
             }
+            MouseStates.ForceReleaseAllButtons();
         }
         private void ClickSave()
         {
@@ -253,6 +256,7 @@ namespace DOSBOX_HEX_EDIT
                     writer.Write(pixels);
                 }
             }
+            MouseStates.ForceReleaseAllButtons();
         }
 
         void global_update()
@@ -269,6 +273,20 @@ namespace DOSBOX_HEX_EDIT
                 if (s) cam.y += cam_speed;
                 if (q) cam.x -= cam_speed;
                 if (d) cam.x += cam_speed;
+            }
+            else
+            {
+                if (KB.IsKeyPressed(KB.Key.L))
+                    ClickLoad();
+                if (KB.IsKeyPressed(KB.Key.S))
+                    ClickSave();
+
+                if (KB.IsKeyPressed(KB.Key.X))
+                    tool_selection = 3;// cut
+                if (KB.IsKeyPressed(KB.Key.C))
+                    tool_selection = 4;// copy
+                else if (KB.IsKeyPressed(KB.Key.V))
+                    tool_selection = 5;// paste
             }
             if (MouseStates.Delta != 0f)
             {
@@ -293,11 +311,18 @@ namespace DOSBOX_HEX_EDIT
         }
         void do_tool()
         {
-            switch(tool_selection)
+            if (KB.LeftAlt)
             {
-                case 0: do_tool_pen(); break;
-                case 1: do_tool_bucket(); break;
-                case 2: do_tool_line(); break;
+                do_selection();
+            }
+            else
+            {
+                switch (tool_selection)
+                {
+                    case 0: do_tool_pen(); break;
+                    case 1: do_tool_bucket(); break;
+                    case 2: do_tool_line(); break;
+                }
             }
         }
         void do_tool_pen()
@@ -389,6 +414,26 @@ namespace DOSBOX_HEX_EDIT
                 tool_line_first_node = vec.Null;
             }
         }
+        void do_selection()
+        {
+            if (MouseStates.ButtonsDown[MouseButtons.Left])
+            {
+                if (MouseStates.IsButtonPressed(MouseButtons.Left))
+                    rect_selection_start = ms.i;
+                else
+                    rect_selection_end = ms.i;
+            }
+        }
+        void do_tool_cut()
+        {
+        }
+        void do_tool_copy()
+        {
+        }
+        void do_tool_paste()
+        {
+        }
+
         void prepare_undo()
         {
             snapshot = new byte[pixels.Length];
@@ -531,6 +576,17 @@ namespace DOSBOX_HEX_EDIT
                         }
                     }
                 }
+            }
+
+            if (rect_selection_start != vec.Null && rect_selection_end != vec.Null)
+            {
+                long tick = 0xff000000 + (int)DateTime.Now.Ticks % 0xffffff;
+                vecf screen_start = WorldToScreen(rect_selection_start.f);
+                vecf screen_end = WorldToScreen(rect_selection_end.f);
+                float x = screen_start.x, y = screen_start.y;
+                float w = screen_end.x - x + scale * 8, h = screen_end.y - y + scale * 8;
+                float sz = 4F * scale;
+                g.DrawRectangle(new Pen(Color.FromArgb((int)tick), sz), x - sz / 2f, y - sz / 2f, w + sz / 2f, h + sz / 2f);
             }
         }
 
