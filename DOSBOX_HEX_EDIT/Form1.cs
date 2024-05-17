@@ -197,6 +197,7 @@ namespace DOSBOX_HEX_EDIT
             w = (byte)row[nm_w];
             h = (byte)row[nm_h];
             resize_array(ref pixels, ow, oh, w, h, 3);
+            undo_available = false;
         }
         void resize_array(ref byte[] array, int ow, int oh, int nw, int nh, byte defaultValue)
         {
@@ -215,6 +216,7 @@ namespace DOSBOX_HEX_EDIT
             undo_available = true;
             pixels = new byte[w * h];
             clear();
+            undo_available = false;
         }
         private void ClickLoad()
         {
@@ -231,6 +233,7 @@ namespace DOSBOX_HEX_EDIT
                     h = reader.ReadByte();
                     pixels = reader.ReadBytes(w * h);
                 }
+                undo_available = false;
             }
         }
         private void ClickSave()
