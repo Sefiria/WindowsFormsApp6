@@ -132,6 +132,13 @@ namespace Tooling
                     return Color.FromArgb(a, num5, num6, num7);
             }
         }
+        public static Color ColorFromHue(this int hue)
+        {
+            // Conversion de HSL à RGB
+            return Color.FromArgb(255, (int)(Math.Sin(hue * 2 * Math.PI / 256) * 127) + 128,
+                                        (int)(Math.Sin(hue * 2 * Math.PI / 256 + 2 * Math.PI / 3) * 127) + 128,
+                                        (int)(Math.Sin(hue * 2 * Math.PI / 256 + 4 * Math.PI / 3) * 127) + 128);
+        }
         private static float SetToMaxOrMin(float s)
         {
             if ((double)s > 1.0)

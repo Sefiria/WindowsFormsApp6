@@ -4,6 +4,9 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Tooling;
 using Tooling.UI;
@@ -14,6 +17,7 @@ namespace DOSBOX_HEX_EDIT
     {
         Timer TimerUpdate = new Timer() { Enabled = true, Interval = 10 };
         Timer TimerDraw = new Timer() { Enabled = true, Interval = 10 };
+        Timer TimerHue = new Timer() { Enabled = true, Interval = 10 };
         List<int> palette;
         vecf cam = vecf.Zero;
         float scale = 0.5f, min_scale = 0.5f, max_scale = 16f;
@@ -22,13 +26,18 @@ namespace DOSBOX_HEX_EDIT
         Graphics g;
         SolidBrush[] b = new SolidBrush[4];
         byte w = 128, h = 32;
+        int hue = 0;
+        Color hue_color;
         byte[] pixels;
-        byte color_selection = 0, tool_selection = 0, pen_size = 1;
+        byte color_selection = 0, tool_selection = 0, tool_selection_prev = 0, pen_size = 1;
         float screen_margin => 2 * scale * 8;
         byte[] snapshot;
-        bool undo_available = false;
+        bool undo_available = false, paste_done = false;
         vec tool_line_first_node = vec.Null;
         vec rect_selection_start = vec.Null, rect_selection_end = vec.Null;
+        vec rect_selection_init = vec.Zero;
+        copypastedata data_pasting;
+        long ticks = 0;
 
         bool IsOutScreen(vec v) => v.x < -screen_margin || v.y < -screen_margin || v.x >= form_size.x + screen_margin || v.y >= form_size.y + screen_margin;
         bool IsOutScreen(PointF pt) => pt.X < -screen_margin || pt.Y < -screen_margin || pt.X >= form_size.x + screen_margin || pt.Y >= form_size.y + screen_margin;
@@ -86,6 +95,11 @@ namespace DOSBOX_HEX_EDIT
 
             TimerUpdate.Tick += Update;
             TimerDraw.Tick += Draw;
+            TimerHue.Tick += (s, e) =>
+            {
+                hue = (hue + 1) % 256;
+                hue_color = hue.ColorFromHue();
+            };
         }
         void init_ui()
         {
@@ -123,6 +137,8 @@ namespace DOSBOX_HEX_EDIT
             if (KB.IsKeyPressed(KB.Key.Escape))
                 Close();
             global_update();
+            ticks++;
+            while (ticks > 256 * 256) ticks -= 256*256;
             KB.Update();
             UIMgt.Update();
             MouseStates.Update();
@@ -281,12 +297,20 @@ namespace DOSBOX_HEX_EDIT
                 if (KB.IsKeyPressed(KB.Key.S))
                     ClickSave();
 
-                if (KB.IsKeyPressed(KB.Key.X))
-                    tool_selection = 3;// cut
-                if (KB.IsKeyPressed(KB.Key.C))
-                    tool_selection = 4;// copy
-                else if (KB.IsKeyPressed(KB.Key.V))
-                    tool_selection = 5;// paste
+                if (rect_selection_start != vec.Null && rect_selection_end != vec.Null)
+                {
+                    if (KB.IsKeyDown(KB.Key.D))
+                    {
+                        rect_selection_start = vec.Null;
+                        rect_selection_end = vec.Null;
+                    }
+                    else if (KB.IsKeyPressed(KB.Key.X)) { do_selection_cut(); }
+                    else if (KB.IsKeyPressed(KB.Key.C)) { do_selection_copy(); }
+                }
+                if (KB.IsKeyPressed(KB.Key.V))
+                {
+                    do_selection_prepare_paste();
+                }
             }
             if (MouseStates.Delta != 0f)
             {
@@ -313,9 +337,7 @@ namespace DOSBOX_HEX_EDIT
         {
             if (KB.LeftAlt)
             {
-                //if (rect_selection_start != vec.Null && rect_selection_end != vec.Null)
-
-                    do_selection();
+                do_selection();
             }
             else
             {
@@ -324,9 +346,7 @@ namespace DOSBOX_HEX_EDIT
                     case 0: do_tool_pen(); break;
                     case 1: do_tool_bucket(); break;
                     case 2: do_tool_line(); break;
-                    case 3: do_tool_cut(); break;
-                    case 4: do_tool_copy(); break;
-                    case 5: do_tool_paste(); break;
+                    case 3: do_tool_paste(); break;
                 }
             }
         }
@@ -423,24 +443,57 @@ namespace DOSBOX_HEX_EDIT
         {
             if (MouseStates.ButtonsDown[MouseButtons.Left])
             {
+                int x = (int)ms.x;
+                int y = (int)ms.y;
                 if (MouseStates.IsButtonPressed(MouseButtons.Left))
-                    rect_selection_start = ms.i;
+                {
+                    rect_selection_start.x = rect_selection_end.x = rect_selection_init.x = x;
+                    rect_selection_start.y = rect_selection_end.y = rect_selection_init.y = y;
+                }
                 else
-                    rect_selection_end = ms.i;
+                {
+                    if(x == rect_selection_init.x) rect_selection_start.x = rect_selection_end.x = x;
+                    else if (x < rect_selection_init.x) rect_selection_start.x = x; else rect_selection_end.x = x;
+                    if(y == rect_selection_init.y) rect_selection_start.y = rect_selection_end.y = y;
+                    else if (y < rect_selection_init.y) rect_selection_start.y = y; else rect_selection_end.y = y;
+                }
             }
         }
-        void do_tool_cut()
+        void do_selection_cut()
         {
-            if (rect_selection_start == vec.Null || rect_selection_end == vec.Null)
-                return;
+            do_selection_copy(true);
         }
-        void do_tool_copy()
+        void do_selection_copy(bool cut = false)
         {
-            if (rect_selection_start == vec.Null || rect_selection_end == vec.Null)
-                return;
+            int x = rect_selection_start.x;
+            int y = rect_selection_start.y;
+            int w = rect_selection_end.x - rect_selection_start.x;
+            int h = rect_selection_end.y - rect_selection_start.y;
+            Clipboard.SetText(new copypastedata { w=w, h=h, data=CopyFromPixels(x, y, w, h, cut) }.ToBase64());
+        }
+        void do_selection_prepare_paste()
+        {
+            var text = Clipboard.GetText();
+            if (!string.IsNullOrWhiteSpace(text) && IsBase64String(text))
+            {
+                data_pasting = new copypastedata(text);
+                tool_selection_prev = tool_selection;
+                tool_selection = 3;
+                rect_selection_start = vec.Null;
+                rect_selection_end = vec.Null;
+                paste_done = false;
+            }
         }
         void do_tool_paste()
         {
+            if(KB.IsKeyPressed(KB.Key.Enter) || KB.IsKeyPressed(KB.Key.Back) || KB.IsKeyPressed(KB.Key.Space))
+                tool_selection = tool_selection_prev;
+            else
+            if (MouseStates.IsButtonPressed(MouseButtons.Left))
+            {
+                CopyToPixels(data_pasting.data, (int)ms.x - data_pasting.w / 2, (int)ms.y - data_pasting.h / 2, data_pasting.w, data_pasting.h);
+                paste_done = true;
+            }
         }
 
         void prepare_undo()
@@ -586,22 +639,119 @@ namespace DOSBOX_HEX_EDIT
                     }
                 }
             }
+            else if (tool_selection == 3)
+            {
+                SolidBrush[] _b = new SolidBrush[4];
+                byte tick = (byte)(0x11 + ((int)ticks * 10) % (0xff - 0x22)).ByteCut();
+                for (int i = 0; i < 4; i++)
+                    _b[i] = new SolidBrush(Color.FromArgb(tick, b[i].Color));
+                vec sz = (data_pasting.w, data_pasting.h).V();
+                for (int x = 0; x < data_pasting.w; x++)
+                {
+                    for (int y = 0; y < data_pasting.h; y++)
+                    {
+                        pt = WorldToScreen(ms.i.x + x - sz.x / 2, ms.i.y + y - sz.y / 2).pt;
+                        if (IsintScreen(pt))
+                            g.FillRectangle(_b[data_pasting.data[y * data_pasting.w + x]], pt.X, pt.Y, scale * 8, scale * 8);
+                    }
+                }
+                pt = WorldToScreen(ms.i.x - sz.x / 2, ms.i.y - sz.y / 2).pt;
+                g.DrawRectangle(Pens.Black, pt.X, pt.Y, data_pasting.w * scale * 8, data_pasting.h * scale * 8);
+            }
 
             if (rect_selection_start != vec.Null && rect_selection_end != vec.Null)
             {
-                long tick = 0xff000000 + (int)DateTime.Now.Ticks % 0xffffff;
-                vecf screen_start = WorldToScreen(rect_selection_start.f);
-                vecf screen_end = WorldToScreen(rect_selection_end.f);
+                vec screen_start = WorldToScreen(rect_selection_start.f).i;
+                vec screen_end = WorldToScreen(rect_selection_end.f).i;
                 float x = screen_start.x, y = screen_start.y;
-                float w = screen_end.x - x + scale * 8, h = screen_end.y - y + scale * 8;
-                float sz = 4F * scale;
-                g.DrawRectangle(new Pen(Color.FromArgb((int)tick), sz), x - sz / 2f, y - sz / 2f, w + sz / 2f, h + sz / 2f);
+                float w = screen_end.x - x, h = screen_end.y - y;
+                float sz = 2F * scale;
+                g.DrawRectangle(new Pen(hue_color, sz), x - sz / 2f, y - sz / 2f, w + sz / 2f, h + sz / 2f);
             }
         }
 
         private void Form1_Resize(object sender, EventArgs e)
         {
             form_size = Size.V();
+        }
+        private byte[] CopyFromPixels(int i, int j, int w, int h, bool cut = false)
+        {
+            byte[] result = new byte[w * h];
+            int index = 0;
+
+            for (int y = j; y < j + h; y++)
+            {
+                for (int x = i; x < i + w; x++)
+                {
+                    result[index] = pixels[y * this.w + x];
+                    if (cut)
+                        pixels[y * this.w + x] = 3;
+                    index++;
+                }
+            }
+
+            return result;
+        }
+        private void CopyToPixels(byte[] data, int i, int j, int w, int h)
+        {
+            for (int y = j; y < j + h; y++)
+            {
+                for (int x = i; x < i + w; x++)
+                {
+                    if(isin(x,y))
+                        pixels[y * this.w + x] = data[(y-j) * w + (x - i)];
+                }
+            }
+        }
+
+        [Serializable]
+        public struct copypastedata
+        {
+            public int w, h;
+            public byte[] data;
+            public copypastedata(copypastedata copy)
+            {
+                w = copy.w;
+                h = copy.h;
+                data = copy.data;
+            }
+            public string ToBase64() => ConvertToBase64(this);
+            public copypastedata(string base64)
+            {
+                var obj = ConvertFromBase64<copypastedata>(base64);
+                w = obj.w;
+                h = obj.h;
+                data = obj.data;
+            }
+        }
+        public static string ConvertToBase64<T>(T obj)
+        {
+            var binaryFormatter = new BinaryFormatter();
+            using (var memoryStream = new MemoryStream())
+            {
+                binaryFormatter.Serialize(memoryStream, obj);
+                return Convert.ToBase64String(memoryStream.ToArray());
+            }
+        }
+        public static T ConvertFromBase64<T>(string base64String) where T:struct
+        {
+            if (string.IsNullOrWhiteSpace(base64String) || !IsBase64String(base64String))
+                return default;
+            var binaryFormatter = new BinaryFormatter();
+            byte[] bytes = Convert.FromBase64String(base64String);
+            using (var memoryStream = new MemoryStream(bytes, 0, bytes.Length))
+            {
+                try
+                {
+                    return (T)binaryFormatter.Deserialize(memoryStream);
+                }
+                catch (SerializationException) { return default; }
+            }
+        }
+        public static bool IsBase64String(string s)
+        {
+            s = s.Trim();
+            return (s.Length % 4 == 0) && Regex.IsMatch(s, @"^[a-zA-Z0-9\+/]*={0,3}$", RegexOptions.None);
         }
     }
 }
