@@ -26,6 +26,12 @@ namespace Tooling
         }
         public static Bitmap Resize(this Bitmap img, int w, int h) => new Bitmap(img, w, h);
         public static Bitmap Resize(this Bitmap img, int sz) => new Bitmap(img, sz, sz);
+        public static Bitmap Transparent(this Bitmap img)
+        {
+            var b = new Bitmap(img);
+            b.MakeTransparent(Color.White);
+            return b;
+        }
         public static List<Bitmap> Resize(this List<Bitmap> imgs, int w, int h) => imgs.Select(img => img.Resize(w, h)).ToList();
         public static List<Bitmap> Resize(this List<Bitmap> imgs, int sz) => imgs.Select(img => img.Resize(sz)).ToList();
         public static vecf vecf(this Point pt) => new vecf(pt.X, pt.Y);

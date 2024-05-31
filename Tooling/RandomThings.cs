@@ -19,7 +19,15 @@ namespace Tooling
         public static int arnd(int min, int max, bool max_included = true) => advanced_rnd(min, max, max_included);
 
         public static float rnd(float min, float max_excluded) => rnd((int)(min * 1000), (int)(max_excluded * 1000)) / 1000f;
-        public static float rnd1() => rnd(100001) / 100001f;
+        public static float rnd1(int precision = 100000) => rnd(precision + 1) / (precision + 1F);
         public static float rnd1Around0() => rnd(200001) / 100001f - 1f;
+        public static bool rnd_IsInRange(float range_min, float range_max)
+        {
+            float rnd = rnd1((int)Math.Max(Math.Max(1F / range_min, 1F / range_max), 100000));
+            return rnd >= range_min && rnd <= range_max;
+        }
+        public static vecf rnd_vecf_in_screen(float w, float h, float x = 0F, float y = 0F) => (arnd((int)x, (int)w, false), arnd((int)y, (int)h, false)).Vf();
+        public static vec rnd_vec_in_screen(int w, int h, int x = 0, int y = 0) => (arnd(x, w, false), arnd(y, h, false)).V();
+        public static string rndByteHexString() => ((byte)(rnd1() * 0xFF)).ToString("x2");
     }
 }

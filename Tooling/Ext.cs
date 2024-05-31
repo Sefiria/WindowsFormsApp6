@@ -113,6 +113,40 @@ namespace Tooling
         public static float Distance(this vec a, vecf b) => Maths.Distance(a.f, b);
         public static float Distance(this vecf a, vecf b) => Maths.Distance(a, b);
         public static float Distance(this vecf a, vec b) => Maths.Distance(a, b.f);
+        public static float LerpDistanceMin(this (vecf a, vecf b) A, vecf B)
+        {
+            if (B == null)
+                return float.MaxValue;
+            if(A.a == null)
+                return Maths.Distance(A.b, B);
+            if (A.b == null)
+                return Maths.Distance(A.a, B);
+            float result = float.MaxValue;
+            float d;
+            vecf v;
+            for (float t = 0F; t < 1F; t += 1F / A.a.Distance(A.b))
+            {
+                v = Maths.Lerp(A.a, A.b, t);
+                d = Maths.Distance(v, B);
+                if (d < result)
+                    result = d;
+            }
+            return result;
+        }
+        public static float LerpDistanceMax(this (vecf a, vecf b) A, vecf B)
+        {
+            float result = 0F;
+            float d;
+            vecf v;
+            for (float t = 0F; t < 1F; t += 1F / A.a.Distance(A.b))
+            {
+                v = Maths.Lerp(A.a, A.b, t);
+                d = Maths.Distance(v, B);
+                if (d > result)
+                    result = d;
+            }
+            return result;
+        }
         public static ICoords IC(this (int X, int Y) data) => ICoordsFactory.Create(data.X, data.Y);
         public static ICoords IC(this (float X, float Y) data) => ICoordsFactory.Create(data.X, data.Y);
         public static float DistanceFromLine(this PointF self, float ax, float by, float c) => Maths.DistanceFromLine(self, ax, by, c);
@@ -248,6 +282,10 @@ namespace Tooling
         {
             return source.MinBy(selector, null);
         }
+        public static TSource MaxBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> selector)
+        {
+            return source.MaxBy(selector, null);
+        }
         public static TSource MinBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> selector, IComparer<TKey> comparer)
         {
             if (source == null) throw new ArgumentNullException("source");
@@ -273,6 +311,33 @@ namespace Tooling
                     }
                 }
                 return min;
+            }
+        }
+        public static TSource MaxBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> selector, IComparer<TKey> comparer)
+        {
+            if (source == null) throw new ArgumentNullException("source");
+            if (selector == null) throw new ArgumentNullException("selector");
+            if (comparer == null) comparer = Comparer<TKey>.Default;
+
+            using (var sourceIterator = source.GetEnumerator())
+            {
+                if (!sourceIterator.MoveNext())
+                {
+                    throw new InvalidOperationException("Sequence contains no elements");
+                }
+                var max = sourceIterator.Current;
+                var maxKey = selector(max);
+                while (sourceIterator.MoveNext())
+                {
+                    var candidate = sourceIterator.Current;
+                    var candidateProjected = selector(candidate);
+                    if (comparer.Compare(candidateProjected, maxKey) < 0)
+                    {
+                        max = candidate;
+                        maxKey = candidateProjected;
+                    }
+                }
+                return max;
             }
         }
         public static void ForEach<T>(this T[,] array, Action<T> action)
