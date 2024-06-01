@@ -172,6 +172,7 @@ namespace WindowsFormsApp27.entities
                     var opponent = opponents[(int)(RandomThings.rnd1() * opponents.Length)];
                     opponent.Home.exists = false;
                     opponent.exists = false;
+                    Common.sim_deaths++;
                 }
             }
         }

@@ -128,6 +128,7 @@ namespace WindowsFormsApp27
             {
                 proc_end_day();
                 IsReporting = true;
+                Reporting.PreGenerate(w, h);
             }
             else
             {
@@ -145,15 +146,17 @@ namespace WindowsFormsApp27
                     p.FruitsOwn -= 3;
                     var tent = Tent.Create((int)(20 + RandomThings.rnd1() * (w - 40)), (int)(20 + RandomThings.rnd1() * (h - 40)), "");
                     People.Create(tent.x, tent.y + tent.h / 2, p.dna_muted()).Home = tent;
+                    Common.sim_births++;
                 }
             }
 
-            Reporting.AddDataPoint(new Reporting.DataPoint() { Population = Entity.Peoples.Count });
+            Reporting.AddDataPoint(new Reporting.DataPoint() { Population = Entity.Peoples.Count, Deaths = Common.sim_deaths, Births = Common.sim_births });
         }
         void proc_report()
         {
             if (KB.IsKeyDown(KB.Key.Space))
             {
+                Reporting.PostGenerate();
                 reset();
             }
             else
@@ -167,6 +170,8 @@ namespace WindowsFormsApp27
             Common.sim_ticks = 0L;
             for (int i = 0; i < sim_ticks_gen.Length; i++)
                 sim_ticks_gen[i] = 0L;
+            Common.sim_births = 0;
+            Common.sim_deaths = 0;
         }
 
         void proc_generate_world()

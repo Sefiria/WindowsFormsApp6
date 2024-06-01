@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows;
+using System.Windows.Media.Media3D;
 using Color = System.Drawing.Color;
 using Point = System.Drawing.Point;
 
@@ -39,10 +40,12 @@ namespace Tooling
             return sum;
         }
         public static float Distance(float x1, float y1, float x2, float y2) => Sq(x2 - x1) + Sq(y2 - y1) == 0 ? 0F : Sqrt(Sq(x2 - x1) + Sq(y2 - y1));
+        public static float Distance(float x1, float y1, float z1, float x2, float y2, float z2) => Sq(x2 - x1) + Sq(y2 - y1) + Sq(z2 - z1) == 0 ? 0F : Sqrt(Sq(x2 - x1) + Sq(y2 - y1) + Sq(z2 - z1));
         public static float Distance(float x1, float y1, int x2, int y2) => Distance(x1, y1, (float)x2, (float)y2);
         public static float Distance(int x1, int y1, float x2, float y2) => Distance((float)x1, (float)y1, x2, y2);
         public static float Distance(int x1, int y1, int x2, int y2) => Distance((float)x1, (float)y1, (float)x2, (float)y2);
         public static float Distance(PointF a, PointF b) => Distance(a.X, a.Y, b.X, b.Y);
+        public static float Distance(this Point3D a, Point3D b) => Distance((float)a.X, (float)a.Y, (float)a.Z, (float)b.X, (float)b.Y, (float)b.Z);
         public static float Distance(PointF pt_to_center) => Distance(0, 0, pt_to_center.X, pt_to_center.Y);
         public static float Distance(vec a, vec b) => Distance(a.x, a.y, b.x, b.y);
         public static float Distance(vecf a, vecf b) => Distance(a.x, a.y, b.x, b.y);

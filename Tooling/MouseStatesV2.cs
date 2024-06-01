@@ -50,7 +50,7 @@ namespace Tooling
         }
         public static void Update()
         {
-            if (Render.IsDisposed)
+            if (Render?.IsDisposed ?? false)
                 return;
             Delta = 0;
             foreach (MouseButtons b in Enum.GetValues(typeof(MouseButtons)))
