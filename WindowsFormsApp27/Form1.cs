@@ -53,7 +53,7 @@ namespace WindowsFormsApp27
             /* */if (KB.IsKeyDown(KB.Key.Up)) Global.SPEED_SCALE = 1.0F;
             else if (KB.IsKeyDown(KB.Key.Left)) Global.SPEED_SCALE = 5.0F;
             else if (KB.IsKeyDown(KB.Key.Down)) Global.SPEED_SCALE = 10.0F;
-            else if (KB.IsKeyDown(KB.Key.Right)) Global.SPEED_SCALE = 30.0F;
+            else if (KB.IsKeyDown(KB.Key.Right)) Global.SPEED_SCALE = 50.0F;
 
             if (Common.IsSimRuning)
             {
@@ -150,6 +150,7 @@ namespace WindowsFormsApp27
                 }
             }
 
+            Reporting.Init(w, h);
             Reporting.AddDataPoint(new Reporting.DataPoint() { Population = Entity.Peoples.Count, Deaths = Common.sim_deaths, Births = Common.sim_births });
         }
         void proc_report()
@@ -161,6 +162,7 @@ namespace WindowsFormsApp27
             }
             else
             {
+                Reporting.Update(w, h);
             }
         }
         void reset()

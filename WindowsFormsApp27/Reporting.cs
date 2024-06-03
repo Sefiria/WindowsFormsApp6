@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Media3D;
 using Tooling;
+using static WindowsFormsApp27.Reporting;
 
 namespace WindowsFormsApp27
 {
@@ -20,30 +21,32 @@ namespace WindowsFormsApp27
             {
             }
 
-            public void Draw(Reporting context, Graphics g, int i, int i_visible, Rectangle chart_rect)
+            public void Draw(Reporting context, Graphics g, int i, float i_visible, Rectangle chart_rect)
             {
                 Pen p = new Pen(Color.FromArgb(50, 50, 100, 180));
-                int x = chart_rect.X + 10 + i_visible * (20 + 10);
-                int y = chart_rect.Y + chart_rect.Height - 10;
+                float x = chart_rect.X + 10 + i_visible * (20 + 10);
+                float y = chart_rect.Y + chart_rect.Height - 10;
 
                 int max = context.DataPoints.Select(dp => dp.Population).Max();
                 int sz = (int) ((Population / (float)max) * (chart_rect.Height - 20));
                 int prev = i > 0 ? context.DataPoints[i - 1].Population : 0;
                 int diff = prev == 0 ? 0 : (int)(((Math.Max(prev, Population) - Math.Min(prev, Population)) / (float)max) * (chart_rect.Height - 20));
 
-                var rect = new RectangleF(x, y-sz, 20, sz);
+                var x_offset = Math.Max(0, chart_rect.Left - x);
+                var w_offset = -x_offset - Math.Max(0, x + 20 - chart_rect.Right);
+                var rect = new RectangleF(x + x_offset, y-sz, 20 + w_offset, sz);
                 var hover = rect.Contains(MouseStates.Position);
                 Brush b = new SolidBrush(Color.FromArgb(Population == prev ? (hover ? 70 : 50) : (hover ? 200 : 100), 50, 100, 180));
                 g.FillRectangle(b, rect);
                 if (hover && diff > 0)
-                    g.FillRectangle(Population > prev ? Brushes.ForestGreen : Brushes.IndianRed, new RectangleF(x, y - sz + diff * (Population > prev ? 0 : -1), 20, diff));
+                    g.FillRectangle(Population > prev ? Brushes.ForestGreen : Brushes.IndianRed, new RectangleF(x + x_offset, y - sz + diff * (Population > prev ? 0 : -1), 20 + w_offset, diff));
 
                 if (Population != prev)
                     g.DrawLine(Population > prev ? Pens.ForestGreen : Pens.IndianRed, rect.X, rect.Y, rect.X + rect.Width, rect.Y);
 
                 if(hover)
                 {
-                    g.DrawString(i.ToString(), Common.minifont, Brushes.Yellow, new RectangleF(rect.X, rect.Bottom - rect.Width, rect.Width, rect.Width));
+                    g.DrawString((i + 1).ToString(), Common.minifont, Brushes.Yellow, new RectangleF(rect.X, rect.Bottom - rect.Width, rect.Width, rect.Width));
 
                     int j = 0;
                     int h = (int)g.MeasureString("A", Common.font).Height + 5;
@@ -59,6 +62,9 @@ namespace WindowsFormsApp27
         }
 
         public List<DataPoint> DataPoints;
+        private float datapoint_start_index;
+
+        public Rectangle get_chart_rect(int w, int h) => new RectangleF(w * 0.1F, h * 0.1F, w - w * 0.2F, h - h * 0.66F).ToIntRect();
 
         public Reporting()
         {
@@ -70,11 +76,30 @@ namespace WindowsFormsApp27
             animated_bg_data1.Clear();
             DataPoints.Add(pt);
         }
+        public void Init(int w, int h)
+        {
+            Rectangle chart_rect = get_chart_rect(w, h);
+            int max = (chart_rect.Width - 20) / 30 + 2;
+            datapoint_start_index = Math.Max(0, DataPoints.Count - max);
+        }
+        public void Update(int w, int h)
+        {
+            var ms = MouseStates.Position.ToPoint();
+            Rectangle chart_rect = get_chart_rect(w, h);
+            if (!chart_rect.Contains(ms))
+                return;
+            var msr = ms.Minus(chart_rect.Location);
+            int max = (chart_rect.Width - 20) / 30 + 2;
+            if (msr.X < chart_rect.Width / 5)
+                datapoint_start_index = Math.Max(0, datapoint_start_index - 0.1F);
+            if (msr.X > chart_rect.Width - chart_rect.Width / 5 && DataPoints.Count - 1 - datapoint_start_index - max > 0)
+                datapoint_start_index += 0.1F;
+        }
         public void GenerateDraw(Graphics g)
         {
             int w = (int)g.VisibleClipBounds.Width;
             int h = (int)g.VisibleClipBounds.Height;
-            Rectangle chart_rect = new RectangleF(w * 0.1F, h * 0.1F, w - w * 0.2F, h - h * 0.66F).ToIntRect();
+            Rectangle chart_rect = get_chart_rect(w, h);
 
             float t = (Common.ticks % 400) < 200 ? (Common.ticks % 200) / 200F : 1F - (Common.ticks % 200) / 200F;
             g.Clear(Color.FromArgb((byte)(5 * t), (byte)(10 * t), (byte)(40 * t)));
@@ -84,9 +109,9 @@ namespace WindowsFormsApp27
             g.FillRectangle(new SolidBrush(Color.FromArgb(100, 0, 50, 130)), chart_rect);
             g.DrawRectangle(new Pen(Color.FromArgb(200, 50, 100, 180)), chart_rect);
 
-            int max = (chart_rect.Width - 20) / 30 + 1;
-            for (int i = 0; i < Math.Min(max, DataPoints.Count); i++)
-                DataPoints[i + Math.Max(0, DataPoints.Count - max)].Draw(this, g, i + Math.Max(0, DataPoints.Count - max), i, chart_rect);
+            int max = (chart_rect.Width - 20) / 30 + 2;
+            for (int i = (int)datapoint_start_index; i - (int)datapoint_start_index < Math.Min(max, DataPoints.Count); i++)
+                DataPoints[i].Draw(this, g, i, i - datapoint_start_index, chart_rect);
 
             g.DrawLine(new Pen(Color.FromArgb(50, 50, 100, 180)), chart_rect.X, chart_rect.Y + chart_rect.Height / 2, chart_rect.X + chart_rect.Width, chart_rect.Y + chart_rect.Height / 2);
         }
