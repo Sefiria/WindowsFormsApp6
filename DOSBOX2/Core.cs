@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using Tooling;
+using DOSBOX2.Common;
 
 namespace DOSBOX2
 {

@@ -25,7 +25,7 @@ namespace DOSBOX_HEX_EDIT
         vec form_size;
         Graphics g;
         SolidBrush[] b = new SolidBrush[4];
-        byte w = 128, h = 32;
+        byte w = 16, h = 16;
         int hue = 0;
         Color hue_color;
         byte[] pixels;
@@ -262,7 +262,7 @@ namespace DOSBOX_HEX_EDIT
             var box = new SaveFileDialog()
             {
                 Filter = "HEX Files|*.hex",
-                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+                InitialDirectory = Directory.GetCurrentDirectory()//Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
             };
             if (box.ShowDialog() == DialogResult.OK)
             {
