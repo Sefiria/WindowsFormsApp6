@@ -1,10 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Windows.Input;
 
 namespace Tooling
 {
     public class KB
     {
+        public delegate void KBHandler(System.Windows.Input.Key key);
+        public static  event KBHandler OnKeyPressed, OnKeyDown, OnKeyReleased;
+
         public enum Key
         {
             Escape = 0,
@@ -162,7 +166,26 @@ namespace Tooling
         };
 
         public static void Init() => Update();
-        public static void Update() => AvailableKeys.ForEach(k => Released[k] = !Keyboard.IsKeyDown(k));
+        //public static void Update() => AvailableKeys.ForEach(k => Released[k] = !Keyboard.IsKeyDown(k));
+        public static void Update()
+        {
+            bool a = false, b = false;
+            for(int i=0;i<AvailableKeys.Count;i++)
+            {
+                a = !Released[AvailableKeys[i]];
+                Released[AvailableKeys[i]] = !Keyboard.IsKeyDown(AvailableKeys[i]);
+                b = Released[AvailableKeys[i]];
+                if (a)
+                {
+                    if (b) OnKeyPressed?.Invoke(AvailableKeys[i]);
+                    else OnKeyDown?.Invoke(AvailableKeys[i]);
+                }
+                else
+                {
+                    if (b) OnKeyReleased?.Invoke(AvailableKeys[i]);
+                }
+            }
+        }
         public static bool IsKeyDown(Key k) => Keyboard.IsKeyDown(AvailableKeys[(int)k]);
         public static bool IsKeyPressed(Key k) => Keyboard.IsKeyDown(AvailableKeys[(int)k]) && Released[AvailableKeys[(int)k]];
         public static bool IsKeyUp(Key k) => !IsKeyDown(k);

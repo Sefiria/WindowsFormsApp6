@@ -124,10 +124,11 @@ namespace DOSBOX_HEX_EDIT
             UIMgt.UI.Add(UIButtonFactory_Create(2 + 102 * ix++, 2, 100, 30, "Load", (e) => ClickLoad()));
             UIMgt.UI.Add(UIButtonFactory_Create(2 + 102 * ix++, 2, 100, 30, "Save", (e) => ClickSave()));
             UIMgt.UI.Add(UIButtonFactory_Create(2 + 102 * ix++, 2, 100, 30, "Recenter", (e) => cam = vecf.Zero));
-            UIMgt.UI.Add(new UIImage("pal0", palette[0], palette[0], 2 + 102 * ix + 30 * 0, 2, 30, 30));
-            UIMgt.UI.Add(new UIImage("pal1", palette[1], palette[0], 2 + 102 * ix + 30 * 1, 2, 30, 30));
-            UIMgt.UI.Add(new UIImage("pal2", palette[2], palette[0], 2 + 102 * ix + 30 * 2, 2, 30, 30));
-            UIMgt.UI.Add(new UIImage("pal3", palette[3], palette[0], 2 + 102 * ix + 30 * 3, 2, 30, 30));
+            UIMgt.UI.Add(new UIImage("pal_select", palette[0], palette[0], 2 + 102 * ix + 30 * 0, 2, 30, 30));
+            UIMgt.UI.Add(new UIImage("pal0",          palette[0], palette[0], 2 + 102 * ix + 30 * 1, 2, 30, 30));
+            UIMgt.UI.Add(new UIImage("pal1",          palette[1], palette[0], 2 + 102 * ix + 30 * 2, 2, 30, 30));
+            UIMgt.UI.Add(new UIImage("pal2",          palette[2], palette[0], 2 + 102 * ix + 30 * 3, 2, 30, 30));
+            UIMgt.UI.Add(new UIImage("pal3",          palette[3], palette[0], 2 + 102 * ix + 30 * 4, 2, 30, 30));
         }
 
         private void Update(object _, EventArgs e)
@@ -323,10 +324,13 @@ namespace DOSBOX_HEX_EDIT
                     scale = Math.Min(max_scale, Math.Max(min_scale, scale + MouseStates.Delta / 1000F));
                 }
             }
+            int old_color_selection = color_selection;
             if (KB.IsKeyDown(KB.Key.Numpad0)) color_selection = 0;
             if (KB.IsKeyDown(KB.Key.Numpad1)) color_selection = 1;
             if (KB.IsKeyDown(KB.Key.Numpad2)) color_selection = 2;
             if (KB.IsKeyDown(KB.Key.Numpad3)) color_selection = 3;
+            if(old_color_selection != color_selection)
+                UIMgt.GetUIByName<UIImage>("pal_select").NewImageFromArgb(palette[color_selection]);
             if (KB.IsKeyDown(KB.Key.P)) tool_selection = 0;// pen
             if (KB.IsKeyDown(KB.Key.B)) tool_selection = 1;// bucket
             if (KB.IsKeyDown(KB.Key.L)) { tool_selection = 2; tool_line_first_node = vec.Null; }// line
@@ -341,12 +345,22 @@ namespace DOSBOX_HEX_EDIT
             }
             else
             {
-                switch (tool_selection)
+                if (MouseStates.IsButtonDown(MouseButtons.Right))
                 {
-                    case 0: do_tool_pen(); break;
-                    case 1: do_tool_bucket(); break;
-                    case 2: do_tool_line(); break;
-                    case 3: do_tool_paste(); break;
+                    color_selection = get(ms.i);
+                    var ui = UIMgt.GetUIByName<UIImage>("pal_select");
+                    ui.NewImageFromArgb(palette[color_selection]);
+                    ui.Update();
+                }
+                else
+                {
+                    switch (tool_selection)
+                    {
+                        case 0: do_tool_pen(); break;
+                        case 1: do_tool_bucket(); break;
+                        case 2: do_tool_line(); break;
+                        case 3: do_tool_paste(); break;
+                    }
                 }
             }
         }
@@ -570,6 +584,10 @@ namespace DOSBOX_HEX_EDIT
                     for (int y = 0; y < pen_size; y++)
                     {
                         var v = Maths.Lerp((tool_line_first_node.x + x, tool_line_first_node.y + y).Vf(), (ms.x + x, ms.y + y).Vf(), t).i;
+                        v.x = Math.Max(0, v.x);
+                        v.y = Math.Max(0, v.y);
+                        v.x = Math.Min(w, v.x);
+                        v.y = Math.Min(h, v.y);
                         preview_bytes[v.y * w + v.x] = color_selection;
                     }
                 }
