@@ -13,6 +13,11 @@ namespace DOSBOX2
             public Palette palette;
         }
 
+        public enum BatchMode
+        {
+            Raw=0, HumanReadable, Reset
+        }
+
         public static readonly int screen_size = 480, pixel_size = 4;
         public static readonly int resolution = screen_size / pixel_size;
         public static byte[,] pixels = new byte[screen_size, screen_size];
@@ -47,13 +52,36 @@ namespace DOSBOX2
             refresh_indexes.Add((x, y).V());
             pixels[x, y] = v;
         }
-        public static void SetBatch(byte[,] batch, int x, int y, bool reverse = false)
+        public static void SetBatch(byte[,] batch, int x, int y, BatchMode mode = BatchMode.Raw, bool reverse = false)
         {
-            int w = batch.GetLength(0);
-            int h = batch.GetLength(1);
-            for (int i = 0; i < w; i++)
-                for (int j = 0; j < h; j++)
-                    Set(reverse ? x + w - i : x + i, y + j, batch[i, j]);
+            int w, h, i, j;
+
+
+            w = batch.GetLength(0);
+            h = batch.GetLength(1);
+
+            switch (mode)
+            {
+
+                case BatchMode.Raw:
+                    for (i = 0; i < w; i++)
+                        for (j = 0; j < h; j++)
+                            Set(reverse ? x + w - i : x + i, y + j, batch[i, j]);
+                    break;
+
+                case BatchMode.HumanReadable:
+                    for (i = 0; i < w; i++)
+                        for (j = 0; j < h; j++)
+                            Set(reverse ? x + w - i : x + i, y + j, batch[i, j]);
+                    break;
+
+                case BatchMode.Reset:
+                    for (i = 0; i < w; i++)
+                        for (j = 0; j < h; j++)
+                            Set(reverse ? x + w - i : x + i, y + j, 3);
+                    break;
+
+            }
         }
 
         public static void Draw()
@@ -80,12 +108,31 @@ namespace DOSBOX2
                 Set(x+w, j, color_index);
             }
         }
+        public static void DrawCircle(byte color_index, int x, int y, int radius)
+        {
+            for (int angle = 0; angle < 360; angle++)
+            {
+                int i = (int)(radius * Math.Cos(angle * Math.PI / 180));
+                int j = (int)(radius * Math.Sin(angle * Math.PI / 180));
+                Set(x + i, y + j, color_index);
+            }
+        }
+
+
         public static void FillRect(byte color_index, int x, int y, int w, int h)
         {
             for (int i = x; i <= x + w; i++)
                 for (int j = y; j <= y + h; j++)
                     Set(i, j, color_index);
         }
+        public static void FillCircle(byte color_index, int x, int y, int radius)
+        {
+            for (int i = -radius; i <= radius; i++)
+                for (int j = -radius; j <= radius; j++)
+                    if (i * i + j * j <= radius * radius)
+                        Set(x + i, y + j, color_index);
+        }
+
         public static void FillDrawRect(byte color_index_content, byte color_index_bounds, int x, int y, int w, int h)
         {
             FillRect(color_index_content, x, y, w, h);

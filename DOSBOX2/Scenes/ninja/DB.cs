@@ -12,6 +12,7 @@ namespace DOSBOX2.Scenes.ninja
         {
            NULL         = 0x00,
            GUN          = 0x01,
+           BULLET      = 0x02,
         }
     }
 }

@@ -49,9 +49,13 @@
   <ItemGroup>
     <Compile Include="Common\CharacterControls.cs" />
     <Compile Include="Common\CharacterStatus.cs" />
+    <Compile Include="Common\Entity.cs" />
+    <Compile Include="Common\EntityManager.cs" />
     <Compile Include="Common\Inventory.cs" />
     <Compile Include="Common\Item.cs" />
     <Compile Include="Core.cs" />
+    <Compile Include="GameObjects\BaseBullet.cs" />
+    <Compile Include="Graphic.cs" />
     <Compile Include="Scenes\ninja\DB.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
@@ -61,7 +65,6 @@
     </Compile>
     <Compile Include="GameObjects\BasePlateformCharacter.cs" />
     <Compile Include="GraphicExt.cs" />
-    <Compile Include="Graphic.cs" />
     <Compile Include="Palette.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

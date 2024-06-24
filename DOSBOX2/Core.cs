@@ -12,6 +12,8 @@ namespace DOSBOX2
         public static int CurrentSceneIndex = -1;
         private static int menu_selection = 0;
 
+        public static float Speed = 1F;
+
         public static List<(string Name, IScene Instance)> Suggestions = new List<(string, IScene)>()
         {
             ("Ninja", new SceneNinja()),

@@ -1,18 +1,12 @@
 ﻿using DOSBOX2.Common;
 using DOSBOX2.Scenes.ninja;
-using System.Drawing;
 using Tooling;
+using KeyBindings = DOSBOX2.Common.CharacterControls.KeyBindings;
 
 namespace DOSBOX2.GameObjects
 {
-    internal class BasePlateformCharacter
+    internal class BasePlateformCharacter : Entity
     {
-        public byte Faction; // group of colliders
-        public CharacterControls Controls;
-        public CharacterStatus Status;
-        public Collider Collider;
-        public Inventory Inventory;
-
         #region Events
         public delegate void EmptyHandler();
         //public delegate void UpdateHandler();
@@ -28,6 +22,7 @@ namespace DOSBOX2.GameObjects
             Collider collider = null,
             Inventory inventory = null
             )
+            : base(faction, status_init, collider, inventory)
         {
             Faction = faction;
             Controls = new CharacterControls();
@@ -36,26 +31,25 @@ namespace DOSBOX2.GameObjects
             Inventory = inventory ?? new Inventory();
         }
 
-        public virtual void Update()
+        public override void Update()
         {
             UpdateShot();
             Inventory.CleanEmptySlots();
         }
         private void UpdateShot()
         {
-            if (KB.IsKeyPressed(Controls.Shot))
+            if (KB.IsKeyPressed(Controls.KeyBinds[KeyBindings.Shot]))
             {
-                if (Inventory.Substract(DB.REF.GUN))
+                if (Inventory.Contains(DB.REF.GUN) && Inventory.Substract(DB.REF.BULLET))
                 {
-                    // create bullet
+                    new BaseBullet(1, (Facing == Faces.Left ? -1 : 1, 0).Vf(), Faction) { Name = "Bullet (Player)", Facing = Facing, x = x + w / 2, y = y + h / 2 };
                 }
             }
-        }
-        public virtual void Colliding()
-        {
-        }
-        public virtual void Draw(Graphics g)
-        {
+
+            if (KB.IsKeyDown(Controls.KeyBinds[KeyBindings.Left]))
+                x -= Speed;
+            if (KB.IsKeyDown(Controls.KeyBinds[KeyBindings.Right]))
+                x += Speed;
         }
     }
 }

@@ -29,5 +29,17 @@ namespace DOSBOX2
             Graphic.Set(x + 5, y + 0, (byte)(a ? 0 : 2));
             Graphic.Set(x + 6, y + 0, (byte)(b ? 0 : 2));
         }
+
+        public static byte[,] CreateBatch(string to_parse)
+        {
+            var lines = to_parse.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            var w = lines[0].Length;
+            var h = lines.Length;
+            byte[,] result = new byte[w, h];
+            for (int x = 0; x < w; x++)
+                for (int y = 0; y < h; y++)
+                    result[x, y] = (byte) int.Parse(""+lines[y][x]);
+            return result;
+        }
     }
 }

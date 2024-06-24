@@ -37,5 +37,7 @@ namespace Tooling
             this.x = (float)Math.Ceiling(x);
             this.y = (float)Math.Ceiling(y);
         }
+
+        public override bool SameAs(Collider other) => other is Circle ? x == other.x && y == other.y && r == (other as Circle).r : false;
     }
 }
