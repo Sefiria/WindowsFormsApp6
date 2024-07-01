@@ -28,6 +28,8 @@ namespace DOSBOX2.Common
         public Dictionary<KeyBindings, KB.Key> KeyBinds = new Dictionary<KeyBindings, KB.Key>(DefaultKeyBinds);
         public Dictionary<KeyBindings, bool> ForcedStates = new Dictionary<KeyBindings, bool>();
 
+        public bool IsMoving => ForcedStates[KeyBindings.Left] || ForcedStates[KeyBindings.Right] || KB.IsKeyDown(KeyBinds[KeyBindings.Left]) || KB.IsKeyDown(KeyBinds[KeyBindings.Right]);
+
         public CharacterControls()
         {
             KeyBinds.Keys.ToList().ForEach(x => ForcedStates[x] = false);

@@ -1,5 +1,9 @@
-﻿using System;
+﻿using DOSBOX2.GameObjects;
+using System;
+using System.Drawing;
+using System.Linq;
 using Tooling;
+using static DOSBOX2.Common.EventHandlers;
 
 namespace DOSBOX2.Common
 {
@@ -12,6 +16,11 @@ namespace DOSBOX2.Common
 
         public static EntityManager Manager = null;
 
+        #region events
+        public event EmptyHandler OnGroundHit;
+        public event CollisionHandler OnHit;
+        #endregion
+
         public bool Exists = true;
         public Guid ID;
         public string Name;
@@ -20,55 +29,48 @@ namespace DOSBOX2.Common
         public Faces Facing = Faces.Right;
         public CharacterControls Controls;
         public CharacterStatus Status;
-        public Collider Collider;
         public Inventory Inventory;
-        public byte[,] Texture = null;
         public vecf PrevPosition;
+        public Entity Owner = null;
+        /// <summary>
+        /// Prevent Gravity to apply if true
+        /// </summary>
+        public bool IsKinetic = false;
+        /// <summary>
+        /// Indicates no physical collision with entities, but keep triggering hit events
+        /// IsKinetic = true is implicit
+        /// </summary>
+        public bool IsTrigger = false;
 
-        private bool first_before_update_done = false;
+        public float Gravity = 0.75F;
+        public bool IsMoving = false;
+        public bool IsOnGround = false;
+
+        public virtual float x { get; set; }
+        public virtual float y { get; set; }
+        public virtual float w { get; protected set; }
+        public virtual float h { get; protected set; }
+
+        public float cx => x + w / 2F;
+        public float cy => y + h / 2F;
+        public vecf center => (cx, cy).Vf();
+
+
+        public Rectangle Rect => new Rectangle((int)x, (int)y, (int)w, (int)h);
+
+        protected bool first_before_update_done = false;
 
         public float Speed = 0.5F;
-
-        public float x { get => Collider?.x ?? 0F; set { if (Collider != null) Collider.x = value; } }
-        public float y { get => Collider?.y ?? 0F; set { if (Collider != null) Collider.y = value; } }
-        public float w
-        {
-            get
-            {
-                if (Collider == null) return 0F;
-                switch (Collider)
-                {
-                    default: return 0F;
-                    case Circle c: return c.diameter;
-                    case Box b: return b.w;
-                }
-            }
-        }
-        public float h
-        {
-            get
-            {
-                if (Collider == null) return 0F;
-                switch (Collider)
-                {
-                    default: return 0F;
-                    case Circle c: return c.diameter;
-                    case Box b: return b.h;
-                }
-            }
-        }
 
         public Entity(
             byte faction = 0,
             CharacterStatus.Init status_init = CharacterStatus.Init.Mid,
-            Collider collider = null,
             Inventory inventory = null)
         {
             ID = Guid.NewGuid();
 
             Faction = faction;
             Status = new CharacterStatus(status_init);
-            Collider = collider;
             Inventory = inventory;
 
             Manager.Add(this);
@@ -81,39 +83,65 @@ namespace DOSBOX2.Common
         }
         public virtual void Update()
         {
-            x += Look.x * Speed * Core.Speed;
+            if (Look.x < 0F) Facing = Faces.Left;
+            if (Look.x > 0F) Facing = Faces.Right;
+
+            Entity ground_contact_collider = null;
+            bool touches_ground = IsKinetic || IsTrigger || (ground_contact_collider = Manager.Entities.Except(this).ToList().FirstOrDefault(e => new RectangleF(x, y + h - 2, w, 4).IntersectsWith(e.Rect))) != null;
+            if (!IsOnGround && touches_ground)
+            {
+                OnGroundHit?.Invoke();
+                Look.y = Math.Min(0F, Look.y);
+            }
+            IsOnGround = touches_ground;
+
+            if (!IsOnGround)
+                Look.y += !IsKinetic && !IsTrigger && !touches_ground ? Gravity : 0F;
+
+            if(Manager.Entities.Except(this).Except(ground_contact_collider).ToList().FirstOrDefault(e => new RectangleF(x + Look.x * Speed * Core.Speed, y + h - 2, w, 4).IntersectsWith(e.Rect)) == null)
+                x += Look.x * Speed * Core.Speed;
             y += Look.y * Speed * Core.Speed;
         }
         public virtual void AfterUpdate()
         {
             Controls?.Update();
+            IsMoving = Controls?.IsMoving ?? false;
         }
         public virtual void Colliding()
         {
-        }
-        public virtual void Draw(bool force = false, bool reset_prev = true)
-        {
-            if (!force && (PrevPosition?.i == (x, y).V() || !first_before_update_done))
-                return;
-            if(Texture != null)
+            if (IsTrigger) return;
+            var entities = Manager.Entities.Except(this).ToList().Where(e => !e.IsTrigger);
+            vecf n;
+
+            foreach (Entity other in entities)
             {
-                if(reset_prev)Graphic.SetBatch(Texture, (int)PrevPosition.x, (int)PrevPosition.y, Graphic.BatchMode.Reset, Facing == Faces.Left);
-                Graphic.SetBatch(Texture, (int)x, (int)y, Graphic.BatchMode.Raw, Facing == Faces.Left);
-            }
-            else if(Collider != null)
-            {
-                switch (Collider)
+                if (!other.Rect.IntersectsWith(Rect)) continue;
+                n = (other.center - center).Normalized();
+
+                if (other.IsKinetic && !IsKinetic)
                 {
-                    case Circle c:
-                        if (reset_prev) Graphic.FillCircle(3, (int)PrevPosition.x, (int)PrevPosition.y, (int)c.r);
-                        Graphic.FillCircle(0, (int)c.x, (int)c.y, (int)c.r);
-                        break;
-                    case Box b:
-                        if (reset_prev) Graphic.FillRect(3, (int)PrevPosition.x, (int)PrevPosition.y, (int)b.w, (int)b.h);
-                        Graphic.FillRect(0, (int)b.x, (int)b.y, (int)b.w, (int)b.h);
-                        break;
+                    do { x -= n.x * Core.Speed * 2F; y -= n.y * Core.Speed * 2F; } while (other.Rect.IntersectsWith(Rect));
+                }
+                else if (!other.IsKinetic && IsKinetic)
+                {
+                    do { other.y -= Speed * Core.Speed * 2F; } while (other.Rect.IntersectsWith(Rect));
+                }
+                else if (!other.IsKinetic && !IsKinetic)
+                {
+                    do
+                    {
+                        if (other.y < y) { x -= n.x * Core.Speed * 2F; y -= n.y * Core.Speed * 2F; }
+                        else { other.x -= n.x * Core.Speed * 2F; other.y -= n.y * Core.Speed * 2F; }
+                    } while (other.Rect.IntersectsWith(Rect));
                 }
             }
+        }
+
+        public virtual void Draw()
+        {
+        }
+        public virtual void ClearDraw()
+        {
         }
     }
 }

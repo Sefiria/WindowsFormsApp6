@@ -31,7 +31,10 @@ namespace DOSBOX2.Common
             foreach (Entity e in copy)
             {
                 if (e.Exists)
+                {
                     e.Update();
+                    e.Colliding();
+                }
                 else
                     Entities.Remove(e);
             }
@@ -44,7 +47,10 @@ namespace DOSBOX2.Common
                 if (e.Exists)
                     e.AfterUpdate();
                 else
+                {
+                    e.ClearDraw();
                     Entities.Remove(e);
+                }
             }
         }
         public void Draw()

@@ -41,6 +41,10 @@ namespace Tooling
             w = c.r * 2;
             h = c.r * 2;
         }
+        public Box()
+        {
+            x = y = w = h = 0;
+        }
 
         public override bool SameAs(Collider other) => other is Box ? x == other.x && y == other.y && w == (other as Box).w && h == (other as Box).h : false;
     }
