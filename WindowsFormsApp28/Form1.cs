@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
@@ -16,8 +17,8 @@ namespace WindowsFormsApp28
                 Color.FromArgb(35, 48, 64) };
         List<SolidBrush> PaletteBrushes;
 
-        const int w = byte.MaxValue;
-        const int h = byte.MaxValue;
+        const int w = 256;
+        const int h = 256;
         float z = 10F;
         float x=w / 2, y= h/ 2;
         float mvspd = 0.5F;
@@ -26,10 +27,11 @@ namespace WindowsFormsApp28
         Timer TimerUpdate = new Timer() { Enabled = true, Interval = 10 };
         Timer TimerDraw = new Timer() { Enabled = true, Interval = 10 };
         Bitmap Image;
-        Graphics g;
         byte px_pal_sel = 0;
         Font font;
         Size CharSize;
+        double time = 0;
+        bool busy = false;
 
         public Form1()
         {
@@ -51,7 +53,11 @@ namespace WindowsFormsApp28
 
         private void Update(object sender, EventArgs e)
         {
+            if (busy || !Focused) return;
+            busy = true;
             var (z, q, s, d) = KB.ZQSD();
+            var kc = KB.IsKeyPressed(KB.Key.C);
+            var kx = KB.IsKeyPressed(KB.Key.X);
             var left_pressed = MouseStates.IsButtonPressed(MouseButtons.Left);
             var right_pressed = MouseStates.IsButtonPressed(MouseButtons.Right);
             bool pressed = left_pressed || right_pressed;
@@ -64,6 +70,9 @@ namespace WindowsFormsApp28
             if (q) x -= adjustedSpeed;
             if (s) y += adjustedSpeed;
             if (d) x += adjustedSpeed;
+
+            if (kx) ResetPixels();
+            if (kc) ResetFluids();
 
             var ms = MouseStates.Position.ToPoint();
             var oldMs = MouseStates.OldPosition.ToPoint();
@@ -88,7 +97,7 @@ namespace WindowsFormsApp28
                     if (worldX >= 0 && worldX < w && worldY >= 0 && worldY < h)
                     {
                         int index = worldY * w + worldX;
-                        if (right_down) Fluids[index] = 1F;
+                        if (right_down) Fluids[index] = Math.Min(10F, Fluids[index]+1F);
                         else Pixels[index] = px_pal_sel;
                     }
                 }
@@ -97,60 +106,108 @@ namespace WindowsFormsApp28
             if (MouseStates.Delta != 0)
                 this.z *= 1 + MouseStates.Delta / 1000F;
 
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
             ManageFluids();
+            time = stopwatch.Elapsed.TotalSeconds;
 
             KB.Update();
             MouseStates.Update();
+            busy = false;
         }
 
         void ManageFluids()
         {
-            bool px(int x, int y) => Pixels[y * w + x] != 3;
-            float get(int x, int y) => Fluids[y * w + x];
+            float[] new_fluids = new float[w * h];
+            Array.Copy(Fluids, new_fluids, w * h);
+
+            bool px(int x, int y) => Pixels[y * w + x] != 3 && get(x,y) < 1F;
+            float get(int x, int y) => new_fluids[y * w + x];
             float fluiddiff(int x, int y, int ofst_x, int ofst_y)
             {
-                float diff = get(x,y) - get(x + ofst_x, y + ofst_y);
-                return diff > 0.01F ? diff : 0F;
+                //float diff = get(x, y) - get(x + ofst_x, y + ofst_y);
+                float diff = get(x, y);
+                return diff;// > 0.01F ? diff : 0F;
             }
 
-            for (int y = 0; y < h; y++)
+            int startX = Math.Max(0, (int)(x - Width / (2 * z)));
+            int startY = Math.Max(0, (int)(y - Height / (2 * z)));
+            int endX = Math.Min(w-1, (int)(x + Width / z));
+            int endY = Math.Min(h-1, (int)(y + Height / z));
+
+            for (int y = startY; y < endY; y++)
             {
-                for (int x = 0; x < w; x++)
+                for (int x = startX; x < endX; x++)
                 {
-                    if (Fluids[y * w + x] == 0F)
+                    if (get(x, y) == 0F)
                         continue;
 
                     bool bottom = y < h - 1 && px(x, y + 1) && get(x, y + 1) < 1F;
                     bool left = x > 0 && px(x - 1, y) && get(x - 1, y) < 1F;
                     bool right = x < w - 1 && px(x + 1, y) && get(x + 1, y) < 1F;
                     bool top = y > 0 && px(x, y - 1) && get(x, y - 1) < 1F;
-                    float d, d2, q, spd = 0.2F;
+                    float d, d2, q, spd = 0.7F;
                     
                     void move(int ofst_x, int ofst_y, float _d)
                     {
-                        if (_d <= 0F) return;
-                        q = Math.Max(0.02F, _d);
+                        //q = Math.Min(Math.Min(Fluids[y * w + x], _d), 1F-Fluids[(y + ofst_y) * w + x + ofst_x]);
+                        q = Math.Min(Fluids[y * w + x], _d);
                         Fluids[y*w+x] -= q;
-                        if (get(x, y) < 0F) Fluids[y * w + x] = 0F;
+                        if (Fluids[y * w + x] < 0F) Fluids[y * w + x] = 0F;
                         Fluids[(y + ofst_y) * w + x + ofst_x] += q;
                     }
                     void job(int ofst_x, int ofst_y, bool isdiff = true)
                     {
-                        move(ofst_x, ofst_y, isdiff ? fluiddiff(x, y, ofst_x, ofst_y) * spd : get(x, y) * 0.25F);
+                        move(ofst_x, ofst_y, isdiff ? fluiddiff(x, y, ofst_x, ofst_y) * spd : get(x, y) * spd);
                     }
 
                     if (bottom) job(0, 1, false);
-                    else if (left && right) { d = fluiddiff(x, y, -1, 0) * spd; d2 = fluiddiff(x, y, 1, 0) * spd; move(-1, 0, d); move(1, 0, d2); }
-                    else if (left) job(-1, 0);
-                    else if (right) job(1, 0);
+                    //else if (left && right) { d = fluiddiff(x, y, -1, 0) * spd; d2 = fluiddiff(x, y, 1, 0) * spd; move(-1, 0, d); move(1, 0, d2); }
+                    else if (left && right)
+                    {
+                        d = fluiddiff(x, y, -1, 0) * spd;
+                        d2 = fluiddiff(x, y, 1, 0) * spd;
+                        if (d == d2)
+                        {
+                            move(-1, 0, d/2F);
+                            move(1, 0, d2/2F);
+                        }
+                        if (d < d2)
+                            move(-1, 0, d);
+                        else
+                            move(1, 0, d2);
+                    }
+                    else if (left || right)
+                    {
+                        if (right) job(1, 0);
+                        if (left) job(-1, 0);
+                    }
                     else if (top) job(0, -1);
 
-                    if (get(x, y) > 1F) Fluids[y * w + x] = 1F;
-                    if (get(x, y) < 0.01F) Fluids[y * w + x] = 0F;
+                    if (Fluids[y * w + x] < 0.01F) Fluids[y * w + x] = 0F;
                 }
             }
         }
-
+        void ResetFluids()
+        {
+            for (int y = 0; y < h; y++)
+            {
+                for (int x = 0; x < w; x++)
+                {
+                    Fluids[y * w + x] = 0F;
+                }
+            }
+        }
+        void ResetPixels()
+        {
+            for (int y = 0; y < h; y++)
+            {
+                for (int x = 0; x < w; x++)
+                {
+                    Pixels[y * w + x] = 0;
+                }
+            }
+        }
 
         private void Draw(object sender, EventArgs e)
         {
@@ -159,15 +216,15 @@ namespace WindowsFormsApp28
             {
                 int startX = Math.Max(0, (int)(x - Width / (2 * z)));
                 int startY = Math.Max(0, (int)(y - Height / (2 * z)));
-                int endX = Math.Min(w, (int)(x + Width / z));
-                int endY = Math.Min(h, (int)(y + Height / z));
+                int endX = Math.Min(w-1, (int)(x + Width / z));
+                int endY = Math.Min(h-1, (int)(y + Height / z));
 
                 for (int y = startY; y < endY; y++)
                     for (int x = startX; x < endX; x++)
                     {
                         int index = y * w + x;
                         if(Pixels[index] == 0 && Fluids[index] > 0F)
-                            g.FillRectangle(PaletteBrushes[Fluids[index] >= 0.2F ? 2 : 1], (x - this.x + Width / (2 * z)) * z, (y - this.y + Height / (2 * z)) * z, z, z);
+                            g.FillRectangle(PaletteBrushes[Fluids[index] > 0.2F ? 2 : 1], (x - this.x + Width / (2 * z)) * z, (y - this.y + Height / (2 * z)) * z, z, z);
                         else
                             g.FillRectangle(PaletteBrushes[Pixels[index]], (x - this.x + Width / (2 * z)) * z, (y - this.y + Height / (2 * z)) * z, z, z);
                     }
@@ -178,8 +235,12 @@ namespace WindowsFormsApp28
                 if (worldX >= 0 && worldX < w && worldY >= 0 && worldY < h)
                 {
                     int index = worldY * w + worldX;
-                    g.DrawString(Maths.Round(Fluids[index], 2).ToString(), font, Brushes.Black, ms.X - CharSize.Width / 2, ms.Y - CharSize.Height * 1.5F);
+                    var tx = $"{{{worldX},{worldY}}} {Maths.Round(Fluids[index], 2)}";
+                    var txw = g.MeasureString(tx, font).Width;
+                    g.DrawString(tx, font, Brushes.Black, ms.X - txw / 2, ms.Y - CharSize.Height * 1.5F);
                 }
+
+                g.DrawString(time.ToString(), font, Brushes.Black, 10, 10);
             }
             Render.Image = Image;
         }
