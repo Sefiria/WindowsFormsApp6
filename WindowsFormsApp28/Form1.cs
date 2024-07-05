@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Reflection;
+using System.Linq;
 using System.Windows.Forms;
 using Tooling;
 
@@ -23,7 +23,7 @@ namespace WindowsFormsApp28
         float x=w / 2, y= h/ 2;
         float mvspd = 0.5F;
         byte[] Pixels = new byte[w * h];
-        float[] Fluids = new float[w * h];
+        Fluid[] Fluids = new Fluid[w * h];
         Timer TimerUpdate = new Timer() { Enabled = true, Interval = 10 };
         Timer TimerDraw = new Timer() { Enabled = true, Interval = 10 };
         Bitmap Image;
@@ -43,6 +43,10 @@ namespace WindowsFormsApp28
             PaletteBrushes = new List<SolidBrush>();
             foreach (Color c in Palette)
                 PaletteBrushes.Add(new SolidBrush(c));
+
+            for(int x=0;x<w; x++)
+                for(int y=0;y<h;y++)
+                    Fluids[y*w+x] = new Fluid();
 
             KB.Init();
             MouseStates.Initialize(Render);
@@ -97,7 +101,7 @@ namespace WindowsFormsApp28
                     if (worldX >= 0 && worldX < w && worldY >= 0 && worldY < h)
                     {
                         int index = worldY * w + worldX;
-                        if (right_down) Fluids[index] = Math.Min(10F, Fluids[index]+1F);
+                        if (right_down) Fluids[index].Q = Math.Min(10F, Fluids[index].Q+0.01F);
                         else Pixels[index] = px_pal_sel;
                     }
                 }
@@ -116,17 +120,20 @@ namespace WindowsFormsApp28
             busy = false;
         }
 
+        int tick = 0;
         void ManageFluids()
         {
-            float[] new_fluids = new float[w * h];
-            Array.Copy(Fluids, new_fluids, w * h);
+            //if (tick++ < 10) return;
+            //tick = 0;
 
-            bool px(int x, int y) => Pixels[y * w + x] != 3 && get(x,y) < 1F;
-            float get(int x, int y) => new_fluids[y * w + x];
+            Fluid[] new_fluids = Fluids.Select(fluid => new Fluid(fluid)).ToArray();
+
+            bool px(int x, int y) => Pixels[y * w + x] != 3 && get(x,y) < 0.1F;
+            float get(int x, int y) => new_fluids[y * w + x].Q;
             float fluiddiff(int x, int y, int ofst_x, int ofst_y)
             {
-                //float diff = get(x, y) - get(x + ofst_x, y + ofst_y);
-                float diff = get(x, y);
+                float diff = get(x, y) - get(x + ofst_x, y + ofst_y);
+                //float diff = get(x, y);
                 return diff;// > 0.01F ? diff : 0F;
             }
 
@@ -142,40 +149,41 @@ namespace WindowsFormsApp28
                     if (get(x, y) == 0F)
                         continue;
 
-                    bool bottom = y < h - 1 && px(x, y + 1) && get(x, y + 1) < 1F;
-                    bool left = x > 0 && px(x - 1, y) && get(x - 1, y) < 1F;
-                    bool right = x < w - 1 && px(x + 1, y) && get(x + 1, y) < 1F;
-                    bool top = y > 0 && px(x, y - 1) && get(x, y - 1) < 1F;
+                    bool bottom = y < h - 1 && px(x, y + 1);
+                    bool left = x > 0 && px(x - 1, y);
+                    bool right = x < w - 1 && px(x + 1, y);
+                    bool top = y > 0 && !left && !right && Pixels[y * w + x] != 3 && get(x, y) > 1F;
                     float d, d2, q, spd = 0.7F;
-                    
+
                     void move(int ofst_x, int ofst_y, float _d)
                     {
-                        //q = Math.Min(Math.Min(Fluids[y * w + x], _d), 1F-Fluids[(y + ofst_y) * w + x + ofst_x]);
-                        q = Math.Min(Fluids[y * w + x], _d);
-                        Fluids[y*w+x] -= q;
-                        if (Fluids[y * w + x] < 0F) Fluids[y * w + x] = 0F;
-                        Fluids[(y + ofst_y) * w + x + ofst_x] += q;
+                        q = Math.Min(Fluids[y * w + x].Q, _d);
+                        Fluids[y * w + x].Q -= q;
+                        if (Fluids[y * w + x].Q < 0F) Fluids[y * w + x].Q = 0F;
+                        Fluids[(y + ofst_y) * w + x + ofst_x].Q += q;
                     }
                     void job(int ofst_x, int ofst_y, bool isdiff = true)
                     {
-                        move(ofst_x, ofst_y, isdiff ? fluiddiff(x, y, ofst_x, ofst_y) * spd : get(x, y) * spd);
+                        move(ofst_x, ofst_y, get(x, y) * spd);
                     }
 
                     if (bottom) job(0, 1, false);
-                    //else if (left && right) { d = fluiddiff(x, y, -1, 0) * spd; d2 = fluiddiff(x, y, 1, 0) * spd; move(-1, 0, d); move(1, 0, d2); }
                     else if (left && right)
                     {
                         d = fluiddiff(x, y, -1, 0) * spd;
                         d2 = fluiddiff(x, y, 1, 0) * spd;
                         if (d == d2)
                         {
-                            move(-1, 0, d/2F);
-                            move(1, 0, d2/2F);
+                            move(-1, 0, d / 2F);
+                            move(1, 0, d2 / 2F);
                         }
-                        if (d < d2)
-                            move(-1, 0, d);
                         else
-                            move(1, 0, d2);
+                        {
+                            if (d < d2)
+                                move(-1, 0, d);
+                            else
+                                move(1, 0, d2);
+                        }
                     }
                     else if (left || right)
                     {
@@ -184,7 +192,7 @@ namespace WindowsFormsApp28
                     }
                     else if (top) job(0, -1);
 
-                    if (Fluids[y * w + x] < 0.01F) Fluids[y * w + x] = 0F;
+                    if (Fluids[y * w + x].Q < 0.01F) Fluids[y * w + x].Q = 0F;
                 }
             }
         }
@@ -194,7 +202,7 @@ namespace WindowsFormsApp28
             {
                 for (int x = 0; x < w; x++)
                 {
-                    Fluids[y * w + x] = 0F;
+                    Fluids[y * w + x].Q = 0F;
                 }
             }
         }
@@ -223,8 +231,21 @@ namespace WindowsFormsApp28
                     for (int x = startX; x < endX; x++)
                     {
                         int index = y * w + x;
-                        if(Pixels[index] == 0 && Fluids[index] > 0F)
-                            g.FillRectangle(PaletteBrushes[Fluids[index] > 0.2F ? 2 : 1], (x - this.x + Width / (2 * z)) * z, (y - this.y + Height / (2 * z)) * z, z, z);
+                        
+                        if (Pixels[index] != 3)
+                        {
+                            //    if(Fluids[index].Q == 0F)
+                            //        g.FillRectangle(Brushes.White, (x - this.x + Width / (2 * z)) * z, (y - this.y + Height / (2 * z)) * z, z, z);
+                            //    else
+                            //    g.FillRectangle(new SolidBrush(Color.FromArgb((byte)(100 - Fluids[index].Q * 100), (byte)(200 - Fluids[index].Q * 200), (byte)(255 - Fluids[index].Q * 255))), (x - this.x + Width / (2 * z)) * z, (y - this.y + Height / (2 * z)) * z, z, z);
+                            if (Fluids[index].Q > 0F)
+                                g.FillRectangle(PaletteBrushes[2], (x - this.x + Width / (2 * z)) * z, (y - this.y + Height / (2 * z)) * z, z, z);
+                            else if (Fluids[index].LF > 0F)
+                            {
+                                g.FillRectangle(PaletteBrushes[1], (x - this.x + Width / (2 * z)) * z, (y - this.y + Height / (2 * z)) * z, z, z);
+                                Fluids[index].LF -= Fluid.GraphicalDeathSpeed;
+                            }
+                    }
                         else
                             g.FillRectangle(PaletteBrushes[Pixels[index]], (x - this.x + Width / (2 * z)) * z, (y - this.y + Height / (2 * z)) * z, z, z);
                     }
@@ -235,7 +256,7 @@ namespace WindowsFormsApp28
                 if (worldX >= 0 && worldX < w && worldY >= 0 && worldY < h)
                 {
                     int index = worldY * w + worldX;
-                    var tx = $"{{{worldX},{worldY}}} {Maths.Round(Fluids[index], 2)}";
+                    var tx = $"{{{worldX},{worldY}}} {Maths.Round(Fluids[index].Q, 2)}";
                     var txw = g.MeasureString(tx, font).Width;
                     g.DrawString(tx, font, Brushes.Black, ms.X - txw / 2, ms.Y - CharSize.Height * 1.5F);
                 }
