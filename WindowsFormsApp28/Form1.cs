@@ -151,7 +151,12 @@ namespace WindowsFormsApp28
                         Fluids[y * w + x].Q -= q;
                         if (Fluids[y * w + x].Q < 0F) Fluids[y * w + x].Q = 0F;
                         Fluids[(y + ofst_y) * w + x + ofst_x].Q += q;
+                        Fluids[(y + ofst_y) * w + x + ofst_x].previous_look_x = Maths.Round(ofst_x, 3);
                     }
+
+                    Fluid f = Fluids[y*w+x];
+
+                    if ((!left && right && f.previous_look_x < 0F) || left && !right && f.previous_look_x > 0F) f.previous_look_x *= 0.8F;
 
                     if (bottom)
                     {
@@ -160,27 +165,27 @@ namespace WindowsFormsApp28
                             int c = Convert.ToInt32(left) + Convert.ToInt32(right);
                             if (c > 0)
                             {
-                                if (right) move(1, 0, get(x, y) / c * spd);
-                                if (left) move(-1, 0, get(x, y) / c * spd);
+                                if (right && f.previous_look_x <= 0F) move(1, 0, f.Q / c * spd);
+                                if (left && f.previous_look_x >= 0F) move(-1, 0, f.Q / c * spd);
                             }
                         }
                         else
                         {
-                            move(0, 1, get(x, y) * spd);
+                            move(0, 1, f.Q * spd);
                         }
                     }
                     else if (left && right)
                     {
-                        float d = get(x, y) * spd;
+                        float d = f.Q * spd;
                         move(-1, 0, d / 2F);
                         move(1, 0, d / 2F);
                     }
                     else if (left || right)
                     {
-                        if (right) move(1, 0, get(x, y) * spd);
-                        if (left) move(-1, 0, get(x, y) * spd);
+                        if (right) move(1, 0, f.Q * spd);
+                        if (left) move(-1, 0, f.Q * spd);
                     }
-                    else if (top) move(0, -1, get(x, y) * spd);
+                    else if (top) move(0, -1, f.Q * spd);
 
                     int digits = 3;
                     bool fix(int _x, int _y)
