@@ -120,27 +120,17 @@ namespace WindowsFormsApp28
             busy = false;
         }
 
-        int tick = 0;
         void ManageFluids()
         {
-            //if (tick++ < 10) return;
-            //tick = 0;
-
             Fluid[] new_fluids = Fluids.Select(fluid => new Fluid(fluid)).ToArray();
 
-            bool px(int x, int y) => Pixels[y * w + x] != 3 && get(x,y) < 0.1F;
+            bool px(int x, int y) => Pixels[y * w + x] != 3 && get(x, y) < 0.2F;
             float get(int x, int y) => new_fluids[y * w + x].Q;
-            float fluiddiff(int x, int y, int ofst_x, int ofst_y)
-            {
-                float diff = get(x, y) - get(x + ofst_x, y + ofst_y);
-                //float diff = get(x, y);
-                return diff;// > 0.01F ? diff : 0F;
-            }
 
             int startX = Math.Max(0, (int)(x - Width / (2 * z)));
             int startY = Math.Max(0, (int)(y - Height / (2 * z)));
-            int endX = Math.Min(w-1, (int)(x + Width / z));
-            int endY = Math.Min(h-1, (int)(y + Height / z));
+            int endX = Math.Min(w - 1, (int)(x + Width / z));
+            int endY = Math.Min(h - 1, (int)(y + Height / z));
 
             for (int y = startY; y < endY; y++)
             {
@@ -153,46 +143,62 @@ namespace WindowsFormsApp28
                     bool left = x > 0 && px(x - 1, y);
                     bool right = x < w - 1 && px(x + 1, y);
                     bool top = y > 0 && !left && !right && Pixels[y * w + x] != 3 && get(x, y) > 1F;
-                    float d, d2, q, spd = 0.7F;
+                    float spd = 0.7F;
 
                     void move(int ofst_x, int ofst_y, float _d)
                     {
-                        q = Math.Min(Fluids[y * w + x].Q, _d);
+                        float q = Math.Min(Fluids[y * w + x].Q, _d);
                         Fluids[y * w + x].Q -= q;
                         if (Fluids[y * w + x].Q < 0F) Fluids[y * w + x].Q = 0F;
                         Fluids[(y + ofst_y) * w + x + ofst_x].Q += q;
                     }
-                    void job(int ofst_x, int ofst_y, bool isdiff = true)
-                    {
-                        move(ofst_x, ofst_y, get(x, y) * spd);
-                    }
 
-                    if (bottom) job(0, 1, false);
-                    else if (left && right)
+                    if (bottom)
                     {
-                        d = fluiddiff(x, y, -1, 0) * spd;
-                        d2 = fluiddiff(x, y, 1, 0) * spd;
-                        if (d == d2)
+                        if (get(x, y + 1) >= 0.2F)
                         {
-                            move(-1, 0, d / 2F);
-                            move(1, 0, d2 / 2F);
+                            int c = Convert.ToInt32(left) + Convert.ToInt32(right);
+                            if (c > 0)
+                            {
+                                if (right) move(1, 0, get(x, y) / c * spd);
+                                if (left) move(-1, 0, get(x, y) / c * spd);
+                            }
                         }
                         else
                         {
-                            if (d < d2)
-                                move(-1, 0, d);
-                            else
-                                move(1, 0, d2);
+                            move(0, 1, get(x, y) * spd);
                         }
+                    }
+                    else if (left && right)
+                    {
+                        float d = get(x, y) * spd;
+                        move(-1, 0, d / 2F);
+                        move(1, 0, d / 2F);
                     }
                     else if (left || right)
                     {
-                        if (right) job(1, 0);
-                        if (left) job(-1, 0);
+                        if (right) move(1, 0, get(x, y) * spd);
+                        if (left) move(-1, 0, get(x, y) * spd);
                     }
-                    else if (top) job(0, -1);
+                    else if (top) move(0, -1, get(x, y) * spd);
 
-                    if (Fluids[y * w + x].Q < 0.01F) Fluids[y * w + x].Q = 0F;
+                    int digits = 3;
+                    bool fix(int _x, int _y)
+                    {
+                        if (Maths.Round(Fluids[(y+_y) * w + x + _x].Q, digits) == 0F)
+                        {
+                            Fluids[(y + _y) * w + x + _x].Q = 0F;
+                            return true;
+                        }
+                        return false;
+                    }
+                    if (fix(0,0))
+                    {
+                        fix(-1, 0);
+                        fix(1, 0);
+                        fix(0, -1);
+                        fix(0, 1);
+                    }
                 }
             }
         }
