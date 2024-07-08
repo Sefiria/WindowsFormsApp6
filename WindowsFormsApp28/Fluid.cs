@@ -11,7 +11,7 @@ namespace WindowsFormsApp28
     {
         public static float GraphicalDeathSpeed = 0.05F;
         protected float _Q, _LF;
-        public vecf Look;
+        public vecf Look = vecf.Zero;
         public float Q
         {
             get => _Q;
@@ -33,6 +33,7 @@ namespace WindowsFormsApp28
         public Fluid(Fluid copy)
         {
             Q = copy.Q;
+            Look = copy.Look;
         }
         public Fluid(float q)
         {
