@@ -12,6 +12,8 @@ namespace WindowsFormsApp28
         public static float GraphicalDeathSpeed = 0.05F;
         protected float _Q, _LF;
         public float previous_look_x = 0F;
+        public vec From = vec.Null;
+
         public float Q
         {
             get => _Q;
@@ -34,6 +36,7 @@ namespace WindowsFormsApp28
         {
             Q = copy.Q;
             previous_look_x = copy.previous_look_x;
+            From = copy.From;
         }
         public Fluid(float q)
         {
@@ -42,6 +45,12 @@ namespace WindowsFormsApp28
         public Fluid()
         {
             Q = 0F;
+        }
+        public void Reset()
+        {
+            Q = 0F;
+            previous_look_x = 0F;
+            From = vec.Null;
         }
     }
 }
