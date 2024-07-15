@@ -37,7 +37,7 @@ namespace WindowsFormsApp28
             cell_fluid = fluids[y * w + x];
             if (x - 1 >= 0 && pixels[(y) * w + (x - 1)] == PIPE) linked_pipes.Add((x - 1, y).V());
             if (x + 1 < w && pixels[(y) * w + (x + 1)] == PIPE) linked_pipes.Add((x + 1, y).V());
-            if (y + 1 >= 0 && pixels[(y - 1) * w + x] == PIPE) linked_pipes.Add((x, y - 1).V());
+            if (y - 1 >= 0 && pixels[(y - 1) * w + x] == PIPE) linked_pipes.Add((x, y - 1).V());
             if (y + 1 < h && pixels[(y + 1) * w + x] == PIPE) linked_pipes.Add((x, y + 1).V());
             IsAir = cell_px < BRICK;
             IsBrick = cell_px == BRICK;

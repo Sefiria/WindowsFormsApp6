@@ -31,9 +31,9 @@ namespace WindowsFormsApp28
         byte px_pal_sel = 0;
         Font font;
         Size CharSize;
-        double time = 0;
         bool busy = false;
         byte block_selection = 3;
+        int line_start_arrid = -1;
 
         const int BRICK = 3;
         const int PIPE = 4;
@@ -74,6 +74,9 @@ namespace WindowsFormsApp28
             var right_down = MouseStates.IsButtonDown(MouseButtons.Right) && Focused;
             var down = left_down || right_down;
             float adjustedSpeed = mvspd / this.z * 20F;
+            var ctrl = KB.LeftCtrl;
+
+            if (!ctrl) line_start_arrid = -1;
 
             if (z) y -= adjustedSpeed;
             if (q) x -= adjustedSpeed;
@@ -98,10 +101,12 @@ namespace WindowsFormsApp28
                 if (worldX >= 0 && worldX < w && worldY >= 0 && worldY < h)
                 {
                     int index = worldY * w + worldX;
-                    px_pal_sel = Pixels[index] == 0 ? (byte)(left_pressed? block_selection : 1) : (byte)0;
+                    if (ctrl) // line start
+                        line_start_arrid = index;
+                    px_pal_sel = Pixels[index] == 0 ? (byte)(left_pressed ? block_selection : 1) : (byte)0;
                 }
             }
-            else if (down)
+            else if (down && !ctrl)
             {
                 for (float t = 0; t <= 1; t += 0.01f)
                 {
@@ -111,19 +116,36 @@ namespace WindowsFormsApp28
                     if (worldX >= 0 && worldX < w && worldY >= 0 && worldY < h)
                     {
                         int index = worldY * w + worldX;
-                        if (right_down) Fluids[index].Q = Math.Min(10F, Fluids[index].Q+0.01F);
+                        if (right_down) Fluids[index].Q = Math.Min(10F, Fluids[index].Q + 0.01F);
                         else Pixels[index] = px_pal_sel;
                     }
+                }
+            }
+            else if (!down && ctrl)
+            {
+                if (line_start_arrid != -1)
+                {
+                    int worldX = (int)((ms.X - Width / 2) / this.z + x);
+                    int worldY = (int)((ms.Y - Height / 2) / this.z + y);
+                    int index = worldY * w + worldX;
+                    int prevId = -1, id;
+                    for (float t = 0; t <= 1; t += 0.01f)
+                    {
+                        id = Maths.Lerp(line_start_arrid, index, t);
+                        if (id != prevId)
+                        {
+                            Pixels[id] = px_pal_sel;
+                            prevId = id;
+                        }
+                    }
+                    line_start_arrid = -1;
                 }
             }
 
             if (MouseStates.Delta != 0)
                 this.z *= 1 + MouseStates.Delta / 1000F;
 
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
             ManageFluids();
-            time = stopwatch.Elapsed.TotalSeconds;
 
             KB.Update();
             MouseStates.Update();
@@ -317,10 +339,6 @@ namespace WindowsFormsApp28
                         
                         if (Pixels[index] < BRICK)
                         {
-                            //    if(Fluids[index].Q == 0F)
-                            //        g.FillRectangle(Brushes.White, (x - this.x + Width / (2 * z)) * z, (y - this.y + Height / (2 * z)) * z, z, z);
-                            //    else
-                            //    g.FillRectangle(new SolidBrush(Color.FromArgb((byte)(100 - Fluids[index].Q * 100), (byte)(200 - Fluids[index].Q * 200), (byte)(255 - Fluids[index].Q * 255))), (x - this.x + Width / (2 * z)) * z, (y - this.y + Height / (2 * z)) * z, z, z);
                             if (Fluids[index].Q > 0F)
                                 g.FillRectangle(PaletteBrushes[2], (x - this.x + Width / (2 * z)) * z, (y - this.y + Height / (2 * z)) * z, z, z);
                             else if (Fluids[index].LF > 0F)
@@ -344,8 +362,6 @@ namespace WindowsFormsApp28
                     g.DrawString(tx, font, Brushes.Black, ms.X - txw / 2, ms.Y - CharSize.Height * 1.5F);
                     g.DrawString(tx, font, Brushes.White, ms.X - txw / 2 + 1, ms.Y - CharSize.Height * 1.5F + 1);
                 }
-
-                g.DrawString(time.ToString(), font, Brushes.Black, 10, 10);
             }
             Render.Image = Image;
         }

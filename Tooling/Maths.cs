@@ -179,6 +179,10 @@ namespace Tooling
         {
             return (float)((1D - t) * (double)v0 + t * (double)v1);
         }
+        public static int Lerp(int v0, int v1, double t)
+        {
+            return (int)((1D - t) * v0 + t * v1);
+        }
         public static PointF Lerp(PointF v0, PointF v1, double t)
         {
             return new PointF(Lerp(v0.X, v1.X, t), Lerp(v0.Y, v1.Y, t));
