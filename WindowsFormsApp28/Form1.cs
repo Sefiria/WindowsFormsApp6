@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
 using Tooling;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace WindowsFormsApp28
 {
@@ -31,9 +33,9 @@ namespace WindowsFormsApp28
         byte px_pal_sel = 0;
         Font font;
         Size CharSize;
-        bool busy = false;
+        bool busy = false, making_a_line = false;
         byte block_selection = 3;
-        int line_start_arrid = -1;
+        int line_start_x = -1, line_start_y = -1;
 
         const int BRICK = 3;
         const int PIPE = 4;
@@ -76,7 +78,7 @@ namespace WindowsFormsApp28
             float adjustedSpeed = mvspd / this.z * 20F;
             var ctrl = KB.LeftCtrl;
 
-            if (!ctrl) line_start_arrid = -1;
+            if (!ctrl) line_start_x = line_start_y = -1;
 
             if (z) y -= adjustedSpeed;
             if (q) x -= adjustedSpeed;
@@ -102,11 +104,15 @@ namespace WindowsFormsApp28
                 {
                     int index = worldY * w + worldX;
                     if (ctrl) // line start
-                        line_start_arrid = index;
+                    {
+                        line_start_x = worldX;
+                        line_start_y = worldY;
+                    }
+                    making_a_line = ctrl;
                     px_pal_sel = Pixels[index] == 0 ? (byte)(left_pressed ? block_selection : 1) : (byte)0;
                 }
             }
-            else if (down && !ctrl)
+            else if (down && !ctrl && !making_a_line && line_start_x == -1)
             {
                 for (float t = 0; t <= 1; t += 0.01f)
                 {
@@ -123,22 +129,25 @@ namespace WindowsFormsApp28
             }
             else if (!down && ctrl)
             {
-                if (line_start_arrid != -1)
+                if (making_a_line && line_start_x != -1)
                 {
                     int worldX = (int)((ms.X - Width / 2) / this.z + x);
                     int worldY = (int)((ms.Y - Height / 2) / this.z + y);
-                    int index = worldY * w + worldX;
-                    int prevId = -1, id;
+                    int index;
+                    int prevId = -1;
+                    vec line_v;
                     for (float t = 0; t <= 1; t += 0.01f)
                     {
-                        id = Maths.Lerp(line_start_arrid, index, t);
-                        if (id != prevId)
+                        line_v = Maths.Lerp((line_start_x, line_start_y).V(), (worldX, worldY).V(), t);
+                        index = line_v.y * w + line_v.x;
+                        if (index != prevId)
                         {
-                            Pixels[id] = px_pal_sel;
-                            prevId = id;
+                            Pixels[index] = px_pal_sel;
+                            prevId = index;
                         }
                     }
-                    line_start_arrid = -1;
+                    line_start_x = line_start_y = -1;
+                    making_a_line = false;
                 }
             }
 
@@ -332,11 +341,16 @@ namespace WindowsFormsApp28
                 int endX = Math.Min(w-1, (int)(x + Width / z));
                 int endY = Math.Min(h-1, (int)(y + Height / z));
 
+                var ms = MouseStates.Position.ToPoint();
+                int worldX = (int)((ms.X - Width / 2) / this.z + x);
+                int worldY = (int)((ms.Y - Height / 2) / this.z + y);
+                int index = -1;
+
                 for (int y = startY; y < endY; y++)
                     for (int x = startX; x < endX; x++)
                     {
-                        int index = y * w + x;
-                        
+                        index = y * w + x;
+
                         if (Pixels[index] < BRICK)
                         {
                             if (Fluids[index].Q > 0F)
@@ -346,17 +360,32 @@ namespace WindowsFormsApp28
                                 g.FillRectangle(PaletteBrushes[1], (x - this.x + Width / (2 * z)) * z, (y - this.y + Height / (2 * z)) * z, z, z);
                                 Fluids[index].LF -= Fluid.GraphicalDeathSpeed;
                             }
-                    }
+                        }
                         else
                             g.FillRectangle(PaletteBrushes[Pixels[index]], (x - this.x + Width / (2 * z)) * z, (y - this.y + Height / (2 * z)) * z, z, z);
                     }
 
-                var ms = MouseStates.Position.ToPoint();
-                int worldX = (int)((ms.X - Width / 2) / z + x);
-                int worldY = (int)((ms.Y - Height / 2) / z + y);
+
+                // line preview
+                if (line_start_x != -1)
+                {
+                    int prevId = -1;
+                    var b = new SolidBrush(Color.FromArgb(100, PaletteBrushes[px_pal_sel].Color));
+                    for (float t = 0; t <= 1; t += 0.01f)
+                    {
+                        vec line_v = Maths.Lerp((line_start_x, line_start_y).V(), (worldX, worldY).V(), t);
+                        index = line_v.y * w + line_v.x;
+                        if (index != prevId)
+                        {
+                            g.FillRectangle(b, (line_v.x - x + Width / (2 * z)) * z, (line_v.y - y + Height / (2 * z)) * z, z, z);
+                            prevId = index;
+                        }
+                    }
+                }
+
                 if (worldX >= 0 && worldX < w && worldY >= 0 && worldY < h)
                 {
-                    int index = worldY * w + worldX;
+                    index = worldY * w + worldX;
                     var tx = $"{{{worldX},{worldY}}} {Maths.Round(Fluids[index].Q, 2)}";
                     var txw = g.MeasureString(tx, font).Width;
                     g.DrawString(tx, font, Brushes.Black, ms.X - txw / 2, ms.Y - CharSize.Height * 1.5F);
