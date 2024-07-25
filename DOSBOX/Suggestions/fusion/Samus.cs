@@ -165,7 +165,7 @@ namespace DOSBOX.Suggestions.fusion
         {
             float i = new List<int>() { 4, 5, 6 }.Contains(direction) ? 1F : (new List<int>() { 0, 1, 2 }.Contains(direction) ? -1F : 0F);
             float j = new List<int>() { 0, 6, 7 }.Contains(direction) ? 1F : (new List<int>() { 2, 3, 4 }.Contains(direction) ? -1F : 0F);
-            Fusion.Instance.bullets.Add(new Bullet(vec.x + _w / 2F + i * (_w + 2) / 2F, vec.y + _h / 4F + j * (_h + 2) / 2F, new vecf(i, j)));
+            Fusion.Instance.bullets.Add(new Bullet(vec.x + i * (_w + 2), vec.y + j * (_h + 2), new vecf(i, j)));
         }
         public void GivePowerup(byte type)
         {
