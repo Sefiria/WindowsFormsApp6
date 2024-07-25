@@ -38,8 +38,8 @@ namespace DOSBOX.Utilities
             int w = Core.Layers[layer].GetLength(0);
             int h = Core.Layers[layer].GetLength(1);
 
-            int x = (int) vec.x + (srcLoc != null ? srcLoc.x : 0);
-            int y = (int) vec.y + (srcLoc != null ? srcLoc.y : 0);
+            int x = (int) vec.x - (srcLoc != null ? srcLoc.x : 0);
+            int y = (int) vec.y - (srcLoc != null ? srcLoc.y : 0);
 
             if(DisplayCenterSprite)
             {

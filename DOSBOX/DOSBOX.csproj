@@ -105,6 +105,12 @@
     <Compile Include="Suggestions\city\Tile.cs" />
     <Compile Include="Suggestions\city\User.cs" />
     <Compile Include="Suggestions\Fusion.cs" />
+    <Compile Include="Suggestions\fusion\Door.cs" />
+    <Compile Include="Suggestions\fusion\Particule.cs" />
+    <Compile Include="Suggestions\fusion\Room.cs" />
+    <Compile Include="Suggestions\fusion\Bullet.cs" />
+    <Compile Include="Suggestions\fusion\Samus.cs" />
+    <Compile Include="Suggestions\fusion\Tile.cs" />
     <Compile Include="Suggestions\Plants.cs" />
     <Compile Include="Suggestions\plants\Data.cs" />
     <Compile Include="Suggestions\plants\Fiole.cs" />

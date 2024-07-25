@@ -376,5 +376,6 @@ namespace Tooling
                 for (; y < h; y++)
                     array[x, y] = behavior((x,y).V(), array[x, y]);
         }
+        public static List<T> Clone<T>(this List<T> source) where T : class => new List<T>(source);
     }
 }

@@ -11,6 +11,7 @@ namespace DOSBOX
 {
     public partial class DOSBOX : Form
     {
+        Timer TimerTick = new Timer() { Enabled = true, Interval = 100 };
         Timer TimerUpdate = new Timer() { Enabled = true, Interval = 10 };
         Timer TimerDraw = new Timer() { Enabled = true, Interval = 10 };
 
@@ -27,10 +28,15 @@ namespace DOSBOX
 
             KB.Init();
 
+            TimerTick.Tick += NewTick;
             TimerUpdate.Tick += Update;
             TimerDraw.Tick += Draw;
         }
 
+        private void NewTick(object _, EventArgs e)
+        {
+            Core.TotalTicks++;
+        }
         private void Update(object _, EventArgs e)
         {
             if (Core.NextSuggestion != null)

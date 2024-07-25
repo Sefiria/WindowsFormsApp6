@@ -21,6 +21,7 @@ namespace DOSBOX
         public static ISuggestion CurrentSuggestion = null, NextSuggestion = null;
         public static vecf Cam = vecf.Zero;
         public static bool KeepCamCoords = false;
+        public static long TotalTicks;
 
         public static bool isout(vecf v, int layer = -1, vecf cam = null) => isout(v.i.x, v.i.y, layer, cam);
         public static bool isout(vec v, int layer = -1, vecf cam = null) => isout(v.x, v.y, layer, cam);
