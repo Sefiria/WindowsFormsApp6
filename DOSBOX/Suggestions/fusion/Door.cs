@@ -59,27 +59,33 @@ namespace DOSBOX.Suggestions.fusion
         }
         void CreateGraphicsExt()
         {
-            if (state == 1)
-            {
-                vec s = size - (0, 4).V();
-                for (int i = (int)(-s.x * 0.2F); i < (int)(s.x * 0.2F); i++)
-                    for (int j = (int)(-s.y * 0.25F); j < (int)(s.y * 0.25F); j++)
-                        if ((i % 2 == 0 && j % 2 != 0) || (i % 2 != 0 && j % 2 == 0))
-                            g[size.x / 2 + i, size.y / 2 + j] = (byte)graphics_ext_timer;
-            }
-
-            if(state == 2)
+            if (state == 2)
             {
                 for (int i = 2; i < size.x - 2; i++)
                     g[i, 2] = 1;
-                g[size.x - 3 - (Core.TotalTicks % (size.x-4)), 2] = 0;
+                g[size.x - 3 - (Core.TotalTicks % (size.x - 4)), 2] = 0;
+            }
+            else
+            {
+                for (int i = 2; i < size.x - 2; i++)
+                    for (int j = 2; j < size.y - 2; j++)
+                        g[i, j] = 1;
+                vec s = size - (0, 4).V();
+                bool w = (Core.TotalTicks % 20 < 10);
+                for (int i = (int)(s.x * 0.2F); i < (int)(s.x * 0.4F); i++)
+                    for (int j = (int)(s.y * 0.2F); j < (int)(s.y * 0.85F); j++)
+                        if (w ?
+                            (i % 2 == 0 && j % 2 != 0) || (i % 2 != 0 && j % 2 == 0)
+                            : (i % 2 == 0 && j % 2 == 0) || (i % 2 != 0 && j % 2 != 0)
+                            )
+                            g[2 + i, 2 + j] = (byte)graphics_ext_timer;
             }
 
             #region graphics_ext_timer_mgmt
             graphics_ext_timer += graphics_ext_timer_incr;
-            if (graphics_ext_timer < 1)
+            if (graphics_ext_timer < 2)
             {
-                graphics_ext_timer = 2;
+                graphics_ext_timer = 3;
                 graphics_ext_timer_incr = 0.1F;
             }
             if (graphics_ext_timer > 4)
