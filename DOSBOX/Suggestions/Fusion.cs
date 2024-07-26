@@ -122,7 +122,7 @@ namespace DOSBOX.Suggestions
         public object ColliderRoom(float x, float y)
         {
             if (Instance.room.isout(x, y))
-                return true;
+                return null;
             
             // Doors
 

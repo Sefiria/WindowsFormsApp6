@@ -114,6 +114,12 @@ namespace DOSBOX.Suggestions.fusion
             }
             if (timershot > 0)
                 timershot--;
+
+
+            if (Fusion.Instance.room.isout(vec.x, vec.y))
+            {
+
+            }
         }
 
         /// <returns>false if colliding (then no move)</returns>
@@ -128,26 +134,21 @@ namespace DOSBOX.Suggestions.fusion
                 vec.y += look.y;
 
             // x
-            if (!(collides = Fusion.Instance.CollidesRoom(new vecf(vec.x + offset.x + look.x * speed, vec.y))))
-                vec.x += look.x;
-            else
+            if (look.x != 0F)
             {
-                collides = false;
-                float n = -1F;
-                for (float i = 0.1F; i <= 1.05F && !collides; i += 0.1F)
-                    if (!(collides = Fusion.Instance.CollidesRoom(new vecf(vec.x + offset.x + look.x * i * speed, vec.y))))
-                        n = i;
-                if (collides && n != -1F)
-                    vec.x += look.x * n * speed;
+                if (!(collides = Fusion.Instance.CollidesRoom(new vecf(vec.x + offset.x + look.x * speed, vec.y))))
+                    vec.x += look.x;
+                else
+                {
+                    collides = false;
+                    float n = -1F;
+                    for (float i = 0.1F; i <= 1.05F && !collides; i += 0.1F)
+                        if (!(collides = Fusion.Instance.CollidesRoom(new vecf(vec.x + offset.x + look.x * i * speed, vec.y))))
+                            n = i;
+                    if (collides && n != -1F)
+                        vec.x += look.x * n * speed;
+                }
             }
-            //for (float i = 0F; i < speed && !collides; i++)
-            //    for (float t = 0F; t <= 1F && !collides; t+=1F/ (lerpOnH?_h:_w))
-            //        collides = Instance.CollidesRoom(Maths.Lerp(
-            //            new vecf(vec.x + (lerpOnH ? offset.x : 0F) + look.x, vec.y + (lerpOnH ? offset.y : 0F) + look.y),
-            //            new vecf(vec.x + (lerpOnH ? offset.x : _w) + look.x, vec.y + (lerpOnH ? offset.y : _h) + look.y),
-            //            t));
-            //if (!collides)
-            //    vec += look;
             return !collides;
         }
 
