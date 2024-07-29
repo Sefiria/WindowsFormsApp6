@@ -132,7 +132,7 @@ namespace DOSBOX.Suggestions
             
             // Tiles
 
-            Tile tile = Room.RefTiles[room.Tiles[(int)x / Tile.TSZ, (int)y / Tile.TSZ]];
+            Tile tile = RoomTiles.RefTiles[room.Tiles[(int)x / Tile.TSZ, (int)y / Tile.TSZ]];
             var c_tile = tile.Type == Tile.TYPE.SOLID ? tile : null;
             if (c_tile != null)
                 return c_tile;

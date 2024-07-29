@@ -105,6 +105,15 @@
     <Compile Include="Suggestions\city\Tile.cs" />
     <Compile Include="Suggestions\city\User.cs" />
     <Compile Include="Suggestions\Fusion.cs" />
+    <Compile Include="Suggestions\fusion\jsondata\RoomData.cs" />
+    <Compile Include="Suggestions\fusion\jsondata\RoomData_fromto.cs" />
+    <Compile Include="Suggestions\fusion\jsondata\RoomData_coord.cs" />
+    <Compile Include="Suggestions\fusion\jsondata\RoomData_doors.cs" />
+    <Compile Include="Suggestions\fusion\jsondata\RoomData_warps.cs" />
+    <Compile Include="Suggestions\fusion\Fly.cs" />
+    <Compile Include="Suggestions\fusion\Mob.cs" />
+    <Compile Include="Suggestions\fusion\RoomTiles.cs" />
+    <Compile Include="Suggestions\fusion\Warp.cs" />
     <Compile Include="Suggestions\fusion\Door.cs" />
     <Compile Include="Suggestions\fusion\Particule.cs" />
     <Compile Include="Suggestions\fusion\Room.cs" />
@@ -185,6 +194,8 @@
     <None Include="Resources\room_0.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\room_2_meta.data" />
+    <None Include="Resources\room_1_meta.data" />
     <None Include="Resources\room_0_meta.data" />
   </ItemGroup>
   <ItemGroup>
@@ -193,6 +204,13 @@
       <Name>Tooling</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\room_1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\room_2.png" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Text.Json.6.0.6\build\System.Text.Json.targets" Condition="Exists('..\packages\System.Text.Json.6.0.6\build\System.Text.Json.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

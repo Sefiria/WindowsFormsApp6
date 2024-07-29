@@ -79,5 +79,45 @@ namespace DOSBOX.Properties {
                 return ((byte[])(obj));
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap room_1 {
+            get {
+                object obj = ResourceManager.GetObject("room_1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] room_1_meta {
+            get {
+                object obj = ResourceManager.GetObject("room_1_meta", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap room_2 {
+            get {
+                object obj = ResourceManager.GetObject("room_2", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] room_2_meta {
+            get {
+                object obj = ResourceManager.GetObject("room_2_meta", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
     }
 }

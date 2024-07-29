@@ -1,6 +1,7 @@
 ﻿using DOSBOX.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Tooling;
 
 namespace DOSBOX.Suggestions.fusion
@@ -9,6 +10,8 @@ namespace DOSBOX.Suggestions.fusion
     {
         public bool SuperMorph = false;
         public bool PrevIsMorph, IsMorph = false;
+        public long afk_duration = 0;
+
         byte timershot = 0;
         float jump_look_y = 0F;
         bool is_on_ground = false;
@@ -35,6 +38,16 @@ namespace DOSBOX.Suggestions.fusion
 
         public void Update()
         {
+            bool T = KB.IsKeyDown(KB.Key.Up);
+            bool L = KB.IsKeyDown(KB.Key.Left);
+            bool B = KB.IsKeyDown(KB.Key.Down);
+            bool R = KB.IsKeyDown(KB.Key.Right);
+            bool Q = KB.IsKeyDown(KB.Key.Q);
+            bool D = KB.IsKeyDown(KB.Key.D);
+            bool Space = KB.IsKeyDown(KB.Key.Space);
+
+            vec last_tile = vec.i.tile(Tile.TSZ);
+
             if (PrevIsMorph != IsMorph)
             {
                 CreateGraphics();
@@ -44,20 +57,20 @@ namespace DOSBOX.Suggestions.fusion
             is_on_ground = Fusion.Instance.CollidesRoom(new vecf(vec.x, vec.y + _h - 2));
 
             float speed = 1F;
-            float input_look_x = (KB.IsKeyDown(KB.Key.Q) ? -1F : 0F) + (KB.IsKeyDown(KB.Key.D) ? 1F : 0F);
+            float input_look_x = (Q ? -1F : 0F) + (D ? 1F : 0F);
             float input_offset_x = input_look_x == 0 ? 0 : (_w / 2F * (input_look_x < 0F ? -1F : 1F));
             if (jump_look_y == 0F)
             {
-                if (KB.IsKeyDown(KB.Key.Q))
+                if (Q)
                 {
                     move(new vecf(-1F, 0F), speed, new vecf(-_w / 2F, 0F));
                 }
-                if (KB.IsKeyDown(KB.Key.D))
+                if (D)
                 {
                     move(new vecf(1F, 0F), speed, new vecf(_w / 2F, 0F));
                 }
             }
-            if (KB.IsKeyPressed(KB.Key.Space) && is_on_ground && jump_look_y == 0F)
+            if (Space && is_on_ground && jump_look_y == 0F)
             {
                 jump_look_y = 2F;
             }
@@ -78,10 +91,6 @@ namespace DOSBOX.Suggestions.fusion
                 }
             }
 
-            bool T = KB.IsKeyDown(KB.Key.Up);
-            bool L = KB.IsKeyDown(KB.Key.Left);
-            bool B = KB.IsKeyDown(KB.Key.Down);
-            bool R = KB.IsKeyDown(KB.Key.Right);
             if (T || L || B || R)
             {
                 if (timershot == 0)
@@ -118,7 +127,27 @@ namespace DOSBOX.Suggestions.fusion
 
             if (Fusion.Instance.room.isout(vec.x, vec.y))
             {
+                var warp = Fusion.Instance.room.Warps.FirstOrDefault(w => w.Tiles.From.Contains(last_tile));
+                if (warp != null)
+                {
+                    Fusion.Instance.room = Room.Load((byte)warp.DestinationRoom);
+                    vec = warp.Tiles.To[warp.Tiles.From.IndexOf(last_tile)].f * Tile.TSZ + _h % Tile.TSZ;
+                    var door = Fusion.Instance.room.Doors.FirstOrDefault(d => d.vec.tile(Tile.TSZ) == vec.tile(Tile.TSZ) || d.vec.tile(Tile.TSZ) == vec.tile(Tile.TSZ) - (0, 1).Vf());
+                    if(door != null) door.state = 22;
+                }
+                else
+                {
+                    vec = last_tile.f * Tile.TSZ;
+                }
+            }
 
+            if(!T && !L && !B && !R && !Q && !D && !Space)
+            {
+                afk_duration++;
+            }
+            else
+            {
+                afk_duration = 0;
             }
         }
 

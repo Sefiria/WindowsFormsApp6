@@ -1,4 +1,6 @@
 ﻿using DOSBOX.Properties;
+using DOSBOX.Suggestions.fusion.jsondata;
+using DOSBOX.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -14,14 +16,17 @@ namespace DOSBOX.Suggestions.fusion
         public byte ID;
         public byte[,] Tiles;
         public List<Door> Doors = new List<Door>();
+        public List<Warp> Warps = new List<Warp>();
         public byte[,] Pixels, PixelsFront;
         public int w => Pixels.GetLength(0);
         public int h => Pixels.GetLength(1);
+        public bool HasFLies = false;
+        public List<Fly> Flies = new List<Fly>();
+        public const int max_flies = 3;
 
         public static Room Load(byte ID)
         {
-            if (RefTiles == null)
-                DefineTiles();
+            RoomTiles.Load();
 
             Room room = new Room();
             if (room.LoadPixels(ID))
@@ -36,6 +41,41 @@ namespace DOSBOX.Suggestions.fusion
         public void Update()
         {
             Doors.Clone().ForEach(b =>b.Update());
+            FliesMgmt();
+        }
+        public void FliesMgmt()
+        {
+            if (!HasFLies)
+                return;
+            if (Fusion.Instance.samus.afk_duration > 100)
+            {
+                if (Flies.Count < max_flies)
+                {
+                    if (RandomThings.rnd1() <= 0.075F)
+                        Flies.Add(new Fly(RandomThings.rnd_vecf_in_screen(w, h)));
+                }
+                var flies = Flies.Clone();
+                foreach (var fly in flies)
+                {
+                    fly.Update();
+                    if (isout(fly))
+                        Flies.Remove(fly);
+                }
+            }
+            else
+            {
+                if (Flies.Count > 0)
+                {
+                    var flies = Flies.Clone();
+                    foreach (var fly in flies)
+                    {
+                        fly.LeaveScreen();
+                        if (isout(fly))
+                            Flies.Remove(fly);
+                    }
+                }
+            }
+            
         }
         public void Display(vecf cam)
         {
@@ -51,7 +91,8 @@ namespace DOSBOX.Suggestions.fusion
                 }
             }
 
-            Doors.Clone().ForEach(b => b.Display(1, Core.Cam.i));
+            Doors.Clone().ForEach(d => d.Display(1, Core.Cam.i));
+            Flies.Clone().ForEach(f => f.Display(1, Core.Cam.i));
         }
         public void DisplayFront(vecf cam)
         {
@@ -94,10 +135,10 @@ namespace DOSBOX.Suggestions.fusion
             for (int x = 0; x < TSZ; x++)
                 for (int y = 0; y < TSZ; y++)
                 {
-                    if (RefTiles[id].Type == Tile.TYPE.FRONT)
-                        PixelsFront[_x * TSZ + x, _y * TSZ + y] = RefTiles[id][x, y];
-                    else if (RefTiles[id][x, y] != 4)
-                        Pixels[_x * TSZ + x, _y * TSZ + y] = RefTiles[id][x, y];
+                    if (RoomTiles.RefTiles[id].Type == Tile.TYPE.FRONT)
+                        PixelsFront[_x * TSZ + x, _y * TSZ + y] = RoomTiles.RefTiles[id][x, y];
+                    else if (RoomTiles.RefTiles[id][x, y] != 4)
+                        Pixels[_x * TSZ + x, _y * TSZ + y] = RoomTiles.RefTiles[id][x, y];
                 }
         }
         void LoadData()
@@ -107,12 +148,19 @@ namespace DOSBOX.Suggestions.fusion
                 return;
             var meta = Encoding.UTF8.GetString(metaBytes);
             RoomData data = JsonSerializer.Deserialize<RoomData>(meta);
-            if (data.doors?.Length > 0)
+            if (data != null)
             {
                 Doors.Clear();
-                Doors.AddRange(data.doors.Select(d => new Door(d.x, d.y, d.w, d.h, (byte)d.state.ByteCut())));
+                if(data.doors?.Length > 0)
+                    Doors.AddRange(data.doors.Select(d => new Door(d.x, d.y, d.w, d.h, (byte)d.state.ByteCut())));
+                Warps.Clear();
+                if(data.warps?.Length > 0)
+                    Warps.AddRange(data.warps.Select(w => new Warp(w.room, w.tiles)));
+                HasFLies = data.HasFlies;
+                Flies.Clear();
             }
         }
+        public bool isout(Dispf d) => isout(d.vec.i.x, d.vec.i.y);
         public bool isout(vecf v) => isout(v.i.x, v.i.y);
         public bool isout(float x, float y) => isout((int)x, (int)y);
         public bool isout(int x, int y) => x < 0 || y < 0 || x >= w || y >= h;
@@ -123,70 +171,6 @@ namespace DOSBOX.Suggestions.fusion
             return x < 0 || y < 0 || x + w >= this.w || y + h >= this.h;
         }
 
-        public class RoomData
-        {
-            public RoomData_data[] doors { get; set; }
-        }
-        public class RoomData_data
-        {
-            public int state { get; set; }
-            public int x { get; set; }
-            public int y { get; set; }
-            public int w { get; set; }
-            public int h { get; set; }
-        }
-
         public static int TSZ => Tile.TSZ;
-        public static List<Tile> RefTiles = null;
-        private static void DefineTiles()
-        {
-            var humanreadableTiles = new List<Tile>
-                {
-                    new Tile() { Type = Tile.TYPE.EMPTY, Pixels = new byte[8, 8] },
-                    new Tile() { Type = Tile.TYPE.SOLID, Pixels = new byte[8, 8]
-                    {
-                        { 3, 3, 3, 3, 3, 3, 3, 3 },
-                        { 3, 0, 0, 0, 0, 0, 0, 0 },
-                        { 3, 1, 1, 1, 1, 1, 1, 0 },
-                        { 3, 1, 1, 1, 1, 1, 1, 0 },
-                        { 3, 3, 3, 3, 3, 3, 3, 3 },
-                        { 0, 0, 0, 0, 3, 0, 0, 0 },
-                        { 1, 1, 1, 0, 3, 1, 1, 1 },
-                        { 1, 1, 1, 0, 3, 1, 1, 1 },
-                    } },
-                    new Tile() { Type = Tile.TYPE.SOLID, Pixels = new byte[8, 8]
-                    {
-                        { 3, 3, 3, 3, 3, 3, 3, 3 },
-                        { 3, 2, 0, 0, 0, 0, 2, 3 },
-                        { 3, 0, 2, 0, 0, 2, 0, 3 },
-                        { 3, 0, 0, 2, 2, 0, 0, 3 },
-                        { 3, 0, 0, 2, 2, 0, 0, 3 },
-                        { 3, 0, 2, 0, 0, 2, 0, 3 },
-                        { 3, 2, 0, 0, 0, 0, 2, 3 },
-                        { 3, 3, 3, 3, 3, 3, 3, 3 },
-                    } },
-                    new Tile() { Type = Tile.TYPE.FRONT, Pixels = new byte[8, 8]
-                    {
-                        { 0, 0, 0, 0, 0, 0, 0, 0 },
-                        { 0, 0, 0, 0, 0, 0, 0, 0 },
-                        { 0, 0, 0, 0, 0, 0, 0, 0 },
-                        { 0, 0, 0, 3, 3, 0, 0, 0 },
-                        { 0, 3, 3, 3, 3, 3, 3, 0 },
-                        { 3, 3, 4, 4, 4, 4, 3, 3 },
-                        { 3, 4, 3, 3, 3, 3, 4, 3 },
-                        { 3, 3, 3, 3, 3, 3, 3, 3 },
-                    } },
-                };
-
-            RefTiles = new List<Tile>();
-            foreach (var t in humanreadableTiles)
-            {
-                var tile = new Tile() { Type = t.Type, Pixels = new byte[8, 8] };
-                for (int x = 0; x < 8; x++)
-                    for (int y = 0; y < 8; y++)
-                        tile.Pixels[x, y] = t[y, x];
-                RefTiles.Add(tile);
-            }
-        }
     }
 }
