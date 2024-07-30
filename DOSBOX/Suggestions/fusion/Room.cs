@@ -1,10 +1,12 @@
 ﻿using DOSBOX.Properties;
 using DOSBOX.Suggestions.fusion.jsondata;
+using DOSBOX.Suggestions.fusion.Triggerables;
 using DOSBOX.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Text.Json;
 using Tooling;
@@ -18,6 +20,7 @@ namespace DOSBOX.Suggestions.fusion
         public List<Door> Doors = new List<Door>();
         public List<Warp> Warps = new List<Warp>();
         public List<Mob> Mobs = new List<Mob>();
+        public List<PhysicalObject> PhysicalObjects = new List<PhysicalObject>();
         public byte[,] Pixels, PixelsFront;
         public int w => Pixels.GetLength(0);
         public int h => Pixels.GetLength(1);
@@ -43,6 +46,7 @@ namespace DOSBOX.Suggestions.fusion
         {
             Doors.Clone().ForEach(d => d.Update());
             Mobs.Clone().ForEach(m => { if (!m.Exists) { Register.Write(m); Mobs.Remove(m); } else m.Update(); });
+            PhysicalObjects.Clone().ForEach(po => { if (!po.Exists) { Register.Write(po); PhysicalObjects.Remove(po); } else po.Update(); });
             FliesMgmt();
         }
         public void FliesMgmt()
@@ -89,12 +93,14 @@ namespace DOSBOX.Suggestions.fusion
             {
                 for (int y = 0; y < screen.h; y++)
                 {
-                    Core.Layers[0][x, y] = Pixels[chunk.x * screen.w + x, chunk.y * screen.h + y];
+                    if(chunk.x * screen.w + x< w && chunk.y * screen.h + y < h)
+                        Core.Layers[0][x, y] = Pixels[chunk.x * screen.w + x, chunk.y * screen.h + y];
                 }
             }
 
             Doors.Clone().ForEach(d => d.Display(1, Core.Cam.i));
             Mobs.Clone().ForEach(m => m.Display(1, Core.Cam.i));
+            PhysicalObjects.Clone().ForEach(po => po.Display(1, Core.Cam.i));
             Flies.Clone().ForEach(f => f.Display(1, Core.Cam.i));
         }
         public void DisplayFront(vecf cam)
@@ -107,9 +113,12 @@ namespace DOSBOX.Suggestions.fusion
             {
                 for (int y = 0; y < screen.h; y++)
                 {
-                    px = PixelsFront[chunk.x * screen.w + x, chunk.y * screen.h + y];
-                    if (px != 0)
-                        Core.Layers[1][x, y] = px;
+                    if (chunk.x * screen.w + x < w && chunk.y * screen.h + y < h)
+                    {
+                        px = PixelsFront[chunk.x * screen.w + x, chunk.y * screen.h + y];
+                        if (px != 0)
+                            Core.Layers[1][x, y] = px;
+                    }
                 }
             }
         }
@@ -155,7 +164,7 @@ namespace DOSBOX.Suggestions.fusion
             {
                 Doors.Clear();
                 if(data.doors?.Length > 0)
-                    Doors.AddRange(data.doors.Select(d => new Door(d)));
+                    Doors.AddRange(data.doors.Select(d => new Door(ID, d)));
                 Warps.Clear();
                 if(data.warps?.Length > 0)
                     Warps.AddRange(data.warps.Select(w => new Warp(w)));
@@ -169,6 +178,9 @@ namespace DOSBOX.Suggestions.fusion
                             Mobs.Add(new Mob(ID, m));
                     }
                 }
+                PhysicalObjects.Clear();
+                if (data.objects?.Length > 0)
+                    PhysicalObjects.AddRange(data.objects.Select(po => PhysicalObject.FactoryCreate(po)));
             }
         }
         public bool isout(Dispf d) => isout(d.vec.i.x, d.vec.i.y);

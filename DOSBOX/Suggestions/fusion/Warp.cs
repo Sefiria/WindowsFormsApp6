@@ -46,8 +46,8 @@ namespace DOSBOX.Suggestions.fusion
         }
         public _FromTo(RoomData_fromto[] raw)
         {
-            From = raw.ToList().Select(ft => new vec(ft.from.x, ft.from.y)).ToList();
-            To = raw.ToList().Select(ft => new vec(ft.to.x, ft.to.y)).ToList();
+            From = raw.ToList().Select(ft => ft.from.AsVec()).ToList();
+            To = raw.ToList().Select(ft => ft.to.AsVec()).ToList();
         }
         public _FromTo(List<vec> from, List<vec> to)
         {

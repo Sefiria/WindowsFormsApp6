@@ -1,4 +1,5 @@
-﻿using DOSBOX.Utilities;
+﻿using DOSBOX.Suggestions.fusion.Triggerables;
+using DOSBOX.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,9 +49,11 @@ namespace DOSBOX.Suggestions.fusion
             bool B = KB.IsKeyDown(KB.Key.Down);
             bool R = KB.IsKeyDown(KB.Key.Right);
             bool Q = KB.IsKeyDown(KB.Key.Q);
+            bool Z = KB.IsKeyDown(KB.Key.Z);
             bool D = KB.IsKeyDown(KB.Key.D);
             bool Space = KB.IsKeyDown(KB.Key.Space);
 
+            vecf last_vec = new vecf(vec);
             vec last_tile = vec.i.tile(Tile.TSZ);
 
             if (PrevIsMorph != IsMorph)
@@ -59,7 +62,7 @@ namespace DOSBOX.Suggestions.fusion
                 PrevIsMorph = IsMorph;
             }
 
-            is_on_ground = Fusion.Instance.CollidesRoom(new vecf(vec.x, vec.y + _h - 2), _w, _h);
+            is_on_ground = Fusion.Instance.CollidesRoom(new vecf(vec.x, vec.y + _h / 2), _w, _h, this);
 
             float speed = 1F;
             float input_look_x = (Q ? -1F : 0F) + (D ? 1F : 0F);
@@ -129,16 +132,35 @@ namespace DOSBOX.Suggestions.fusion
             if (timershot > 0)
                 timershot--;
 
+            if(Z)
+                (Fusion.Instance.room.PhysicalObjects.FirstOrDefault(po => po is ITriggerable && (vec / Tile.TSZ).i == (po.vec / Tile.TSZ).i) as ITriggerable)?.Trigger(this);
+
 
             if (Fusion.Instance.room.isout(vec.x, vec.y))
             {
                 var warp = Fusion.Instance.room.Warps.FirstOrDefault(w => w.Tiles.From.Contains(last_tile));
                 if (warp != null)
                 {
-                    Fusion.Instance.room = Room.Load((byte)warp.DestinationRoom);
-                    vec = warp.Tiles.To[warp.Tiles.From.IndexOf(last_tile)].f * Tile.TSZ + _h % Tile.TSZ;
-                    var door = Fusion.Instance.room.Doors.FirstOrDefault(d => d.vec.tile(Tile.TSZ) == vec.tile(Tile.TSZ) || d.vec.tile(Tile.TSZ) == vec.tile(Tile.TSZ) - (0, 1).Vf());
-                    if(door != null) door.state = 22;
+                    var next_room = Room.Load((byte)warp.DestinationRoom);
+                    var next_vec = warp.Tiles.To[warp.Tiles.From.IndexOf(last_tile)].f * Tile.TSZ + _h % Tile.TSZ;
+                    var door = next_room.Doors.FirstOrDefault(d => d.vec.tile(Tile.TSZ) == next_vec.tile(Tile.TSZ) || d.vec.tile(Tile.TSZ) == next_vec.tile(Tile.TSZ) - (0, 1).Vf());
+                    bool blocked_by_locked_door = false;
+                    if (door != null)
+                    {
+                        if (door.Locked)
+                            blocked_by_locked_door = true;
+                        else
+                            door.state = 22;
+                    }
+                    if (!blocked_by_locked_door)
+                    {
+                        Fusion.Instance.room = next_room;
+                        vec = next_vec;
+                    }
+                    else
+                    {
+                        vec = last_vec;
+                    }
                 }
                 else
                 {
@@ -164,20 +186,20 @@ namespace DOSBOX.Suggestions.fusion
             bool collides;
 
             // y
-            if (!(collides = Fusion.Instance.CollidesRoom(new vecf(vec.x, vec.y + (lerpOnH ? offset.y : 0F) + look.y * speed), _w, _h)))
+            if (!(collides = Fusion.Instance.CollidesRoom(new vecf(vec.x, vec.y + (lerpOnH ? offset.y : 0F) + look.y * speed), _w, _h, this)))
                 vec.y += look.y;
 
             // x
             if (look.x != 0F)
             {
-                if (!(collides = Fusion.Instance.CollidesRoom(new vecf(vec.x + offset.x + look.x * speed, vec.y), _w, _h)))
+                if (!(collides = Fusion.Instance.CollidesRoom(new vecf(vec.x + offset.x + look.x * speed, vec.y), _w, _h, this)))
                     vec.x += look.x;
                 else
                 {
                     collides = false;
                     float n = -1F;
                     for (float i = 0.1F; i <= 1.05F && !collides; i += 0.1F)
-                        if (!(collides = Fusion.Instance.CollidesRoom(new vecf(vec.x + offset.x + look.x * i * speed, vec.y), _w, _h)))
+                        if (!(collides = Fusion.Instance.CollidesRoom(new vecf(vec.x + offset.x + look.x * i * speed, vec.y), _w, _h, this)))
                             n = i;
                     if (collides && n != -1F)
                         vec.x += look.x * n * speed;
@@ -209,7 +231,7 @@ namespace DOSBOX.Suggestions.fusion
             {
                 j = -0.2F;
             }
-            Fusion.Instance.bullets.Add(new Bullet(vec.x + i * (_w + 2), vec.y + j * (_h + 2), new vecf(i, j)) { Owner = this });
+            Fusion.Instance.bullets.Add(new Bullet(vec.x + i * _w / 2F, vec.y + j * _h / 2F, new vecf(i, j)) { Owner = this });
         }
         public void GivePowerup(byte type)
         {

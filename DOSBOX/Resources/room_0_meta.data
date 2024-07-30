@@ -5,7 +5,8 @@
 			"x": 0,
 			"y": 4,
 			"w": 1,
-			"h": 2
+			"h": 2,
+			"locked": true
 		}
 	],
 	"warps": [
@@ -14,5 +15,23 @@
 	],
 	"mobs": [
 		{"vec":{"x": 6,"y": 6}}
+	],
+	"objects": [
+		{
+			"type": 0,
+			"side": 1,
+			"vec": {
+				"x": 1,
+				"y": 6
+			},
+			"data": {
+				"pushed": false,
+				"linked": [
+					{
+						"x": 0,"y": 4
+					}
+				]
+			}
+		}
 	]
 }

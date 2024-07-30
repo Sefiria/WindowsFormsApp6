@@ -105,6 +105,7 @@
     <Compile Include="Suggestions\city\Tile.cs" />
     <Compile Include="Suggestions\city\User.cs" />
     <Compile Include="Suggestions\Fusion.cs" />
+    <Compile Include="Suggestions\fusion\Enumerations.cs" />
     <Compile Include="Suggestions\fusion\Harmful.cs" />
     <Compile Include="Suggestions\fusion\Hittable.cs" />
     <Compile Include="Suggestions\fusion\jsondata\RoomData.cs" />
@@ -112,11 +113,15 @@
     <Compile Include="Suggestions\fusion\jsondata\RoomData_coord.cs" />
     <Compile Include="Suggestions\fusion\jsondata\RoomData_doors.cs" />
     <Compile Include="Suggestions\fusion\jsondata\RoomData_mobs.cs" />
+    <Compile Include="Suggestions\fusion\jsondata\RoomData_objects.cs" />
     <Compile Include="Suggestions\fusion\jsondata\RoomData_warps.cs" />
     <Compile Include="Suggestions\fusion\Fly.cs" />
     <Compile Include="Suggestions\fusion\Mob.cs" />
     <Compile Include="Suggestions\fusion\Register.cs" />
     <Compile Include="Suggestions\fusion\RoomTiles.cs" />
+    <Compile Include="Suggestions\fusion\PhysicalObject.cs" />
+    <Compile Include="Suggestions\fusion\Triggerables\Button.cs" />
+    <Compile Include="Suggestions\fusion\Triggerables\Triggerable.cs" />
     <Compile Include="Suggestions\fusion\Warp.cs" />
     <Compile Include="Suggestions\fusion\Door.cs" />
     <Compile Include="Suggestions\fusion\Particule.cs" />

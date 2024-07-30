@@ -104,6 +104,7 @@ namespace DOSBOX.Suggestions
                 }
             }
             Core.Layers[2][2, 2] = (byte)(KB.IsKeyDown(KB.Key.Q) ? 3 : 1);
+            Core.Layers[2][3, 2] = (byte)(KB.IsKeyDown(KB.Key.Z) ? 3 : 1);
             Core.Layers[2][4, 2] = (byte)(KB.IsKeyDown(KB.Key.D) ? 3 : 1);
             Core.Layers[2][2, 3] = (byte)(KB.IsKeyDown(KB.Key.Space) ? 3 : 1);
             Core.Layers[2][3, 3] = (byte)(KB.IsKeyDown(KB.Key.Space) ? 3 : 1);
@@ -118,24 +119,29 @@ namespace DOSBOX.Suggestions
         {
         }
 
-        public bool CollidesRoom(vecf v, int w, int h) => CollidesRoom(v.x, v.y, w, h);
-        public bool CollidesRoom(float x, float y, int w, int h) => ColliderRoom(x,y, w, h) != null;
-        public object ColliderRoom(vecf v, int w, int h) => ColliderRoom(v.x, v.y, w, h);
-        public object ColliderRoom(float x, float y, int w, int h)
+        public bool CollidesRoom(vecf v, int w, int h, object @as = null) => CollidesRoom(v.x, v.y, w, h, @as);
+        public bool CollidesRoom(float x, float y, int w, int h, object @as = null) => ColliderRoom(x,y, w, h, @as) != null;
+        public object ColliderRoom(vecf v, int w, int h, object @as = null) => ColliderRoom(v.x, v.y, w, h, @as);
+        public object ColliderRoom(float x, float y, int w, int h, object @as = null)
         {
             if (Instance.room.isout(x, y))
                 return null;
-            
+
+            // Samus
+
+            if (@as != samus && new Rectangle((int)samus.vec.x, (int)samus.vec.y, samus._w, samus._h).IntersectsWith(new Rectangle((int)x, (int)y, w, h)))
+                return samus;
+
             // Doors
 
             var c_door = room.Doors.Clone().FirstOrDefault(d => new Rectangle((int)d.vec.x, (int)d.vec.y, d._w, d._h).IntersectsWith(new Rectangle((int)x, (int)y, w, h)));
-            if (c_door != null)
+            if (c_door != null && @as != c_door)
                 return c_door;
 
             // Mobs
 
             var c_mob = room.Mobs.Clone().FirstOrDefault(d => new Rectangle((int)d.vec.x, (int)d.vec.y, d._w, d._h).IntersectsWith(new Rectangle((int)x, (int)y, w, h)));
-            if (c_mob != null)
+            if (c_mob != null && @as != c_mob)
                 return c_mob;
 
             // Tiles

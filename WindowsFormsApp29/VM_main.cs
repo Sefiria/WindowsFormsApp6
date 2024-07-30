@@ -15,10 +15,10 @@ namespace WindowsFormsApp29
             MainForm.Ref.Controls.Add(console);
             console.Dock = DockStyle.Fill;
             console.StartProcess("cmd /k echo test", null);
-            console.ProcessCommand += (sender, e) =>
-            {
-                console.WriteOutput(e.Command);
-            };
+            //console.ProcessCommand += (sender, e) =>
+            //{
+            //    console.WriteOutput(e.Command);
+            //};
 
             //uIElements.Add(new CMD());
         }

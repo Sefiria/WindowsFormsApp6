@@ -13,5 +13,6 @@ namespace DOSBOX.Suggestions.fusion.jsondata
         public int y { get; set; }
         public int w { get; set; }
         public int h { get; set; }
+        public bool locked { get; set; } = false;
     }
 }

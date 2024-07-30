@@ -1,6 +1,7 @@
 ﻿using DOSBOX.Suggestions.fusion.jsondata;
 using DOSBOX.Utilities;
 using System;
+using System.Net.Sockets;
 using Tooling;
 
 namespace DOSBOX.Suggestions.fusion
@@ -16,7 +17,10 @@ namespace DOSBOX.Suggestions.fusion
         public vec base_size;
         public vec size;
         public float interm_state = 0F, graphics_ext_timer = 0, graphics_ext_timer_incr = 0.1F;
-        public Door(RoomData_doors d)
+        public bool Locked;
+        public string BaseHash = null, Hash = null;
+
+        public Door(byte room_id, RoomData_doors d)
         {
             state = (byte)d.state;
             if (state == 11) state = 1;
@@ -27,8 +31,13 @@ namespace DOSBOX.Suggestions.fusion
             base_size = size = new vec(d.w * Tile.TSZ, d.h * Tile.TSZ);
             CreateGraphics();
             CreateGraphicsExt();
+
+            BaseHash = GenerateBaseHash(room_id, d.x, d.y);
+            Hash = GenerateHash(room_id, d.x, d.y);
+
+            Locked = Register.open_doors.Contains(BaseHash) ? false : d.locked;
         }
-        public Door(float x, float y, int w, int h, byte state = 1)
+        public Door(byte room_id, int x, int y, int w, int h, byte state = 1, bool locked = false)
         {
             if (state == 11) state = 1;
             if (state == 22) state = 2;
@@ -39,6 +48,11 @@ namespace DOSBOX.Suggestions.fusion
             base_size = size = new vec(w * Tile.TSZ, h * Tile.TSZ);
             CreateGraphics();
             CreateGraphicsExt();
+
+            BaseHash = GenerateBaseHash(room_id, x, y);
+            Hash = GenerateHash(room_id, x, y);
+
+            Locked = Register.open_doors.Contains(BaseHash) ? true : locked;
         }
         void CreateGraphics()
         {
@@ -141,10 +155,15 @@ namespace DOSBOX.Suggestions.fusion
         }
         public override void Hit(Harmful by)
         {
-            if (state != 2)
-                state = 22;
-            else if (state != 1)
-                state = 11;
+            if (!Locked)
+            {
+                if (state != 2)
+                    state = 22;
+                else if (state != 1)
+                    state = 11;
+            }
         }
+        public static string GenerateBaseHash(byte room_id, int x, int y) => $"door-{room_id}-{x}-{y}";
+        public static string GenerateHash(byte room_id, int x, int y) => GenerateBaseHash(room_id, x, y) + "+" + RandomThings.GetCurrentTickDigits(4);
     }
 }

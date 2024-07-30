@@ -14,17 +14,22 @@ namespace DOSBOX.Suggestions.fusion
         public bool Exists = true;
         public string BaseHash = null, Hash = null;
 
+        //public bool ClimbAbility = true;
+
         byte timershot = 0;
         float jump_look_y = 0F;
         bool is_on_ground = false;
+        bool has_collisionned_sides = false, has_collisionned_roof = false, ai_side_go_left = true;
 
         public sbyte ShieldMax = 0;
         public sbyte Shield = 0;
         public sbyte Lives = 1;
 
+        public vecf Look;
+
         public Mob(byte room_id, RoomData_mobs m)
         {
-            vec = new vecf(m.vec.x * Tile.TSZ, m.vec.y * Tile.TSZ);
+            vec = m.vec.AsVec().f * Tile.TSZ;
             CreateGraphics();
             DisplayCenterSprite = true;
 
@@ -63,16 +68,13 @@ namespace DOSBOX.Suggestions.fusion
                 { 3, 3, 3, 3, 3, 3, 3, 3 },
             };
 
-            var w = human_readable.GetLength(0);
-            var h = human_readable.GetLength(1);
+            var w = human_readable.GetLength(1);
+            var h = human_readable.GetLength(0);
             g = new byte[w, h];
 
-            foreach (var t in human_readable)
-            {
-                for (int x = 0; x < w; x++)
-                    for (int y = 0; y < h; y++)
-                        g[y, x] = human_readable[x, y];
-            }
+            for (int x = 0; x < w; x++)
+                for (int y = 0; y < h; y++)
+                    g[y, x] = human_readable[x, y];
 
             scale = 1;
         }
@@ -85,7 +87,7 @@ namespace DOSBOX.Suggestions.fusion
 
             vec last_tile = vec.i.tile(Tile.TSZ);
 
-            is_on_ground = Fusion.Instance.CollidesRoom(new vecf(vec.x, vec.y + _h - 2), _w, _h);
+            is_on_ground = Fusion.Instance.room.isout(new vecf(vec.x, vec.y + _h / 2)) || Fusion.Instance.CollidesRoom(new vecf(vec.x, vec.y + _h / 2), _w, _h, this);
 
             float speed = 1F;
             float input_look_x = (Q ? -1F : 0F) + (D ? 1F : 0F);
@@ -94,11 +96,11 @@ namespace DOSBOX.Suggestions.fusion
             {
                 if (Q)
                 {
-                    move(new vecf(-1F, 0F), speed, new vecf(-_w / 2F, 0F));
+                    has_collisionned_sides = !move(new vecf(-1F, 0F), speed, new vecf(-_w / 2F, -_h / 2F));
                 }
                 if (D)
                 {
-                    move(new vecf(1F, 0F), speed, new vecf(_w / 2F, 0F));
+                    has_collisionned_sides = !move(new vecf(1F, 0F), speed, new vecf(0F, -_h / 2F));
                 }
             }
             if (Space && is_on_ground && jump_look_y == 0F)
@@ -107,7 +109,7 @@ namespace DOSBOX.Suggestions.fusion
             }
             if (jump_look_y > 0F)
             {
-                move(new vecf(input_look_x, -1F), speed, new vecf(input_offset_x, -_h / 2F));
+                has_collisionned_roof = !move(new vecf(input_look_x, -1F), speed, new vecf(input_offset_x, -_h / 2F));
                 jump_look_y -= 0.2F;
             }
             else
@@ -153,20 +155,19 @@ namespace DOSBOX.Suggestions.fusion
             }
             if (timershot > 0)
                 timershot--;
-
-
-            if (Fusion.Instance.room.isout(vec.x, vec.y))
-            {
-                vec = last_tile.f * Tile.TSZ;
-            }
         }
 
-        private (bool T, bool L, bool B, bool R, bool Q, bool D, bool Space)  ai()
+        private (bool T, bool L, bool B, bool R, bool Q, bool D, bool Space) ai()
         {
             bool T, L, B, R, Q, D, Space;
             T = L = B = R = Q = D = Space = false;
 
+            if (has_collisionned_sides) ai_side_go_left = !ai_side_go_left;
 
+            if (ai_side_go_left)
+                Q = true;
+            else
+                D = true;
 
             return (T, L, B, R, Q, D, Space);
         }
@@ -174,25 +175,24 @@ namespace DOSBOX.Suggestions.fusion
         /// <returns>false if colliding (then no move)</returns>
         private bool move(vecf look, float speed, vecf offset)
         {
-            if (offset.x == 0F && offset.y == 0F) throw new Exception("jpeux pas faire mon lerp là comme ça");
             bool lerpOnH = offset.y != 0F;
             bool collides;
 
             // y
-            if (!(collides = Fusion.Instance.CollidesRoom(new vecf(vec.x, vec.y + (lerpOnH ? offset.y : 0F) + look.y * speed), _w, _h)))
+            if (!(collides = Fusion.Instance.room.isout(new vecf(vec.x, vec.y + (lerpOnH ? offset.y : 0F) + look.y * speed)) || Fusion.Instance.CollidesRoom(new vecf(vec.x, vec.y + (lerpOnH ? offset.y : 0F) + look.y * speed), _w, _h, this)))
                 vec.y += look.y;
 
             // x
             if (look.x != 0F)
             {
-                if (!(collides = Fusion.Instance.CollidesRoom(new vecf(vec.x + offset.x + look.x * speed, vec.y), _w, _h)))
+                if (!(collides = Fusion.Instance.CollidesRoom(new vecf(vec.x + offset.x + look.x * speed, vec.y), _w, _h, this)))
                     vec.x += look.x;
                 else
                 {
                     collides = false;
                     float n = -1F;
                     for (float i = 0.1F; i <= 1.05F && !collides; i += 0.1F)
-                        if (!(collides = Fusion.Instance.CollidesRoom(new vecf(vec.x + offset.x + look.x * i * speed, vec.y), _w, _h)))
+                        if (!(collides = Fusion.Instance.CollidesRoom(new vecf(vec.x + offset.x + look.x * i * speed, vec.y), _w, _h, this)))
                             n = i;
                     if (collides && n != -1F)
                         vec.x += look.x * n * speed;
