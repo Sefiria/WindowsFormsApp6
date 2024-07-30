@@ -17,6 +17,7 @@ namespace DOSBOX.Suggestions.fusion
         public byte[,] Tiles;
         public List<Door> Doors = new List<Door>();
         public List<Warp> Warps = new List<Warp>();
+        public List<Mob> Mobs = new List<Mob>();
         public byte[,] Pixels, PixelsFront;
         public int w => Pixels.GetLength(0);
         public int h => Pixels.GetLength(1);
@@ -40,7 +41,8 @@ namespace DOSBOX.Suggestions.fusion
 
         public void Update()
         {
-            Doors.Clone().ForEach(b =>b.Update());
+            Doors.Clone().ForEach(d => d.Update());
+            Mobs.Clone().ForEach(m => { if (!m.Exists) { Register.Write(m); Mobs.Remove(m); } else m.Update(); });
             FliesMgmt();
         }
         public void FliesMgmt()
@@ -92,6 +94,7 @@ namespace DOSBOX.Suggestions.fusion
             }
 
             Doors.Clone().ForEach(d => d.Display(1, Core.Cam.i));
+            Mobs.Clone().ForEach(m => m.Display(1, Core.Cam.i));
             Flies.Clone().ForEach(f => f.Display(1, Core.Cam.i));
         }
         public void DisplayFront(vecf cam)
@@ -152,12 +155,20 @@ namespace DOSBOX.Suggestions.fusion
             {
                 Doors.Clear();
                 if(data.doors?.Length > 0)
-                    Doors.AddRange(data.doors.Select(d => new Door(d.x, d.y, d.w, d.h, (byte)d.state.ByteCut())));
+                    Doors.AddRange(data.doors.Select(d => new Door(d)));
                 Warps.Clear();
                 if(data.warps?.Length > 0)
-                    Warps.AddRange(data.warps.Select(w => new Warp(w.room, w.tiles)));
+                    Warps.AddRange(data.warps.Select(w => new Warp(w)));
                 HasFLies = data.HasFlies;
                 Flies.Clear();
+                if (data.mobs?.Length > 0)
+                {
+                    foreach(var m in data.mobs)
+                    {
+                        if(!Register.mobs_killed.Contains(Mob.GenerateBaseHash(ID, m.vec.x, m.vec.y)))
+                            Mobs.Add(new Mob(ID, m));
+                    }
+                }
             }
         }
         public bool isout(Dispf d) => isout(d.vec.i.x, d.vec.i.y);

@@ -10,10 +10,6 @@ namespace DOSBOX.Suggestions.fusion
 {
     public class Fly : Dispf
     {
-        public sbyte ShieldMax = 0;
-        public sbyte Shield = 0;
-        public sbyte Lifes = 1;
-
         public Fly(vecf v)
         {
             vec = v;

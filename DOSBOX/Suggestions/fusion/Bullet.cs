@@ -5,9 +5,9 @@ using Tooling;
 
 namespace DOSBOX.Suggestions.fusion
 {
-    public class Bullet : Dispf
+    public class Bullet : Harmful
     {
-        vecf look;
+        public vecf look;
 
         public Bullet(float x, float y, vecf look)
         {
@@ -29,7 +29,7 @@ namespace DOSBOX.Suggestions.fusion
         public void Update()
         {
             float speed = 2F;
-            var collider = Fusion.Instance.ColliderRoom(vec + look * speed);
+            var collider = Fusion.Instance.ColliderRoom(vec + look * speed, _w, _h);
             if (collider == null)
             {
                 vec += look * speed;
@@ -37,7 +37,7 @@ namespace DOSBOX.Suggestions.fusion
             }
             else
             {
-                (collider as Door)?.Hit(this);
+                (collider as Hittable)?.Hit(this);
                 Destroy();
             }
 

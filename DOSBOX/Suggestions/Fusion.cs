@@ -34,6 +34,8 @@ namespace DOSBOX.Suggestions
         {
             Instance = this;
 
+            Register.Reset();
+
             Core.Layers.Clear();
             Core.Layers.Add(new byte[64, 64]); // BG
             Core.Layers.Add(new byte[64, 64]); // Sprites
@@ -54,7 +56,7 @@ namespace DOSBOX.Suggestions
                 return;
             }
 
-            if (KB.IsKeyPressed(KB.Key.Escape))
+            if (KB.IsKeyPressed(KB.Key.Escape) || !samus.Exists)
             {
                 Core.CurrentSuggestion = null;
                 return;
@@ -116,20 +118,26 @@ namespace DOSBOX.Suggestions
         {
         }
 
-        public bool CollidesRoom(vecf v) => CollidesRoom(v.x, v.y);
-        public bool CollidesRoom(float x, float y) => ColliderRoom(x,y) != null;
-        public object ColliderRoom(vecf v) => ColliderRoom(v.x, v.y);
-        public object ColliderRoom(float x, float y)
+        public bool CollidesRoom(vecf v, int w, int h) => CollidesRoom(v.x, v.y, w, h);
+        public bool CollidesRoom(float x, float y, int w, int h) => ColliderRoom(x,y, w, h) != null;
+        public object ColliderRoom(vecf v, int w, int h) => ColliderRoom(v.x, v.y, w, h);
+        public object ColliderRoom(float x, float y, int w, int h)
         {
             if (Instance.room.isout(x, y))
                 return null;
             
             // Doors
 
-            var c_door = room.Doors.Clone().FirstOrDefault(d => new Rectangle((int)d.vec.x, (int)d.vec.y, d._w, d._h).IntersectsWith(new Rectangle((int)x, (int)y, samus._w, samus._h)));
+            var c_door = room.Doors.Clone().FirstOrDefault(d => new Rectangle((int)d.vec.x, (int)d.vec.y, d._w, d._h).IntersectsWith(new Rectangle((int)x, (int)y, w, h)));
             if (c_door != null)
                 return c_door;
-            
+
+            // Mobs
+
+            var c_mob = room.Mobs.Clone().FirstOrDefault(d => new Rectangle((int)d.vec.x, (int)d.vec.y, d._w, d._h).IntersectsWith(new Rectangle((int)x, (int)y, w, h)));
+            if (c_mob != null)
+                return c_mob;
+
             // Tiles
 
             Tile tile = RoomTiles.RefTiles[room.Tiles[(int)x / Tile.TSZ, (int)y / Tile.TSZ]];

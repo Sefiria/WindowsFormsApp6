@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DOSBOX.Suggestions.fusion.jsondata
 {
-    internal class RoomData_doors
+    public class RoomData_doors
     {
         public int state { get; set; }
         public int x { get; set; }

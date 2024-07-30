@@ -1,10 +1,11 @@
-﻿using DOSBOX.Utilities;
+﻿using DOSBOX.Suggestions.fusion.jsondata;
+using DOSBOX.Utilities;
 using System;
 using Tooling;
 
 namespace DOSBOX.Suggestions.fusion
 {
-    public class Door : Dispf
+    public class Door : Hittable
     {
         public static readonly float SPEED_OPENCLOSE = 0.05F;
 
@@ -15,6 +16,18 @@ namespace DOSBOX.Suggestions.fusion
         public vec base_size;
         public vec size;
         public float interm_state = 0F, graphics_ext_timer = 0, graphics_ext_timer_incr = 0.1F;
+        public Door(RoomData_doors d)
+        {
+            state = (byte)d.state;
+            if (state == 11) state = 1;
+            if (state == 22) state = 2;
+            if (state == 1) interm_state = 1F;
+            if (state == 2) interm_state = 0F;
+            vec = new vecf(d.x * Tile.TSZ, d.y * Tile.TSZ);
+            base_size = size = new vec(d.w * Tile.TSZ, d.h * Tile.TSZ);
+            CreateGraphics();
+            CreateGraphicsExt();
+        }
         public Door(float x, float y, int w, int h, byte state = 1)
         {
             if (state == 11) state = 1;
@@ -126,7 +139,7 @@ namespace DOSBOX.Suggestions.fusion
         public void Destroy()
         {
         }
-        public void Hit(Bullet bullet)
+        public override void Hit(Harmful by)
         {
             if (state != 2)
                 state = 22;

@@ -6,8 +6,10 @@ using Tooling;
 
 namespace DOSBOX.Suggestions.fusion
 {
-    public class Samus : Dispf
+    public class Samus : Hittable
     {
+        public bool Exists = true;
+
         public bool SuperMorph = false;
         public bool PrevIsMorph, IsMorph = false;
         public long afk_duration = 0;
@@ -18,7 +20,7 @@ namespace DOSBOX.Suggestions.fusion
 
         public sbyte ShieldMax = 5;
         public sbyte Shield = 5;
-        public sbyte Lifes = 3;
+        public sbyte Lives = 3;
 
         public Samus(int x, int y)
         {
@@ -38,6 +40,9 @@ namespace DOSBOX.Suggestions.fusion
 
         public void Update()
         {
+            if (!Exists)
+                return;
+
             bool T = KB.IsKeyDown(KB.Key.Up);
             bool L = KB.IsKeyDown(KB.Key.Left);
             bool B = KB.IsKeyDown(KB.Key.Down);
@@ -54,7 +59,7 @@ namespace DOSBOX.Suggestions.fusion
                 PrevIsMorph = IsMorph;
             }
 
-            is_on_ground = Fusion.Instance.CollidesRoom(new vecf(vec.x, vec.y + _h - 2));
+            is_on_ground = Fusion.Instance.CollidesRoom(new vecf(vec.x, vec.y + _h - 2), _w, _h);
 
             float speed = 1F;
             float input_look_x = (Q ? -1F : 0F) + (D ? 1F : 0F);
@@ -159,20 +164,20 @@ namespace DOSBOX.Suggestions.fusion
             bool collides;
 
             // y
-            if (!(collides = Fusion.Instance.CollidesRoom(new vecf(vec.x, vec.y + (lerpOnH ? offset.y : 0F) + look.y * speed))))
+            if (!(collides = Fusion.Instance.CollidesRoom(new vecf(vec.x, vec.y + (lerpOnH ? offset.y : 0F) + look.y * speed), _w, _h)))
                 vec.y += look.y;
 
             // x
             if (look.x != 0F)
             {
-                if (!(collides = Fusion.Instance.CollidesRoom(new vecf(vec.x + offset.x + look.x * speed, vec.y))))
+                if (!(collides = Fusion.Instance.CollidesRoom(new vecf(vec.x + offset.x + look.x * speed, vec.y), _w, _h)))
                     vec.x += look.x;
                 else
                 {
                     collides = false;
                     float n = -1F;
                     for (float i = 0.1F; i <= 1.05F && !collides; i += 0.1F)
-                        if (!(collides = Fusion.Instance.CollidesRoom(new vecf(vec.x + offset.x + look.x * i * speed, vec.y))))
+                        if (!(collides = Fusion.Instance.CollidesRoom(new vecf(vec.x + offset.x + look.x * i * speed, vec.y), _w, _h)))
                             n = i;
                     if (collides && n != -1F)
                         vec.x += look.x * n * speed;
@@ -195,7 +200,16 @@ namespace DOSBOX.Suggestions.fusion
         {
             float i = new List<int>() { 4, 5, 6 }.Contains(direction) ? 1F : (new List<int>() { 0, 1, 2 }.Contains(direction) ? -1F : 0F);
             float j = new List<int>() { 0, 6, 7 }.Contains(direction) ? 1F : (new List<int>() { 2, 3, 4 }.Contains(direction) ? -1F : 0F);
-            Fusion.Instance.bullets.Add(new Bullet(vec.x + i * (_w + 2), vec.y + j * (_h + 2), new vecf(i, j)));
+            if (i!=0&&j!=0)
+            {
+                i *= 0.5F;
+                j *= 0.5F;
+            }
+            else if(i!=0F&&j==0F)
+            {
+                j = -0.2F;
+            }
+            Fusion.Instance.bullets.Add(new Bullet(vec.x + i * (_w + 2), vec.y + j * (_h + 2), new vecf(i, j)) { Owner = this });
         }
         public void GivePowerup(byte type)
         {
@@ -203,6 +217,21 @@ namespace DOSBOX.Suggestions.fusion
             {
                 case 0: SuperMorph = true; break;
             }
+        }
+        public override void Hit(Harmful by)
+        {
+            if (by.Owner == this)
+                return;
+
+            Shield--;
+            if (Shield < 0)
+            {
+                Lives += Shield;
+                Shield = 0;
+            }
+
+            if (Lives <= 0)
+                Exists = false;
         }
     }
 }

@@ -10,6 +10,7 @@ namespace DOSBOX.Suggestions.fusion.jsondata
     {
         public RoomData_doors[] doors { get; set; }
         public RoomData_warps[] warps { get; set; }
-        public bool HasFlies { get; set; } = false;
+        public RoomData_mobs[] mobs { get; set; }
+        public bool HasFlies { get; set; } = true;
     }
 }

@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace DOSBOX.Suggestions.fusion.jsondata
 {
-    public class RoomData_warps
+    public class RoomData_mobs
     {
-        public int room { get; set; }
-        public RoomData_fromto[] tiles { get; set; }
+        public RoomData_coord vec { get; set; }
     }
 }

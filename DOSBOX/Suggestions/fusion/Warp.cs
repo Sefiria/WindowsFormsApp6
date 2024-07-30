@@ -18,6 +18,11 @@ namespace DOSBOX.Suggestions.fusion
         public Warp()
         {
         }
+        public Warp(RoomData_warps w)
+        {
+            DestinationRoom = w.room;
+            Tiles = new _FromTo(w.tiles);
+        }
         public Warp(int destinationRoom, RoomData_fromto[] raw)
         {
             DestinationRoom = destinationRoom;

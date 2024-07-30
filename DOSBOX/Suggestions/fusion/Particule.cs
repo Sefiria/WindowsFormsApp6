@@ -29,7 +29,7 @@ namespace DOSBOX.Suggestions.fusion
         {
             var instance = Fusion.Instance;
             float speed = 2F;
-            if (!instance.CollidesRoom(vec + look * speed))
+            if (!instance.CollidesRoom(vec + look * speed, _w, _h))
             {
                 vec += look * speed;
                 look += new vecf(0F, 0.5F);
