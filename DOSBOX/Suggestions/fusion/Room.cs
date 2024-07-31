@@ -30,8 +30,6 @@ namespace DOSBOX.Suggestions.fusion
 
         public static Room Load(byte ID)
         {
-            RoomTiles.Load();
-
             Room room = new Room();
             if (room.LoadPixels(ID))
             {
