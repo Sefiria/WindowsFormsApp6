@@ -9,6 +9,7 @@ namespace DOSBOX.Suggestions.fusion.Triggerables
 {
     public interface ITriggerable
     {
+        string BaseHash { get; set; }
         void Trigger(Dispf by);
     }
 }

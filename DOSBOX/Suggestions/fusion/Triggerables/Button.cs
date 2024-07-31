@@ -3,6 +3,7 @@ using DOSBOX.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -15,12 +16,13 @@ namespace DOSBOX.Suggestions.fusion.Triggerables
         public Enumerations.PhysicalObjectSide Side;
         public bool Pushed;
         public List<vec> Linked_tiles = new List<vec>();
+        public string BaseHash { get; set; } = null;
+        public string Hash = null;
 
-        public Button(RoomData_objects po) : base(po)
+        public Button(byte room_id, RoomData_objects po) : base(po)
         {
             vec = po.vec.AsVec().f * Tile.TSZ;
             Side = po.side;
-            Pushed = po.data.TryGetValue("pushed", out var pushedValue) && pushedValue.ToString().ToLower() == "true";
             if (po.data.TryGetValue("linked", out var linkedValue) && linkedValue is JsonElement linkedElement && linkedElement.ValueKind == JsonValueKind.Array)
             {
                 foreach (JsonElement element in linkedElement.EnumerateArray())
@@ -33,6 +35,11 @@ namespace DOSBOX.Suggestions.fusion.Triggerables
                     }
                 }
             }
+
+            BaseHash = GenerateBaseHash(room_id, po.vec.x, po.vec.y);
+            Hash = GenerateHash(room_id, po.vec.x, po.vec.y);
+
+            Pushed = Register.triggered_objects.Contains(BaseHash) ? true : po.data.TryGetValue("pushed", out var pushedValue) && pushedValue.ToString().ToLower() == "true";
 
             CreateGraphics();
         }
@@ -143,6 +150,7 @@ namespace DOSBOX.Suggestions.fusion.Triggerables
             if(!Pushed)
             {
                 Pushed = true;
+                Register.Write(this);
                 CreateGraphics();
 
                 var room = Fusion.Instance.room;
@@ -158,5 +166,7 @@ namespace DOSBOX.Suggestions.fusion.Triggerables
                 }
             }
         }
+        public static string GenerateBaseHash(byte room_id, int x, int y) => $"obj-{room_id}-{x}-{y}";
+        public static string GenerateHash(byte room_id, int x, int y) => GenerateBaseHash(room_id, x, y) + "+" + RandomThings.GetCurrentTickDigits(4);
     }
 }

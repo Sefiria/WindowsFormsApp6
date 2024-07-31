@@ -178,7 +178,7 @@ namespace DOSBOX.Suggestions.fusion
                 }
                 PhysicalObjects.Clear();
                 if (data.objects?.Length > 0)
-                    PhysicalObjects.AddRange(data.objects.Select(po => PhysicalObject.FactoryCreate(po)));
+                    PhysicalObjects.AddRange(data.objects.Select(po => PhysicalObject.FactoryCreate(ID, po)));
             }
         }
         public bool isout(Dispf d) => isout(d.vec.i.x, d.vec.i.y);

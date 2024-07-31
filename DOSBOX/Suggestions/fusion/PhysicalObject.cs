@@ -15,11 +15,11 @@ namespace DOSBOX.Suggestions.fusion.Triggerables
         public PhysicalObject(RoomData_objects po)
         {
         }
-        public static PhysicalObject FactoryCreate(RoomData_objects po)
+        public static PhysicalObject FactoryCreate(byte room_id, RoomData_objects po)
         {
             switch(po.type)
             {
-                case Enumerations.PhysicalObjectType.button: return new Button(po);
+                case Enumerations.PhysicalObjectType.button: return new Button(room_id, po);
             }
             return new PhysicalObject(po);
         }
