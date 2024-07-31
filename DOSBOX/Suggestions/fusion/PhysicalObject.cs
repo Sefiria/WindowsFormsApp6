@@ -12,7 +12,7 @@ namespace DOSBOX.Suggestions.fusion.Triggerables
     {
         public bool Exists = true;
         public virtual void Update() { }
-        public PhysicalObject(RoomData_objects po)
+        public PhysicalObject()
         {
         }
         public static PhysicalObject FactoryCreate(byte room_id, RoomData_objects po)
@@ -21,7 +21,7 @@ namespace DOSBOX.Suggestions.fusion.Triggerables
             {
                 case Enumerations.PhysicalObjectType.button: return new Button(room_id, po);
             }
-            return new PhysicalObject(po);
+            return new PhysicalObject();
         }
     }
 }

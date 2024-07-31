@@ -11,7 +11,6 @@ namespace DOSBOX.Suggestions.fusion
 {
     public class Mob : Hittable
     {
-        public bool Exists = true;
         public string BaseHash = null, Hash = null;
 
         //public bool ClimbAbility = true;

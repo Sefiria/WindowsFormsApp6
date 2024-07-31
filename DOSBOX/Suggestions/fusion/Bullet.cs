@@ -29,7 +29,7 @@ namespace DOSBOX.Suggestions.fusion
         public void Update()
         {
             float speed = 2F;
-            var collider = Fusion.Instance.ColliderRoom(vec + look * speed, _w, _h);
+            var collider = Fusion.Instance.ColliderRoom(vec + look * speed, _w, _h, this);
             if (collider == null)
             {
                 vec += look * speed;

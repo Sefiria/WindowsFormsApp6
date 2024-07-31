@@ -11,7 +11,7 @@ using Tooling;
 
 namespace DOSBOX.Suggestions.fusion.Triggerables
 {
-    public class Button : PhysicalObject, ITriggerable
+    public class Button : Hittable, ITriggerable
     {
         public Enumerations.PhysicalObjectSide Side;
         public bool Pushed;
@@ -19,7 +19,7 @@ namespace DOSBOX.Suggestions.fusion.Triggerables
         public string BaseHash { get; set; } = null;
         public string Hash = null;
 
-        public Button(byte room_id, RoomData_objects po) : base(po)
+        public Button(byte room_id, RoomData_objects po)
         {
             vec = po.vec.AsVec().f * Tile.TSZ;
             Side = po.side;
@@ -145,6 +145,10 @@ namespace DOSBOX.Suggestions.fusion.Triggerables
             scale = 1;
         }
 
+        public override void Hit(Harmful by)
+        {
+            Trigger(by);
+        }
         public void Trigger(Dispf by)
         {
             if(!Pushed)

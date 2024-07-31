@@ -144,6 +144,15 @@ namespace DOSBOX.Suggestions
             if (c_mob != null && @as != c_mob)
                 return c_mob;
 
+            // Objects
+
+            if (@as is Harmful)
+            {
+                var c_obj = room.PhysicalObjects.Clone().FirstOrDefault(o => new Rectangle((int)o.vec.x, (int)o.vec.y, o._w, o._h).IntersectsWith(new Rectangle((int)x, (int)y, w, h)));
+                if (c_obj != null && @as != c_obj)
+                    return c_obj;
+            }
+
             // Tiles
 
             Tile tile = RoomTiles.RefTiles[room.Tiles[(int)x / Tile.TSZ, (int)y / Tile.TSZ]];
