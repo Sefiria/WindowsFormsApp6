@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Tooling;
@@ -212,10 +213,14 @@ namespace DOSBOX_HEX_EDIT
             var box = new DGVBox(db);
             box.ShowDialog();
             var row = db.Rows[0];
+            _resize((byte)row[nm_w], (byte)row[nm_h]);
+        }
+        private void _resize(byte _w, byte _h)
+        {
             byte ow = w;
             byte oh = h;
-            w = (byte)row[nm_w];
-            h = (byte)row[nm_h];
+            w = _w;
+            h = _h;
             resize_array(ref pixels, ow, oh, w, h, 3);
             undo_available = false;
         }
@@ -297,6 +302,27 @@ namespace DOSBOX_HEX_EDIT
                     ClickLoad();
                 if (KB.IsKeyPressed(KB.Key.S))
                     ClickSave();
+                if (KB.IsKeyPressed(KB.Key.Enter))
+                    Clipboard.SetText($"{w},{h},{string.Join(",", pixels)}");
+                if (KB.IsKeyPressed(KB.Key.Insert))
+                {
+                    string data = string.Concat(Clipboard.GetText(TextDataFormat.Text).Split(','));
+                    if (data.Length >= 3)
+                    {
+                        var _w = (byte)(data[0] - 48);
+                        var _h = (byte)(data[1] - 48);
+                        data = string.Concat(data.Skip(2));
+                        _resize(_w, _h);
+                        using (MemoryStream stream = new MemoryStream(data.Select(c => (byte)(c - 48)).ToArray()))
+                        {
+                            using (BinaryReader reader = new BinaryReader(stream))
+                            {
+                                pixels = reader.ReadBytes(w * h);
+                            }
+                        }
+                        undo_available = false;
+                    }
+                }
 
                 if (rect_selection_start != vec.Null && rect_selection_end != vec.Null)
                 {

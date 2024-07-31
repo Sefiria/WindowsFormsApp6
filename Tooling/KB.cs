@@ -22,7 +22,7 @@ namespace Tooling
             Num1, Num2,Num3,Num4,Num5,Num6,Num7,Num8,Num9, Num0, CharDegree, CharPlus, Add, Substract,
             Numpad1, Numpad2, Numpad3, Numpad4, Numpad5, Numpad6, Numpad7, Numpad8, Numpad9, Numpad0,
             LeftAlt, RightAlt, LeftShift, RightShift, LeftCtrl, RightCtrl,
-            Tab, Supr, Back
+            Tab, Supr, Back, Insert
         }
 
         static Dictionary<System.Windows.Input.Key, bool> Released = new Dictionary<System.Windows.Input.Key, bool>()
@@ -93,6 +93,7 @@ namespace Tooling
             [System.Windows.Input.Key.Tab] = true,
             [System.Windows.Input.Key.Delete] = true,
             [System.Windows.Input.Key.Back] = true,
+            [System.Windows.Input.Key.Insert] = true,
         };
 
         static readonly List<System.Windows.Input.Key> AvailableKeys = new List<System.Windows.Input.Key>()
@@ -163,6 +164,7 @@ namespace Tooling
             System.Windows.Input.Key.Tab,
             System.Windows.Input.Key.Delete,
             System.Windows.Input.Key.Back,
+            System.Windows.Input.Key.Insert,
         };
 
         public static void Init() => Update();
